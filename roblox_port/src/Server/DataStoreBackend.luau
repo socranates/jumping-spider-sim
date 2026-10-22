@@ -25,14 +25,23 @@ end
 
 -- UpdateAsync: `transform(old)` returns the new value, or nil to leave the key as it is. Roblox may call it more than once.
 function DataStoreBackend.update(self: any, key: string, transform: (any) -> any): (boolean, any, string?)
+	local callbackError: string? = nil
 	local ok, value = pcall(function(): any
 		local useCodec=self.restCodec~=nil and restKey(key)
 		local result = self.ds:UpdateAsync(key, function(stored: any): any
-			local old=if useCodec then self.restCodec:decode(stored) else stored
-			local nextValue=transform(old)
-			if nextValue==nil then return nil end
-			return if useCodec then self.restCodec:encode(nextValue) else nextValue
+			-- Native UpdateAsync can log a thrown callback error and return nil to its caller.
+			-- Catch inside the callback, cancel the write, then report the failure outside that API boundary.
+			if callbackError ~= nil then return nil end
+			local transformed, candidate = pcall(function(): any
+				local old=if useCodec then self.restCodec:decode(stored) else stored
+				local nextValue=transform(old)
+				if nextValue==nil then return nil end
+				return if useCodec then self.restCodec:encode(nextValue) else nextValue
+			end)
+			if not transformed then callbackError=tostring(candidate);return nil end
+			return candidate
 		end)
+		if callbackError ~= nil then error(callbackError, 0) end
 		if useCodec then return self.restCodec:decode(result) end
 		return result
 	end)

@@ -1975,5 +1975,38 @@ case("identity metadata is included in the admitted checkpoint size",function()
  check(canon(e.backend.data["R_908_main"])==before,"valid earlier retirement remains intact")
 end)
 
+case("a native-swallowed encoder failure cannot acknowledge retirement or report Saved", function()
+ local e=newEnv();local blocked=true;local acknowledgements=0
+ local stored=SaveEnvelope.make(SaveRest.SPECS.main,realRest(120,"main"),e.t-10,nil,nil)
+ local ds:any={data={R_native_main=Json.copy(stored)},errors=0}
+ function ds:GetAsync(key) return Json.copy(self.data[key]) end
+ function ds:UpdateAsync(key,fn)
+  local ok,candidate=pcall(fn,Json.copy(self.data[key]))
+  if not ok then self.errors+=1;return nil end -- observed native API boundary
+  if candidate~=nil then self.data[key]=Json.copy(candidate);return Json.copy(candidate) end
+  return nil
+ end
+ local codec:any={}
+ function codec:decode(value) return value end
+ function codec:encode(value) if blocked then error("injected encoder refusal",0) end;return value end
+ local backend=DataStoreBackend.new(ds,codec)
+ local session=SaveSession.new({backend=backend,userId="native",sessionId="native_test",now=e.now,sleep=e.sleep,
+  onLife=function() acknowledgements+=1 end})
+ check(session:load()=="active","session loads its earlier checkpoint")
+ local before=canon(ds.data.R_native_main)
+ check(session:beginLife("main",1),"retirement request is accepted")
+ session:step()
+ check(acknowledgements==0 and not session.lifeRequests.main.done,"failed encoding is not acknowledged")
+ check(session.restPending.main~=nil and session.sched.items.rest_main.dirty,"failed retirement remains queued")
+ check(session:status()~="saved","failed retirement cannot report Saved")
+ check(canon(ds.data.R_native_main)==before,"earlier checkpoint and backup remain untouched")
+ check(ds.errors==0,"encoder error did not escape into native callback")
+ blocked=false
+ for _=1,80 do e.t+=1;session:step();if acknowledgements>0 then break end end
+ check(acknowledgements==1 and session.lifeRequests.main.done,"a successful retry acknowledges exactly once")
+ local opened=SaveEnvelope.open(SaveRest.SPECS.main,ds.data.R_native_main)
+ check(opened.status=="ok" and SaveRest.isRetired(opened.payload) and opened.backup~=nil,"retry stores marker with recoverable prior checkpoint")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

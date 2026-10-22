@@ -103,4 +103,50 @@ check(codec:decode(unknown)==unknown,"unknown transport metadata was silently di
 local nested=copy(two);nested.backup.backup=copy(two.backup)
 opened=Envelope.open(spec,codec:decode(nested))
 check(opened.status=="ok" and opened.backup.status=="corrupt","nested backup accepted")
+-- Native Studio evidence: UpdateAsync can log a transform error yet return nil without raising.
+-- This adapter emulates that API boundary; an outer pcall alone must not report success.
+local nativeLike={data={R_probe_main=copy(two),P_probe={n=1}},transformErrors=0,replay=false}
+function nativeLike:GetAsync(key) return copy(self.data[key]) end
+function nativeLike:UpdateAsync(key,fn)
+ local good,candidate=pcall(fn,copy(self.data[key]))
+ if not good then self.transformErrors+=1;return nil end
+ if self.replay then
+  good,candidate=pcall(fn,copy(self.data[key]))
+  if not good then self.transformErrors+=1;return nil end
+ end
+ if candidate~=nil then self.data[key]=copy(candidate) end
+ return if candidate~=nil then copy(self.data[key]) else nil
+end
+local guarded=Backend.new(nativeLike,codec)
+local before=assert(Json.canonical(nativeLike.data.R_probe_main))
+local reached=0
+local worked,value,why=guarded:update("R_probe_main",function() reached+=1;error("intentional transform refusal",0) end)
+check(not worked and value==nil and type(why)=="string" and string.find(why,"intentional transform refusal",1,true)~=nil,"native swallowed transform error was reported as success")
+check(reached==1 and assert(Json.canonical(nativeLike.data.R_probe_main))==before,"failed transform changed stored current/backup")
+check(nativeLike.transformErrors==0,"application error escaped into the native transform callback")
+-- Progress has no compression; its transform errors need the same reporting contract.
+worked,value,why=guarded:update("P_probe",function() error("progress refusal",0) end)
+check(not worked and value==nil and string.find(why,"progress refusal",1,true)~=nil and nativeLike.data.P_probe.n==1,"progress callback error was swallowed")
+worked,value,why=guarded:update("R_probe_main",function() return nil end)
+check(worked and value==nil and why==nil,"ordinary cancellation was mistaken for an error")
+check(assert(Json.canonical(nativeLike.data.R_probe_main))==before,"ordinary cancellation changed storage")
+-- Decode failure must cancel before user code; encode failure must cancel before storage.
+nativeLike.data.R_probe_main=copy(brokenCurrent);local corruptBefore=assert(Json.canonical(nativeLike.data.R_probe_main));reached=0
+worked,value,why=guarded:update("R_probe_main",function(old) reached+=1;return old end)
+check(not worked and value==nil and type(why)=="string" and reached==0,"native swallowed decoder error was reported as success")
+check(assert(Json.canonical(nativeLike.data.R_probe_main))==corruptBefore,"decoder failure replaced corrupt record or its backup")
+nativeLike.data.R_probe_main=copy(two);Compression.MAX_STORED_CHARS=1
+worked,value,why=guarded:update("R_probe_main",function(old) return old end)
+Compression.MAX_STORED_CHARS=max
+check(not worked and value==nil and type(why)=="string","native swallowed encoder error was reported as success")
+check(assert(Json.canonical(nativeLike.data.R_probe_main))==before,"encoder failure replaced current/backup")
+-- Once any attempt fails, a replay in this operation cannot turn it into a later write.
+nativeLike.replay=true;reached=0
+worked,value,why=guarded:update("P_probe",function(old) reached+=1;if reached==1 then error("first attempt refusal",0) end;return {n=99} end)
+check(not worked and reached==1 and nativeLike.data.P_probe.n==1,"retry after a failed transform was allowed to write")
+-- The next operation starts clean, and successful native retries still run normally.
+reached=0
+worked,value,why=guarded:update("P_probe",function(old) reached+=1;return {n=old.n+1} end)
+check(worked and value.n==2 and why==nil and reached==2 and nativeLike.data.P_probe.n==2,"error latch leaked into the next operation or suppressed valid retry")
+check(nativeLike.transformErrors==0,"codec failure escaped into the engine callback")
 print(`REST_COMPRESSION passed={passed} failed=0`)

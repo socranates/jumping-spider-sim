@@ -75,9 +75,29 @@ if (HERE/'prepared-native-manifest.json').exists():
  probe=(HERE/'native-probe.luau').read_bytes();assert probe.count(fixture)==1
  assert scripts['StarterPlayer.StarterPlayerScripts.Client.SilkPlayback']==sha(probe)
  prepared=True
+native=False
+if (HERE/'native-receipt.json').exists():
+ n=read('native-receipt.json');assert prepared and n['source']==SOURCE and n['case_count']==9 and n['assertions']==62
+ assert n['fixture_sha256']==sha(fixture) and n['probe_sha256']==sha((HERE/'native-probe.luau').read_bytes())
+ assert n['place_sha256']==m['place_sha256'] and n['persistence_disabled'] and n['creator_errors']==0
+ b=(HERE/'native-output.txt').read_bytes();assert sha(b)==n['output_sha256'];text=b.decode()
+ assert '[FLog::CreatorError]' not in text and '[LEASE_CLEANUP_NATIVE_FAIL]' not in text
+ assert '[LEASE_CLEANUP_NATIVE_GUARD] '+SOURCE+' 218 persistence_disabled' in text
+ cases=re.findall(r'\[LEASE_CLEANUP_NATIVE_CASE\] '+n['run_id']+r' (\d+) (.*?) (\d+)$',text,re.M)
+ assert [int(c[0]) for c in cases]==list(range(1,10)) and int(cases[-1][2])==62
+ assert [c[1] for c in cases]==re.findall(r'^case\("([^"]+)"',fixture.decode(),re.M)
+ assert re.search(r'\[LEASE_CLEANUP_NATIVE_DONE\] '+n['run_id']+r' 9 62$',text,re.M)
+ native=True
+ci=False
+if (HERE/'ci-final.json').exists():
+ c=read('ci-final.json');assert c['head_sha']==SOURCE and c['status']=='completed' and c['conclusion']=='success'
+ assert c['modules_compiled']==217 and c['suites']==65 and c['passed']==443946 and c['failed']==0 and c['runner_regressions']==5 and c['all_download_checksums_verified']
+ for path,h in c['logs_sha256'].items():assert sha((HERE/path).read_bytes())==h,path
+ assert c['workflow_sha256']==sha(subprocess.check_output(['git','show',SOURCE+':.github/workflows/roblox-port.yml'],cwd=ROOT))
+ ci=True
 receipt=dict(source=SOURCE,base=BASE,evidence_id=evidence,production_modules=217,changed_modules=changed,
  baseline_passed=805,baseline_failed=26,candidate_state_passed=831,new_state_checks=62,new_cases=9,targeted_suites=5,targeted_passed=1072,
  compile_passed=217,strict_clean=True,runner_regressions=5,production_sha256=production,test_artifact_rejected=True,
- windows_full_complete=windows,windows_log_sha256=windows_hash,linux_ci_verified=False,native_prepared=prepared,native_verified=False,online_rejoin_verified=False,
+ windows_full_complete=windows,windows_log_sha256=windows_hash,linux_ci_verified=ci,native_prepared=prepared,native_synthetic_cleanup_verified=native,native_synthetic_cleanup_assertions=62 if native else 0,native_verified=False,online_rejoin_verified=False,
  foreign_lease_continue_implemented=False,legacy_world_restoration_implemented=False,published=False,publication_ready=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(receipt,indent=2))

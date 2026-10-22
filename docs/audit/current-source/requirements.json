@@ -93,7 +93,8 @@
       "evidence_boundary": "Unseen/changed retirement remains protected. Current cleanup releases only an owned progress lock after demotion;9 cases/62 new checks cover immediate next visit, metadata preservation, callback races, ambiguous failures, budget and departure. Backend failure/unreadable progress may still require expiry. Safe read-only Continue, explicit displayed intent and delayed-response protocol are not implemented.",
       "references": [
         "docs/save-lease-cleanup/README.md",
-        "docs/observed-life-retirement/README.md"
+        "docs/observed-life-retirement/README.md",
+        "docs/save-lease-cleanup/continue-contract.md"
       ]
     },
     {

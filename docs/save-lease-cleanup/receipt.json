@@ -22,6 +22,8 @@
   "windows_log_sha256": null,
   "linux_ci_verified": false,
   "native_prepared": true,
+  "native_synthetic_cleanup_verified": false,
+  "native_synthetic_cleanup_assertions": 0,
   "native_verified": false,
   "online_rejoin_verified": false,
   "foreign_lease_continue_implemented": false,

@@ -1,3 +1,9 @@
+# Current unpublished milestone: canonical encoding verified, 068a878
+
+[Current evidence and handoff](json-encoding/README.md). One private output buffer preserves exact canonical bytes and errors. Windows and Linux each pass76 suites/465380 checks/0 failures, compile222/strict/runner5; current-game Studio save/return passes32 assertions/225 fingerprints with production Persistence disabled. Paired isolated encoder CPU is40.27percent lower; whole-game FPS and hard frame budgets remain unproven. Root verify.py binds current source and receipts. Broader audit, synchronous capture, legacy-world restore, native lifecycle/device/online checks and release remain open. Nothing published.
+
+Earlier milestones below are historical.
+
 # Current unpublished milestone: local returns across frames, 4ee6aec
 
 [Implementation and evidence](local-return/README.md). Local Continue/Free play, Backspace and end-screen Back prepare privately behind Cancel; world/store/revision fencing and exact backup/schema checks remain. Current27-suite focused matrix25,294/0,222 compile, strict clean/runner5; Studio22 assertions/all223 fingerprints/Persistence disabled. Large local choice3ms, return4.2s/maxupdate38ms in a bounded1.5M case. No hard budget/FPS claim. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Prior133aa60 full Windows/Linux failed5 timing fixtures, c4 Linux failed4; corrections and original failure receipts retained. Nothing published; release artifacts old; broader goal active.

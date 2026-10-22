@@ -1,0 +1,60 @@
+{
+  "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "sequence": "1792707403197",
+  "save_run": "1792707403197",
+  "return_run": "1792707441585",
+  "save_assertions": 10,
+  "return_assertions": 22,
+  "assertions": 32,
+  "creator_errors": 0,
+  "scripts": 225,
+  "persistence_disabled": true,
+  "online_store_accessed": false,
+  "output_sha256": "7b77940a08f17a0b6d02f038123b71f75177e9ac0eb20608284b13f420b2fdf7",
+  "place_sha256": "9cbcd6d5da98c77131077f22b9113b1a39398be2976ed27d84884613c10c3d5e",
+  "no_concurrent_cli": true,
+  "prior_stopped_rig_window_remained": true,
+  "low_resource_warning_observed": false,
+  "whole_game_fps_gain_proven": false,
+  "hard_frame_budget_proven": false,
+  "causal_end_to_end_speedup_proven": false,
+  "published": false,
+  "save_first": {
+    "capture_ms": 108.453,
+    "steps": 543,
+    "cpu_ms": 1194.774,
+    "max_update_ms": 13.899,
+    "max_heartbeat_gap_ms": 122.916,
+    "elapsed_ms": 9070.294,
+    "chars": 1503077,
+    "initialization_attempts": 233,
+    "resident_regions_measured": false
+  },
+  "save_replacement": {
+    "capture_ms": 97.678,
+    "steps": 860,
+    "cpu_ms": 1909.096,
+    "max_update_ms": 17.788,
+    "max_heartbeat_gap_ms": 799.354,
+    "elapsed_ms": 14339.949,
+    "chars": 1503221,
+    "initialization_attempts": 233,
+    "resident_regions_measured": false
+  },
+  "local_continue": {
+    "steps": 222,
+    "max_update_ms": 10.719,
+    "max_heartbeat_gap_ms": 226.284,
+    "cpu_ms": 493.174,
+    "elapsed_ms": 3682.951
+  },
+  "end_screen_return": {
+    "steps": 215,
+    "max_update_ms": 9.607,
+    "max_heartbeat_gap_ms": 90.847,
+    "cpu_ms": 473.258,
+    "elapsed_ms": 3657.387
+  },
+  "continue_choice_ms": 1.83,
+  "continue_synchronous_encodes": 0
+}

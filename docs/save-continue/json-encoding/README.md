@@ -1,6 +1,6 @@
 # Canonical encoding with one owned output buffer
 
-Adopted in the working branch after a private CLI/native comparison. Full integration gates are pending; nothing is published. Only runtime file changed: roblox_port/src/Shared/Persistence/Json.luau. Saved JSON bytes, sorted-key order, full-precision number formatting, checksum input, rejection text/path, metatable/alias/cycle rejection and the cooperative pulse boundary are preserved. No validation, readback, backup, intent/authority or atomic-commit check is removed. There is no save-format version change.
+Adopted in the working branch after a private CLI/native comparison. Both full CLI gates and the bounded adopted-game save/return probe pass; nothing is published. Only runtime file changed: roblox_port/src/Shared/Persistence/Json.luau. Saved JSON bytes, sorted-key order, full-precision number formatting, checksum input, rejection text/path, metatable/alias/cycle rejection and the cooperative pulse boundary are preserved. No validation, readback, backup, intent/authority or atomic-commit check is removed. There is no save-format version change.
 
 The old encoder allocates an output table and joined string per container, then joins those strings again up the tree. The new encoder appends into one private fragment array and joins once after validation succeeds. Source graph and all intermediate output stay private; cancellation discards them. Coherent game capture remains synchronous. Final concatenation and other native calls remain non-preemptible, so the frame budget is still soft.
 
@@ -31,11 +31,21 @@ The adopted function is byte-identical to the tested prototype except its introd
 
 Adoption checks from exec56254: JSON_ENCODING20716/0, CHECKPOINT570/0, SAVE_WORK39/0, SAVE_RESTORE24/0, REST_STORAGE14/0 and REST_COMPRESSION57/0; six suites/21420 total. All222 modules compile, strict analysis clean, runner5 pass in final-check. This ad hoc output is tool evidence; the full gates provide primary archived integration logs.
 
-Linux39860574006 is terminal success on the committed adoption source:76 suites/465380/0 plus compile222/strict/runner5. Exact source/workflow/log hashes are verified. Windows28618 remains live on the same immutable source;76/465380 remains an expectation there until its terminal receipt. Root docs/save-continue/verify.py now refuses to pass until both current full gates exist and succeed. Older save-cost verification is pinned to archivedab8ca95 inputs so historical proof stays reproducible. A subsequent native adopted-game save/restore run and broad28-item audit still remain open. Source release XML/BuildInfo remain old; goal active, no publication.
+Windows exec28618 and Linux39860574006 are terminal success on committed adoption source068a87891770dbdf291ec3cab0e67480d14c0251: each76 suites/465380 checks/0 failures, compile222/strict/runner5. Exact current source/test/workflow bytes and raw log hashes are verified. Windows self-tests include garden41/0/0 and preserve274/0/0. Root docs/save-continue/verify.py verifies both full gates, the paired algorithm evidence and the current native save/return probe. Older save-cost verification remains pinned to archivedab8ca95 inputs for historical provenance.
 
-Committed adoption source068a87891770dbdf291ec3cab0e67480d14c0251. Windows exec28618 remains live. Linux39860574006 has closed successfully with all76 suites/465380 checks; compile222/strict/runner5 pass. fetch-ci.py collects that exact run/source only. Do not restart live jobs or stage the Windows log before its terminal receipt.
+## Adopted-game native save/return verification
 
+game-build.py packages source068a878 with the unchanged10-check save-cost probe and22-check cancellable local-return probe, sequentially driven by game-probe.luau. All225 exact script fingerprints passed; PlaceId0, production Persistence disabled, no online store access. Sequence1792707403197 includes save run1792707403197 and return run1792707441585. Both original PASS markers have their exact counts:32 assertions total, no probe failures and zero CreatorErrors in the guarded span. No heavy local CLI ran concurrently.
 
-## Current adopted-game probe prepared, not run
+| Operation | Capture ms | Worker steps | Worker CPU ms | Max update ms | Max Heartbeat gap ms | Elapsed ms |
+|---|---:|---:|---:|---:|---:|---:|
+| First save |108.453|543|1194.774|13.899|122.916|9070.294|
+| Replacement save |97.678|860|1909.096|17.788|799.354|14339.949|
+| Local Continue |—|222|493.174|10.719|226.284|3682.951|
+| End-screen return |—|215|473.258|9.607|90.847|3657.387|
 
-game-build.py packages source068a878 with the unchanged10-check actual save-cost probe and22-check cancellable local-return probe, sequentially driven by game-probe.luau.225 unique script fingerprints; production Persistence disabled; PlaceId0 guard. Prepared artifact C:/Users/natha/claude-xfer/Windowsill-encoder-game-068a878/Windowsill-encoder-game-review.rbxlx, SHA2569cbcd6d5da98c77131077f22b9113b1a39398be2976ed27d84884613c10c3d5e. Manifest/guard are bound here. Both original PASS markers with their exact counts and no FAIL/CreatorError are required; wrapper END only means sequence completion. Run only after local full Windows exec28618 is terminal. No actual adopted-game native result exists yet. Never publish the diagnostic. This source/probe preparation does not change any production code or the live full-run inputs.
+Continue choice took1.830ms with zero synchronous canonical encodes. Save records were1503077/1503221 characters, with233 initialization attempts each. Cancellation, stale-source refusal, decoding once, stored bytes and end-screen revival remain covered by the unchanged probes. These game records differ from the earlier paired fixture; do not infer a causal end-to-end percentage improvement. Synchronous capture near100ms, total preparation latency and wider Heartbeat gaps remain limitations.
+
+The diagnostic was stopped, saved, closed and its window25169032 exited. game-collect.py archives bounded output, timing and closure receipts; original XML/hash restored. Archive: C:/Users/natha/claude-xfer/Windowsill-encoder-game-068a878/Windowsill-encoder-game-review.rbxlx, SHA2569cbcd6d5da98c77131077f22b9113b1a39398be2976ed27d84884613c10c3d5e. The pre-existing stopped rig window94504044 remains untouched. Never publish a diagnostic.
+
+The broader28-item audit, lossless older-world restore, actual online/rejoin and physical devices, full native lifecycle, whole-game performance and release/laptop synchronization remain open. Source release XML/BuildInfo remain old. Goal active; no publication, whole-game FPS or hard frame-budget claim.

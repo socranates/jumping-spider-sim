@@ -1,0 +1,23 @@
+{
+  "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "current_workspace_inputs_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 465380,
+  "linux_suites": 76,
+  "linux_passed": 465380,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "adopted_algorithm_native_paired_assertions": 20738,
+  "native_paired_reference_source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+  "native_adopted_game_save_return_verified": true,
+  "native_game_assertions": 32,
+  "native_game_scripts": 225,
+  "current_adopted_game_native_lifecycle_verified": false,
+  "whole_game_fps_gain_proven": false,
+  "hard_frame_budget_proven": false,
+  "goal_complete": false,
+  "release_rebuilt": false,
+  "published": false
+}

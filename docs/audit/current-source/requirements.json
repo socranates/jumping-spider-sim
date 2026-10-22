@@ -23,13 +23,14 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "encoder-linux-full-verified-windows-running",
-      "evidence_boundary": "Source068a878 Linux39860574006 completed76 suites/465380 checks/0 failures, compile222/strict/runner5. Current source/test/workflow bytes and raw CI log hashes verified. Windows28618 remains live on immutable same source; garden selftest41/0/0 (outer5/0) passes, expected76/465380 remains unproven until terminal. Prototype native20738 assertions/224 exact fingerprints verifies the exact adopted algorithm on matched records, not current whole-game lifecycle/performance. Current-game225-script save/return probe prepared, not run. Root full gate remains pending Windows.",
+      "status": "encoder-full-gates-verified",
+      "evidence_boundary": "Source068a878 Windows28618 and Linux39860574006 each completed76 suites/465380 checks/0 failures, compile222/strict/runner5; exact source/test/workflow/log hashes verified. Current-game native sequence1792707403197 passed32 save/return assertions/225 fingerprints, production Persistence disabled, zero CreatorErrors and closed/restored artifact verified. Paired native20738 assertions proves isolated encoder cost only. Broader lifecycle/device/online/performance/release requirements remain open.",
       "references": [
         "docs/save-continue/json-encoding/README.md",
-        "docs/save-continue/json-encoding/prototype-verification.json",
-        "docs/save-continue/json-encoding/ci-start.json",
-        "docs/save-continue/save-cost/verification.json"
+        "docs/save-continue/json-encoding/verification.json",
+        "docs/save-continue/json-encoding/game-native-receipt.json",
+        "docs/save-continue/json-encoding/windows-full-process.json",
+        "docs/save-continue/json-encoding/ci-final.json"
       ]
     },
     {
@@ -277,7 +278,7 @@
   "latest_save_milestone": {
     "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
     "reference_source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
-    "status": "encoder-linux-full-verified-windows-running",
+    "status": "encoder-full-and-native-save-return-verified",
     "evidence": "docs/save-continue/json-encoding/README.md",
     "goal_complete": false,
     "published": false

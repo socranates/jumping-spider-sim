@@ -28,7 +28,7 @@ for name in folders:
             continue
         files.add(p)
 for name in ["roblox_port/default.project.json", "roblox_port/tests.project.json",
-             "roblox_port/.luaurc", "roblox_port/README.md",
+             "roblox_port/README.md",
              "roblox_port/TheWindowsill.rbxlx", "roblox_port/TheWindowsillTests.rbxlx",
              "chet/HANDOFF-v50.md", "chet/review-5.md", "docs/DECISIONS.md",
              "docs/reference/chet-prompt-v49.md", "docs/MESHES.md", ".github/workflows/roblox-port.yml"]:

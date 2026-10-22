@@ -2,6 +2,8 @@
 
 Branch `codex/memory-trace`, based on `cdce01d`. Gameplay source is frozen at `3c8de801e5fab68598e1e5323e7f5e1c8151b0e6`. This branch adds diagnostic tools and receipts only. It does not change production game modules, publish a place, or access online saves.
 
+Update: the long run has now completed and been reconstructed successfully: 1,800.080 seconds / 121 samples / 59 full visits. The result is **investigate_growth**, with stable matched live-instance/client-GC low points but rising engine BaseParts/Instances/Signals category counters. Read `docs/memory-trace/RESULTS-v1b.md`. Observer 52003 is terminal and Studio Play was stopped after DONE; do not continue polling or restart it. The following in-progress instructions are retained as historical protocol, not current status. Completed receipts were added on the later audit branch; source remains the exact frozen commit above.
+
 The outdoor encounter reset has completed its Windows gate (63 suites, 443,469 checks, zero failures), Linux CI gate (`39761460756`, success), and source-guarded native gate (46 assertions). See `chet/outdoor-life-reset.md` and `docs/outdoor-life-reset/` for those separate receipts.
 
 ## Memory evidence

@@ -35,3 +35,9 @@ The eighth audit scene now holds ordinary Forward input continuously from x=-60,
 The v6 places have been built and the driver compiles; native route smoke and the four-way full-length matrix are still pending. Do not quote performance gains. Keep full/low viewport, focus and engine configuration matched, and do not run CPU-heavy tests while timing. The optional region-cycle trace uses placements between scenes and is separate from the eighth scene's uninterrupted walk; it does not by itself prove a continuous 30-minute player journey.
 
 The v6 configuration explicitly enables Wasp, Cat, Bird and Frog. The SilkPlayback marker otherwise disables the wasp and cat in the production controller's test-place path, so the older v5 smoke must not be described as a full predator workload. Each timed record now includes predator enabled flags and states before and after; collection refuses missing/disabled workloads. Both roles still use the explicitly recorded Free/gentle mode, not Normal-mode mortality or a worst-case predator encounter.
+
+### Native execution status after save verification
+
+The separate save-isolation native review completed with 216/216 production fingerprints, 274/0/0 preserve checks and 9 native save cases / 110 checks. Its receipts are in `docs/save-slot-isolation/`. These are correctness results, not paired performance evidence.
+
+The v6b baseline-full place opened in Studio, but selection/activation of the new Studio window failed with `foreground window did not report a process id`. Refreshing the window inventory and retrying once produced the same error; UI input stopped under the computer-use recovery rule. No v6b source guard or timed run was executed. The actual continuous route and the corrected enabled-predator workload still require native validation before the full matrix can be called complete. Do not infer a benchmark from the static route probe or synthetic collector tests.

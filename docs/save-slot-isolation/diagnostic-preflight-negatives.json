@@ -10,22 +10,22 @@
     "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
   },
   {
-    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\baseline-full.rbxlx",
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6b\\baseline-full.rbxlx",
     "refused": true,
     "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
   },
   {
-    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\baseline-low.rbxlx",
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6b\\baseline-low.rbxlx",
     "refused": true,
     "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
   },
   {
-    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\candidate-full.rbxlx",
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6b\\candidate-full.rbxlx",
     "refused": true,
     "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
   },
   {
-    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\candidate-low.rbxlx",
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6b\\candidate-low.rbxlx",
     "refused": true,
     "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
   }

@@ -2255,3 +2255,19 @@ part, including a line bent around something farther away. Supporting a rider
 and delaying departure are explicit game concessions, not biological claims.
 The existing seven/ten full-meal moults, earned abilities, manual jump aiming,
 quiet hunger bar and current lighting are unchanged.
+
+
+## ROBLOX-132 - Drawn greedy-merge feasibility stop (2026-10-22, Nathan)
+
+Nathan requested a measured, drawn-only greedy-merge study with a 10% reduction
+threshold. Walkable geometry and golden data were excluded. On unchanged v51
+runtime 14e60991, the read-only estimator examined 1,383 regions/zones/patches
+at both tiers. A deliberately optimistic connectivity bound permits at most
+320/109,151 full-tier records (0.29%) or 158/9,073 low-tier records (1.74%) to
+be removed. Excluding near-detail patches still permits only 3.20% / 6.98%.
+The bound allows even nonrectangular connected groups to become one box, so
+safe exact-solid merging cannot exceed it. Per the requested stop gate, no
+runtime mesher, look cache, test-pin change, mesh replacement or release was
+made. See chet/greedy-merge.md and docs/verification/greedy-merge/estimate.json.
+The broad foundation audit is parked separately with unresolved save/API and
+performance findings; this study does not declare those issues solved.

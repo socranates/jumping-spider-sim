@@ -1,0 +1,28 @@
+{
+  "branch": "codex/greedy-merge",
+  "base_commit": "a8ef989504c712889f21e74a798679aef213df8a",
+  "runtime_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "evidence_id": "d9ddc5e0ed43d301",
+  "last_previously_verified_publication": {
+    "release": "v51",
+    "place_version": 140
+  },
+  "cloud_edit_guard": {
+    "place_version": 141,
+    "module_count": 215,
+    "matched": 215,
+    "time": "2026-10-22T06:13:36Z",
+    "runtime": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+    "publication_not_inferred_from_edit_version": true
+  },
+  "export_exit_code": 0,
+  "production_and_tests_unchanged": true,
+  "published": false,
+  "compressed_records": {
+    "bytes": 7948201,
+    "sha256": "814bf51478c61b063e3890a8394bd4b664f7c4054c99e18b44dd4c4e135a35e6",
+    "uncompressed_bytes": 36543659,
+    "uncompressed_sha256": "381a6ae0331803d7bccf7627bcd6c519a39499eee53ca0ab954ea9ccd79ed7bc"
+  },
+  "foundation_audit_parked_on": "codex/life-retirement at a6146c9; unresolved A12 plus prior open findings"
+}

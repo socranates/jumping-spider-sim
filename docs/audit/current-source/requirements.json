@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T14:30:39.825598+00:00",
+  "as_of_utc": "2026-10-22T14:44:23.588692+00:00",
   "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
   "evidence_id": "58063ec00de84212",
   "goal_complete": false,
@@ -105,10 +105,13 @@
     },
     {
       "id": "determinism-A07",
-      "status": "open",
-      "evidence_boundary": "Seeded graph output does not establish identical activation. Route wall-clock/frame budgets and station-air preparation need 30/60/120Hz input traces and a deterministic activation decision.",
+      "status": "reproduced-proposed-fix",
+      "evidence_boundary": "Current-source cold RivalDrive component: route readiness ticks403/198/98 at30/60/120Hz. Experimental pre-play preparation gives readiness tick1, movement tick16 and nine matching samples. Controlled StationAir scheduling model: blocked-route readiness1251/626/313 versus1 when prepared.12 isolated traces; not full moving-input/controller/RNG/native replay. Production unchanged; combined yielding startup gate must be integrated and measured.",
       "references": [
-        "docs/audit/CODE-REVIEW.md"
+        "docs/audit/CODE-REVIEW.md",
+        "docs/activation-timing/README.md",
+        "docs/activation-timing/receipt.json",
+        "docs/activation-timing/air/receipt.json"
       ]
     },
     {

@@ -54,3 +54,7 @@ The generated local place was saved and closed; its Studio serialization was arc
 ## Subsequent native foundation gate
 
 Current-source shadow cleanup passed7 cases/1513 assertions and synthetic save safety passed8 cases/45 assertions; zero Creator errors. See ../docs/native-foundation-current/README.md and its receipt. The first save fixture failed on an incorrect Easy-mode API call; corrected diagnostic v2 reran everything without changing production rules. No online-save/rejoin/automatic-streaming/performance claim.
+
+## Next correctness work: A07 activation
+
+Twelve source-bound isolated traces reproduced frame-rate-dependent surface/air navigation readiness and tested a pre-play preparation experiment. See ../docs/activation-timing/README.md for actual counts, limits and integration tasks. No production changes yet; warm-up must yield behind loading and cover both systems before simulation starts. Full creature/controller/RNG/native timing remains to verify.

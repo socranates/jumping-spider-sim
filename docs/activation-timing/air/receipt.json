@@ -1,0 +1,45 @@
+{
+  "source": "fc1fc6d8f9a15d9ae64cc5b21074e61a42d7e2b4",
+  "trials": [
+    {
+      "barrier": false,
+      "fps": 30,
+      "route_ready_tick": 1251,
+      "log_sha256": "8222588e784db4bc3d90ada75848e7c2b13dfd7de1588a18ade962e03ff0cdf6"
+    },
+    {
+      "barrier": false,
+      "fps": 60,
+      "route_ready_tick": 626,
+      "log_sha256": "f54f45b91eab68621aef653f01d80bfe14d10303097a9428a8e8b4cd3c9654e0"
+    },
+    {
+      "barrier": false,
+      "fps": 120,
+      "route_ready_tick": 313,
+      "log_sha256": "a846617f04d2a54dd38019aaddb50bc9aac489613c7609604d18fc6c4c6cf4bb"
+    },
+    {
+      "barrier": true,
+      "fps": 30,
+      "route_ready_tick": 1,
+      "log_sha256": "84a18d234df6c738e99cc944a52fd0eaa73a117da72a32aa19558c271d19f3eb"
+    },
+    {
+      "barrier": true,
+      "fps": 60,
+      "route_ready_tick": 1,
+      "log_sha256": "e456fab00424a42875e7c227f8a0be25e659942a533fff1432914656b0153b9c"
+    },
+    {
+      "barrier": true,
+      "fps": 120,
+      "route_ready_tick": 1,
+      "log_sha256": "f9afb3498460d5779e739b3cc950791511f95533f7d1112a7dde347326a2f3c3"
+    }
+  ],
+  "prepare_yields": 625,
+  "full_wasp_actor_trace": false,
+  "scope": "Controlled one-resume-per-render-frame model of StationAir.prepare task.wait callback; blocked doorway route query, not native scheduler proof",
+  "production_change": false
+}

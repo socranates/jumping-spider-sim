@@ -1,0 +1,57 @@
+{
+  "source": "fc1fc6d8f9a15d9ae64cc5b21074e61a42d7e2b4",
+  "production_inputs": 216,
+  "fixed_tick_hz": 60,
+  "simulated_seconds_per_trial": 90,
+  "trials": [
+    {
+      "barrier": false,
+      "fps": 30,
+      "prepared_tick": 403,
+      "moved_tick": 418,
+      "log_sha256": "5a747ee425a898836cc7a8e2a4eb069606207eb900101251b9a032f26fa83dbd"
+    },
+    {
+      "barrier": false,
+      "fps": 60,
+      "prepared_tick": 198,
+      "moved_tick": 213,
+      "log_sha256": "43144e0b91a0bd1b766fe0135968975415fa20a13356f756ef7ac93616f527f8"
+    },
+    {
+      "barrier": false,
+      "fps": 120,
+      "prepared_tick": 98,
+      "moved_tick": 113,
+      "log_sha256": "1f86ddf03686f8d133eeb1b2309bc55ea3fa5943d2c60758c9ef481ebad131b4"
+    },
+    {
+      "barrier": true,
+      "fps": 30,
+      "prepared_tick": 1,
+      "moved_tick": 16,
+      "log_sha256": "40bdd4a768acf82ef34fb40febdf35669c68058649359c5091ce139b0c243b0a"
+    },
+    {
+      "barrier": true,
+      "fps": 60,
+      "prepared_tick": 1,
+      "moved_tick": 16,
+      "log_sha256": "5af52063889f69b0e89c2ef4b5c9b759083340235ea1c258f42689915146b579"
+    },
+    {
+      "barrier": true,
+      "fps": 120,
+      "prepared_tick": 1,
+      "moved_tick": 16,
+      "log_sha256": "b1629ac6fc654f1eee5ad758214443d66b352e51490ba71d69e0190d507cd0b5"
+    }
+  ],
+  "barrier_sample_count": 9,
+  "barrier_position_samples_match": true,
+  "production_change": false,
+  "full_client_trace": false,
+  "station_air_covered": false,
+  "native_performance_claim": false,
+  "scope": "Cold RivalDrive/Route component, static safe observer and patrol record, seed914; render-rate calls use actual production Drive.advance budgets"
+}

@@ -31,9 +31,9 @@ The adopted function is byte-identical to the tested prototype except its introd
 
 Adoption checks from exec56254: JSON_ENCODING20716/0, CHECKPOINT570/0, SAVE_WORK39/0, SAVE_RESTORE24/0, REST_STORAGE14/0 and REST_COMPRESSION57/0; six suites/21420 total. All222 modules compile, strict analysis clean, runner5 pass in final-check. This ad hoc output is tool evidence; the full gates provide primary archived integration logs.
 
-Full Windows/Linux now need to run on the committed adoption source: expected76 suites/465380 checks, still an expectation until terminal receipts. Root docs/save-continue/verify.py now refuses to pass until both current full gates exist and succeed. Older save-cost verification is pinned to archivedab8ca95 inputs so historical proof stays reproducible. A subsequent native adopted-game save/restore run and broad28-item audit still remain open. Source release XML/BuildInfo remain old; goal active, no publication.
+Linux39860574006 is terminal success on the committed adoption source:76 suites/465380/0 plus compile222/strict/runner5. Exact source/workflow/log hashes are verified. Windows28618 remains live on the same immutable source;76/465380 remains an expectation there until its terminal receipt. Root docs/save-continue/verify.py now refuses to pass until both current full gates exist and succeed. Older save-cost verification is pinned to archivedab8ca95 inputs so historical proof stays reproducible. A subsequent native adopted-game save/restore run and broad28-item audit still remain open. Source release XML/BuildInfo remain old; goal active, no publication.
 
-Committed adoption source068a87891770dbdf291ec3cab0e67480d14c0251. Windows exec28618 and Linux39860574006 are confirmed live; Linux compile222/strict are already successful. fetch-ci.py collects that exact run/source only. Do not restart live jobs or stage the Windows log before its terminal receipt.
+Committed adoption source068a87891770dbdf291ec3cab0e67480d14c0251. Windows exec28618 remains live. Linux39860574006 has closed successfully with all76 suites/465380 checks; compile222/strict/runner5 pass. fetch-ci.py collects that exact run/source only. Do not restart live jobs or stage the Windows log before its terminal receipt.
 
 
 ## Current adopted-game probe prepared, not run

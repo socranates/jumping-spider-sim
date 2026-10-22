@@ -1,3 +1,13 @@
+# Current unpublished candidate: encoder adoption, 068a878
+
+Current source068a87891770dbdf291ec3cab0e67480d14c0251 is on codex/save-continue. [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/json-encoding/README.md). One-buffer canonical encoding retains exact bytes/errors/checksums; only runtime Json.luau changed. Focused21420/0, compile222/strict/runner5 pass, native paired algorithm20738 assertions/224 fingerprints pass. A same-record isolated native comparison averages40.27percent lower encoder CPU; no whole-game FPS, heap-gain or hard-frame claim.
+
+Linux39860574006 has completed76 suites/465380/0, compile222/strict/runner5 on source068a878. Full Windows exec28618 remains live on the same immutable source;76/465380 is not yet a completed Windows result. Windows garden self-test ends41/0/0, outer5/0. Do not restart a live job on timeout or stage its incomplete log. Root verifier intentionally refuses pending full gates. The current-game225-script save/return probe is prepared, not run, and must wait for local CLI completion.
+
+Current-source/MAP.md and inventory.json now bind all222 current production files to that source; this remains lexical evidence only. Current CODE-REVIEW overlay separates historical findings such as already-implemented outdoor resets. The requirement registry preserves the broader28-item audit and incomplete native/device/online/legacy-world/release gates. Source XML/BuildInfo remain old, nothing new published, goal active.
+
+Every milestone/job command below is historical and superseded where it conflicts with this current header. Do not resume an old job or obsolete correction command from those notes.
+
 # Current unpublished milestone: local returns across frames, 4ee6aec
 
 [Implementation and evidence](../save-continue/local-return/README.md). Local Continue/Free play, Backspace and end-screen Back prepare privately behind Cancel; world/store/revision fencing and exact backup/schema checks remain. Current27-suite focused matrix25,294/0,222 compile, strict clean/runner5; Studio22 assertions/all223 fingerprints/Persistence disabled. Large local choice3ms, return4.2s/maxupdate38ms in a bounded1.5M case. No hard budget/FPS claim. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Prior133aa60 full Windows/Linux failed5 timing fixtures, c4 Linux failed4; corrections and original failure receipts retained. Nothing published; release artifacts old; broader goal active.

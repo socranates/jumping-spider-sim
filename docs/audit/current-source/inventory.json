@@ -1,6 +1,6 @@
 {
-  "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
-  "branch": "codex/save-lease-cleanup",
+  "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "branch": "codex/save-continue",
   "baseline": {
     "published": true,
     "release": "v51",
@@ -433,15 +433,19 @@
       ]
     },
     {
-      "sha256": "f809e83fa6ac68ead62698f2857126c9b4e035621199ccf765003d282f79a6ad",
+      "sha256": "5f3da74904f3ae57b4a39131c3385ddea2121d11a07c20404283f7666ef64bfc",
       "path": "roblox_port/src/Client/SaveClient.luau",
       "name": "SaveClient",
-      "lines": 167,
+      "lines": 279,
       "purpose": "The client's side of persistent saves (ROBLOX-39). It looks for the server's remotes, says hello, hears the saved state, and sends the",
       "side": "Client",
       "strict": true,
-      "requires": [],
+      "requires": [
+        "SaveContinuation"
+      ],
       "tests": [
+        "local_rest.luau",
+        "save_continuation.luau",
         "state.luau",
         "state_client.luau",
         "state_offline.luau",
@@ -453,10 +457,47 @@
       ]
     },
     {
-      "sha256": "fb34d2c680a90450cc3d9e702478a1a127c9e5ce269015e88dd6446bfde2817f",
+      "sha256": "a748bbff893946937836e67e0d2ea06d019bed79900e6e4612aea287f2f93043",
+      "path": "roblox_port/src/Client/SaveContinuation.luau",
+      "name": "SaveContinuation",
+      "lines": 337,
+      "purpose": "Opt-in protocol3 state. No engine waits or DataStore access. The game supplies",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "save_continuation.luau",
+        "save_offers.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SaveClient.luau"
+      ]
+    },
+    {
+      "sha256": "212f718139db58a4b7aab4d6bdb3ea94096e7b6583c6eeb3ef8338c2ac9c72e7",
+      "path": "roblox_port/src/Client/SaveRestore.luau",
+      "name": "SaveRestore",
+      "lines": 48,
+      "purpose": "One private preparation at a time. prepare owns a stable record and returns",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "SaveWork"
+      ],
+      "tests": [
+        "save_restore.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "sha256": "cfb858a819dc67826e428cd4c70e55582fe03b8a67a14a2d607b20db85d40b9b",
       "path": "roblox_port/src/Client/SelfTest.luau",
       "name": "SelfTest",
-      "lines": 1804,
+      "lines": 1809,
       "purpose": "The live place's self-test (ROBLOX-104): a run of the real client inside a real Studio Play session, which prints what it finds to Output, so every publish can be",
       "side": "Client",
       "strict": true,
@@ -557,10 +598,10 @@
       ]
     },
     {
-      "sha256": "1baa1f1d07401928e4acb9064aa195c37a1ae2728c31e3f666e4c8f87e6db582",
+      "sha256": "da3757953423c311469916a49bdc6d15502d6b54e01203294c5ddec03e44c32f",
       "path": "roblox_port/src/Client/SpiderClient.client.luau",
       "name": "SpiderClient.client",
-      "lines": 2419,
+      "lines": 2668,
       "purpose": "The playable spider. Wires one control scheme (SpiderInput: keyboard and mouse, controller and touch together) to the",
       "side": "Client",
       "strict": true,
@@ -597,6 +638,7 @@
         "HudLayout",
         "InspectText",
         "InspectView",
+        "Json",
         "JumpInput",
         "LifeClock",
         "LifeLoop",
@@ -642,8 +684,11 @@
         "RivalText",
         "SaveClient",
         "SaveProgress",
+        "SaveRest",
+        "SaveRestore",
         "SaveRules",
         "SaveText",
+        "SaveWork",
         "SelfTest",
         "Sensor",
         "SettingsModel",
@@ -682,9 +727,12 @@
         "client_mating.luau",
         "client_rival.luau",
         "client_smoke.luau",
+        "continuation_menu.luau",
         "eyes.luau",
         "feeding_survival.luau",
         "inspect.luau",
+        "local_rest_client.luau",
+        "local_return.luau",
         "lock.luau",
         "minimal_hud.luau",
         "nature_client.luau",
@@ -1023,10 +1071,10 @@
       ]
     },
     {
-      "sha256": "837abc22fe8eea941c48fb658c499d23794b599186135e6f8aa2b1dc157f35ac",
+      "sha256": "7bca22a20add702e5ef73743545a5bed7b2d0565e22730a4332e5315f7aa2eb0",
       "path": "roblox_port/src/Server/SaveService.luau",
       "name": "SaveService",
-      "lines": 216,
+      "lines": 265,
       "purpose": "The server's persistence service (ROBLOX-39): one SaveSession per player, and the only place a client's message is turned into anything",
       "side": "Server",
       "strict": true,
@@ -1348,18 +1396,24 @@
       ]
     },
     {
-      "sha256": "844af40a915666e8931dca19218cde370ffc047b7fdd442761f1f5b9358ec491",
+      "sha256": "12900acd1094a534af630762090ba3def738a197c7c2a3a771f9607a611a5b68",
       "path": "roblox_port/src/Shared/Data/SaveRules.luau",
       "name": "SaveRules",
-      "lines": 75,
+      "lines": 76,
       "purpose": "Every number and name the persistent saves use (ROBLOX-39): store names, key prefixes, sizes, timings, limits. The logic is in",
       "side": "Shared",
       "strict": true,
       "requires": [],
       "tests": [
         "client_ant.luau",
+        "continuation_menu.luau",
+        "local_rest.luau",
         "rest_storage.luau",
+        "save_continuation.luau",
+        "save_intent.luau",
         "save_notice.luau",
+        "save_observation.luau",
+        "save_offers.luau",
         "settings.luau",
         "state.luau",
         "state_client.luau"
@@ -1371,6 +1425,8 @@
         "roblox_port/src/Server/SaveService.luau",
         "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
         "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+        "roblox_port/src/Shared/Persistence/SaveIntent.luau",
+        "roblox_port/src/Shared/Persistence/SaveObservation.luau",
         "roblox_port/src/Shared/Persistence/SaveProgress.luau",
         "roblox_port/src/Shared/Persistence/SaveRest.luau",
         "roblox_port/src/Shared/Persistence/SaveScheduler.luau",
@@ -1411,6 +1467,7 @@
         "bodies.luau",
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "feeding_survival.luau",
         "flies.luau",
         "garden_life.luau",
@@ -1461,6 +1518,7 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "gaze.luau",
         "lock.luau",
         "mating.luau",
@@ -1825,11 +1883,14 @@
         "client_mating.luau",
         "client_rival.luau",
         "client_smoke.luau",
+        "continuation_menu.luau",
         "eyes.luau",
         "feeding_survival.luau",
         "gaze.luau",
         "inspect.luau",
         "life.luau",
+        "local_rest_client.luau",
+        "local_return.luau",
         "lock.luau",
         "mating.luau",
         "nature.luau",
@@ -1979,10 +2040,10 @@
       ]
     },
     {
-      "sha256": "2b05cd0ec002b062c91e7f156d899229728baab374fbf8798c35680481f813e9",
+      "sha256": "e4d4c31e207a7dfa60bf757cba0f081172da4c385cf71a922ed5d70bac941e48",
       "path": "roblox_port/src/Shared/Life/LifeLoop.luau",
       "name": "LifeLoop",
-      "lines": 264,
+      "lines": 304,
       "purpose": "LifeLoop: the rest, sleep and day of the frozen scripts/habitat/habitat_loop.gd (T08, LIFE-04 to LIFE-06), without the",
       "side": "Shared",
       "strict": true,
@@ -1993,17 +2054,19 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "continuing.luau",
         "feeding_survival.luau",
         "growth.luau",
         "life.luau",
+        "local_rest.luau",
         "mating.luau",
         "nature.luau",
         "rest_storage.luau",
         "state.luau",
         "state_client.luau"
       ],
-      "any_casts": 0,
+      "any_casts": 1,
       "required_by": [
         "roblox_port/src/Client/SpiderClient.client.luau",
         "roblox_port/src/Shared/Persistence/Checkpoint.luau"
@@ -2111,10 +2174,12 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "continuing.luau",
         "feeding_survival.luau",
         "growth.luau",
         "life.luau",
+        "local_rest.luau",
         "mating.luau",
         "nature.luau",
         "nature_client.luau",
@@ -2394,6 +2459,7 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "gaze.luau",
         "lock.luau",
         "mating.luau",
@@ -2532,6 +2598,7 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "garden_life.luau",
         "mating.luau",
         "nature.luau",
@@ -2588,6 +2655,7 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "eyes.luau",
         "garden_life.luau",
         "mating.luau",
@@ -2646,10 +2714,10 @@
       ]
     },
     {
-      "sha256": "d42c3e376966e1361a54d15255ca987b4551efffca0cbdff1ea16e93d42cd5b8",
+      "sha256": "a6c54cfbc957b1579cd69693e791b93b96259745c23928caaff6b3c28200ca16",
       "path": "roblox_port/src/Shared/Persistence/Checkpoint.luau",
       "name": "Checkpoint",
-      "lines": 590,
+      "lines": 620,
       "purpose": "The retreat checkpoint (S01-C; Godot's scripts/persistence/checkpoint.gd, T09; ROBLOX-25). A checkpoint is the whole world",
       "side": "Shared",
       "strict": true,
@@ -2683,6 +2751,7 @@
         "PreyRandom",
         "RareDirector",
         "RivalSpider",
+        "SaveWork",
         "Sensor",
         "SensorCore",
         "Skater",
@@ -2696,6 +2765,8 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
+        "local_return.luau",
         "mating.luau",
         "nature.luau",
         "rest_storage.luau",
@@ -2709,18 +2780,22 @@
       ]
     },
     {
-      "sha256": "80f88d2a4164b5f79dae0d2f25c8a60a0e950cfde09e1af8aa8e2dd3cdaeb9b2",
+      "sha256": "226d9b2a4b1bafa3a58f1b9ecfdd907096f5fc371031ffae91f5d15cdba74110",
       "path": "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
       "name": "CheckpointStore",
-      "lines": 207,
+      "lines": 231,
       "purpose": "Where checkpoints live (S02; Godot's scripts/persistence/checkpoint_store.gd; ROBLOX-25), behind a DataStore-shaped",
       "side": "Shared",
       "strict": true,
       "requires": [
-        "Json"
+        "Json",
+        "SaveWork"
       ],
       "tests": [
-        "checkpoint.luau"
+        "checkpoint.luau",
+        "continuation_menu.luau",
+        "local_rest.luau",
+        "local_rest_client.luau"
       ],
       "any_casts": 1,
       "required_by": [
@@ -2745,32 +2820,47 @@
       ]
     },
     {
-      "sha256": "dd91c183535b6c596b0fd741e461bfd60dac1301cfcd51eee538dc85d80d2642",
+      "sha256": "9b6599b4c1476c5c5114bacb5106b2a869d799a78988d20688b572c6d0f31384",
       "path": "roblox_port/src/Shared/Persistence/Json.luau",
       "name": "Json",
-      "lines": 147,
+      "lines": 148,
       "purpose": "What a Roblox DataStore can hold, checked without the engine (ROBLOX-25), and the canonical text a checksum is taken over",
       "side": "Shared",
       "strict": true,
-      "requires": [],
+      "requires": [
+        "SaveWork"
+      ],
       "tests": [
         "checkpoint.luau",
         "client_mating.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
+        "json_encoding.luau",
+        "local_rest.luau",
+        "local_rest_client.luau",
+        "local_return.luau",
         "mating.luau",
         "nature.luau",
         "rare_sightings.luau",
         "rest_compression.luau",
         "rest_storage.luau",
+        "save_continuation.luau",
+        "save_observation.luau",
+        "save_offers.luau",
+        "save_restore.luau",
+        "save_work.luau",
         "state.luau",
         "state_client.luau",
         "world_client.luau"
       ],
       "any_casts": 0,
       "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
         "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
         "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
         "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+        "roblox_port/src/Shared/Persistence/SaveIntent.luau",
+        "roblox_port/src/Shared/Persistence/SaveObservation.luau",
         "roblox_port/src/Shared/Persistence/SaveRest.luau",
         "roblox_port/src/Shared/Persistence/SaveSession.luau"
       ]
@@ -2794,20 +2884,23 @@
       "required_by": []
     },
     {
-      "sha256": "f05d14238470ea8302b2537b236dc742e1e8a119543ccd3a564b321372113a87",
+      "sha256": "ec51bb6c05f4b9ca8a7e07931fbb0970b03a7f89849ca546ecfbd295db4c4330",
       "path": "roblox_port/src/Shared/Persistence/ObjectRecord.luau",
       "name": "ObjectRecord",
-      "lines": 329,
+      "lines": 335,
       "purpose": "ObjectRecord (ROBLOX-25): the state of a few live objects as one plain record that a DataStore could hold, and back.",
       "side": "Shared",
       "strict": true,
-      "requires": [],
+      "requires": [
+        "SaveWork"
+      ],
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
         "feeding_survival.luau",
         "mating.luau",
-        "rare_sightings.luau"
+        "rare_sightings.luau",
+        "save_work.luau"
       ],
       "any_casts": 2,
       "required_by": [
@@ -2839,6 +2932,46 @@
       ]
     },
     {
+      "sha256": "c6001916ba2356736127ace646a995a848a73a6f8f96fa75d9f65c0e2fe07b02",
+      "path": "roblox_port/src/Shared/Persistence/SaveIntent.luau",
+      "name": "SaveIntent",
+      "lines": 66,
+      "purpose": "Transient server decisions. Identity/lease validation and durable retirement",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json",
+        "SaveRules"
+      ],
+      "tests": [
+        "save_intent.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "sha256": "d383f22738da5c06e1f7a1bd62991035343692cd186a9020f62fc64a37b49bae",
+      "path": "roblox_port/src/Shared/Persistence/SaveObservation.luau",
+      "name": "SaveObservation",
+      "lines": 95,
+      "purpose": "Private server observations, independent of write credentials. The caller must",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json",
+        "SaveRules"
+      ],
+      "tests": [
+        "save_observation.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
       "sha256": "60f089b363f0648fd1ef1464d7bbc797b1afeb490160c3b58d28134b2df0e86d",
       "path": "roblox_port/src/Shared/Persistence/SaveProgress.luau",
       "name": "SaveProgress",
@@ -2853,6 +2986,7 @@
         "SettingsModel"
       ],
       "tests": [
+        "continuation_menu.luau",
         "preserve.luau",
         "rare_sightings.luau",
         "rest_storage.luau",
@@ -2869,10 +3003,10 @@
       ]
     },
     {
-      "sha256": "653e605308a78f2e8cee18206c3726f4b5109bcd21132786919d76b356d4c067",
+      "sha256": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d",
       "path": "roblox_port/src/Shared/Persistence/SaveRest.luau",
       "name": "SaveRest",
-      "lines": 120,
+      "lines": 123,
       "purpose": "The last rest of a mode, as the server keeps it (ROBLOX-39): a retreat checkpoint (Checkpoint) in an envelope, one per mode.",
       "side": "Shared",
       "strict": true,
@@ -2881,16 +3015,19 @@
         "Json",
         "SaveEnvelope",
         "SaveRules",
+        "SaveWork",
         "Species"
       ],
       "tests": [
         "checkpoint.luau",
+        "continuation_menu.luau",
         "rest_storage.luau",
         "state.luau",
         "state_client.luau"
       ],
       "any_casts": 1,
       "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
         "roblox_port/src/Shared/Persistence/SaveSession.luau"
       ]
     },
@@ -2914,16 +3051,18 @@
       ]
     },
     {
-      "sha256": "b8cb9095e9b7c2bddc187a1bd4b704dc35f20b67e94c75f9cea895a6cc92be02",
+      "sha256": "b3a566210743c40e2ac146cd9e7adab4a0e76c85ce758cfc285379a3952e2886",
       "path": "roblox_port/src/Shared/Persistence/SaveSession.luau",
       "name": "SaveSession",
-      "lines": 704,
+      "lines": 953,
       "purpose": "One player's save session (ROBLOX-39): loads their records through a store backend, keeps their progress and rests in memory, and writes",
       "side": "Shared",
       "strict": true,
       "requires": [
         "Json",
         "SaveEnvelope",
+        "SaveIntent",
+        "SaveObservation",
         "SaveProgress",
         "SaveRest",
         "SaveRules",
@@ -2957,6 +3096,34 @@
       "required_by": [
         "roblox_port/src/Server/Persistence.server.luau",
         "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "sha256": "268cedc7bc81730d3f650b36fe9016e485928d4d7b1a957332a16093819f746e",
+      "path": "roblox_port/src/Shared/Persistence/SaveWork.luau",
+      "name": "SaveWork",
+      "lines": 69,
+      "purpose": "Cooperative preparation only. Callers must own/hold stable inputs and gate",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "json_encoding.luau",
+        "local_rest.luau",
+        "save_offers.luau",
+        "save_restore.luau",
+        "save_work.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SaveRestore.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
+        "roblox_port/src/Shared/Persistence/Json.luau",
+        "roblox_port/src/Shared/Persistence/ObjectRecord.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau"
       ]
     },
     {
@@ -3487,6 +3654,7 @@
       "tests": [
         "checkpoint.luau",
         "compact_layout.luau",
+        "continuation_menu.luau",
         "garden_life.luau",
         "mating.luau",
         "nature.luau",
@@ -4409,10 +4577,10 @@
       ]
     },
     {
-      "sha256": "677792ea3ce81f52171050787aa1313eab173cbac54b2de893565f6f66a52ff3",
+      "sha256": "560591336ee81ff4500b340ee8c65088e3b0758a1600f162e90e36ff5b276e64",
       "path": "roblox_port/src/Shared/UI/SaveText.luau",
       "name": "SaveText",
-      "lines": 94,
+      "lines": 99,
       "purpose": "The words about saving (ROBLOX-39): what the menu and a short toast say. Plain and honest: saved, saving, or off for this visit and why.",
       "side": "Shared",
       "strict": true,

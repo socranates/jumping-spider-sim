@@ -1,3 +1,13 @@
+# Current-source overlay: 068a878, encoder full gates running
+
+The current lexical map now binds222 production files/56,775 lines to source068a87891770dbdf291ec3cab0e67480d14c0251 on codex/save-continue. All indexed production bytes match. Thirteen files exceed800 lines; fifteen lack a direct top-level test import. These counts are not runtime coverage percentages or an exhaustive review; no cycles were found only in the literal-require graph.
+
+The initial findings below are historical. In particular, the earlier claim that Fresh resets only the cat is superseded: current SpiderClient explicitly resets bird/frog/crabs, applies the new life's gentle rules, and tests/outdoor_life_reset.luau exercises stale reaction cleanup through the real client shim. Current full Windows output includes OUTDOOR_RESET45/0. This is code/shim proof, not completion of native lifecycle or every device case.
+
+The current encoder change preserves format and validations while replacing per-container output buffers with one private fragment buffer. Focused compatibility/save checks21420/0, compile222/strict/runner5 and native paired algorithm20738 assertions pass; Linux39860574006 has completed76/465380/0 plus static/runner gates; Windows28618 remains live. The adopted-game225-script save/return probe is prepared and not run. See ../save-continue/json-encoding/README.md. Do not infer whole-game FPS, heap improvement, online durability or broad audit completion from the paired encoder CPU measurements.
+
+The older review record follows, with its original scope and evidence limits.
+
 # Source review and follow-up boundaries
 
 > Current candidate status: [CURRENT.md](CURRENT.md). This report retains its original named-source evidence.

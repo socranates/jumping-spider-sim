@@ -52620,7 +52620,9 @@ local function applySaved(msg: any)
 	if type(msg) ~= "table" then return end
 	local _, p = M.SaveProgress.sanitize(msg.progress)
 	if p then
-  M.rareHistory=M.RareLedger.merge(M.rareHistory,p.rare)
+  local rare=M.RareLedger.merge(M.rareHistory,p.rare)
+  M.rareHistory.serial=rare.serial;M.rareHistory.claimed=rare.claimed
+  M.rareHistory.once=rare.once;M.rareHistory.blocked=rare.blocked
 		local mine = book:toRecord()
 		local ids: { string } = {}
 		local seen: { [string]: boolean } = {}

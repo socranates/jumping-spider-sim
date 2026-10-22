@@ -139,6 +139,11 @@ local Map=require("../src/Shared/World/WorldMap")
 local Build=require("../src/Shared/World/WorldBuild")
 workspace:ClearAllChildren();workspace:SetAttribute("World","preserve");Map.use("preserve")
 Build.world(workspace,Map.SEED,{})
+local saveFolder=Instance.new("Folder");saveFolder.Name="SaveRemotes";saveFolder.Parent=game:GetService("ReplicatedStorage")
+local callbacks={};local toClient=Instance.new("RemoteEvent");toClient.Name="ToClient";toClient.Parent=saveFolder
+rawset(toClient,"OnClientEvent",{Connect=function(_,fn) table.insert(callbacks,fn) end})
+local toServer=Instance.new("RemoteEvent");toServer.Name="ToServer";toServer.Parent=saveFolder
+rawset(toServer,"FireServer",function() end)
 local loaded,loadError=pcall(function() require("../src/Client/SpiderClient.client") end)
 assert(loaded,loadError)
 local d=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
@@ -155,5 +160,9 @@ local bodyAge=d.rareBody.age;d.openMenu()
 for _=1,3 do frame(1/60) end
 check(d.rareBody.age==bodyAge,"menu freezes animal animation and observation")
 check(d.fresh("free",false) and d.life.rareSerial==serial+1 and d.rareBody.model==nil,"next life clears visit without erasing history")
+local identity=d.rareHistory;local incoming=Progress.default();incoming.rare=Ledger.new();incoming.rare.serial=1000;incoming.rare.claimed.luna_moth=1000
+for _,fn in callbacks do fn({kind="loaded",status="saved",progress=incoming,rests={}}) end
+check(#callbacks>0 and d.rareHistory==identity and identity.serial==1000 and identity.claimed.luna_moth==1000,"late progress merge preserves live history identity")
+check(d.fresh("free",false) and d.life.rareSerial==1001,"next life advances beyond late-loaded high-water mark")
 print(`RARE passed={passed} failed={failed}`)
 if failed>0 then error("rare sightings failed") end

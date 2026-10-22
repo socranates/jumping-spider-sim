@@ -6,7 +6,8 @@ return function(d)
  local Environment=require(Shared.World.Environment)
  local Spec=require(Shared.Data.RareSightings).luna
  local until_=os.clock()+30
- while not d.menu:isShowing() and os.clock()<until_ do task.wait(.2) end
+ while not d.session.started and not d.menu:isShowing() and os.clock()<until_ do task.wait(.2) end
+ task.wait(3) -- allow the server's initial progress response before test identities
  assert(d.fresh("free",false))
  if d.title:holding() then d.title:stop() end
  d.cam.mouse=false
@@ -25,8 +26,8 @@ return function(d)
  d.place(Spec.at+Vector3.new(0,1,1));task.wait(.5)
  check(d.rareBody.model==nil,"absent before scheduled arrival")
  -- A fixed review camera, not production camera behavior.
- local scene=RS:BindToRenderStep("ChetLunaReview",999,function()
-  workspace.CurrentCamera.CFrame=CFrame.lookAt(Spec.at+Vector3.new(10,12,14),Spec.at)
+ RS:BindToRenderStep("ChetLunaReview",999,function()
+  workspace.CurrentCamera.CFrame=CFrame.lookAt(Spec.at+Vector3.new(10,12,-14),Spec.at)
  end)
  task.wait(12)
  check(d.rareBody.model~=nil and d.rareBody.serial==serial,"scheduled animal drawn")
@@ -41,6 +42,10 @@ return function(d)
  d.input:simulate("Forward",true);task.wait(.25);d.input:simulate("Forward",false);task.wait(.5)
  check(d.motor.mode=="attached" and math.abs(d.motor.pos.Y-floorY)<.25,"short walk stays on wing")
  print("[CHET_V51_RARE_VIEW]",d.detail,"wing",d.motor.pos,"native screenshot window")
+ local times={};local elapsed=0
+ while elapsed<3 do local dt=RS.RenderStepped:Wait();table.insert(times,dt);elapsed+=dt end
+ table.sort(times)
+ print("[CHET_V51_RARE_FRAME]",d.detail,"frames",#times,"mean_ms",elapsed/#times*1000,"p95_ms",times[math.ceil(#times*.95)]*1000)
  task.wait(12)
  d.life.clock.day=plan.day+1;d.life.clock.hour=6.1;task.wait(1)
  check(d.rareBody.model~=nil and d.rareBody.leaving==0,"dawn waits for rider")

@@ -17,6 +17,7 @@ with tempfile.TemporaryDirectory() as folder:
   (snap/'roblox_port/tests/activation_trace.luau').write_text(fixture,encoding='utf8',newline='\n')
   code=runner['bundle']('activation_trace.luau');bundle=snap/'bundle.luau';bundle.write_text(code,encoding='utf8',newline='\n')
   with (OUT/f'trace-{int(barrier)}-{fps}.txt').open('w',encoding='utf8',newline='\n') as log:r=subprocess.run([str(TOOL),str(bundle)],stdout=log,stderr=subprocess.STDOUT)
+  log_path=OUT/f'trace-{int(barrier)}-{fps}.txt';log_path.write_bytes(log_path.read_bytes().replace(b'\r\n',b'\n'))
   rows.append(dict(barrier=barrier,fps=fps,exit_code=r.returncode,bundle_sha256=hashlib.sha256(code.encode()).hexdigest()));print(barrier,fps,'exit',r.returncode,flush=True)
   assert r.returncode==0
  (OUT/'process.json').write_text(json.dumps(dict(source=source,inputs=inputs,trials=rows,fixture_sha256=hashlib.sha256(fixture_path.read_bytes()).hexdigest()),indent=2)+'\n',encoding='utf8',newline='\n')

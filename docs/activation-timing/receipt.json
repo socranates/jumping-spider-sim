@@ -9,42 +9,42 @@
       "fps": 30,
       "prepared_tick": 403,
       "moved_tick": 418,
-      "log_sha256": "5a747ee425a898836cc7a8e2a4eb069606207eb900101251b9a032f26fa83dbd"
+      "log_sha256": "0b6a80da8dcced160bddcd54fd54473f97d5ff33586a876a3a16f0758a86a072"
     },
     {
       "barrier": false,
       "fps": 60,
       "prepared_tick": 198,
       "moved_tick": 213,
-      "log_sha256": "43144e0b91a0bd1b766fe0135968975415fa20a13356f756ef7ac93616f527f8"
+      "log_sha256": "d2a0ac65b0a54615b6d38451c6ff963d09348ea626432fc52a0f350db6c4083d"
     },
     {
       "barrier": false,
       "fps": 120,
       "prepared_tick": 98,
       "moved_tick": 113,
-      "log_sha256": "1f86ddf03686f8d133eeb1b2309bc55ea3fa5943d2c60758c9ef481ebad131b4"
+      "log_sha256": "4ec44a1bc57b2e0e9e835619857e8678055d708dcbdb446c4493be0bfe7e987e"
     },
     {
       "barrier": true,
       "fps": 30,
       "prepared_tick": 1,
       "moved_tick": 16,
-      "log_sha256": "40bdd4a768acf82ef34fb40febdf35669c68058649359c5091ce139b0c243b0a"
+      "log_sha256": "d578f060d8ca160a7fa12f00bffe2b8c7cc228dac5c30559c3a012d6379499ab"
     },
     {
       "barrier": true,
       "fps": 60,
       "prepared_tick": 1,
       "moved_tick": 16,
-      "log_sha256": "5af52063889f69b0e89c2ef4b5c9b759083340235ea1c258f42689915146b579"
+      "log_sha256": "1d329cd7cbb77bb9f03cd70a79cadb01ffd54e4f93280cf252deddcbc6820509"
     },
     {
       "barrier": true,
       "fps": 120,
       "prepared_tick": 1,
       "moved_tick": 16,
-      "log_sha256": "b1629ac6fc654f1eee5ad758214443d66b352e51490ba71d69e0190d507cd0b5"
+      "log_sha256": "29457e01c559a58680d1aed9532e2b340f63131355f3cd5f2bccaf75d09c0dff"
     }
   ],
   "barrier_sample_count": 9,

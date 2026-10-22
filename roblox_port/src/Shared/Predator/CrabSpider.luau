@@ -67,6 +67,15 @@ function CrabSpider.new(seed: number): any
 	}, CrabSpider)
 end
 
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function CrabSpider.reset(self: any)
+	local clean = CrabSpider.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
+end
+
 -- Puts each crab spider on its flower for `day`.
 function CrabSpider.place(self: any, day: number)
 	self.day = day

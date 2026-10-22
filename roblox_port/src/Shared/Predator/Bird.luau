@@ -236,6 +236,15 @@ function Bird.new(seed: number): any
 	}, Bird)
 end
 
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function Bird.reset(self: any)
+	local clean = Bird.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
+end
+
 -- Its head (where it looks from) and its bill's base (where it strikes from).
 function Bird.head(self: any): Vector3
 	return self.pos + self.heading * 6 + Vector3.yAxis * Bird.HEAD_Y

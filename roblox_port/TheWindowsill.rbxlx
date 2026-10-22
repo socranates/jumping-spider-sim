@@ -16970,6 +16970,15 @@ function Bird.new(seed: number): any
 	}, Bird)
 end
 
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function Bird.reset(self: any)
+	local clean = Bird.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
+end
+
 -- Its head (where it looks from) and its bill's base (where it strikes from).
 function Bird.head(self: any): Vector3
 	return self.pos + self.heading * 6 + Vector3.yAxis * Bird.HEAD_Y
@@ -17737,6 +17746,15 @@ function CrabSpider.new(seed: number): any
 	}, CrabSpider)
 end
 
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function CrabSpider.reset(self: any)
+	local clean = CrabSpider.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
+end
+
 -- Puts each crab spider on its flower for `day`.
 function CrabSpider.place(self: any, day: number)
 	self.day = day
@@ -17882,6 +17900,15 @@ function Frog.new(seed: number): any
 		seed = seed, gentle = false, enabled = true, day = -1, seat = 0, pos = Vector3.zero, heading = Vector3.xAxis, rest = Vector3.xAxis, state = "sit",
 		t = 0, still = 0, cooldown = 0, strike = -1, met = false, signals = {}, strikes = 0, misses = 0, notices = 0, now = 0,
 	}, Frog)
+end
+
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function Frog.reset(self: any)
+	local clean = Frog.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
 end
 
 -- Puts it on its seat for `day`.
@@ -52502,6 +52529,11 @@ local function returnToCheckpoint()
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
  needs:useGameRules()
+ -- These seeded visitors do not serialize transient encounters in a rest.
+ if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
+ if M.bird then M.bird:reset();M.bird.gentle=needs.gentle end
+ if M.frog then M.frog:reset();M.frog.gentle=needs.gentle end
+ M.birdSeen=nil;M.frogAt=nil
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
  life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
@@ -52555,6 +52587,11 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
  if M.cat then M.cat:load(M.Cat.defaultRecord()) end -- (ROBLOX-118: a new life meets the cat anew)
+ -- Outdoor encounters belong to this life too, including a restart on the same day.
+ if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
+ if M.bird then M.bird:reset();M.bird.gentle=needs.gentle end
+ if M.frog then M.frog:reset();M.frog.gentle=needs.gentle end
+ M.birdSeen=nil;M.frogAt=nil
  if position then motor:place(position,Vector3.yAxis,M.World.spawnHeading) end
  closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false

@@ -63,6 +63,15 @@ function Frog.new(seed: number): any
 	}, Frog)
 end
 
+-- Start another life without invalidating references held by the client/presentation.
+-- Seeded schedules and enable/rule configuration survive; reactions and signals do not.
+function Frog.reset(self: any)
+	local clean = Frog.new(self.seed)
+	clean.enabled, clean.gentle = self.enabled, self.gentle
+	table.clear(self)
+	for key, value in clean do self[key] = value end
+end
+
 -- Puts it on its seat for `day`.
 function Frog.place(self: any, day: number)
 	self.day = day

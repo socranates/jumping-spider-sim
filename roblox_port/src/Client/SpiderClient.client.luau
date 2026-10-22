@@ -786,6 +786,11 @@ local function returnToCheckpoint()
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
  needs:useGameRules()
+ -- These seeded visitors do not serialize transient encounters in a rest.
+ if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
+ if M.bird then M.bird:reset();M.bird.gentle=needs.gentle end
+ if M.frog then M.frog:reset();M.frog.gentle=needs.gentle end
+ M.birdSeen=nil;M.frogAt=nil
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
  life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
@@ -839,6 +844,11 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
  if M.cat then M.cat:load(M.Cat.defaultRecord()) end -- (ROBLOX-118: a new life meets the cat anew)
+ -- Outdoor encounters belong to this life too, including a restart on the same day.
+ if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
+ if M.bird then M.bird:reset();M.bird.gentle=needs.gentle end
+ if M.frog then M.frog:reset();M.frog.gentle=needs.gentle end
+ M.birdSeen=nil;M.frogAt=nil
  if position then motor:place(position,Vector3.yAxis,M.World.spawnHeading) end
  closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false

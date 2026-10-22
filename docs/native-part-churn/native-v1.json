@@ -1,0 +1,783 @@
+{
+  "complete": true,
+  "failures": [],
+  "records": [
+    {
+      "quiet_seconds": 30,
+      "source": "isolated standard Parts; no Windowsill game scripts",
+      "initial_focus": "foreground guard and F5; loss events monitored",
+      "engine": "0.744.0.7441077",
+      "stationary_seconds": 30,
+      "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+      "sample_seconds": 5,
+      "version": 1,
+      "cycles": 60,
+      "viewport": [
+        1105,
+        433
+      ],
+      "kind": "header",
+      "gc": "natural; no forced collection",
+      "parts": 1000
+    },
+    {
+      "phase_seconds": 0.0007137000211514533,
+      "focus_losses": 0,
+      "elapsed": 0.16233160003321245,
+      "destroyed": 0,
+      "frames": 9,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 0.1527329972013831,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.560546875,
+          "GraphicsParts": 0.44736480712890625,
+          "BaseParts": 0.364105224609375,
+          "Signals": 8.509193420410156,
+          "Internal": 986.8200073242188,
+          "Instances": 99.813232421875
+        },
+        "gc_mib": 1.958984375,
+        "instances": 51780,
+        "total_mb": 828.23828125
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 5.00468600000022,
+      "focus_losses": 0,
+      "elapsed": 5.166304600017611,
+      "destroyed": 0,
+      "frames": 308,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 5.165671003982425,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.886474609375,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.509956359863281,
+          "Internal": 989.2861328125,
+          "Instances": 99.81002044677734
+        },
+        "gc_mib": 2.0478515625,
+        "instances": 51780,
+        "total_mb": 275.1953125
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 10.00425830000313,
+      "focus_losses": 0,
+      "elapsed": 10.165876700018998,
+      "destroyed": 0,
+      "frames": 608,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 10.165024602785707,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.052734375,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.510231018066406,
+          "Internal": 988.8936157226562,
+          "Instances": 99.81002044677734
+        },
+        "gc_mib": 2.1357421875,
+        "instances": 51780,
+        "total_mb": 283
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 15.004166099999566,
+      "focus_losses": 0,
+      "elapsed": 15.165784700016957,
+      "destroyed": 0,
+      "frames": 908,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 15.164746309630573,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.052734375,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.510231018066406,
+          "Internal": 988.8936157226562,
+          "Instances": 99.81002044677734
+        },
+        "gc_mib": 2.2236328125,
+        "instances": 51780,
+        "total_mb": 303.51171875
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 20.004694400005974,
+      "focus_losses": 0,
+      "elapsed": 20.166313100024126,
+      "destroyed": 0,
+      "frames": 1208,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 20.16614781320095,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.28173828125,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.509574890136719,
+          "Internal": 989.1305541992188,
+          "Instances": 99.8097152709961
+        },
+        "gc_mib": 2.3125,
+        "instances": 51780,
+        "total_mb": 283.50390625
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 25.004669599991757,
+      "focus_losses": 0,
+      "elapsed": 25.16628700000001,
+      "destroyed": 0,
+      "frames": 1508,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 25.164879518561065,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.28173828125,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.509574890136719,
+          "Internal": 989.1305541992188,
+          "Instances": 99.8097152709961
+        },
+        "gc_mib": 2.400390625,
+        "instances": 51780,
+        "total_mb": 306.34765625
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 30.004664200008847,
+      "focus_losses": 0,
+      "elapsed": 30.166282600024715,
+      "destroyed": 0,
+      "frames": 1804,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 30.165615926031023,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.432373046875,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.513542175292969,
+          "Internal": 989.0924072265625,
+          "Instances": 99.80941772460938
+        },
+        "gc_mib": 2.4677734375,
+        "instances": 51780,
+        "total_mb": 287.98046875
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "stationary"
+    },
+    {
+      "phase_seconds": 0.0007014999864622951,
+      "focus_losses": 0,
+      "elapsed": 30.167601599998306,
+      "destroyed": 0,
+      "frames": 1804,
+      "cycle": 0,
+      "live_parts": 1000,
+      "frame_seconds": 30.165615926031023,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.432373046875,
+          "GraphicsParts": 1.0671005249023438,
+          "BaseParts": 1.66748046875,
+          "Signals": 8.513542175292969,
+          "Internal": 989.0924072265625,
+          "Instances": 99.80941772460938
+        },
+        "gc_mib": 2.484375,
+        "instances": 51780,
+        "total_mb": 288.0859375
+      },
+      "kind": "sample",
+      "created": 1000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 5.064668000035454,
+      "focus_losses": 0,
+      "elapsed": 35.2315681000473,
+      "destroyed": 5000,
+      "frames": 2106,
+      "cycle": 5,
+      "live_parts": 1000,
+      "frame_seconds": 35.23029861366376,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.9013671875,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 7.546112060546875,
+          "Signals": 8.511405944824219,
+          "Internal": 993.5645141601562,
+          "Instances": 100.18700408935547
+        },
+        "gc_mib": 2.2294921875,
+        "instances": 51780,
+        "total_mb": 332.58203125
+      },
+      "kind": "sample",
+      "created": 6000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 10.114841300004628,
+      "focus_losses": 0,
+      "elapsed": 40.281741700018756,
+      "destroyed": 10000,
+      "frames": 2409,
+      "cycle": 10,
+      "live_parts": 1000,
+      "frame_seconds": 40.28088259836659,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.78515625,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 13.313278198242188,
+          "Signals": 8.511054992675781,
+          "Internal": 1011.4204711914062,
+          "Instances": 100.56793975830078
+        },
+        "gc_mib": 1.80859375,
+        "instances": 51780,
+        "total_mb": 385.91796875
+      },
+      "kind": "sample",
+      "created": 11000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 15.197994699992705,
+      "focus_losses": 0,
+      "elapsed": 45.36489470000379,
+      "destroyed": 15000,
+      "frames": 2714,
+      "cycle": 15,
+      "live_parts": 1000,
+      "frame_seconds": 45.36384459817782,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.78515625,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 13.313278198242188,
+          "Signals": 8.511054992675781,
+          "Internal": 1015.192626953125,
+          "Instances": 100.56793975830078
+        },
+        "gc_mib": 1.7236328125,
+        "instances": 51780,
+        "total_mb": 417.16015625
+      },
+      "kind": "sample",
+      "created": 16000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 20.24743380001746,
+      "focus_losses": 0,
+      "elapsed": 50.41433400003007,
+      "destroyed": 20000,
+      "frames": 3017,
+      "cycle": 20,
+      "live_parts": 1000,
+      "frame_seconds": 50.41429330268875,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.6240234375,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 24.947853088378906,
+          "Signals": 8.563148498535156,
+          "Internal": 1016.5037841796875,
+          "Instances": 101.3290023803711
+        },
+        "gc_mib": 1.916015625,
+        "instances": 51780,
+        "total_mb": 432.69921875
+      },
+      "kind": "sample",
+      "created": 21000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 25.313869200006593,
+      "focus_losses": 0,
+      "elapsed": 55.48076930001844,
+      "destroyed": 25000,
+      "frames": 3321,
+      "cycle": 25,
+      "live_parts": 1000,
+      "frame_seconds": 55.48025310225785,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.6240234375,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 24.947853088378906,
+          "Signals": 8.563148498535156,
+          "Internal": 1016.5037841796875,
+          "Instances": 101.3290023803711
+        },
+        "gc_mib": 2.1650390625,
+        "instances": 51780,
+        "total_mb": 436.54296875
+      },
+      "kind": "sample",
+      "created": 26000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 30.364476900023874,
+      "focus_losses": 0,
+      "elapsed": 60.531377300038,
+      "destroyed": 30000,
+      "frames": 3624,
+      "cycle": 30,
+      "live_parts": 1000,
+      "frame_seconds": 60.52974510425702,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.8369140625,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 36.597816467285156,
+          "Signals": 9.175956726074219,
+          "Internal": 1016.1988525390625,
+          "Instances": 102.09247589111328
+        },
+        "gc_mib": 1.98828125,
+        "instances": 51780,
+        "total_mb": 453.453125
+      },
+      "kind": "sample",
+      "created": 31000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 35.41345860000001,
+      "focus_losses": 0,
+      "elapsed": 65.58035840000957,
+      "destroyed": 35000,
+      "frames": 3927,
+      "cycle": 35,
+      "live_parts": 1000,
+      "frame_seconds": 65.58025901159272,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.968505859375,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 42.34284210205078,
+          "Signals": 9.478096008300781,
+          "Internal": 1016.3524169921875,
+          "Instances": 102.47493743896484
+        },
+        "gc_mib": 1.9111328125,
+        "instances": 51780,
+        "total_mb": 468.640625
+      },
+      "kind": "sample",
+      "created": 36000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 40.446798000019044,
+      "focus_losses": 0,
+      "elapsed": 70.61369800003013,
+      "destroyed": 40000,
+      "frames": 4229,
+      "cycle": 40,
+      "live_parts": 1000,
+      "frame_seconds": 70.61266449978575,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.37060546875,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 48.12152862548828,
+          "Signals": 9.723640441894531,
+          "Internal": 1015.7913818359375,
+          "Instances": 102.85704803466797
+        },
+        "gc_mib": 2.7470703125,
+        "instances": 51780,
+        "total_mb": 436
+      },
+      "kind": "sample",
+      "created": 41000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 45.514104400004726,
+      "focus_losses": 0,
+      "elapsed": 75.6810047000181,
+      "destroyed": 45000,
+      "frames": 4533,
+      "cycle": 45,
+      "live_parts": 1000,
+      "frame_seconds": 75.67950000753626,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.37060546875,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 48.12152862548828,
+          "Signals": 9.723640441894531,
+          "Internal": 1015.7913818359375,
+          "Instances": 102.85704803466797
+        },
+        "gc_mib": 2.5068359375,
+        "instances": 51780,
+        "total_mb": 442.64453125
+      },
+      "kind": "sample",
+      "created": 46000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 50.56398410000838,
+      "focus_losses": 0,
+      "elapsed": 80.73088430002099,
+      "destroyed": 50000,
+      "frames": 4836,
+      "cycle": 50,
+      "live_parts": 1000,
+      "frame_seconds": 80.72848090995103,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.26416015625,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 58.995094299316406,
+          "Signals": 10.335990905761719,
+          "Internal": 1015.9072265625,
+          "Instances": 103.61975860595703
+        },
+        "gc_mib": 2.4794921875,
+        "instances": 51780,
+        "total_mb": 468.53125
+      },
+      "kind": "sample",
+      "created": 51000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 55.62879970000358,
+      "focus_losses": 0,
+      "elapsed": 85.79570010001771,
+      "destroyed": 55000,
+      "frames": 5134,
+      "cycle": 55,
+      "live_parts": 1000,
+      "frame_seconds": 85.7956369058229,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.26416015625,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 58.995094299316406,
+          "Signals": 10.335990905761719,
+          "Internal": 1015.9072265625,
+          "Instances": 103.61975860595703
+        },
+        "gc_mib": 2.478515625,
+        "instances": 51780,
+        "total_mb": 458.734375
+      },
+      "kind": "sample",
+      "created": 56000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 60.663353300013114,
+      "focus_losses": 0,
+      "elapsed": 90.8302533000242,
+      "destroyed": 60000,
+      "frames": 5436,
+      "cycle": 60,
+      "live_parts": 1000,
+      "frame_seconds": 90.82970780134201,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.893798828125,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 70.21393585205078,
+          "Signals": 10.941932678222656,
+          "Internal": 1016.5443115234375,
+          "Instances": 104.30440521240234
+        },
+        "gc_mib": 2.140625,
+        "instances": 51780,
+        "total_mb": 479.0546875
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "churn"
+    },
+    {
+      "phase_seconds": 6.669998401775956e-05,
+      "focus_losses": 0,
+      "elapsed": 90.8410683000111,
+      "destroyed": 61000,
+      "frames": 5436,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 90.82970780134201,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.893798828125,
+          "GraphicsParts": 1.0741500854492188,
+          "BaseParts": 70.21393585205078,
+          "Signals": 10.941932678222656,
+          "Internal": 1016.5443115234375,
+          "Instances": 104.30440521240234
+        },
+        "gc_mib": 2.158203125,
+        "instances": 50779,
+        "total_mb": 478.75
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 5.003913900000043,
+      "focus_losses": 0,
+      "elapsed": 95.84491540002637,
+      "destroyed": 61000,
+      "frames": 5737,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 95.84563690191135,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 738.893798828125,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.38294219970703,
+          "Signals": 11.006126403808594,
+          "Internal": 1015.8810424804688,
+          "Instances": 104.45723724365234
+        },
+        "gc_mib": 2.2001953125,
+        "instances": 50779,
+        "total_mb": 484.44140625
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 10.00603669998236,
+      "focus_losses": 0,
+      "elapsed": 100.84703830000944,
+      "destroyed": 61000,
+      "frames": 6037,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 100.84648230625317,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.36310577392578,
+          "Signals": 11.011512756347656,
+          "Internal": 1015.470458984375,
+          "Instances": 104.45687103271484
+        },
+        "gc_mib": 2.2412109375,
+        "instances": 50779,
+        "total_mb": 501.89453125
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 15.00446580001153,
+      "focus_losses": 0,
+      "elapsed": 105.84546740003861,
+      "destroyed": 61000,
+      "frames": 6337,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 105.8442207002081,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.36310577392578,
+          "Signals": 11.011512756347656,
+          "Internal": 1015.470458984375,
+          "Instances": 104.45687103271484
+        },
+        "gc_mib": 2.28125,
+        "instances": 50779,
+        "total_mb": 505.6875
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 20.00423680001404,
+      "focus_losses": 0,
+      "elapsed": 110.84523840004113,
+      "destroyed": 61000,
+      "frames": 6637,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 110.8440585997887,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.19189453125,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.35956573486328,
+          "Signals": 11.011436462402344,
+          "Internal": 1015.8431396484375,
+          "Instances": 104.45516204833984
+        },
+        "gc_mib": 1.681640625,
+        "instances": 50779,
+        "total_mb": 476.0546875
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 25.004195199988317,
+      "focus_losses": 0,
+      "elapsed": 115.84519660001388,
+      "destroyed": 61000,
+      "frames": 6937,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 115.8447962035425,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.19189453125,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.35956573486328,
+          "Signals": 11.011436462402344,
+          "Internal": 1015.8431396484375,
+          "Instances": 104.45516204833984
+        },
+        "gc_mib": 1.7177734375,
+        "instances": 50779,
+        "total_mb": 478.64453125
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "phase_seconds": 30.003031499974895,
+      "focus_losses": 0,
+      "elapsed": 120.84403310000198,
+      "destroyed": 61000,
+      "frames": 7237,
+      "cycle": 60,
+      "live_parts": 0,
+      "frame_seconds": 120.8433876032941,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 739.09716796875,
+          "GraphicsParts": 0.45534515380859375,
+          "BaseParts": 71.35956573486328,
+          "Signals": 11.010536193847656,
+          "Internal": 1010.1656494140625,
+          "Instances": 104.4539566040039
+        },
+        "gc_mib": 1.7587890625,
+        "instances": 50779,
+        "total_mb": 482.1328125
+      },
+      "kind": "sample",
+      "created": 61000,
+      "phase": "quiet"
+    },
+    {
+      "created": 61000,
+      "quiet_seconds": 30.00348319998011,
+      "focus_losses": 0,
+      "elapsed": 120.8448056000052,
+      "destroyed": 61000,
+      "stationary_seconds": 30.00521829997888,
+      "churn_seconds": 60.66371629998321,
+      "frame_seconds": 120.8433876032941,
+      "kind": "final",
+      "frames": 7237,
+      "live_parts": 0
+    }
+  ],
+  "scope": "Isolated desktop Studio Part allocation control, not game walking, standalone-client, phone or FPS evidence",
+  "game_source_included": false,
+  "published": false,
+  "run": "1792669956410",
+  "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+  "duration_seconds": 120.8448056000052,
+  "changes": {
+    "BaseParts": {
+      "stationary_delta_mb": 1.303375244140625,
+      "churn_delta_mb": 68.54645538330078,
+      "quiet_residual_mb": 69.69208526611328
+    },
+    "GraphicsParts": {
+      "stationary_delta_mb": 0.6197357177734375,
+      "churn_delta_mb": 0.007049560546875,
+      "quiet_residual_mb": -0.61175537109375
+    },
+    "Instances": {
+      "stationary_delta_mb": -0.003814697265625,
+      "churn_delta_mb": 4.494987487792969,
+      "quiet_residual_mb": 4.644538879394531
+    },
+    "Internal": {
+      "stationary_delta_mb": 2.27239990234375,
+      "churn_delta_mb": 27.451904296875,
+      "quiet_residual_mb": 21.0732421875
+    },
+    "LuaHeap": {
+      "stationary_delta_mb": 0.871826171875,
+      "churn_delta_mb": -0.53857421875,
+      "quiet_residual_mb": -0.335205078125
+    },
+    "Signals": {
+      "stationary_delta_mb": 0.0043487548828125,
+      "churn_delta_mb": 2.4283905029296875,
+      "quiet_residual_mb": 2.4969940185546875
+    }
+  },
+  "part_category_investigation_threshold_mb": 8,
+  "isolated_part_growth_observed": true,
+  "persists_after_30_seconds": true,
+  "interpretation": "A single isolated Studio control can reproduce category growth without Windowsill code. It cannot establish a game leak, engine bug, production-client behavior or FPS benefit.",
+  "events_sha256": "bdcc975fe3a2d8c1334ba93f9f7c3ae4c45febd2d456292d693464e49a76707d",
+  "manifest_sha256": "6ea405782e55d1b2b0e64bfe5fa656beabaab8eaef28fe86455bb4f9267ad9ef"
+}

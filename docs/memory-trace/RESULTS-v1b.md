@@ -2,6 +2,8 @@
 
 Run `1792666028145` completed **1,800.080 seconds**, 121 interval/end samples, and 59 completed habitat visits (nine each at sill, desk and garden; eight each at meadow, pond, doorway and lamp). Source `3c8de801e5fab68598e1e5323e7f5e1c8151b0e6`; all 217 diagnostic-place scripts guarded; production persistence disabled. The complete record/checksum, source, habitat readiness, viewport, focus and simulation-activity gates pass. Simulation advanced 1,797.17 seconds. No focus loss or CreatorError was recorded. The trace is valid; its memory verdict is **investigate growth**.
 
+Follow-up attribution control: `docs/native-part-churn/RESULTS-v1.md` reproduces BaseParts/Instances/Signals category growth in an isolated one-script Studio place with no Windowsill game scripts, stable live batch counts and zero fixture Parts after cleanup. Its post-run scripting-reference view does not list the probe as retaining instances. That narrows attribution; it does not invalidate this original trace, prove an engine bug, or establish leak-free production-client behavior. Keep the original investigation flag.
+
 ## What grew
 
 The predeclared matched comparison uses visits 3/4 versus each habitat's final two completed visits, taking medians of the observed within-visit lower envelopes. These are sparse sampled minima, not forced-GC readings or continuously observed true minima.

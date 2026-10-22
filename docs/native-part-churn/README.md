@@ -1,6 +1,6 @@
 # Isolated native Part allocation control
 
-Prepared experiment; **no native result yet**. This investigation follows `docs/memory-trace/RESULTS-v1b.md`, where repeated habitat visits had stable live counts/client-GC low points but rising BaseParts/Instances/Signals category counters. That observation does not identify the cause.
+**Native control completed; category growth reproduced without Windowsill game scripts.** Read `RESULTS-v1.md` for the actual run, separate post-run reference inspection and interpretation limits. This investigation follows `docs/memory-trace/RESULTS-v1b.md`, where repeated habitat visits had stable live counts/client-GC low points but rising BaseParts/Instances/Signals category counters. Neither observation alone identifies the cause.
 
 This place contains exactly one authored LocalScript and no Windowsill game source, persistence, third-party assets or character. A source/attribute/count guard must pass before Play. A fresh Studio process and fixed viewport/focus are required; wait for the current full Windows CLI run to finish before measuring. Never publish this diagnostic.
 
@@ -21,3 +21,5 @@ An isolated reproduction would show that this Studio counter behavior does not r
 Official references: [Stats](https://create.roblox.com/docs/reference/engine/classes/Stats), [memory categories and snapshots](https://create.roblox.com/docs/studio/optimization/memory-usage), [performance investigation](https://create.roblox.com/docs/performance-optimization/improve). These distinguish client Lua heap, instance counts and engine categories; none turns a category slope alone into proof of a retaining-code bug.
 
 Prepared v1: `C:\Users\natha\claude-xfer\Windowsill-part-churn-v1\Windowsill-part-churn-control.rbxlx`, SHA-256 `e2391f3d640306229068c85093d6310e86bd63ef06681eb3f4e6992c2e3976b4`. Probe SHA-256 `80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67`; unoptimized compilation passed. `build.py` freezes a copy of the probe, checks the exact authored script set and writes the native guard/manifest. The production game and its running full-suite input bytes remain unchanged.
+
+The full Windows job is now terminal and successful. Observer 76550 is also terminal; do not restart or continue polling it. Studio was closed after native DONE with the original package restored. `prepared.json` and `origin-v1.json` retain historical preparation/start state; `native-v1.json` and `receipt.json` are the reconstructed completion evidence. Eight decoder tests pass; their synthetic records are not native measurements.

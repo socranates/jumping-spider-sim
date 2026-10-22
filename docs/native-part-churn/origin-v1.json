@@ -1,0 +1,18 @@
+{
+  "source_log": "C:/Users/natha/AppData/Local/Roblox/logs/0.744.0.7441077_20261022T114007Z_Studio_78DD6_last.log",
+  "window_id": 71633286,
+  "observer_session_id": 76550,
+  "observer_directory": "C:/Users/natha/claude-xfer/Windowsill-part-churn-v1/observer",
+  "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+  "place_sha256": "e2391f3d640306229068c85093d6310e86bd63ef06681eb3f4e6992c2e3976b4",
+  "windows_full_terminal_before_start": true,
+  "windows_full_source": "fab75695ba918eeebe793e6768a08cabe99a70f3",
+  "windows_full_passed": 443522,
+  "game_source_included": false,
+  "persistence_included": false,
+  "status_at_recording": "started, completion not yet observed",
+  "initial_focus_evidence": "Inspected matching Studio title and exact source guard, then F5 in that window; later native focus loss is monitored",
+  "host_free_physical_kib_before_play": 438088,
+  "host_free_virtual_kib_before_play": 8184780,
+  "lighting_notice": "Studio automatically migrated the blank place from Compatibility to Voxel before Play; dismissed informational notice; no game lighting edited"
+}

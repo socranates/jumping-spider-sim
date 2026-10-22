@@ -1,0 +1,21 @@
+{
+  "native_complete": true,
+  "native_run": "1792669956410",
+  "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+  "native_duration_seconds": 120.8448056000052,
+  "records": 29,
+  "fixture_created": 61000,
+  "fixture_destroyed": 61000,
+  "final_live_fixture_parts": 0,
+  "isolated_category_growth_reproduced": true,
+  "growth_persists_after_30_seconds": true,
+  "post_run_client_reference_tree_verified": true,
+  "post_run_probe_group_listed": false,
+  "game_memory_leak_proven": false,
+  "absence_of_game_leaks_proven": false,
+  "engine_bug_proven": false,
+  "standalone_client_verified": false,
+  "phone_verified": false,
+  "fps_benefit_claimed": false,
+  "published": false
+}

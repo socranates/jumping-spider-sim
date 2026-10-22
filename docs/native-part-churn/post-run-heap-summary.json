@@ -1,0 +1,121 @@
+{
+  "api": "SceneAnalysisService:GetUnparentedInstancesAsync",
+  "scope": "One client-context snapshot after timed control completed; not the original game trace or C++ allocation inspection",
+  "root_count": 42,
+  "host_groups": 10,
+  "tree_nodes": 22,
+  "retained_probe_group_listed": false,
+  "nodes": [
+    {
+      "path": "/UnparentedInstances",
+      "children": 10,
+      "size": 42
+    },
+    {
+      "path": "/UnparentedInstances/Chat.ClientChatModules.ChatLocalization",
+      "children": 1,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Chat.ClientChatModules.ChatLocalization/Translator",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Chat.ClientChatModules.ChatSettings",
+      "children": 1,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Chat.ClientChatModules.ChatSettings/BindableEvent",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerGui.Freecam.FreecamScript",
+      "children": 1,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerGui.Freecam.FreecamScript/UserGameSettings",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.BubbleChat",
+      "children": 1,
+      "size": 12
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.BubbleChat/ImageLabel",
+      "children": 0,
+      "size": 12
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.ChatScript",
+      "children": 1,
+      "size": 4
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.ChatScript/BindableEvent",
+      "children": 0,
+      "size": 4
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.ChatScript.ChatMain",
+      "children": 1,
+      "size": 13
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.ChatScript.ChatMain/BindableEvent",
+      "children": 0,
+      "size": 13
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.CameraModule.CameraInput",
+      "children": 1,
+      "size": 4
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.CameraModule.CameraInput/BindableEvent",
+      "children": 0,
+      "size": 4
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.CameraModule.MouseLockController",
+      "children": 1,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.CameraModule.MouseLockController/BindableEvent",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface",
+      "children": 1,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface/BindableEvent",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay",
+      "children": 2,
+      "size": 4
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay/Animation",
+      "children": 0,
+      "size": 1
+    },
+    {
+      "path": "/UnparentedInstances/Players.socranates.PlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay/Part",
+      "children": 0,
+      "size": 3
+    }
+  ],
+  "not_a_no_leaks_proof": true
+}

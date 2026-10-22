@@ -1,0 +1,8 @@
+{
+  "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+  "evidence_id": "13ceab93a7239418",
+  "exec_session_id": 3260,
+  "exit_code": 0,
+  "completion_observed_utc": "2026-10-22T05:02:44.184450+00:00",
+  "note": "Actual terminal completion and exit 0 observed with write_stdin. Source unchanged during run."
+}

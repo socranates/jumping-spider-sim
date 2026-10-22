@@ -1,0 +1,73 @@
+{
+  "candidate": {
+    "branch": "codex/save-compaction",
+    "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+    "evidence_id": "13ceab93a7239418"
+  },
+  "published": false,
+  "source_manifest_matches": true,
+  "compile_fingerprints_match": true,
+  "computed_evidence_id": "13ceab93a7239418",
+  "local_cli": {
+    "completed_summaries": 62,
+    "passed": 443158,
+    "failed": 0,
+    "failure_lines": []
+  },
+  "local_process": {
+    "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+    "evidence_id": "13ceab93a7239418",
+    "exec_session_id": 3260,
+    "exit_code": 0,
+    "completion_observed_utc": "2026-10-22T05:02:44.184450+00:00",
+    "note": "Actual terminal completion and exit 0 observed with write_stdin. Source unchanged during run."
+  },
+  "ci": {
+    "id": 39722478961,
+    "head_sha": "133261b5b175d44211d7ddd607b272e9694e72f3",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39722478961",
+    "created_at": "2026-10-22T04:27:29Z",
+    "updated_at": "2026-10-22T04:36:51Z",
+    "suites": 62,
+    "failed_summary_lines": []
+  },
+  "native": {
+    "passed": 274,
+    "failed": 0,
+    "skipped": 0,
+    "source_guard_matches": true
+  },
+  "offline_gates_pass": true,
+  "online_store_attempt": {
+    "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+    "evidence_id": "13ceab93a7239418",
+    "universe_id": 10771103250,
+    "place_id": 120119801868085,
+    "place_version": 140,
+    "store": "WindowsillTest_v1",
+    "key": "R_chet_compaction_1792644816574_main",
+    "result": "StudioAccessToApisNotAllowed",
+    "failed_operation": "first uncached GetAsync",
+    "writes_attempted": 0,
+    "production_store_accessed": false,
+    "timestamp": "2026-10-22T04:53:36Z"
+  },
+  "actual_client_rejoin_verified": false,
+  "performance_matrix_complete": false,
+  "physical_phone_tested": false,
+  "publication_ready": false,
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "bytes": 3083481,
+      "sha256": "cc6c96ccb44e63833ce21d698d8125e8f6feebbb85b23cdb1b9b4e81681a5fb7"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "bytes": 3285767,
+      "sha256": "6a86a71ef66fe17b2f8b55541c9593df85e60485e7420160783efc80994998ff"
+    }
+  ]
+}

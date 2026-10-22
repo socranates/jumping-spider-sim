@@ -1,0 +1,14 @@
+{
+  "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+  "evidence_id": "13ceab93a7239418",
+  "universe_id": 10771103250,
+  "place_id": 120119801868085,
+  "place_version": 140,
+  "store": "WindowsillTest_v1",
+  "key": "R_chet_compaction_1792644816574_main",
+  "result": "StudioAccessToApisNotAllowed",
+  "failed_operation": "first uncached GetAsync",
+  "writes_attempted": 0,
+  "production_store_accessed": false,
+  "timestamp": "2026-10-22T04:53:36Z"
+}

@@ -1,0 +1,7 @@
+REST_COMPRESSION passed=33 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233 passed=1 failed=0
+AUDIT_READY calls=192
+state: a rest is 17887 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 11.5 s
+STATE passed=517 failed=0
+STATE_CLIENT passed=145 failed=0

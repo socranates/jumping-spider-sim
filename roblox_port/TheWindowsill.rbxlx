@@ -3388,10 +3388,11 @@ SaveRules.FORMAT = "the-windowsill save"
 SaveRules.REMOTES_NAME = "SaveRemotes" -- the folder in ReplicatedStorage holding ToServer and ToClient
 
 -- ---------------------------------------------------------------- sizes (characters of canonical JSON)
--- Measured: a rest is about 22 thousand characters (tests/state.luau prints the real figures). The cap leaves room for a long life's
--- growth and is far under Roblox's 4,194,304-character limit even with the kept backup inside the same value.
-SaveRules.MAX_REST_CHARS = 262144
-SaveRules.MAX_REST_NODES = 120000 -- values (tables, numbers, strings) a rest may hold, counted before it is encoded
+-- Expanded validation bounds, NOT the stored-value budget. The full preserve initialization is 2.28M characters.
+-- Server/RestCompression bounds the actual compressed envelope INCLUDING its backup to 1.5M stored characters,
+-- and checks its Zstd frame size before expanding (12M maximum). Old uncompressed records remain readable.
+SaveRules.MAX_REST_CHARS = 5000000
+SaveRules.MAX_REST_NODES = 600000 -- values a rest may hold, checked before encoding/checkpoint graph construction
 SaveRules.MAX_DEPTH = 24
 SaveRules.MAX_PROGRESS_CHARS = 16384
 SaveRules.MAX_VALUE_CHARS = 4194304 -- Roblox's own limit on one stored value
@@ -42441,27 +42442,41 @@ return table.freeze(Worlds)
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
--- The real store backend (ROBLOX-39): a thin adapter from a Roblox DataStore to the interface Shared/Persistence/MemoryBackend documents
--- (read and update, neither raises). It holds no logic of its own; it takes the DataStore object as an argument so a fake can stand in for
--- it (tests/state.luau runs it against one). Only the server requires this module: the server owns all DataStore access.
+-- Roblox DataStore adapter (read and update, neither raises). An optional storage codec handles only R_ rest keys;
+-- transforms always see the original envelope. Failed decoding/compression never replaces an earlier stored value.
+-- Store and codec are injected for boundary tests; only the server owns real DataStore access.
 local DataStoreBackend = {}
 DataStoreBackend.__index = DataStoreBackend
 
-function DataStoreBackend.new(dataStore: any): any
-	return setmetatable({ ds = dataStore }, DataStoreBackend)
+function DataStoreBackend.new(dataStore: any, restCodec: any?): any
+	return setmetatable({ ds = dataStore, restCodec = restCodec }, DataStoreBackend)
 end
+
+local function restKey(key: string): boolean return string.sub(key,1,2)=="R_" end
 
 -- GetAsync: ok, the value (nil when the key does not exist), the error text.
 function DataStoreBackend.read(self: any, key: string): (boolean, any, string?)
 	local ok, value = pcall(function(): any return self.ds:GetAsync(key) end)
 	if not ok then return false, nil, tostring(value) end
+	if self.restCodec and restKey(key) then
+		local decoded, result=pcall(function(): any return self.restCodec:decode(value,true) end)
+		if not decoded then return false,nil,tostring(result) end
+		value=result
+	end
 	return true, value, nil
 end
 
 -- UpdateAsync: `transform(old)` returns the new value, or nil to leave the key as it is. Roblox may call it more than once.
 function DataStoreBackend.update(self: any, key: string, transform: (any) -> any): (boolean, any, string?)
 	local ok, value = pcall(function(): any
-		local result = self.ds:UpdateAsync(key, transform)
+		local useCodec=self.restCodec~=nil and restKey(key)
+		local result = self.ds:UpdateAsync(key, function(stored: any): any
+			local old=if useCodec then self.restCodec:decode(stored) else stored
+			local nextValue=transform(old)
+			if nextValue==nil then return nil end
+			return if useCodec then self.restCodec:encode(nextValue) else nextValue
+		end)
+		if useCodec then return self.restCodec:decode(result) end
 		return result
 	end)
 	if not ok then return false, nil, tostring(value) end
@@ -42574,6 +42589,7 @@ local SaveRules = require(Shared.Data.SaveRules)
 local SaveStores = require(Shared.Persistence.SaveStores)
 local SaveService = require(script.Parent.SaveService)
 local DataStoreBackend = require(script.Parent.DataStoreBackend)
+local RestCompression = require(script.Parent.RestCompression)
 
 local isStudio = RunService:IsStudio()
 local isTestPlace = ServerScriptService:FindFirstChild("PortTests") ~= nil
@@ -42581,9 +42597,12 @@ local storeName = SaveStores.name(isStudio, isTestPlace, Workspace:GetAttribute(
 
 -- The real DataStore when the service can be asked for one; otherwise an unavailable backend: session-only, never a misleading Saved status.
 local backend: any
-local okStore, store = pcall(function(): any return game:GetService("DataStoreService"):GetDataStore(storeName) end)
+local okStore, store = pcall(function(): any
+	local dataStore=game:GetService("DataStoreService"):GetDataStore(storeName)
+	return DataStoreBackend.new(dataStore,RestCompression.engine())
+end)
 if okStore and store ~= nil then
-	backend = DataStoreBackend.new(store)
+	backend = store
 else
 	warn("[Windowsill] saves: no DataStore service (" .. tostring(store) .. "); saving stays in memory for this server")
 	backend = {
@@ -42646,6 +42665,140 @@ end)
         </Properties>
       </Item>
       <Item class="ModuleScript" referent="198">
+        <Properties>
+          <string name="Name">RestCompression</string>
+          <string name="Source"><![CDATA[--!strict
+-- Storage only: independently compressed current/backup cores retain their original canonical checksums.
+-- The opaque schema-2 header makes an older server refuse this value as newer. No simulation fields change.
+local RestCompression={}
+RestCompression.__index=RestCompression
+RestCompression.ENCODING="zstd-base64-2"
+RestCompression.MAX_STORED_CHARS=1500000
+RestCompression.MAX_CORE_BYTES=6000000
+RestCompression.MAX_EXPANDED_BYTES=12000000
+RestCompression.HEADER_RESERVE=2048
+export type Adapter={
+ compress:(string)->string, expandedSize:(string)->number?, decompress:(string)->string,
+ parse:(string)->any, serialize:(any)->(string?,string?),
+}
+local function finite(v: any): boolean
+ return type(v)=="number" and v==v and v~=math.huge and v~=-math.huge
+end
+local function whole(v: any): boolean return finite(v) and v>=1 and v==math.floor(v) end
+local function restKind(v: any): boolean
+ return v=="rest_main" or v=="rest_easy" or v=="rest_free"
+end
+local FIELDS={format=true,kind=true,schema=true,innerSchema=true,updatedAt=true,encoding=true,bytes=true,data=true,backup=true}
+local function future(v: any): boolean
+ if type(v)~="table" or not finite(v.schema) or v.schema<2 then return false end
+ if v.schema>2 or v.encoding~=RestCompression.ENCODING then return true end
+ for k in v do if not FIELDS[k] then return true end end
+ return false
+end
+function RestCompression.new(adapter: Adapter): any
+ assert(2*RestCompression.MAX_CORE_BYTES<=RestCompression.MAX_EXPANDED_BYTES,"invalid combined expansion budget")
+ return setmetatable({adapter=adapter},RestCompression)
+end
+local function coreEnvelope(v: any): any
+ local out={}
+ for k,x in v do if k~="backup" then out[k]=x end end
+ return out
+end
+local function packCore(self: any,envelope: any): any
+ assert(type(envelope)=="table" and restKind(envelope.kind),"not a rest envelope")
+ assert(whole(envelope.schema) and finite(envelope.updatedAt),"invalid rest envelope header")
+ local text,why=self.adapter.serialize(coreEnvelope(envelope))
+ assert(text,why)
+ assert(#text<=RestCompression.MAX_CORE_BYTES,"rest core exceeds expanded limit")
+ local data=self.adapter.compress(text)
+ assert(type(data)=="string" and #data<=RestCompression.MAX_STORED_CHARS,"compressed rest exceeds storage limit")
+ return {format=envelope.format,kind=envelope.kind,schema=2,innerSchema=envelope.schema,
+  updatedAt=envelope.updatedAt,encoding=RestCompression.ENCODING,bytes=#text,data=data}
+end
+function RestCompression.encode(self: any,envelope: any): any
+ local wrapped=packCore(self,envelope)
+ if envelope.backup~=nil then
+  local backup=coreEnvelope(envelope.backup)
+  backup.format,backup.kind=envelope.format,envelope.kind
+  wrapped.backup=packCore(self,backup)
+ end
+ local dataBytes=#wrapped.data+(if wrapped.backup then #wrapped.backup.data else 0)
+ assert(dataBytes+RestCompression.HEADER_RESERVE<=RestCompression.MAX_STORED_CHARS,"compressed rest and backup exceed storage limit")
+ assert(#assert(self.adapter.serialize(wrapped))<=RestCompression.MAX_STORED_CHARS,"compressed rest header exceeds storage limit")
+ return wrapped
+end
+local function unpackCore(self: any,v: any): any
+ assert(type(v)=="table" and v.encoding==RestCompression.ENCODING and v.schema==2,"invalid compressed rest schema")
+ assert(restKind(v.kind) and type(v.format)=="string" and #v.format<=64,"invalid compressed rest kind")
+ assert(whole(v.innerSchema) and finite(v.updatedAt),"invalid inner rest header")
+ assert(type(v.data)=="string" and #v.data<=RestCompression.MAX_STORED_CHARS,"invalid compressed rest size")
+ assert(whole(v.bytes) and v.bytes<=RestCompression.MAX_CORE_BYTES,"invalid expanded rest size")
+ local size=self.adapter.expandedSize(v.data)
+ assert(size==v.bytes,"compressed rest frame size does not match its header")
+ local text=self.adapter.decompress(v.data)
+ assert(type(text)=="string" and #text==size,"decompressed rest size does not match")
+ local envelope=self.adapter.parse(text)
+ assert(type(envelope)=="table" and envelope.format==v.format and envelope.kind==v.kind
+  and envelope.schema==v.innerSchema and envelope.updatedAt==v.updatedAt and envelope.backup==nil,
+  "compressed rest header does not match its contents")
+ return envelope
+end
+local function corruptCore(v: any): any
+ return {format=v.format,kind=v.kind,schema=if whole(v.innerSchema) then v.innerSchema else 1,
+  updatedAt=if finite(v.updatedAt) then v.updatedAt else 0,checksum=""}
+end
+-- Read paths can expose a good independent backup through a deliberately corrupt current envelope.
+-- Write callbacks use the strict default: a corrupt current core must never reach a transform.
+function RestCompression.decode(self: any,v: any,recoverBackup: boolean?): any
+ if type(v)~="table" or v.encoding~=RestCompression.ENCODING then return v end
+ if future(v) or future(v.backup) then return v end
+ local backup=v.backup
+ local validBackup=type(backup)=="table" and backup.backup==nil
+  and backup.format==v.format and backup.kind==v.kind
+ local currentBytes=if type(v.data)=="string" then #v.data else 0
+ local backupBytes=if validBackup and type(backup.data)=="string" then #backup.data else 0
+ local withinBudget=currentBytes+backupBytes+RestCompression.HEADER_RESERVE<=RestCompression.MAX_STORED_CHARS
+ if not withinBudget and not recoverBackup then error("compressed rest and backup exceed storage limit",0) end
+ local ok=false
+ local envelope: any="compressed rest and backup exceed storage limit"
+ if withinBudget then ok,envelope=pcall(unpackCore,self,v) end
+ if not ok then
+  if not recoverBackup then error(envelope,0) end
+  envelope=corruptCore(v)
+ end
+ if backup~=nil then
+  local good,decoded=false,nil
+  if validBackup and backupBytes+RestCompression.HEADER_RESERVE<=RestCompression.MAX_STORED_CHARS then good,decoded=pcall(unpackCore,self,backup) end
+  if not good then decoded=corruptCore(if type(backup)=="table" then backup else v) end
+  local restoredBackup=coreEnvelope(decoded)
+  restoredBackup.format,restoredBackup.kind=nil,nil
+  envelope.backup=restoredBackup
+ end
+ return envelope
+end
+function RestCompression.engine(): any
+ local encoding=game:GetService("EncodingService")
+ local http=game:GetService("HttpService")
+ return RestCompression.new({
+  -- Native transport serialization is faster; canonical checksums remain inside both cores.
+  serialize=function(v: any): (string?,string?) return http:JSONEncode(v),nil end,
+  compress=function(text: string): string
+   return buffer.tostring(encoding:Base64Encode(encoding:CompressBuffer(buffer.fromstring(text),Enum.CompressionAlgorithm.Zstd,3)))
+  end,
+  expandedSize=function(data: string): number?
+   return encoding:GetDecompressedBufferSize(encoding:Base64Decode(buffer.fromstring(data)),Enum.CompressionAlgorithm.Zstd)
+  end,
+  decompress=function(data: string): string
+   return buffer.tostring(encoding:DecompressBuffer(encoding:Base64Decode(buffer.fromstring(data)),Enum.CompressionAlgorithm.Zstd))
+  end,
+  parse=function(text: string): any return http:JSONDecode(text) end,
+ })
+end
+return RestCompression
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="199">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -42852,7 +43005,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="199">
+      <Item class="ModuleScript" referent="200">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -42976,19 +43129,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="200">
+  <Item class="StarterPlayer" referent="201">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="201">
+    <Item class="StarterPlayerScripts" referent="202">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="202">
+      <Item class="Folder" referent="203">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="203">
+        <Item class="ModuleScript" referent="204">
           <Properties>
             <string name="Name">BirdBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -43202,7 +43355,7 @@ return BirdBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="204">
+        <Item class="ModuleScript" referent="205">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -43975,7 +44128,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="205">
+        <Item class="ModuleScript" referent="206">
           <Properties>
             <string name="Name">CatBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44102,7 +44255,7 @@ return CatBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="206">
+        <Item class="ModuleScript" referent="207">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -44289,7 +44442,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="207">
+        <Item class="ModuleScript" referent="208">
           <Properties>
             <string name="Name">CrabBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44412,7 +44565,7 @@ return CrabBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="208">
+        <Item class="ModuleScript" referent="209">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -45068,7 +45221,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="209">
+        <Item class="ModuleScript" referent="210">
           <Properties>
             <string name="Name">FrameProfile</string>
             <string name="Source"><![CDATA[--!strict
@@ -45209,7 +45362,7 @@ return FrameProfile
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="210">
+        <Item class="ModuleScript" referent="211">
           <Properties>
             <string name="Name">HutLife</string>
             <string name="Source"><![CDATA[--!strict
@@ -45464,7 +45617,7 @@ return HutLife
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="211">
+        <Item class="ModuleScript" referent="212">
           <Properties>
             <string name="Name">LivingWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -45952,7 +46105,7 @@ return LivingWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="212">
+        <Item class="ModuleScript" referent="213">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -46234,7 +46387,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="213">
+        <Item class="ModuleScript" referent="214">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -46588,7 +46741,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="214">
+        <Item class="ModuleScript" referent="215">
           <Properties>
             <string name="Name">MealPresentation</string>
             <string name="Source"><![CDATA[--!strict
@@ -46662,7 +46815,7 @@ return Meal
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="215">
+        <Item class="ModuleScript" referent="216">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -46700,7 +46853,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="216">
+        <Item class="ModuleScript" referent="217">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -47203,7 +47356,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="217">
+        <Item class="ModuleScript" referent="218">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -47248,7 +47401,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="218">
+        <Item class="ModuleScript" referent="219">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -47488,7 +47641,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="219">
+        <Item class="ModuleScript" referent="220">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -47533,7 +47686,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="220">
+        <Item class="ModuleScript" referent="221">
           <Properties>
             <string name="Name">PondBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -47701,7 +47854,7 @@ return PondBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="221">
+        <Item class="ModuleScript" referent="222">
           <Properties>
             <string name="Name">RareBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -47793,7 +47946,7 @@ return Body
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="222">
+        <Item class="ModuleScript" referent="223">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -47918,7 +48071,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="223">
+        <Item class="ModuleScript" referent="224">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -49728,7 +49881,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="224">
+        <Item class="ModuleScript" referent="225">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -50429,7 +50582,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="225">
+        <Item class="ModuleScript" referent="226">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -50630,7 +50783,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="226">
+        <Item class="ModuleScript" referent="227">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -51360,7 +51513,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="227">
+        <Item class="LocalScript" referent="228">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -53752,7 +53905,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="228">
+        <Item class="ModuleScript" referent="229">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -54218,7 +54371,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="229">
+        <Item class="ModuleScript" referent="230">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -54638,7 +54791,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="230">
+        <Item class="ModuleScript" referent="231">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -54907,7 +55060,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="231">
+        <Item class="ModuleScript" referent="232">
           <Properties>
             <string name="Name">StationMouseBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -54953,7 +55106,7 @@ return Body
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="232">
+        <Item class="ModuleScript" referent="233">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -55220,7 +55373,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="233">
+        <Item class="ModuleScript" referent="234">
           <Properties>
             <string name="Name">TrainPass</string>
             <string name="Source"><![CDATA[--!strict
@@ -55363,7 +55516,7 @@ return TrainPass
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="234">
+        <Item class="ModuleScript" referent="235">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -55595,7 +55748,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="235">
+        <Item class="ModuleScript" referent="236">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -55919,7 +56072,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="236">
+        <Item class="ModuleScript" referent="237">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -55960,7 +56113,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="237">
+        <Item class="ModuleScript" referent="238">
           <Properties>
             <string name="Name">WorldShadows</string>
             <string name="Source"><![CDATA[--!strict
@@ -56135,7 +56288,7 @@ return WorldShadows
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="238">
+  <Item class="Workspace" referent="239">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

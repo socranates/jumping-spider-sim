@@ -1,0 +1,62 @@
+assert(game.PlaceId==0 and game:GetService("RunService"):IsRunning(),"isolated local runtime only")
+local function phase(name,fn)
+ task.wait()
+ print("[CHET_SAVE_PHASE_BEGIN]",name)
+ local started=os.clock()
+ local result=table.pack(fn())
+ print("[CHET_SAVE_PHASE_END]",name,(os.clock()-started)*1000)
+ return table.unpack(result,1,result.n)
+end
+local Shared=game.ReplicatedStorage.Shared
+require(Shared.World.WorldMap).use("preserve")
+local C=require(game.ServerScriptService.Server.RestCompression)
+local J=require(Shared.Persistence.Json)
+local E=require(Shared.Persistence.SaveEnvelope)
+local Checkpoint=require(Shared.Persistence.Checkpoint)
+local Rest=require(Shared.Persistence.SaveRest)
+local http=game:GetService("HttpService")
+local text=game.ReplicatedStorage.FullWorldRestFixture.Value
+local raw=phase("parse",function() return http:JSONDecode(text) end)
+phase("numeric precision",function()
+ local numbers={0,-0.0,2^53-1,-2^53+1,1e-300,-1e300,5e-324,-5e-324,1.2345678901234567}
+ local random=Random.new(914)
+ for i=1,1000 do table.insert(numbers,random:NextNumber(-1,1)*10^random:NextInteger(-300,300)) end
+ assert(J.canonical(http:JSONDecode(http:JSONEncode(numbers)))==J.canonical(numbers))
+end)
+phase("canon raw",function() assert(J.canonical(raw)==text) end)
+phase("validate full record",function() local why=Rest.check("main",raw);assert(#why==0,why[1]) end)
+local spec={kind="rest_main",current=1,migrations={},validate=function(p) return Checkpoint.check(p,Rest.stubWorld()),p end}
+local prior=phase("make prior",function() return E.make(spec,http:JSONDecode(text),1,nil,nil) end)
+local envelope=phase("make current",function() return E.make(spec,raw,2,prior,nil) end)
+local codec=C.engine()
+local packed=phase("encode",function() return codec:encode(envelope) end)
+local storage=#http:JSONEncode(packed)
+local decoded=phase("decode",function() return codec:decode(packed) end)
+local expected=phase("canon expected",function() return assert(J.canonical(envelope)) end)
+local actual=phase("canon decoded",function() return assert(J.canonical(decoded)) end)
+assert(expected==actual)
+phase("validate current and backup",function()
+ local o=E.open(spec,decoded)
+ assert(o.status=="ok" and o.backup and o.backup.status=="ok",table.concat(o.reasons,"; "))
+end)
+assert(E.open(spec,packed).status=="newer")
+phase("recover current corruption",function()
+ local broken=table.clone(packed);broken.data="not-base64"
+ local o=E.open(spec,codec:decode(broken,true))
+ assert(o.status=="corrupt" and o.backup and o.backup.status=="ok")
+ assert(not pcall(function() codec:decode(broken) end))
+end)
+phase("recover backup corruption",function()
+ local broken=table.clone(packed);broken.backup=table.clone(packed.backup);broken.backup.data="not-base64"
+ local o=E.open(spec,codec:decode(broken))
+ assert(o.status=="ok" and o.backup.status=="corrupt")
+end)
+phase("expansion bomb refusal",function()
+ local calls=0;local expand=codec.adapter.decompress
+ codec.adapter.decompress=function(s) calls+=1;return expand(s) end
+ local bomb=table.clone(packed);bomb.backup=nil;bomb.bytes=1
+ bomb.data=codec.adapter.compress(string.rep("x",C.MAX_CORE_BYTES+1))
+ assert(not pcall(function() codec:decode(bomb) end) and calls==0)
+end)
+assert(storage<C.MAX_STORED_CHARS)
+print("[CHET_COMPRESSION_NATIVE_V2]",#text,#expected,#packed.data+#packed.backup.data,storage,"PASS exact current+backup; independent recovery; expansion bound; 1009 numbers; old reader refuses")

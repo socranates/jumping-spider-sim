@@ -1,0 +1,11 @@
+{
+  "source_commit": "133261b5b175d44211d7ddd607b272e9694e72f3",
+  "evidence_id": "13ceab93a7239418",
+  "native_regions": 233,
+  "canonical_checkpoint_chars": 2276508,
+  "native_stored_chars": 226962,
+  "chunks": 454,
+  "sha256": "d7743248887c9529da805472022ea40f8c8a61bc3d387e6888128007e094b86f",
+  "synthetic_ecology": true,
+  "production_store_touched": false
+}

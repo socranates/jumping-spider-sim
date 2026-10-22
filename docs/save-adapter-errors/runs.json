@@ -1,0 +1,14 @@
+{
+  "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+  "evidence_id": "e50104232f063255",
+  "windows_exec_session": 24276,
+  "ci_run": 39733574738,
+  "native_window_id": 7539614,
+  "native_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T062833Z_Studio_47B12_last.log",
+  "native_source_guard": "216/216",
+  "native_self_test": "running; no final result yet",
+  "online_store_gate": "passed; see online-store.json",
+  "actual_client_rejoin": false,
+  "published": false,
+  "native_codec_memory_probe_pass": true
+}

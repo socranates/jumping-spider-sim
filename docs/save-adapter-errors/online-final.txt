@@ -1,0 +1,17 @@
+2026-10-22T06:25:30.919Z,1346.919678,77dc,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_SOURCE] 175 dc1c4b8640014a5718b6dc17d31044aca070c6d7 e50104232f063255
+2026-10-22T06:25:34.514Z,1350.514526,8558,12 [DFLog::HttpTraceError] HttpResponse(#860 0x192c66146f8) time:846.2ms (net:846.0ms timeInRetryQueue:0.0ms)status:404 Not Found bodySize:88 url:{ "https://gamepersistence.roblox.com/v2/persistence/10771103250/datastores/objects/object?datastore=WindowsillTest_v1&objectKey=global%2FR_chet_life_1792650334099_main" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:25:34.592Z,1350.592407,81cc,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_START] WindowsillTest_v1 R_chet_life_1792650334099_main
+2026-10-22T06:25:35.183Z,1351.183838,5660,12 [DFLog::HttpTraceError] HttpResponse(#862 0x1929cef54f8) time:110.2ms (net:110.1ms timeInRetryQueue:0.0ms)status:404 Not Found bodySize:88 url:{ "https://gamepersistence.roblox.com/v2/persistence/10771103250/datastores/objects/object?datastore=WindowsillTest_v1&objectKey=global%2FR_chet_life_1792650334099_main" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:25:50.475Z,1366.475830,7a40,6 [DFLog::NamedMutex] NamedMutex(0000019282BFF4A0, name:InstallerInfo.log)
+2026-10-22T06:25:50.476Z,1366.476807,7a40,6 [DFLog::NamedMutex] ~NamedMutex(0000019282BFF4A0, name:InstallerInfo.log)
+2026-10-22T06:25:50.476Z,1366.476807,7a40,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 1 sh_count 68 cur_l2ts 0 elapsed_l2b 0
+2026-10-22T06:25:54.557Z,1370.557861,7a40,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_STAGE] retirement and independent checkpoint backup
+2026-10-22T06:25:55.273Z,1371.273804,7a40,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_STAGE] stale life refused without storage changes
+2026-10-22T06:26:10.343Z,1386.343384,7a40,6,Info [FLog::StudioPluginOTANew] Attempting to acquire download lock - ensuring only one Studio instance handles OTA downloads
+2026-10-22T06:26:10.346Z,1386.346558,7a40,6,Error [FLog::InterprocessReadWriteLock] InterprocessReadWriteLock::lockImpl failed with Failed to acquire lock for RobloxStudioPluginOTADownloadLock with error The process cannot access the file because another process has locked a portion of the file.
+2026-10-22T06:26:10.346Z,1386.346558,7a40,6,Info [FLog::StudioPluginOTANew] Failed to acquire download lock - another Studio instance is already handling OTA downloads
+2026-10-22T06:26:10.469Z,1386.469238,7a40,6 [DFLog::NamedMutex] NamedMutex(000001928373F4A0, name:InstallerInfo.log)
+2026-10-22T06:26:10.471Z,1386.471191,7a40,6 [DFLog::NamedMutex] ~NamedMutex(000001928373F4A0, name:InstallerInfo.log)
+2026-10-22T06:26:10.471Z,1386.471191,7a40,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 1 sh_count 69 cur_l2ts 0 elapsed_l2b 0
+2026-10-22T06:26:25.592Z,1401.592407,7a40,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_STAGE] second life and compressed backup stored
+2026-10-22T06:26:29.096Z,1405.096924,7a40,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_ONLINE_PASS] WindowsillTest_v1 R_chet_life_1792650334099_main 453974 native codec; fresh uncached reads; retirement envelope and backup; stale refusal; independent corruption recovery; single synthetic key; not a real client rejoin

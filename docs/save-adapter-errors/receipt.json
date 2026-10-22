@@ -1,0 +1,55 @@
+{
+  "candidate": {
+    "branch": "codex/save-adapter-errors",
+    "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+    "evidence_id": "e50104232f063255"
+  },
+  "published": false,
+  "source_manifest_matches": true,
+  "compile_fingerprints_match": true,
+  "computed_evidence_id": "e50104232f063255",
+  "local_cli": {
+    "completed_summaries": 35,
+    "passed": 57492,
+    "failed": 0,
+    "failure_lines": []
+  },
+  "local_process": null,
+  "ci": null,
+  "native": null,
+  "retirement_probe_pass": false,
+  "offline_gates_pass": false,
+  "online_store_attempt": {
+    "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+    "evidence_id": "e50104232f063255",
+    "source_fingerprints": 175,
+    "store": "WindowsillTest_v1",
+    "key": "R_chet_life_1792650334099_main",
+    "native_stored_json_chars": 453974,
+    "passed": true,
+    "native_creator_errors": [],
+    "production_store_touched": false,
+    "api_key_read": false,
+    "candidate_modules_unparented": true,
+    "actual_client_rejoin_verified": false,
+    "scope": "Real DataStoreService with native codec; retirement/backup, uncached reads, stale refusal, independent recovery and failure status; no real player disconnect/rejoin",
+    "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T060304Z_Studio_FE406_last.log"
+  },
+  "online_store_gate_pass": true,
+  "actual_client_rejoin_verified": false,
+  "performance_matrix_complete": false,
+  "physical_phone_tested": false,
+  "publication_ready": false,
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "bytes": 3092001,
+      "sha256": "f1c35c0d13a7533212edecc5b216a91441106e1787b69e34285ce50c03fc33de"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "bytes": 3294287,
+      "sha256": "d6c3e3c3a46367682285e99ffaaeaba352d62acff9dc6578b29ca6c80f58747a"
+    }
+  ]
+}

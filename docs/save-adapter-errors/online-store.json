@@ -1,0 +1,16 @@
+{
+  "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+  "evidence_id": "e50104232f063255",
+  "source_fingerprints": 175,
+  "store": "WindowsillTest_v1",
+  "key": "R_chet_life_1792650334099_main",
+  "native_stored_json_chars": 453974,
+  "passed": true,
+  "native_creator_errors": [],
+  "production_store_touched": false,
+  "api_key_read": false,
+  "candidate_modules_unparented": true,
+  "actual_client_rejoin_verified": false,
+  "scope": "Real DataStoreService with native codec; retirement/backup, uncached reads, stale refusal, independent recovery and failure status; no real player disconnect/rejoin",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T060304Z_Studio_FE406_last.log"
+}

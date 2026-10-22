@@ -1,0 +1,8 @@
+{
+  "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+  "evidence_id": "e50104232f063255",
+  "branch": "codex/save-adapter-errors",
+  "expected_suites": 62,
+  "expected_checks": 443235,
+  "published": false
+}

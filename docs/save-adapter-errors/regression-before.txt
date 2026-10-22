@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmp5nw_a68o.luau:43261: native swallowed transform error was reported as success
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp5nw_a68o.luau:43261 function check
+C:/Users/natha/AppData/Local/Temp/tmp5nw_a68o.luau:43378

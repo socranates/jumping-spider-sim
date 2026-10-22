@@ -1,0 +1,15 @@
+RIG_REFERENCE_CASE brachypelma_hamorii full parts=146
+RIG_REFERENCE_CASE brachypelma_hamorii low parts=84
+RIG_REFERENCE_CASE chromatopelma_cyaneopubescens full parts=148
+RIG_REFERENCE_CASE chromatopelma_cyaneopubescens low parts=84
+RIG_REFERENCE_CASE first_spider full parts=707
+RIG_REFERENCE_CASE first_spider low parts=265
+RIG_REFERENCE_CASE first_spider_male full parts=711
+RIG_REFERENCE_CASE first_spider_male low parts=270
+RIG_REFERENCE_CASE maratus_volans_male full parts=119
+RIG_REFERENCE_CASE maratus_volans_male low parts=80
+RIG_REFERENCE_CASE myrmarachne_formicaria_female full parts=79
+RIG_REFERENCE_CASE myrmarachne_formicaria_female low parts=69
+RIG_REFERENCE_CASE rival_spider full parts=622
+RIG_REFERENCE_CASE rival_spider low parts=211
+RIG_REFERENCE passed=1478428 failed=0 cases=14 frames=2800 worst_position=0 worst_axis=1.59346981104e-15 worst_size=0

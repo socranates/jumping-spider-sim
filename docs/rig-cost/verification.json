@@ -1,0 +1,14 @@
+{
+  "source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "offline_verified": true,
+  "cases": 14,
+  "pose_frames": 2800,
+  "existing_suites": 6,
+  "differential_checks": 1478428,
+  "existing_checks": 7866,
+  "cached_source_sha256": "4cb777342750cdc853b3bea0faa65e7233417bd9aba6c0026bac2d9b6c6778e4",
+  "native_verified": false,
+  "performance_gain_verified": false,
+  "published": false,
+  "scope": "Retained isolated prototype CLI checks only; game source remains unchanged in this experiment"
+}

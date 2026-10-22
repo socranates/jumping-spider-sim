@@ -1,0 +1,19 @@
+{
+  "exit_code": 0,
+  "mode": "-O0 --null",
+  "compiler_sha256": "74cf7ed3621b8966bac6fec7f1a0caf13616655fa06d346133cd31f6aac439d8",
+  "files": [
+    {
+      "name": "RigMeasured.luau",
+      "sha256": "ce13fd99e04c93a57b0fa751781a750e5dad8d1cd0ef36da782848a90981cb64"
+    },
+    {
+      "name": "RigCached.luau",
+      "sha256": "4cb777342750cdc853b3bea0faa65e7233417bd9aba6c0026bac2d9b6c6778e4"
+    },
+    {
+      "name": "driver.client.luau",
+      "sha256": "6e3028935f9a06e2ff3da648513afccc99477d4a8a4033b09a5ddb98cde4efb3"
+    }
+  ]
+}

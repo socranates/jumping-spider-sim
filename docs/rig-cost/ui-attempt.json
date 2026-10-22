@@ -1,0 +1,9 @@
+{
+  "expected_app": "Roblox Studio",
+  "expected_window_id": 386994158,
+  "returned_app": "OpenAI.Codex_2p2nqsd0c76g0!App",
+  "returned_window_id": 2296844,
+  "selection_attempts": 2,
+  "outcome": "State capture returned Codex instead of the selected Studio window, after refresh/retry. No subsequent app input.",
+  "native_run_started": false
+}

@@ -1,0 +1,53 @@
+{
+  "source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "cached_source_sha256": "4cb777342750cdc853b3bea0faa65e7233417bd9aba6c0026bac2d9b6c6778e4",
+  "reference_source_sha256": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20",
+  "rows": [
+    {
+      "suite": "reference.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 20.51600000000326,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "look.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 57.20299999997951,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "idle.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 40.78100000001723,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "growth.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8279999999795109,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "feeding_survival.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9689999999827705,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "client_rival.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 39.96799999999348,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    },
+    {
+      "suite": "inspect.luau",
+      "exit_code": 0,
+      "elapsed_seconds": 64.125,
+      "scope": "CLI shim; isolated prototype, not production or native timing"
+    }
+  ],
+  "passed": true,
+  "native_verified": false,
+  "performance_gain_verified": false,
+  "production_changed": false
+}

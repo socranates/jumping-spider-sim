@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "scope": "Reconstructed the exact v1c suite bundles while the source tree is unchanged; frozen v1d bundles are byte identical. This does not add native or performance evidence.",
+  "rows": [
+    {
+      "suite": "reference.luau",
+      "working_tree_bundle_sha256": "7e67fd00bf2820bfeb1b49bfdf9831119d53cd69b98bce4dda290350f1b4523f",
+      "frozen_bundle_sha256": "7e67fd00bf2820bfeb1b49bfdf9831119d53cd69b98bce4dda290350f1b4523f"
+    },
+    {
+      "suite": "look.luau",
+      "working_tree_bundle_sha256": "a2f5533e02b3a46269da1bc50db25c656f3acddfc1378d4024fc9f1fb8090f86",
+      "frozen_bundle_sha256": "a2f5533e02b3a46269da1bc50db25c656f3acddfc1378d4024fc9f1fb8090f86"
+    },
+    {
+      "suite": "idle.luau",
+      "working_tree_bundle_sha256": "058cf4b2e97f8060b6750d7dbb25a6c5801e5452c801d65435399cdaa36046b4",
+      "frozen_bundle_sha256": "058cf4b2e97f8060b6750d7dbb25a6c5801e5452c801d65435399cdaa36046b4"
+    },
+    {
+      "suite": "growth.luau",
+      "working_tree_bundle_sha256": "e4db606f3cfa15a9e84a6f4ad7cf583dbd5fc306920c67a74810b0607d0b95db",
+      "frozen_bundle_sha256": "e4db606f3cfa15a9e84a6f4ad7cf583dbd5fc306920c67a74810b0607d0b95db"
+    },
+    {
+      "suite": "feeding_survival.luau",
+      "working_tree_bundle_sha256": "eb2823fb091b61f9a53e1c553fe7fd4f67c4ce16d4a1998221f435c7f4a355c6",
+      "frozen_bundle_sha256": "eb2823fb091b61f9a53e1c553fe7fd4f67c4ce16d4a1998221f435c7f4a355c6"
+    },
+    {
+      "suite": "client_rival.luau",
+      "working_tree_bundle_sha256": "1d18d752d74de509d99965aa7dad946661c195d8d715cb58a15f116e0b691a9b",
+      "frozen_bundle_sha256": "1d18d752d74de509d99965aa7dad946661c195d8d715cb58a15f116e0b691a9b"
+    },
+    {
+      "suite": "inspect.luau",
+      "working_tree_bundle_sha256": "492e9b2ffd26f646a6bb9823188c9ae6140765a14fd19bc8d34587fc4b64d7f4",
+      "frozen_bundle_sha256": "492e9b2ffd26f646a6bb9823188c9ae6140765a14fd19bc8d34587fc4b64d7f4"
+    }
+  ]
+}

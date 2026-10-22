@@ -15,7 +15,9 @@ return function(d)
   local deadline=os.clock()+4
   while region and not d.world:regionReady(region.id) and os.clock()<deadline do d.place(at,up);task.wait(.1) end
   assert(region==nil or d.world:regionReady(region.id),name.." not streamed")
+  d.motor:place(at,up,heading);d.cam:snap()
   task.wait(1)
+  assert(d.motor.mode=="attached" and (d.motor.pos-at).Magnitude<.3,name.." fixture did not hold its surface")
   local camera=workspace.CurrentCamera
   local inside={}
   for _,p in workspace:GetPartBoundsInBox(CFrame.new(camera.CFrame.Position),Vector3.one*.04,params) do
@@ -46,9 +48,14 @@ return function(d)
    break
   end
  end
- local at=Vector3.new(0,.31,-24.75)
+ local at=Vector3.new(0,.31,-21.4)
  d.place(at);d.motor:place(at,Vector3.yAxis,-Vector3.zAxis);d.cam:snap()
- d.input:simulate("Drop",true);task.wait(3);d.input:simulate("Drop",false)
+ task.wait(.3)
+ d.input:simulate("Drop",true)
+ local deadline=os.clock()+15
+ while not d.motor:onLine() and os.clock()<deadline do task.wait(.1) end
+ assert(d.motor:onLine(),"fixture did not reach the line from the supported sill edge")
+ task.wait(3);d.input:simulate("Drop",false)
  local camera=workspace.CurrentCamera
  local hits=workspace:GetPartBoundsInBox(CFrame.new(camera.CFrame.Position),Vector3.one*.04,params)
  print("[CHET_V50_LINE_VIEW]",d.detail,d.motor.mode,d.motor.silk.mode,"camera_overlaps",#hits)

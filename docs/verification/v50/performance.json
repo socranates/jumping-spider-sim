@@ -1,0 +1,208 @@
+{
+  "after_source_commit": "856c12e3e71d9b79282954013142fa5577fc3f19",
+  "viewport": "1105x435 Studio player viewport, desktop",
+  "method": "same route, normal camera, noon, 7s settle, 5s sample, no concurrent local regression/compiler jobs",
+  "limits": "observational before/after, warmup and system variance; not a phone benchmark or proof of causal FPS gain",
+  "samples": [
+    {
+      "phase": "before",
+      "tier": "full",
+      "scene": "sill",
+      "frames": 152,
+      "seconds": 5.010256603360176,
+      "mean_ms": 32.96221449579063,
+      "p95_ms": 39.045300334692,
+      "worst_ms": 43.541401624679565
+    },
+    {
+      "phase": "before",
+      "tier": "full",
+      "scene": "garden_b2",
+      "frames": 205,
+      "seconds": 5.015760197304189,
+      "mean_ms": 24.46712291367897,
+      "p95_ms": 31.514398753643036,
+      "worst_ms": 257.05379247665405
+    },
+    {
+      "phase": "before",
+      "tier": "full",
+      "scene": "meadow_a3",
+      "frames": 222,
+      "seconds": 5.056908298283815,
+      "mean_ms": 22.778866208485653,
+      "p95_ms": 28.09940092265606,
+      "worst_ms": 69.2225992679596
+    },
+    {
+      "phase": "before",
+      "tier": "full",
+      "scene": "deck_n2",
+      "frames": 256,
+      "seconds": 5.004574300721288,
+      "mean_ms": 19.54911836219253,
+      "p95_ms": 27.018599212169647,
+      "worst_ms": 63.669100403785706
+    },
+    {
+      "phase": "before",
+      "tier": "full",
+      "scene": "hut_doorway",
+      "frames": 251,
+      "seconds": 5.011620299890637,
+      "mean_ms": 19.966614740600146,
+      "p95_ms": 29.67900037765503,
+      "worst_ms": 47.319501638412476
+    },
+    {
+      "phase": "before",
+      "tier": "low",
+      "scene": "sill",
+      "frames": 260,
+      "seconds": 5.005182585678995,
+      "mean_ms": 19.250702252611518,
+      "p95_ms": 24.77630041539669,
+      "worst_ms": 36.82649880647659
+    },
+    {
+      "phase": "before",
+      "tier": "low",
+      "scene": "garden_b2",
+      "frames": 300,
+      "seconds": 5.018391304649413,
+      "mean_ms": 16.727971015498042,
+      "p95_ms": 19.071200862526894,
+      "worst_ms": 29.4358991086483
+    },
+    {
+      "phase": "before",
+      "tier": "low",
+      "scene": "meadow_a3",
+      "frames": 273,
+      "seconds": 5.002763211727142,
+      "mean_ms": 18.32513996969649,
+      "p95_ms": 23.539500311017036,
+      "worst_ms": 64.42879885435104
+    },
+    {
+      "phase": "before",
+      "tier": "low",
+      "scene": "deck_n2",
+      "frames": 294,
+      "seconds": 5.019653805531561,
+      "mean_ms": 17.073652399767212,
+      "p95_ms": 20.62400057911873,
+      "worst_ms": 67.23649799823761
+    },
+    {
+      "phase": "before",
+      "tier": "low",
+      "scene": "hut_doorway",
+      "frames": 297,
+      "seconds": 5.011984786950052,
+      "mean_ms": 16.87536965303048,
+      "p95_ms": 20.764999091625214,
+      "worst_ms": 26.602400466799736
+    },
+    {
+      "phase": "after",
+      "tier": "full",
+      "scene": "sill",
+      "frames": 235,
+      "seconds": 5.006842899136245,
+      "mean_ms": 21.305714464409554,
+      "p95_ms": 32.600898295640945,
+      "worst_ms": 37.64770179986954
+    },
+    {
+      "phase": "after",
+      "tier": "full",
+      "scene": "garden_b2",
+      "frames": 287,
+      "seconds": 5.003064697608352,
+      "mean_ms": 17.43228117633572,
+      "p95_ms": 21.24750055372715,
+      "worst_ms": 27.960799634456635
+    },
+    {
+      "phase": "after",
+      "tier": "full",
+      "scene": "meadow_a3",
+      "frames": 265,
+      "seconds": 5.0174133982509375,
+      "mean_ms": 18.93363546509788,
+      "p95_ms": 23.647600784897804,
+      "worst_ms": 39.75430130958557
+    },
+    {
+      "phase": "after",
+      "tier": "full",
+      "scene": "deck_n2",
+      "frames": 258,
+      "seconds": 5.011669016443193,
+      "mean_ms": 19.42507370714416,
+      "p95_ms": 28.16930040717125,
+      "worst_ms": 33.203501254320145
+    },
+    {
+      "phase": "after",
+      "tier": "full",
+      "scene": "hut_doorway",
+      "frames": 224,
+      "seconds": 5.0133303962647915,
+      "mean_ms": 22.38093926903925,
+      "p95_ms": 30.25140054523945,
+      "worst_ms": 41.79450124502182
+    },
+    {
+      "phase": "after",
+      "tier": "low",
+      "scene": "sill",
+      "frames": 207,
+      "seconds": 5.008772290311754,
+      "mean_ms": 24.19696758604712,
+      "p95_ms": 33.14470127224922,
+      "worst_ms": 47.21489921212196
+    },
+    {
+      "phase": "after",
+      "tier": "low",
+      "scene": "garden_b2",
+      "frames": 298,
+      "seconds": 5.000063703395426,
+      "mean_ms": 16.778737259716195,
+      "p95_ms": 18.329499289393425,
+      "worst_ms": 56.81620165705681
+    },
+    {
+      "phase": "after",
+      "tier": "low",
+      "scene": "meadow_a3",
+      "frames": 276,
+      "seconds": 5.007151606492698,
+      "mean_ms": 18.141853646712676,
+      "p95_ms": 23.672500625252724,
+      "worst_ms": 30.023900792002678
+    },
+    {
+      "phase": "after",
+      "tier": "low",
+      "scene": "deck_n2",
+      "frames": 300,
+      "seconds": 5.0002833949401975,
+      "mean_ms": 16.667611316467323,
+      "p95_ms": 18.55660043656826,
+      "worst_ms": 26.608100160956383
+    },
+    {
+      "phase": "after",
+      "tier": "low",
+      "scene": "hut_doorway",
+      "frames": 289,
+      "seconds": 5.003807194530964,
+      "mean_ms": 17.314211745781883,
+      "p95_ms": 22.085700184106827,
+      "worst_ms": 34.940898418426514
+    }
+  ]
+}

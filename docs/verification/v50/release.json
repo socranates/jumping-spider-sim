@@ -1,0 +1,30 @@
+{
+  "published": true,
+  "release": "v50",
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "place_version": 139,
+  "published_at_utc": "2026-10-22T02:15:08.763Z",
+  "branch": "codex/v50-feeding-survival",
+  "source_commit": "856c12e3e71d9b79282954013142fa5577fc3f19",
+  "evidence_id": "3112f8aa4f3f192f",
+  "native_source_comparison": {
+    "matched": 211,
+    "expected": 211
+  },
+  "ci_run": 39708111460,
+  "ci_conclusion": "success",
+  "suites_passed": 58,
+  "dashboard_proof": "docs/verification/v50/published-place139.png",
+  "dashboard_url": "https://create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history",
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "sha256": "e572a854ca72ba5cec12f704a837128882ef41cf00bb38fe1a304ab94a064e8b"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "sha256": "c733c8f0533fedb73970009ae2e6e58488e4d09bdc1a5995ddbd27839db29b08"
+    }
+  ]
+}

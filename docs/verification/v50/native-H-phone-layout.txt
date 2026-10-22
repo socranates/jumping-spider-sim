@@ -1,0 +1,2 @@
+2026-10-22T02:10:18.117Z,21906.117188,340c,6,Info [FLog::CreatorOutput] [CHET_V50_H_PHONE_SETUP] iPhone17Pro Studio emulator; layout only
+2026-10-22T02:10:40.939Z,21928.939453,8a8c,6,Info [FLog::CreatorOutput] [CHET_V50_PHONE_LAYOUT] 749, 381 touch_enabled true prompt Tap Eat at 260, 285 size 289, 26

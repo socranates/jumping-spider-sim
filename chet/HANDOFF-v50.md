@@ -1,85 +1,121 @@
-# Windowsill v50 handoff - verification in progress
+# Handoff to Claude - The Windowsill v50, published 2026-10-21 Central
 
-**Not published yet.** Continue from `codex/v50-feeding-survival`, currently
-`a772d2bb24f3141f7c9c5618cf861a947cd1b807`, evidence `c151f1719bee5c60`.
-The existing published baseline is v49/place138. The accepted six-part prompt is
-preserved at `docs/reference/chet-prompt-v49.md`; its requested release name was
-stale, so this is v50. Active work is Roblox; Godot remains frozen.
+**Published and tested.** Pull branch `codex/v50-feeding-survival` from
+https://github.com/socranates/jumping-spider-sim . Tested source:
+`856c12e3e71d9b79282954013142fa5577fc3f19`; evidence `3112f8aa4f3f192f`.
+Later commits contain receipts only. Existing place120119801868085,
+universe10771103250, **published place version139**, publication operation
+2026-10-22T02:15:08.763Z. This builds on v49/place138; the reference prompt's
+v48 baseline and requested v49 name were obsolete.
 
-## Player-facing changes
+## Start here
 
-- E / Xbox left-stick click / PlayStation L3 / touch Grip-Eat explains a caught
-  meal. Taps keep grip, then open a 0.38-second bite window. Faster valid taps
-  renew that window and pulse the bite, without banking food or exceeding the
-  original nutrition rate. Moving or leaving support pauses eating.
-- The fly follows the animated jaws, its drawn body empties, and a bounded
-  three-part noninteractive husk drops and fades. Reduced Motion reduces chewing.
-  A quiet built-in sound supplies bite/end feedback without another asset grant.
-- AutomaticGrip also supports automatic eating, default off. ControlHints
-  covers the new prompts in every mode. The wordless150x6 hunger bar and2px dot
-  remain. No future unlock is advertised; seven/ten full-fly moults and earned
-  Run/lock, controls, aim, jumps, nutrition credit and lighting are preserved.
-- At dusk, a brief reminder names the local home (the Crack at the sill), then
-  the actual rest button there. Rest clears it; the next night returns it.
-- Normal weakens after6 empty-reserve game hours and dies after12. A fresh
-  unfed life is bounded by three game days even using sleeping drain. Easy and
-  Free remain nonfatal. Old pure/Godot references retain24/48 defaults.
-- Restore supplies missing bite fields from pre-v50 saves. ObjectRecord clears
-  constructor defaults; future optional fields need the same compatibility care.
-- Held prey no longer draws its perched shadow in midair. Shelf and floorA
-  fallback spawns clear books/boots. Their geometry and existing saved positions
-  are unchanged. Distant cat pose specs are reused at10Hz beyond180 studs, while
-  her body frame still moves every render; behavior/audio keep their rates.
+Read `chet/review-5.md`, `docs/verification/v50/RESULTS.md`,
+`docs/verification/v50/PERFORMANCE.md` and `docs/DECISIONS.md` ROBLOX-130.
+Actual release/build hashes: `docs/verification/v50/release.json`.
+Actual portable zip path/hash: `docs/verification/v50/portable-package.json`.
+The zip contains active Roblox code/tests/tools, playable and test places,
+reports and an internal file-hash manifest. It excludes the frozen Godot tree
+and generated test captures/snapshot archives. Cloud sessions should use the
+GitHub branch, not expect access to Nathan's Windows paths.
 
-## Evidence and pending work
+From roblox_port, run `python tests/run.py <path-to-luau>` for all58 suites.
+`tools/check.sh compile|types` is the Linux CI entry; the workflow installs its
+toolchain. Build using `python tools/build.py <path-to-rojo>`; it should retain
+evidence3112f8aa4f3f192f while source/tests/project inputs are unchanged.
+No new dependencies, uploaded assets, grants or save-schema changes are needed.
 
-- Current focused checks: meals88/0, spawn clearance20/0, flies283/0,
-  settings1163/0. Strict analysis clean;211 source modules compiled before the
-  final compatibility/text changes (repeat final compile/type receipt).
-- Candidate A full native SelfTest273/0/0. It predates the smooth cat carry,
-  faster tap response, shadow/fallback/old-save fixes. Its source manifest is
-  `docs/verification/v50/native-candidate-A-source.json`.
-- Candidate B full native meal fixture proved jaw distance0, body depletion,
-  device prompts, a three-part husk, built-in audio loaded, dusk and E rest.
-  Full233-region walk/hop/camera survey had no missing regions, stayed within
-  the1500-part scenery budget, and found six camera observations at the two
-  fallback points subsequently fixed. Raw files are retained, not overwritten.
-- A frozen Windows57-suite run of B=`9e60bba` is active in
-  `C:/Users/natha/claude-xfer/v50-cli-9e60bba`. Its known settings-note length
-  failure is fixed and rerun green. Keep its actual source scope in the report.
-- Final source GitHub58-suite CI:
-  https://github.com/socranates/jumping-spider-sim/actions/runs/39704486074
-- Final-source low native SelfTest is active. It now includes the fallback
-  camera guard, so274 checks are expected. Do not restart a quiet live run.
-- Still required: finish those runs, low233-region survey and native final
-  shadow/fallback/tight-space/leaf checks; labelled touch emulator if available;
-  foreground full/low after profiles with **no concurrent CLI**; decide whether
-  to retain the cat optimization from measurements; final source fingerprints,
-  cleanup and publication to the existing place, Dashboard proof, report/package.
+## What changed
 
-Baseline profiles and rendering audit are in `docs/verification/v50`. Initial
-pond_a2 profiling was an underwater view; corrected bank samples use deck_n2.
-Do not claim the temporary black doorway view was a fixed camera bug. The final
-performance receipt must exclude CLI-loaded samples from the native self-test.
+- Actual Feed controls E / Xbox left-stick click / PS L3 / touch Grip-Eat now
+  explain every catch in all modes. After subduing, accepted taps renew a
+  bounded0.38s eating window at the old nutrition rate. Movement/air interrupts;
+  no banked nutrition. AutomaticGrip also supports automatic eating (defaultoff).
+- Held prey follows the animated jaw frame, depletes visually, then drops one
+  temporary grounded three-part noninteractive husk. Head/jaw/palp pulses are
+ 20% in Reduced Motion. Held perched shadows are hidden, restored on release.
+- Quiet built-in volume_slider.ogg feedback respects mute/volume/pause. Native
+  IsLoaded was true; no new asset permission step is required.
+- ContextPrompts uses actual device words and survives SpiderHud.minimalView.
+  ShowControlHints covers it. Dusk briefly names the local home, then gives the
+  real rest button at shelter; rest clears it and next night repeats it.
+- Normal live rules weaken6h/death12h at empty reserve. Full unfed reserve is
+  bounded by three game days even sleeping; rest/save does not erase starvation.
+  Easy/Free remain nonfatal. Old published Normal was48 empty-reserve hours,
+  not immortal; Nathan's exact prior difficulty was not reproduced.
+- Pre-v50 saved meals may omit new bite fields: ObjectRecord.commit clears
+  constructor defaults. useGameRules supplies optional defaults after restore.
+  Keep that compatibility pattern for future optional fields.
+- Shelf fallback moved above its book; floorA fallback moved beside boot sole.
+  Geometry/saved positions/layout revision are unchanged. Old overlaps are
+  reproduced and replacements verified by meaningful motor/camera tests.
+- CatBody caches pose specs10Hz beyond180studs but carries actual body motion
+  every render. AI/attacks/audio remain unchanged. Kept for measured allocation
+  savings, not a demonstrated steady FPS gain.
 
-## Working locations and publication guardrails
+Preserve seven/ten whole-fly equivalents for the first two moults, partial credit,
+Run after first, lock after second, no future unlock spoilers, L1 creep/earned
+contextual lock, L2 Run, R2 Focus, manual aim/jumps, green chelicerae, wordless
+150x6 reserve and2px aim dot. New feeding/dusk cues explicitly narrow the former
+hunger-only screen rule; do not remove them by reapplying the old rule.
 
-Writable clone: `C:/Users/natha/windowsill-publish`. Shared OneDrive and Project
-`sources/` remain read-only. Remote `github` is socranates/jumping-spider-sim;
-do not push the OneDrive `origin`, main, or a Claude branch.
+## Exact verification scope
 
-Local Studio36441252 is a PlaceId0 review file connected to Rojo34872. Cloud
-Studio4131012 is the existing place120119801868085/universe10771103250, stopped
-and disconnected on v49. Publish only that existing place after exact-source
-comparison. Remove SilkPlayback and SelfTest/Detail/Cat/Wasp/TestTarget overrides;
-verify gravity35, streaming and liked Future lighting. Do not publish the local
-review file or a new experience, and do not change audience/access settings.
+Final GitHub run39708111460 succeeded: all58 suites, strict clean and211/211
+source modules compile. Embedded garden SelfTest41/0/0, preserve274/0/0.
+CI stdout/metadata and focused state_client142/0 are retained.
 
-The requested `chet/review-5.md` already holds the v47 report. Preserve that old
-report under its verification directory before replacing it with the final v50
-receipt. Provide an active-Roblox-only source package and exact path/hash, rather
-than a PC-only link or the whole frozen Godot history.
+Native Studio G complete low274/0/0, followed by H selected5/0/0 at each detail
+(the last H edits are test selection/cleanup and stale meal assertions only).
+Historical A full273/0/0 predates several repairs; do not relabel it final.
+Actual H meal/dusk/rest/sound/husk checks pass at both tiers. Controlled capture
+fixtures are not claims of an unassisted player hunt. Native full survey233
+regions found only the two old buried fallback positions (three observations
+each); final low233/233 had0 unready/0 camera interiors, scenery<=500.
+Final full/low tight checks cover both spawns/cans, Crack, bench, leaf and a real
+silk catch with camera overlap0. Surveys sample spawn stand/walk/hop, not every
+possible route or animation.
 
-No messages or emails were sent. Recent inbox alerts linked older GitHub failures;
-the preceding v49 source CI was already green. Do not copy private mail headers
-or unsubscribe links into the repository.
+No concurrent CLI/compiler load during final native timing: five scenes per
+tier, same desktop viewport1105x435,7s settle/5s sample. After full means17.43-
+22.38ms, low16.67-24.20ms. Some samples regress; include the table and variance.
+Paired cat sound-lap allocation (includes CatBody.draw)62/36/63KB per frame,
+whole render161/138/166KB; mean17.62/19.96/20.85ms is inconclusive for FPS.
+MicroProfiler overview/timeline screenshots retained. Phone emulator iPhone17Pro
+749x381, TouchEnabledtrue: TapEat/reserve fit, locked abilities hidden. No real
+phone performance or controller hardware test is claimed.
+
+## Remaining bounded work for a future pass
+
+1. Older phone labels Focus/Creep/Recentre/Cancel wrap. Screenshot
+   `docs/verification/v50/phone-layout-iphone17pro.jpg`. Shorten/fit text while
+   preserving hit targets, controls, accessibility and unlock hiding.
+2. Close milkweed views expose the broad support-box shape beside the detailed
+   oval blade. Records are centered/fitted by axis; no confirmed origin-offset
+   bug was found in the source audit. Retain current collision/save IDs unless
+   Nathan authorizes a support-shape redesign. See final-full-leaf-review.jpg.
+3. Procedural feet can intersect soft vegetation; cans remain faceted; husk is
+   simplified. Low omits decorative leaf meshes while retaining support.
+   Ants/grubs/fleas/dog are still not new food types.
+4. Real-phone play/performance and real-controller testing remain useful.
+   Avoid claiming an optimization from a single frame or a CLI simulation.
+
+## Working and release guardrails
+
+Writable clone C:/Users/natha/windowsill-publish. The OneDrive project and synced
+Project sources remain read-only; Godot remains frozen. Do not push the local
+OneDrive origin/main or a Claude branch. Work on a fresh named branch and tell
+Nathan before another parallel agent edits fly/feeding/settings/menu.
+
+The local PlaceId0 review copy was cleaned, source-compared211/211, saved in
+claude-xfer and closed. Cloud Studio remains stopped/disconnected. Before future
+publication compare source, clear SilkPlayback/SelfTest/Detail/Cat/Wasp/TestTarget,
+verify existing IDs/StreamingEnabled/gravity35, disconnect Rojo and Publish only
+the existing place. Never Publish As, create an experience or change access.
+Future lighting and radii96/160 are unchanged configuration values; their direct
+command-bar reads were unavailable in this Studio context. Do not turn those
+failed diagnostic reads into claims about engine state or change lighting to
+make a guard pass. Dashboard Show published only confirms139; screenshot saved.
+
+No email/messages were sent. Inbox alerts were earlier GitHub failures; final
+H is green. No private mail or credentials belong in this handoff/package.

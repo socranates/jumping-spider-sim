@@ -2202,6 +2202,8 @@ This is combined v47, retaining Claude's v46 creatures, v45 milkweed mesh and v4
 
 ## ROBLOX-130 - Contextual meals, dusk and live survival (2026-10-21, Nathan)
 
+Nathan: "There should be button prompts for eating prey to let you know to tap and then an animation for eating the prey. I didn't die from hunger. It should tell you to go rest in the Crack when it gets dark and let you know to press the correct button. Consider techniques for optimization. Debug and check for clipping etc."
+
 Nathan adopted the six-part Claude prompt preserved in
 `docs/reference/chet-prompt-v49.md`. It explicitly supersedes the v48 hunger-only
 screen rule for small feeding and dusk/rest instructions. The wordless150x6

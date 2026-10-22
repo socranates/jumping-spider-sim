@@ -313,12 +313,11 @@ def bundle(test_file):
              "local __refs, __mods = {}, {}"]
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")
-        if path.exists() and test_file in REFERENCE_ONLY.get(ref, {test_file}):
+        if test_file in REFERENCE_ONLY.get(ref, {test_file}):
             parts.append(f"__refs.{ref} = " + chunk(path))
     for name, rel in MODULES + (CLIENT_MODULES if test_file in CLIENT_TESTS else []):
         path = SRC / rel
-        if path.exists():
-            parts.append(f"__mods.{name} = " + chunk(path))
+        parts.append(f"__mods.{name} = " + chunk(path))
     body = (HERE / test_file).read_text(encoding="utf-8")
     body = body.replace('local shim = require("./shim")', "")
     body = re.sub(r"^_G\.\w+ = shim\.\w+\n", "", body, flags=re.M)
@@ -330,15 +329,18 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau"]:
+    for test_file in named or ["foundation.luau","rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau"]:
         if not (HERE / test_file).exists():
-            if named:  # a misspelt name must not look like a pass
-                print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
-                status = 1
+            print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
+            status = 1
             continue
+        source = bundle(test_file)  # fail before creating a temporary file if an input is missing
         with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
-            f.write(bundle(test_file))
-        status = subprocess.call([luau, f.name]) or status
+            f.write(source)
+        try:
+            status = subprocess.call([luau, f.name]) or status
+        finally:
+            pathlib.Path(f.name).unlink(missing_ok=True)
     sys.exit(status)
 
 

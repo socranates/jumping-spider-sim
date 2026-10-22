@@ -33,3 +33,5 @@ jobs:
           test -z "$out"
       - name: All suites
         run: python3 tests/run.py $HOME/luau/luau
+      - name: Runner failure and cleanup regressions
+        run: python3 -m unittest discover -s tests -p test_runner.py

@@ -50,3 +50,4 @@ check(find("SpiderLifeMenu", "Continue") == nil and find("SpiderLifeMenu", "Easy
 local toast = find("SpiderPrompts", "Toast")
 check(toast ~= nil and string.find(toast.Text, "Saving is off", 1, true) ~= nil, "a toast said it too")
 print(`STATE_OFFLINE passed={passed} failed={failed}`)
+if failed > 0 then error("state_offline checks failed") end

@@ -241,3 +241,4 @@ check("Easy after the first day: every word as before (the walk hint, the crack'
 end)
 
 print(`QUIET passed={passed} failed={failed}`)
+if failed > 0 then error("quiet checks failed") end

@@ -15,7 +15,7 @@ case "${1:-}" in
     n=0; ok=0
     while IFS= read -r f; do
       n=$((n+1))
-      if "$HOME/luau/luau-compile" --null "$f" >/dev/null 2>"${TMPDIR:-/tmp}/compile_err.txt"; then ok=$((ok+1)); else echo "FAIL $f"; cat "${TMPDIR:-/tmp}/compile_err.txt"; fi
+      if "$HOME/luau/luau-compile" -O0 --null "$f" >/dev/null 2>"${TMPDIR:-/tmp}/compile_err.txt"; then ok=$((ok+1)); else echo "FAIL $f"; cat "${TMPDIR:-/tmp}/compile_err.txt"; fi
     done < <(find src -name '*.luau' | sort)
     echo "compile $ok/$n"
     [ "$ok" = "$n" ]

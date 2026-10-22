@@ -1254,3 +1254,4 @@ case("the words of the wasp taking the rival: captions and lines only for a spid
 end)
 
 print(`WASP passed={passed} failed={failed}`)
+if failed > 0 then error("wasp checks failed") end

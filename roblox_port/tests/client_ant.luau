@@ -304,3 +304,4 @@ check("the tarantulas: C reaches them, X plays the threat display and silk mat, 
 end)
 
 print(`CLIENT_ANT passed={passed} failed={failed}`)
+if failed > 0 then error("client_ant checks failed") end

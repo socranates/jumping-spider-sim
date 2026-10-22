@@ -2,7 +2,7 @@
 
 Candidate source `8e02b5ee5f443ab332cf7e70f5951a304cb89eea`, evidence `58063ec00de84212`, branch `codex/startup-world-readiness`. **Not published; not yet reasonably problem-free.** Last publication verified by retained evidence is v51/place140, not a fresh Dashboard check.
 
-The current startup fix passes **1,235 targeted checks**, compilation 216/216, strict analysis and five runner checks. Full Windows 22326/Linux 39792121861 are running for this exact source. Predecessor6026d6c passed 64 suites/443861 each on both platforms, but that does not cover this new change. Current native cold-load/error/legibility verification is still pending; Studio previously warned about low resources.
+The current startup fix passes **1,235 targeted checks**, compilation 216/216, strict analysis and five runner checks. Full Windows22326 and Linux39792121861 are terminal and verified for this exact source: **64 suites/443869 passed/0 failed each**. Native isolated startup components passed12 cases/38 assertions; whole-game cold-load, network and phone checks remain open.
 
 The ten most important current findings:
 

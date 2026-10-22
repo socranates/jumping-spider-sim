@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T14:07:25.651224+00:00",
+  "as_of_utc": "2026-10-22T14:30:39.825598+00:00",
   "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
   "evidence_id": "58063ec00de84212",
   "goal_complete": false,
@@ -24,8 +24,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "pending",
-      "evidence_boundary": "Startup candidate1,235 targeted checks, compile216, strict and runner5 pass. Windows22326 and Linux39792121861 are live pending gates on8e02b5e. Predecessor6026d6c passed64 suites/443861 each on both platforms; those are not current-source full results.",
+      "status": "verified-current-source",
+      "evidence_boundary": "Exact source8e02b5e: Windows22326 exited0 and Linux39792121861 succeeded, each64 suites/443869 passed/0 failed. Compile216, strict and runner5 pass;1,235 targeted checks retained. Native and release gates remain separate.",
       "references": [
         "docs/startup-world-readiness/receipt.json",
         "docs/startup-world-readiness/progress.json"
@@ -246,7 +246,7 @@
     {
       "id": "startup-A12",
       "status": "implemented-current-verification-pending",
-      "evidence_boundary": "Missing World/home/collision and unknown streamed identity no longer admit a partial playable client. Healthy/legacy flat paths, late readiness, timeout/error visibility, deferred disposal and failed-subscription cleanup pass54 focused checks; client/preserve1181 more. Native timing and legibility remain open.",
+      "evidence_boundary": "Missing World/home/collision and unknown streamed identity no longer admit a partial playable client. Healthy/legacy flat paths, late readiness, timeout/error visibility, deferred disposal and failed-subscription cleanup pass54 focused checks; client/preserve1181 more. Native timing and legibility remain open. Exact-source full Windows/Linux gates443869 each and native isolated components12 cases/38 assertions pass. Whole-game cold load, actual streaming, phone layouts and measured timing remain open.",
       "references": [
         "docs/startup-world-readiness/README.md",
         "docs/startup-world-readiness/receipt.json"

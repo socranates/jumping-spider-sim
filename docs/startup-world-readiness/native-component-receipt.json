@@ -1,0 +1,28 @@
+{
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "run_id": "1792679369716",
+  "cases": 12,
+  "assertions": 38,
+  "output_sha256": "96eb9a2df13141dd8f8fc04ce33e042bd8d9768932202ec04f28ba28966bc76f",
+  "place_sha256": "d443bd43ff9eca0b318947a8b61cf278396606876d3d697ed657780fb78b3655",
+  "exact_guarded_scripts": 217,
+  "creator_errors": 0,
+  "post_viewport": [
+    1105,
+    433
+  ],
+  "begin_viewport": [
+    1,
+    1
+  ],
+  "signal_behavior_read": "unavailable to diagnostic LocalScript",
+  "real_instances_gui_signals": true,
+  "controlled_transport": true,
+  "accelerated_splash_timing": true,
+  "whole_game_cold_load_verified": false,
+  "real_network_streaming_verified": false,
+  "phone_verified": false,
+  "performance_verified": false,
+  "online_saves_accessed": false,
+  "published": false
+}

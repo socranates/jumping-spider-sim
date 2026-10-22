@@ -66,5 +66,16 @@ ci=read("ci-final.json") if (HERE/"ci-final.json").exists() else None
 if ci:
  assert ci["head_sha"]==SOURCE and ci["conclusion"]=="success" and ci["suites"]==64 and ci["passed"]==443869 and ci["failed"]==0
  for n,h in ci["logs_sha256"].items():assert sha((HERE/n).read_bytes())==h
-receipt={"source":SOURCE,"base_source":BASE,"evidence_id":"58063ec00de84212","changed_production_modules":sorted(expected_changes),"paired_baseline_failures":10,"world_passed":33,"title_passed":21,"integration_passed":1181,"targeted_passed":1235,"targeted_suites":4,"compiled":216,"strict_clean":True,"runner_regressions":5,"release_sha256":release_hash,"test_place_rejected":True,"windows_full_complete":full,"linux_ci_verified":bool(ci),"native_verified":False,"actual_network_streaming_verified":False,"native_phone_ui_verified":False,"published":False,"publication_ready":False}
+native=False
+if (HERE/"native-component-receipt.json").exists():
+ n=read("native-component-receipt.json");m=read("prepared-native-manifest.json")
+ assert n["source"]==m["source"]==SOURCE and n["cases"]==12 and n["assertions"]==38
+ assert n["creator_errors"]==0 and n["exact_guarded_scripts"]==217
+ assert n["place_sha256"]==m["place_sha256"] and n["output_sha256"]==sha((HERE/"native-output.txt").read_bytes())
+ scripts={r["path"]:r["sha256"] for r in m["scripts"]}
+ assert {p:scripts[p] for p in expected}==expected
+ assert scripts["StarterPlayer.StarterPlayerScripts.Client.ChetStartupProbe"]==sha((HERE/"native-probe.client.luau").read_bytes())
+ assert "[STARTUP_COMPONENT_DONE] "+n["run_id"]+" 12 38" in (HERE/"native-output.txt").read_text(encoding="utf8")
+ native=True
+receipt={"source":SOURCE,"base_source":BASE,"evidence_id":"58063ec00de84212","changed_production_modules":sorted(expected_changes),"paired_baseline_failures":10,"world_passed":33,"title_passed":21,"integration_passed":1181,"targeted_passed":1235,"targeted_suites":4,"compiled":216,"strict_clean":True,"runner_regressions":5,"release_sha256":release_hash,"test_place_rejected":True,"windows_full_complete":full,"linux_ci_verified":bool(ci),"native_component_verified":native,"native_verified":False,"actual_network_streaming_verified":False,"native_phone_ui_verified":False,"published":False,"publication_ready":False}
 (HERE/"receipt.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf8",newline="\n");print(json.dumps(receipt,indent=2))

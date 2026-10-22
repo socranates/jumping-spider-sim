@@ -1,0 +1,24 @@
+2026-10-22T14:27:21.827Z,9.827435,35dc,6,Info [FLog::CreatorOutput] Loading Lua Ribbon, was enabled? true
+2026-10-22T14:29:12.987Z,120.987015,35dc,6,Info [FLog::CreatorOutput] > assert(game.PlaceId==0 and not game:GetService("RunService"):IsRunning() and workspace:GetAttribute("StartupComponentProbe")==true and game.ServerScriptService.Server.Persistence.Disabled==true and game.StarterPlayer.StarterPlayerScripts.Client.SpiderClient.Disabled==true and game.ReplicatedFirst.Splash.Disabled==true);local expected={{"ReplicatedFirst.Splash",596,3240479982},{"ReplicatedFirst.SplashScreen",11774,1684235014},{"ReplicatedStorage.Shared.Data.AntMimic",4899,1739146978},{"ReplicatedStorage.Shared.Data.Appearances",66100,1305127575},{"ReplicatedStorage.Shared.Data.Catch",4563,360966077},{"ReplicatedStorage.Shared.Data.Detail",1282,1712176071},{"ReplicatedStorage.Shared.Data.Eyes",12720,3707977693},{"ReplicatedStorage.Shared.Data.Flora",15833,235218951},{"ReplicatedStorage.Shared.Data.FlyLook",45777,2706099346},{"ReplicatedStorage.Shared.Data.Graphics",19623,2855323685},{"ReplicatedStorage.Shared.Data.MatingRules",7184,698908
+2026-10-22T14:29:13.391Z,121.391769,1148,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_GUARD] 8e02b5ee5f443ab332cf7e70f5951a304cb89eea 217 actor_splash_persistence_disabled
+2026-10-22T14:29:27.622Z,135.622620,1148,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T14:29:27.655Z,135.655212,1148,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T14:29:29.542Z,137.542221,1148,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_BEGIN] 1792679369716 unavailable 1 1
+2026-10-22T14:29:34.678Z,142.678329,1148,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 1 2 healthy server-built native home
+2026-10-22T14:29:35.523Z,143.523468,35dc,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 2 4 delayed home arrives through native WaitForChild
+2026-10-22T14:29:35.524Z,143.524475,35dc,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 3 7 missing and wrong-class home collision
+2026-10-22T14:29:35.524Z,143.524475,35dc,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 4 11 missing essential folders
+2026-10-22T14:29:45.930Z,153.930634,5fa0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 5 14 late identity and unknown identity
+2026-10-22T14:29:45.932Z,153.932632,5fa0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 6 17 legacy, non-streaming and optional decor boundaries
+2026-10-22T14:29:46.080Z,154.080185,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 7 20 healthy native splash handoff
+2026-10-22T14:29:46.209Z,154.209702,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 8 24 explicit failure is legible and owned
+2026-10-22T14:29:47.946Z,155.946335,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 9 30 missing Shared words and large text recover late
+2026-10-22T14:29:48.097Z,156.097687,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 10 33 caught frame failure keeps recovery
+2026-10-22T14:29:49.797Z,157.797165,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 11 35 native readiness/destruction race
+2026-10-22T14:29:50.698Z,158.698593,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_CASE] 1792679369716 12 38 subscription and early-service failure cleanup
+2026-10-22T14:29:50.757Z,158.757599,6ae0,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_DONE] 1792679369716 12 38
+2026-10-22T14:30:13.300Z,181.300690,35dc,6,Info [FLog::CreatorOutput] > assert(game:GetService("RunService"):IsRunning());print("[STARTUP_COMPONENT_POST]",workspace:GetAttribute("StartupComponentFinished"),workspace:GetAttribute("StartupComponentPassed"),workspace.CurrentCamera.ViewportSize.X,workspace.CurrentCamera.ViewportSize.Y,#game.Players.LocalPlayer.PlayerGui:GetChildren())
+2026-10-22T14:30:13.312Z,181.312714,80a4,6,Info [FLog::CreatorOutput] [STARTUP_COMPONENT_POST] true true 1105 433 3
+2026-10-22T14:30:38.525Z,206.525803,40b4,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|65134
+2026-10-22T14:30:38.529Z,206.529785,40b4,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|65134
+2026-10-22T14:31:09.958Z,237.958374,6ae0,6,Info [FLog::CreatorOutput] Saved to 'C:/Users/natha/claude-xfer/Windowsill-startup-component-v1/Windowsill-startup-component-review.rbxlx'

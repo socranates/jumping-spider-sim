@@ -14,7 +14,7 @@
   "test_place_rejected": true,
   "windows_full_complete": false,
   "windows_full_passed": null,
-  "linux_ci_complete": false,
+  "linux_ci_complete": true,
   "linux_ci_run": 39770144327,
   "phone_verified": false,
   "actual_online_rejoin_verified": false,

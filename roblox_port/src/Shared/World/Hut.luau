@@ -2264,8 +2264,10 @@ local function roomFloorDecor(region: Region, add: (Drawn) -> boolean)
 	local G = Hut.RUG
 	local a, b, c, d = clip(G.x0 + 6, G.x1 - 6, G.z0 + 6, G.z1 - 6, lo.X, hi.X, lo.Z, hi.Z)
 	if a ~= nil then
-		-- (a border band 6 cm in from the rug's edge, and its middle field a shade darker)
-		add(rec("RugField", v((b :: number) - a, 0.03, (d :: number) - (c :: number)), v((a + (b :: number)) / 2, FL + G.top + 0.015, ((c :: number) + (d :: number)) / 2), "6a3029", "Fabric", false))
+		-- The darker inset spans three cells. Full detail keeps it; low keeps
+		-- the continuous physical rug, reserving those three draws for the
+		-- rounded thermos and transparent window within the 150-record cap.
+		add(rec("RugField", v((b :: number) - a, 0.03, (d :: number) - (c :: number)), v((a + (b :: number)) / 2, FL + G.top + 0.015, ((c :: number) + (d :: number)) / 2), "6a3029", "Fabric", true))
 	end
 	for side, zz in { G.z0 + 3, G.z1 - 3 } do
 		local a2, b2 = math.max(G.x0 + 2, lo.X), math.min(G.x1 - 2, hi.X)

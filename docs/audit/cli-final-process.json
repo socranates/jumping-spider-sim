@@ -1,0 +1,7 @@
+{
+  "log": "cli-final-1.txt",
+  "source_commit": "5ee048a791da5fa4f5b99aac53d9769bcd358845",
+  "exec_session_id": 53434,
+  "exit_code": 0,
+  "note": "Completion and exit 0 observed through write_stdin before starting the native Studio run. No exact process end timestamp was captured."
+}

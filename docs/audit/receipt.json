@@ -1,0 +1,67 @@
+{
+  "baseline": {
+    "release": "v51",
+    "place_version": 140,
+    "source_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+    "evidence_id": "d9ddc5e0ed43d301"
+  },
+  "candidate": {
+    "branch": "codex/foundation-audit",
+    "source_commit": "5ee048a791da5fa4f5b99aac53d9769bcd358845",
+    "evidence_id": "c7af2726574c44cc"
+  },
+  "published": false,
+  "compile": {
+    "passed": 215,
+    "total": 215,
+    "optimization": 0
+  },
+  "local_cli": {
+    "completed_summaries": 60,
+    "passed": 443102,
+    "failed": 0,
+    "failure_lines": []
+  },
+  "ci": {
+    "id": 39716569341,
+    "head_sha": "5ee048a791da5fa4f5b99aac53d9769bcd358845",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39716569341",
+    "created_at": "2026-10-22T03:23:30Z",
+    "updated_at": "2026-10-22T03:35:06Z",
+    "suites": 60,
+    "failed_summary_lines": []
+  },
+  "local_process": {
+    "log": "cli-final-1.txt",
+    "source_commit": "5ee048a791da5fa4f5b99aac53d9769bcd358845",
+    "exec_session_id": 53434,
+    "exit_code": 0,
+    "note": "Completion and exit 0 observed through write_stdin before starting the native Studio run. No exact process end timestamp was captured."
+  },
+  "source_manifest_matches": true,
+  "computed_evidence_id": "c7af2726574c44cc",
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "bytes": 3075418,
+      "sha256": "1d4f67a03aff18d18b49c0da6ca3c025e8c715e6fc3842e74d1362e56b317ca4"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "bytes": 3277704,
+      "sha256": "8487cfdaa8c6ec8eceeb695bfe7564aecaae5536cc387239c898f40df07b6540"
+    }
+  ],
+  "native": {
+    "passed": 274,
+    "failed": 0,
+    "skipped": 0,
+    "source_guard_matches": true,
+    "evidence_matches": true
+  },
+  "performance_matrix_complete": false,
+  "physical_phone_tested": false,
+  "correctness_gates_pass": true
+}

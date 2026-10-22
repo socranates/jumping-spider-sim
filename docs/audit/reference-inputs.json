@@ -1,0 +1,17 @@
+[
+  {
+    "name": "optimization-guide.md",
+    "sha256": "73dd14750a4074e233f7eb901bf4b4c7e63c760659c3766b9ff985a88c0ef9f4",
+    "role": "user-supplied reference; findings revalidated against v51"
+  },
+  {
+    "name": "foundation-review-2026-10-22.md",
+    "sha256": "053da1977d9f516fe34806ce1ee69c8ae2bdecf08c4c721f4aef445211e1c7cf",
+    "role": "user-supplied reference; findings revalidated against v51"
+  },
+  {
+    "name": "foundation-audit-prompt.md",
+    "sha256": "7cc657121c955424a9c9a1abd6244bc3215676b2177b242c8cd0088784a61890",
+    "role": "user-supplied reference; findings revalidated against v51"
+  }
+]

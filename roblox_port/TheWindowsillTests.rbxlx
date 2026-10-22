@@ -3193,7 +3193,7 @@ SaveRules.CLIENT_WAIT_REPLY = 4 -- and this long for the first reply after sayin
 
 -- ---------------------------------------------------------------- words for statuses
 SaveRules.STATUS = { saved = "saved", saving = "saving", session = "session" } -- session: this visit only
-SaveRules.REASONS = { "offline", "no_api", "load_failed", "other_session", "corrupt", "newer", "write_failed" } :: { string }
+SaveRules.REASONS = { "offline", "no_api", "load_failed", "other_session", "corrupt", "newer", "write_failed", "rest_refused" } :: { string }
 
 -- The slot a life's rests are filed in: free play's own, the main life on the gentle rules (Easy) its own, and the standard main life the key it always had.
 function SaveRules.slotOf(mode: string, rules: string): string
@@ -15828,6 +15828,7 @@ function SaveSession.new(cfg: Config): any
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
+		restRejected = {} :: { [string]: boolean }, -- a locally kept rest the server could not accept
 		lockHeld = false, busy = false, closed = false,
 		lastStatus = "", lastReason = "",
 		counters = { requests = 0, writes = 0, rejected = 0 },
@@ -15858,6 +15859,7 @@ end
 function SaveSession.status(self: any): (string, string?)
 	if self.state == "session" then return SaveRules.STATUS.session, self.reason end
 	if self.state == "loading" then return SaveRules.STATUS.saving, nil end
+	if next(self.restRejected) ~= nil then return SaveRules.STATUS.saving, "rest_refused" end
 	if self.busy or self.sched:anyDirty() or not SaveSession.restsLoaded(self) then
 		local trouble = false
 		for _, item in self.sched.items do
@@ -16039,9 +16041,12 @@ function SaveSession.setRest(self: any, mode: string, record: any): boolean
 	if #problems > 0 then
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
+		self.restRejected[mode] = true
+		self:notify()
 		return false
 	end
 	local now = self.now()
+	self.restRejected[mode] = nil
 	self.restPending[mode], self.restPendingTime[mode] = record, now
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()
@@ -23083,10 +23088,10 @@ function PreyWorld.director(self: any, id: string): any
 		entry.prey.feeding = self.home.feeding -- (a return to a rest rebuilds the jaws: every director eats with the home's)
 		return entry.prey
 	end
-	if self.root == nil or not self.world:regionReady(id) then return nil end
 	local region = self.world.map.region(id)
 	local spec = if region ~= nil then Garden.prey(region) else nil
 	if spec == nil then return nil end
+	if self.root == nil or not self.world:regionReady(id) then return nil end
 	local d = PreyDirector.engine(self.root, Species.fungus_gnat_prototype, spec.seed, spec.target, false, spec, self.casts)
 	d.feeding = self.home.feeding -- one jaws, one reserve
 	entry = entry or {}
@@ -23137,10 +23142,10 @@ function PreyWorld.bugs(self: any, id: string): any
 	if id == self.world.home then return nil end
 	local entry = self.garden[id]
 	if entry ~= nil and entry.bugs ~= nil then return entry.bugs end
-	if not self.world:regionReady(id) then return nil end
 	local region = self.world.map.region(id)
 	local spec = if region ~= nil then Garden.bugs(region) else nil
 	if spec == nil then return nil end
+	if not self.world:regionReady(id) then return nil end
 	local soil: any, boxes = nil, {}
 	for _, p in Region.pieces(region) do
 		if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }
@@ -29855,6 +29860,7 @@ local SaveText = {}
 SaveText.SAVED = "Your notebook and last rests are saved."
 SaveText.SAVING = "Saving..."
 SaveText.TROUBLE = "Having trouble saving. Your progress is kept for now and the game keeps trying."
+SaveText.REST_REFUSED = "Your latest rest could not be saved online. It is kept for this visit; your earlier saved rest is unchanged."
 SaveText.OFF = "Saving is off for this visit: your notebook and rests will last only until you leave."
 SaveText.LOOKING = "Finding your saved game..."
 SaveText.BACK = "Saving is back on."
@@ -29869,6 +29875,7 @@ SaveText.WHY = {
 	corrupt = "Your saved game could not be read, so it was left exactly as it is.",
 	newer = "Your saved game was made by a newer version of this game, so it was left exactly as it is.",
 	write_failed = "This visit could not be saved. Your earlier saved game is still kept.",
+	rest_refused = SaveText.REST_REFUSED,
 } :: { [string]: string }
 
 local function because(reason: string?): string?
@@ -29882,6 +29889,7 @@ function SaveText.menuLine(status: string?, reason: string?): string
 		local why = because(reason)
 		return SaveText.OFF .. (if why then "\n" .. why else "")
 	elseif status == "saving" then
+		if reason == "rest_refused" then return SaveText.REST_REFUSED end
 		return if reason == "write_failed" then SaveText.TROUBLE else SaveText.SAVING
 	elseif status == "saved" then
 		return SaveText.SAVED
@@ -29901,6 +29909,7 @@ function SaveText.toast(oldStatus: string?, oldReason: string?, status: string?,
 	local toSession = now == "session" and was ~= "session"
 	local fromSession = was == "session" and (now == "saved" or now == "saving")
 	local newTrouble = now == "saving" and reason == "write_failed" and was ~= "" and not (was == "saving" and oldReason == "write_failed")
+	if now == "saving" and reason == "rest_refused" and not (was == "saving" and oldReason == "rest_refused") then return SaveText.REST_REFUSED end
 	if toSession then
 		local why = because(reason)
 		return SaveText.OFF .. (if why then " " .. why else "")
@@ -42293,7 +42302,7 @@ end
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "d9ddc5e0ed43d301" }
+return { id = "c7af2726574c44cc" }
 ]]></string>
         </Properties>
       </Item>

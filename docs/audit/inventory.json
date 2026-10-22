@@ -1,0 +1,4874 @@
+{
+  "baseline": {
+    "published": true,
+    "release": "v51",
+    "place_id": 120119801868085,
+    "universe_id": 10771103250,
+    "place_version": 140,
+    "previous_place_version": 139,
+    "published_at_utc": "2026-10-22T03:07:06.023Z",
+    "branch": "codex/v51-rare-sightings",
+    "source_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+    "evidence_id": "d9ddc5e0ed43d301",
+    "implemented_rare_species": [
+      "luna_moth"
+    ],
+    "remaining_species": 12,
+    "native_source_comparison": {
+      "matched": 215,
+      "expected": 215
+    },
+    "native_preserve": {
+      "pass": 274,
+      "fail": 0,
+      "skip": 0
+    },
+    "native_rare": {
+      "full_pass": 14,
+      "low_pass": 14
+    },
+    "windows_cli_rare": {
+      "pass": 265,
+      "fail": 0
+    },
+    "ci_run": 39713498101,
+    "ci_conclusion": "success",
+    "suites_passed": 59,
+    "compile": {
+      "pass": 215,
+      "total": 215
+    },
+    "strict": "clean",
+    "dashboard_proof": "docs/verification/v51/published-place140.png",
+    "dashboard_url": "https://create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history",
+    "builds": [
+      {
+        "path": "roblox_port/TheWindowsill.rbxlx",
+        "sha256": "b386808d049c7c7f3f429ec096f49759cda1c29613206bbebbbd2d704c550240"
+      },
+      {
+        "path": "roblox_port/TheWindowsillTests.rbxlx",
+        "sha256": "6475bedadf36b5abe4ef5242f465b12441e8ecca9c2c1e8e7a331629786ce01d"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "path": "roblox_port/src/Client/BirdBody.luau",
+      "name": "BirdBody",
+      "lines": 208,
+      "purpose": "The robin in the world (ROBLOX-120): Predator/Bird's American robin drawn at its true size, 25 cm from bill to tail (Bird.LENGTH), from `parts` (pure: the previewer",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes"
+      ],
+      "tests": [
+        "bodies.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/BugBodies.luau",
+      "name": "BugBodies",
+      "lines": 767,
+      "purpose": "The drawn woodlice (ROBLOX-96, Prey/Woodlouse): a grey segmented body about a centimetre long, made of seven overlapping plates over the back, a small head",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "FlyLook",
+        "Shapes"
+      ],
+      "tests": [
+        "bodies.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/CatBody.luau",
+      "name": "CatBody",
+      "lines": 121,
+      "purpose": "The ranger's cat in the world (ROBLOX-118): Rig/CatPose's parts, built once and moved each frame from Predator/Cat (where it is, which way it faces, what it is",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "CatPose",
+        "Shapes"
+      ],
+      "tests": [
+        "feeding_survival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/CaughtPanel.luau",
+      "name": "CaughtPanel",
+      "lines": 181,
+      "purpose": "Plain end/start screens. Scroll within the safe area; the selected button owns accept,",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "TitleText",
+        "WaspText"
+      ],
+      "tests": [
+        "title.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/CrabBody.luau",
+      "name": "CrabBody",
+      "lines": 117,
+      "purpose": "The crab spiders in the world (ROBLOX-119): each of Predator/CrabSpider's drawn at true size on its flower, a female goldenrod crab spider about 9 mm long: a broad",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/FlyBodies.luau",
+      "name": "FlyBodies",
+      "lines": 650,
+      "purpose": "The drawn fly: a house fly (Data/FlyLook has every number) 0.7 cm long, made of ellipsoids and rods: a head with two big red-brown",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "FlyLook",
+        "Shapes"
+      ],
+      "tests": [
+        "bodies.luau",
+        "feeding_survival.luau",
+        "flies.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/FrameProfile.luau",
+      "name": "FrameProfile",
+      "lines": 135,
+      "purpose": "The client's frame, timed by part (ROBLOX-111): what the self-test prints when it samples the frame time, so a Studio run says where a slow frame's time goes.",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/HutLife.luau",
+      "name": "HutLife",
+      "lines": 249,
+      "purpose": "The ranger hut's own life on this client (ROBLOX-116, docs/PARK_WORLD_DESIGN.md Phase B): the window's sash, shut through the nursery and propped open by the",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Hut",
+        "Meadow",
+        "Nursery"
+      ],
+      "tests": [],
+      "any_casts": 12,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/LivingWorld.luau",
+      "name": "LivingWorld",
+      "lines": 482,
+      "purpose": "The close world: bounded local detail, ambient animals, and weather. No movement/save/attack rules live here.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "AntForage",
+        "DayLight",
+        "DogGait",
+        "DogGround",
+        "Environment",
+        "Hut",
+        "LivedInSites",
+        "Meshes",
+        "Shapes"
+      ],
+      "tests": [
+        "living_world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/LookStream.luau",
+      "name": "LookStream",
+      "lines": 276,
+      "purpose": "The drawn looks of the regions outside the window, built on this client near the spider and destroyed far from it (ROBLOX-108).",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "DayLight",
+        "LookPlan",
+        "Region",
+        "Scenery",
+        "WorldMap"
+      ],
+      "tests": [
+        "world_client.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/MateStage.luau",
+      "name": "MateStage",
+      "lines": 348,
+      "purpose": "What the mating cycle looks like (ROBLOX-80). Display only: the cycle itself is Life/Mating and Predator/Mate (what is true), and nothing here feeds back.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Appearances",
+        "Growth",
+        "MatingRules",
+        "PreyRandom",
+        "SpiderRig",
+        "SupportMath",
+        "WorldMap"
+      ],
+      "tests": [
+        "client_mating.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/MealPresentation.luau",
+      "name": "MealPresentation",
+      "lines": 68,
+      "purpose": "Drawing only: one held-body override and one short-lived, noninteractive husk.",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "feeding_survival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/NotebookArt.luau",
+      "name": "NotebookArt",
+      "lines": 32,
+      "purpose": "Small authored vector sketches, deliberately diagrams rather than photographs or eye-view claims.",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Client/NotebookPanel.luau",
+      "name": "NotebookPanel",
+      "lines": 497,
+      "purpose": "The naturalist's notebook on screen (ROBLOX-37), from Godot's notebook_panel.gd: the pages found so far on the left, in the order they",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "NotebookText"
+      ],
+      "tests": [
+        "notebook.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/OldSkins.luau",
+      "name": "OldSkins",
+      "lines": 39,
+      "purpose": "At most three pale, empty skins in the retreat. Presentation only, never queried by movement or senses.",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "growth.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/PerceptionHud.luau",
+      "name": "PerceptionHud",
+      "lines": 234,
+      "purpose": "Thin drawer for the pure memory view (Shared/UI/PerceptionView). Reuses widgets rather than creating Instances every frame.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "PerceptionShapes",
+        "PerceptionText",
+        "PerceptionView",
+        "QuietHud"
+      ],
+      "tests": [
+        "hud.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/PerceptionStage.luau",
+      "name": "PerceptionStage",
+      "lines": 39,
+      "purpose": "Temporary D-038 stage, away from spawn, crevice and recovery routes. Physical screen/ledge belong to WORLD.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "TestTarget"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/PondBodies.luau",
+      "name": "PondBodies",
+      "lines": 162,
+      "purpose": "The pond's bigger animals in the world (ROBLOX-122): the green frog of Predator/Frog on its seat, and the green darner (World/Pond.darner) patrolling over the water.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes"
+      ],
+      "tests": [
+        "bodies.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/RareBody.luau",
+      "name": "RareBody",
+      "lines": 86,
+      "purpose": "One bounded local animal. Supports join the custom motor's world query root;",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes"
+      ],
+      "tests": [
+        "rare_sightings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SaveClient.luau",
+      "name": "SaveClient",
+      "lines": 119,
+      "purpose": "The client's side of persistent saves (ROBLOX-39). It looks for the server's remotes, says hello, hears the saved state, and sends the",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "state_client.luau",
+        "state_offline.luau",
+        "title.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SelfTest.luau",
+      "name": "SelfTest",
+      "lines": 1804,
+      "purpose": "The live place's self-test (ROBLOX-104): a run of the real client inside a real Studio Play session, which prints what it finds to Output, so every publish can be",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Ballooning",
+        "BugBodies",
+        "Garden",
+        "LookPlan",
+        "Mate",
+        "Meadow",
+        "Pond",
+        "Preserve",
+        "PreyKinds",
+        "Region",
+        "RivalSpider",
+        "Species",
+        "StationTerritory",
+        "WorldMap"
+      ],
+      "tests": [
+        "selftest.luau",
+        "selftest_preserve.luau",
+        "title.luau"
+      ],
+      "any_casts": 28,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SettingsPanel.luau",
+      "name": "SettingsPanel",
+      "lines": 695,
+      "purpose": "The settings on screen (ROBLOX-49): a list of sections (Sound, Camera, Comfort and accessibility, Help and hints), each setting a row with",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "SettingsModel",
+        "SettingsNav",
+        "SettingsSpec",
+        "SettingsText"
+      ],
+      "tests": [
+        "settings.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/Soundscape.luau",
+      "name": "Soundscape",
+      "lines": 195,
+      "purpose": "Original procedural recordings from the frozen Godot sound_bank.gd. Presentation only:",
+      "side": "Client",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "client_smoke.luau",
+        "feeding_survival.luau",
+        "growth.luau",
+        "settings.luau"
+      ],
+      "any_casts": 3,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderCamera.luau",
+      "name": "SpiderCamera",
+      "lines": 724,
+      "purpose": "The spider's camera: a Roblox port of the frozen Godot rig, scripts/movement/camera_rig.gd (c87ce00).",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "CameraMath",
+        "InspectView",
+        "LineFraming",
+        "LockOn",
+        "SupportMath"
+      ],
+      "tests": [
+        "eyes.luau",
+        "gaze.luau",
+        "growth.luau",
+        "scenarios.luau",
+        "spawn_clearance.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderClient.client.luau",
+      "name": "SpiderClient.client",
+      "lines": 2386,
+      "purpose": "The playable spider. Wires one control scheme (SpiderInput: keyboard and mouse, controller and touch together) to the",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "AntMimicPose",
+        "AntMimicText",
+        "Ballooning",
+        "Bird",
+        "BirdBody",
+        "BirdText",
+        "Breakaway",
+        "BugBodies",
+        "Cat",
+        "CatBody",
+        "CatText",
+        "CaughtPanel",
+        "Checkpoint",
+        "CheckpointStore",
+        "ContextPrompts",
+        "ControlText",
+        "CrabBody",
+        "CrabSpider",
+        "CrabText",
+        "DayLight",
+        "Detail",
+        "FieldNotebook",
+        "FlyBodies",
+        "FocusState",
+        "FrameProfile",
+        "Frog",
+        "FrogText",
+        "Growth",
+        "Heard",
+        "HudLayout",
+        "InspectText",
+        "InspectView",
+        "JumpInput",
+        "LifeClock",
+        "LifeLoop",
+        "LifeSession",
+        "LifeText",
+        "LockOn",
+        "Mate",
+        "MateDrive",
+        "MateStage",
+        "MateText",
+        "Mating",
+        "MatingRules",
+        "MatingScene",
+        "MealPresentation",
+        "Nature",
+        "NeedsModel",
+        "NotebookPages",
+        "NotebookPanel",
+        "NotebookText",
+        "NotebookWatch",
+        "ObservationMemory",
+        "OldSkins",
+        "PeacockDance",
+        "PeacockText",
+        "PerceptionHud",
+        "PerceptionStage",
+        "Pond",
+        "PondBodies",
+        "PreyDirector",
+        "PreyKinds",
+        "PreyText",
+        "PreyWorld",
+        "QuietHud",
+        "RareBody",
+        "RareDirector",
+        "RareLedger",
+        "Region",
+        "RivalDisplay",
+        "RivalDrive",
+        "RivalGrip",
+        "RivalSpider",
+        "RivalText",
+        "SaveClient",
+        "SaveProgress",
+        "SaveRules",
+        "SaveText",
+        "SelfTest",
+        "Sensor",
+        "SettingsModel",
+        "SettingsPanel",
+        "SettingsSpec",
+        "Soundscape",
+        "Species",
+        "SpiderCamera",
+        "SpiderChoice",
+        "SpiderEyes",
+        "SpiderHud",
+        "SpiderInput",
+        "SpiderMotor",
+        "SpiderRig",
+        "StationMouse",
+        "StationMouseBody",
+        "StickCarry",
+        "SupportMath",
+        "Surfaces",
+        "TarantulaPose",
+        "TarantulaText",
+        "TitleCard",
+        "TitleText",
+        "WaspBody",
+        "WaspDirector",
+        "WaspText",
+        "Water",
+        "WaterText",
+        "WorldClient",
+        "WorldDetail",
+        "WorldMap"
+      ],
+      "tests": [
+        "client_ant.luau",
+        "client_mating.luau",
+        "client_rival.luau",
+        "client_smoke.luau",
+        "eyes.luau",
+        "feeding_survival.luau",
+        "inspect.luau",
+        "lock.luau",
+        "nature_client.luau",
+        "notebook.luau",
+        "perception_client.luau",
+        "quiet.luau",
+        "rare_sightings.luau",
+        "selftest.luau",
+        "selftest_preserve.luau",
+        "settings.luau",
+        "state_client.luau",
+        "state_offline.luau",
+        "title.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 19,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderEyes.luau",
+      "name": "SpiderEyes",
+      "lines": 460,
+      "purpose": "The spider-eye picture (ROBLOX-20): what the eye view looks like, drawn on this client from the pure rules of Shared/UI/EyeOptics",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "EyeOptics",
+        "Eyes",
+        "Sensor",
+        "SettingsModel"
+      ],
+      "tests": [
+        "eyes.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderHud.luau",
+      "name": "SpiderHud",
+      "lines": 414,
+      "purpose": "The spider's screen: the centre dot and Focus ticks, the aim's words under them (Godot jump_hud.gd), a status line and",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "HudLayout",
+        "LifeText"
+      ],
+      "tests": [
+        "feeding_survival.luau",
+        "hud.luau",
+        "minimal_hud.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderInput.luau",
+      "name": "SpiderInput",
+      "lines": 263,
+      "purpose": "One action path for keyboard, mouse, gamepad and held on-screen touch buttons, all at once.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "HudLayout",
+        "InputState"
+      ],
+      "tests": [
+        "client_smoke.luau",
+        "lock.luau",
+        "notebook.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/StationMouseBody.luau",
+      "name": "StationMouseBody",
+      "lines": 40,
+      "purpose": "Presentation only. Shapes are anchored and non-queryable like other animals.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes"
+      ],
+      "tests": [
+        "station_debug.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/TitleCard.luau",
+      "name": "TitleCard",
+      "lines": 261,
+      "purpose": "The title card's camera and the intro of a new life (ROBLOX-109). The words are UI/TitleText's, the shots Movement/TitleShots'; this module draws them.",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "TitleShots",
+        "TitleText"
+      ],
+      "tests": [],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/TrainPass.luau",
+      "name": "TrainPass",
+      "lines": 137,
+      "purpose": "The trains beyond the preserve's north fence, drawn (ROBLOX-115): a silhouette of cars that runs along the railway's track when World/PreserveTrain's timetable",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Materials",
+        "PreserveTrain"
+      ],
+      "tests": [],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/WaspBody.luau",
+      "name": "WaspBody",
+      "lines": 226,
+      "purpose": "The drawn mud dauber wasp (Data/WaspLook has every number): about 2.5 cm long, built from ellipsoids and rods as the fly is",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Shapes",
+        "WaspLook"
+      ],
+      "tests": [
+        "wasp.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/WorldClient.luau",
+      "name": "WorldClient",
+      "lines": 318,
+      "purpose": "The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "FrameProfile",
+        "HutLife",
+        "LifeClock",
+        "LivingWorld",
+        "LookStream",
+        "Region",
+        "StationTerritory",
+        "TrainPass",
+        "WorldMap",
+        "WorldShadows",
+        "Worlds"
+      ],
+      "tests": [
+        "world_client.luau"
+      ],
+      "any_casts": 10,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/WorldDetail.luau",
+      "name": "WorldDetail",
+      "lines": 35,
+      "purpose": "The low-detail tier of the world, applied on one client: phones and tablets drop what the server built for the full tier",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Graphics"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Client/WorldShadows.luau",
+      "name": "WorldShadows",
+      "lines": 166,
+      "purpose": "The walkable boxes' shadows, kept to the ones an eye at the spider could see (ROBLOX-121).",
+      "side": "Client",
+      "strict": true,
+      "requires": [
+        "Region"
+      ],
+      "tests": [
+        "shadows.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/First/Splash.client.luau",
+      "name": "Splash.client",
+      "lines": 10,
+      "purpose": "ReplicatedFirst's one script (ROBLOX-109): the game's own loading screen, First/SplashScreen. Whatever happens in it, it ends: SplashScreen.run is",
+      "side": "First",
+      "strict": true,
+      "requires": [],
+      "tests": [],
+      "any_casts": 1,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/First/SplashScreen.luau",
+      "name": "SplashScreen",
+      "lines": 209,
+      "purpose": "The splash (ROBLOX-109): the game's own loading screen, from ReplicatedFirst. Roblox's default loading screen is removed at once and in its place is",
+      "side": "First",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "title.luau"
+      ],
+      "any_casts": 4,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Server/DataStoreBackend.luau",
+      "name": "DataStoreBackend",
+      "lines": 29,
+      "purpose": "The real store backend (ROBLOX-39): a thin adapter from a Roblox DataStore to the interface Shared/Persistence/MemoryBackend documents",
+      "side": "Server",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/Persistence.server.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Server/Main.server.luau",
+      "name": "Main.server",
+      "lines": 72,
+      "purpose": "Builds the world: the windowsill (scripts/habitat/windowsill.gd) as region 0 of the map (World/WorldBuild, ROBLOX-94: every region's physical boxes under one `World`",
+      "side": "Server",
+      "strict": true,
+      "requires": [
+        "Lit",
+        "Region",
+        "Scenery",
+        "WorldBuild",
+        "WorldFocus",
+        "WorldMap",
+        "Worlds"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Server/Persistence.server.luau",
+      "name": "Persistence.server",
+      "lines": 87,
+      "purpose": "Persistent saves, the server's side (ROBLOX-39). Wires the engine to SaveService: the DataStore, the two remotes, the players coming and",
+      "side": "Server",
+      "strict": true,
+      "requires": [
+        "DataStoreBackend",
+        "SaveRules",
+        "SaveService",
+        "SaveStores"
+      ],
+      "tests": [],
+      "any_casts": 1,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Server/SaveService.luau",
+      "name": "SaveService",
+      "lines": 201,
+      "purpose": "The server's persistence service (ROBLOX-39): one SaveSession per player, and the only place a client's message is turned into anything",
+      "side": "Server",
+      "strict": true,
+      "requires": [
+        "SaveRules",
+        "SaveSession"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/Persistence.server.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Server/WorldFocus.luau",
+      "name": "WorldFocus",
+      "lines": 116,
+      "purpose": "Where the server streams the world to (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). With Workspace.StreamingEnabled the server sends each client only the instances around",
+      "side": "Server",
+      "strict": true,
+      "requires": [
+        "WorldMap"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/Main.server.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/AntMimic.luau",
+      "name": "AntMimic",
+      "lines": 61,
+      "purpose": "The ant-mimicking jumping spider's walk and antennae (ROBLOX-64): every number the pose needs, each marked DOC (reported in the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "antmimic.luau",
+        "notebook.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Learning/NotebookWatch.luau",
+        "roblox_port/src/Shared/Rig/AntMimicPose.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Appearances.luau",
+      "name": "Appearances",
+      "lines": 844,
+      "purpose": "Artist-directed appearance, independent of species tuning, growth and physics.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "antmimic.luau",
+        "idle.luau",
+        "look.luau",
+        "peacock.luau",
+        "run.luau",
+        "state.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Shared/Rig/SpiderChoice.luau",
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Catch.luau",
+      "name": "Catch",
+      "lines": 81,
+      "purpose": "The catch struggle as the game plays it (ROBLOX-72, ROBLOX-77). Game tuning, not measurements; Godot's values (Prey/Feeding's defaults, checked",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Species"
+      ],
+      "tests": [
+        "garden_life.luau",
+        "preserve.luau",
+        "prey.luau",
+        "rival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Prey/Feeding.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Detail.luau",
+      "name": "Detail",
+      "lines": 20,
+      "purpose": "Which detail tier a device runs: \"full\" for computers and consoles, \"low\" for touch-only phones and tablets. The tier",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Eyes.luau",
+      "name": "Eyes",
+      "lines": 160,
+      "purpose": "The numbers of the spider-eye picture (ROBLOX-20): how each way of seeing looks, how the two retinae move, how the lateral",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "eyes.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderEyes.luau",
+        "roblox_port/src/Shared/UI/EyeOptics.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Flora.luau",
+      "name": "Flora",
+      "lines": 213,
+      "purpose": "The plants of the drawn world: the Pilea on the sill, the trough's planting, and the garden outside the window. Numbers and",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/DayLight.luau",
+        "roblox_port/src/Shared/Habitat/Dressing.luau",
+        "roblox_port/src/Shared/Habitat/Plants.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau",
+        "roblox_port/src/Shared/World/Garden.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/FlyLook.luau",
+      "name": "FlyLook",
+      "lines": 482,
+      "purpose": "How a fly looks: numbers and names only; Client/FlyBodies builds the parts and places them each frame. A house fly (Musca",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "bodies.luau",
+        "flies.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/BugBodies.luau",
+        "roblox_port/src/Client/FlyBodies.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Graphics.luau",
+      "name": "Graphics",
+      "lines": 228,
+      "purpose": "How the world looks, apart from the spider (whose look is Data/Appearances). Numbers and names only, so the whole look can",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "life.luau",
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/WorldDetail.luau",
+        "roblox_port/src/Shared/Habitat/DayLight.luau",
+        "roblox_port/src/Shared/Habitat/Dressing.luau",
+        "roblox_port/src/Shared/Habitat/Lit.luau",
+        "roblox_port/src/Shared/Habitat/Patina.luau",
+        "roblox_port/src/Shared/Habitat/Plants.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/MatingRules.luau",
+      "name": "MatingRules",
+      "lines": 85,
+      "purpose": "The mating cycle's numbers (ROBLOX-79). Game tuning, not measurements: Predator/Mate and Life/Mating read these and nothing else decides them.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "client_mating.luau",
+        "mating.luau",
+        "nature.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Life/Mating.luau",
+        "roblox_port/src/Shared/Life/MatingScene.luau",
+        "roblox_port/src/Shared/Predator/Mate.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Meshes.luau",
+      "name": "Meshes",
+      "lines": 36,
+      "purpose": "The preserve's first meshes (ROBLOX-126; docs/MESHES.md, assets/meshes/manifest.json): original Blender studies by Chet, uploaded by socranates and verified",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/NotebookPages.luau",
+      "name": "NotebookPages",
+      "lines": 665,
+      "purpose": "The naturalist's notebook pages (LEARN-01), GENERATED by tools/gen_notebook_pages.py from the frozen Godot",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "antmimic.luau",
+        "client_mating.luau",
+        "notebook.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Learning/FieldNotebook.luau",
+        "roblox_port/src/Shared/Learning/NotebookWatch.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Peacock.luau",
+      "name": "Peacock",
+      "lines": 74,
+      "purpose": "The peacock spider's courtship dance (ROBLOX-29): every number the dance needs, each marked DOC (reported in the paper) or ART",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "peacock.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/PeacockDance.luau",
+        "roblox_port/src/Shared/UI/PeacockText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/RareSightings.luau",
+      "name": "RareSightings",
+      "lines": 12,
+      "purpose": "Only finished encounters are registered. The thirteen-creature roadmap is",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "rare_sightings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Life/RareDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/RivalRules.luau",
+      "name": "RivalRules",
+      "lines": 57,
+      "purpose": "When the brown rival spider arrives (ROBLOX-68). Game tuning, not measurements. Predator/RivalSpider reads these; nothing else decides it.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "mating.luau",
+        "nature.luau",
+        "rival.luau",
+        "rivalnav.luau",
+        "worldmap.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Predator/RivalDrive.luau",
+        "roblox_port/src/Shared/Predator/RivalRoute.luau",
+        "roblox_port/src/Shared/Predator/RivalSpider.luau",
+        "roblox_port/src/Shared/World/Region.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/SaveRules.luau",
+      "name": "SaveRules",
+      "lines": 69,
+      "purpose": "Every number and name the persistent saves use (ROBLOX-39): store names, key prefixes, sizes, timings, limits. The logic is in",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "client_ant.luau",
+        "settings.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Server/Persistence.server.luau",
+        "roblox_port/src/Server/SaveService.luau",
+        "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
+        "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+        "roblox_port/src/Shared/Persistence/SaveProgress.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau",
+        "roblox_port/src/Shared/Persistence/SaveScheduler.luau",
+        "roblox_port/src/Shared/Persistence/SaveSession.luau",
+        "roblox_port/src/Shared/Persistence/SaveStores.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/SettingsSpec.luau",
+      "name": "SettingsSpec",
+      "lines": 102,
+      "purpose": "Every setting the player can change (ROBLOX-49): its id, words, kind, default and range. One table, no logic: Shared/UI/SettingsModel",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "lock.luau",
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SettingsPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/SettingsModel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Species.luau",
+      "name": "Species",
+      "lines": 592,
+      "purpose": "GENERATED by tools/json_to_luau.py from data/species/*.json. Do not edit by hand.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "bodies.luau",
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "feeding_survival.luau",
+        "flies.luau",
+        "garden_life.luau",
+        "gaze.luau",
+        "lock.luau",
+        "mating.luau",
+        "nature.luau",
+        "perception.luau",
+        "preserve.luau",
+        "prey.luau",
+        "rare_sightings.luau",
+        "rival.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "scenarios.luau",
+        "sensor.luau",
+        "spawn_clearance.luau",
+        "state.luau",
+        "state_client.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "verge_litter.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Data/Catch.luau",
+        "roblox_port/src/Shared/Life/Growth.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau",
+        "roblox_port/src/Shared/Prey/PreyKinds.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Surfaces.luau",
+      "name": "Surfaces",
+      "lines": 97,
+      "purpose": "GENERATED by tools/json_to_luau.py from data/surfaces/*.json. Do not edit by hand.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "gaze.luau",
+        "lock.luau",
+        "mating.luau",
+        "nature.luau",
+        "preserve.luau",
+        "rare_sightings.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "scenarios.luau",
+        "spawn_clearance.luau",
+        "state.luau",
+        "state_client.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "verge_litter.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Tarantula.luau",
+      "name": "Tarantula",
+      "lines": 50,
+      "purpose": "The tarantulas' threat display and silk mat (ROBLOX-82): every number the pose needs. The pose is presentation only: it bends and",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "look.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/TarantulaPose.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Wasp.luau",
+      "name": "Wasp",
+      "lines": 136,
+      "purpose": "The mud dauber wasp's rules: every number of scripts/predator/wasp_director.gd (LIFE round 4, LIFE-14 to LIFE-17), unchanged, in",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "mating.luau",
+        "nature.luau",
+        "wasp.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Predator/WaspDirector.luau",
+        "roblox_port/src/Shared/UI/Heard.luau",
+        "roblox_port/src/Shared/UI/WaspText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/WaspLook.luau",
+      "name": "WaspLook",
+      "lines": 75,
+      "purpose": "How the mud dauber wasp looks: numbers and names only; Client/WaspBody builds the parts and poses them each frame. A black-and-yellow",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "wasp.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/WaspBody.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Wear.luau",
+      "name": "Wear",
+      "lines": 87,
+      "purpose": "What age and use have done to the sill, the glass and the retreat, and the few small things left lying about: numbers and names",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Dressing.luau",
+        "roblox_port/src/Shared/Habitat/Patina.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Breakaway.luau",
+      "name": "Breakaway",
+      "lines": 71,
+      "purpose": "Godot windowsill.gd T09b: the pale east leaf tip falls on a committed jump.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/DayLight.luau",
+      "name": "DayLight",
+      "lines": 142,
+      "purpose": "The light of the hour on the sill (ROBLOX-24, after Godot's LIFE-06 set_daylight): the life clock's daylight, 0 (night) to 1",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Flora",
+        "Graphics"
+      ],
+      "tests": [
+        "life.luau",
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Client/LookStream.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Dressing.luau",
+      "name": "Dressing",
+      "lines": 221,
+      "purpose": "Dresses the sill (ROBLOX-74, \"more grass and detail\"), from Data/Flora, on top of what Plants and Patina already draw: moss on the shaded",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Flora",
+        "Graphics",
+        "Plants",
+        "Shapes",
+        "Wear"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Lit.luau",
+      "name": "Lit",
+      "lines": 125,
+      "purpose": "The lighting, sky and screen effects (Data/Graphics): a soft warm sun picked by SunPick so that it shines in through the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Graphics",
+        "SunPick"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Server/Main.server.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Materials.luau",
+      "name": "Materials",
+      "lines": 32,
+      "purpose": "Material names (as Data/Graphics spells them) to Roblox's Enum.Material, so the data stays plain text and a typo is caught by",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau",
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/TrainPass.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau",
+        "roblox_port/src/Shared/Habitat/Shapes.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Patina.luau",
+      "name": "Patina",
+      "lines": 118,
+      "purpose": "Builds what age and use have done to the sill, the glass and the retreat, from Data/Wear: a worn strip along the front lip, grime",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Graphics",
+        "Shapes",
+        "Wear"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Plants.luau",
+      "name": "Plants",
+      "lines": 520,
+      "purpose": "Builds the plants of the drawn world from Data/Flora: the Pilea that replaces the leaf and stem pieces of the sill, the trough's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Flora",
+        "Graphics",
+        "Shapes",
+        "WindowsillLayout"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Dressing.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Scenery.luau",
+      "name": "Scenery",
+      "lines": 540,
+      "purpose": "Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a \"Decor\" model (a persistent one, ROBLOX-94) with the window wall,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Dressing",
+        "Flora",
+        "Graphics",
+        "Materials",
+        "Meshes",
+        "Patina",
+        "Plants",
+        "Shapes",
+        "Surfaces",
+        "WindowsillLayout"
+      ],
+      "tests": [
+        "preserve.luau",
+        "selftest_preserve.luau",
+        "shadows.luau",
+        "world.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/LookStream.luau",
+        "roblox_port/src/Server/Main.server.luau",
+        "roblox_port/src/Shared/World/WorldBuild.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Shapes.luau",
+      "name": "Shapes",
+      "lines": 145,
+      "purpose": "Drawn-only parts for the decor builders (Habitat/Scenery, Plants, Patina) and the fly (Client/FlyBodies): every part is anchored, nothing collides with it, no",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Materials",
+        "WindowsillLayout"
+      ],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/BirdBody.luau",
+        "roblox_port/src/Client/BugBodies.luau",
+        "roblox_port/src/Client/CatBody.luau",
+        "roblox_port/src/Client/CrabBody.luau",
+        "roblox_port/src/Client/FlyBodies.luau",
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Client/PondBodies.luau",
+        "roblox_port/src/Client/RareBody.luau",
+        "roblox_port/src/Client/StationMouseBody.luau",
+        "roblox_port/src/Client/WaspBody.luau",
+        "roblox_port/src/Shared/Habitat/Dressing.luau",
+        "roblox_port/src/Shared/Habitat/Patina.luau",
+        "roblox_port/src/Shared/Habitat/Plants.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/SunPick.luau",
+      "name": "SunPick",
+      "lines": 68,
+      "purpose": "Finds a sun that shines in through the window: behind the back wall (-Z), standing between a low and a middling height,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Lit.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/TestTarget.luau",
+      "name": "TestTarget",
+      "lines": 32,
+      "purpose": "Godot test_target.gd: a labelled prop, never prey. Path stepping is independent of rendering.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "perception_view.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/PerceptionStage.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/WindowsillLayout.luau",
+      "name": "WindowsillLayout",
+      "lines": 95,
+      "purpose": "The windowsill of scripts/habitat/windowsill.gd (\"windowsill-v1\"), box for box. Coordinates are studs = Godot WU = cm,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "client_ant.luau",
+        "client_mating.luau",
+        "client_rival.luau",
+        "client_smoke.luau",
+        "eyes.luau",
+        "feeding_survival.luau",
+        "gaze.luau",
+        "inspect.luau",
+        "life.luau",
+        "lock.luau",
+        "mating.luau",
+        "nature.luau",
+        "notebook.luau",
+        "perception_client.luau",
+        "preserve.luau",
+        "quiet.luau",
+        "rival.luau",
+        "rivalnav.luau",
+        "scenarios.luau",
+        "settings.luau",
+        "state.luau",
+        "state_client.luau",
+        "state_offline.luau",
+        "title.luau",
+        "wasp.luau",
+        "world.luau",
+        "worldmap.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Habitat/Plants.luau",
+        "roblox_port/src/Shared/Habitat/Scenery.luau",
+        "roblox_port/src/Shared/Habitat/Shapes.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Learning/FieldNotebook.luau",
+      "name": "FieldNotebook",
+      "lines": 193,
+      "purpose": "The naturalist's notebook (LEARN-01), a port of the frozen scripts/learning/field_notebook.gd without the file and the node.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "NotebookPages",
+        "Signal"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "notebook.luau",
+        "rare_sightings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Learning/NotebookWatch.luau",
+      "name": "NotebookWatch",
+      "lines": 230,
+      "purpose": "Watches play for the moments the naturalist's notebook opens pages on: a port of the frozen scripts/learning/notebook_watch.gd.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "AntMimic",
+        "NotebookPages"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "notebook.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Ballooning.luau",
+      "name": "Ballooning",
+      "lines": 153,
+      "purpose": "Ballooning, the lineage moves (ROBLOX-120, docs/PARK_WORLD_DESIGN.md section 5: \"the spiderlings balloon. The player chooses one to follow: where it lands is drawn from",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Preserve"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "preserve.luau",
+        "selftest_preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Growth.luau",
+      "name": "Growth",
+      "lines": 117,
+      "purpose": "Frozen Godot scripts/life/growth.gd, LIFE-10..12. Durations and scales are game tuning, not measured instars.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Species"
+      ],
+      "tests": [
+        "gaze.luau",
+        "growth.luau",
+        "life.luau",
+        "mating.luau",
+        "nature.luau",
+        "quiet.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Life/LifeLoop.luau",
+        "roblox_port/src/Shared/Life/Mating.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeClock.luau",
+      "name": "LifeClock",
+      "lines": 193,
+      "purpose": "The life clock: a port of the frozen scripts/life/life_clock.gd (LIFE-04). The windowsill's time of day and the spider's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "feeding_survival.luau",
+        "life.luau",
+        "mating.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/WorldClient.luau",
+        "roblox_port/src/Shared/Life/LifeLoop.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/UI/ContextPrompts.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeLoop.luau",
+      "name": "LifeLoop",
+      "lines": 264,
+      "purpose": "LifeLoop: the rest, sleep and day of the frozen scripts/habitat/habitat_loop.gd (T08, LIFE-04 to LIFE-06), without the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Growth",
+        "LifeClock"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "continuing.luau",
+        "feeding_survival.luau",
+        "growth.luau",
+        "life.luau",
+        "mating.luau",
+        "nature.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeSession.luau",
+      "name": "LifeSession",
+      "lines": 43,
+      "purpose": "LIFE-19..23: player progress lives outside world checkpoints. Session only until server saves are ported.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "continuing.luau",
+        "growth.luau",
+        "nature.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Mating.luau",
+      "name": "Mating",
+      "lines": 336,
+      "purpose": "The mating cycle and the new generation (ROBLOX-79). One plain record, life.mating, in LifeLoop's checkpoint graph beside life.mate (the mate's body,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Growth",
+        "Mate",
+        "MatingRules",
+        "PreyRandom"
+      ],
+      "tests": [
+        "client_mating.luau",
+        "mating.luau",
+        "nature.luau",
+        "selftest_preserve.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/MatingScene.luau",
+      "name": "MatingScene",
+      "lines": 162,
+      "purpose": "The mating scene (ROBLOX-89): what happens between \"the meter is full\" and \"they part\", as a pure plan. About fifteen seconds, in four beats, with a camera that",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "MatingRules",
+        "PreyRandom"
+      ],
+      "tests": [
+        "client_mating.luau",
+        "mating.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Nature.luau",
+      "name": "Nature",
+      "lines": 165,
+      "purpose": "Nature's rules (ROBLOX-106, W4 of docs/OPEN_WORLD_DESIGN.md; the design called it \"ROBLOX-97\", a number never used). Nathan: \"Normal mode should feel like it doesn't",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "lock.luau",
+        "nature.luau",
+        "nature_client.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/NeedsModel.luau",
+      "name": "NeedsModel",
+      "lines": 370,
+      "purpose": "NeedsModel: a port of the frozen scripts/needs/needs_model.gd (spec 11, 19.3, 21.3 NeedState; LIFE-05). The spider's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "continuing.luau",
+        "feeding_survival.luau",
+        "growth.luau",
+        "life.luau",
+        "mating.luau",
+        "nature.luau",
+        "nature_client.luau",
+        "rival.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/Feeding.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Nursery.luau",
+      "name": "Nursery",
+      "lines": 42,
+      "purpose": "The nursery rule (ROBLOX-116, docs/PARK_WORLD_DESIGN.md: Nathan's \"born on the sill, the sash shut until ready\"). In the preserve's first life the ranger hut's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/HutLife.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/RareDirector.luau",
+      "name": "RareDirector",
+      "lines": 74,
+      "purpose": "Optional life fields are part of the existing checkpoint object graph.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Environment",
+        "RareLedger",
+        "RareSightings"
+      ],
+      "tests": [
+        "rare_sightings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/RareLedger.luau",
+      "name": "RareLedger",
+      "lines": 70,
+      "purpose": "Player progress, outside rests. High-water marks prevent a rewound rest",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "rare_sightings.luau"
+      ],
+      "any_casts": 5,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Life/RareDirector.luau",
+        "roblox_port/src/Shared/Persistence/SaveProgress.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Water.luau",
+      "name": "Water",
+      "lines": 151,
+      "purpose": "The water (ROBLOX-122, docs/PARK_WORLD_DESIGN.md zone 4: \"water (drowning)\"): the pond's surface is not a place a jumping spider can live on. The sources the notebook's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/CameraMath.luau",
+      "name": "CameraMath",
+      "lines": 292,
+      "purpose": "Pure camera and stick math, ported from the frozen Godot reference (c87ce00):",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "lock.luau",
+        "run.luau",
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderCamera.luau",
+        "roblox_port/src/Shared/Movement/LineFraming.luau",
+        "roblox_port/src/Shared/Movement/LockOn.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/FocusState.luau",
+      "name": "FocusState",
+      "lines": 17,
+      "purpose": "D-041: toggle is optional, grounded only, and Cancel belongs to other actions first.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "perception_view.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/InputState.luau",
+      "name": "InputState",
+      "lines": 87,
+      "purpose": "Pure input state: test without Studio. +Y is forward on the control pad; look +X is right, +Y is down",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderInput.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/InspectView.luau",
+      "name": "InspectView",
+      "lines": 147,
+      "purpose": "Inspect mode's view, as numbers (ROBLOX-90): an orbit of the spider by yaw, elevation and distance in body-lengths, the auto-orbit when the player is",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "inspect.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderCamera.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/JumpInput.luau",
+      "name": "JumpInput",
+      "lines": 165,
+      "purpose": "Jump input: a port of the frozen Godot scripts/movement/jump_controller.gd (c87ce00, hold mode). Pure: the motor is passed",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "run.luau",
+        "scenarios.luau"
+      ],
+      "any_casts": 3,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/JumpMath.luau",
+      "name": "JumpMath",
+      "lines": 152,
+      "purpose": "Port of scripts/movement/jump_math.gd (spec 6.3, 27). Pure math, no Instances, so it runs in tests/run.luau too.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Movement/SpiderMotor.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/LineFraming.luau",
+      "name": "LineFraming",
+      "lines": 95,
+      "purpose": "The camera's line framing at a catch: a port of the frozen Godot camera_rig.gd (c87ce00; A-017, chunk 6A, capped in 6B).",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "CameraMath"
+      ],
+      "tests": [
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderCamera.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/LockOn.luau",
+      "name": "LockOn",
+      "lines": 182,
+      "purpose": "Lock-on and the sidestep (ROBLOX-110). Nathan: \"a lock on so you can track prey without the visual cues and the ability to side step\".",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "CameraMath",
+        "Observation",
+        "SupportMath"
+      ],
+      "tests": [
+        "lock.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderCamera.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SilkController.luau",
+      "name": "SilkController",
+      "lines": 334,
+      "purpose": "Engine adapter for the frozen safety line. One local-space anchor, at most one bend.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "TetherMath"
+      ],
+      "tests": [
+        "rare_sightings.luau",
+        "scenarios.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/Movement/SpiderMotor.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SpiderMotor.luau",
+      "name": "SpiderMotor",
+      "lines": 811,
+      "purpose": "The spider's body on the windowsill: a kinematic port of the frozen Godot motor's core (scripts/movement/spider_motor.gd,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "JumpMath",
+        "SilkController",
+        "SupportMath"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "gaze.luau",
+        "lock.luau",
+        "mating.luau",
+        "nature.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "scenarios.luau",
+        "spawn_clearance.luau",
+        "state.luau",
+        "state_client.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "verge_litter.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Predator/RivalDrive.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/StickCarry.luau",
+      "name": "StickCarry",
+      "lines": 54,
+      "purpose": "The carry over an edge: a port of the frozen Godot scripts/movement/player_controller.gd _carry (c87ce00).",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "run.luau",
+        "scenarios.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SupportMath.luau",
+      "name": "SupportMath",
+      "lines": 76,
+      "purpose": "Port of scripts/movement/support_math.gd (spec 6.1, 6.2). Pure geometry for supported locomotion; unit vectors in world space.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "gaze.luau",
+        "idle.luau",
+        "lock.luau",
+        "look.luau",
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Client/SpiderCamera.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Movement/LockOn.luau",
+        "roblox_port/src/Shared/Movement/SpiderMotor.luau",
+        "roblox_port/src/Shared/Predator/RivalDrive.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/TetherMath.luau",
+      "name": "TetherMath",
+      "lines": 62,
+      "purpose": "Pure safety-line operations from frozen Godot tether.gd / spider_motor.gd.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Movement/SilkController.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/TitleShots.luau",
+      "name": "TitleShots",
+      "lines": 166,
+      "purpose": "The camera of the first minute (ROBLOX-109), as pure functions of time: the drift the splash (First/SplashScreen) and the title card (Client/TitleCard)",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau",
+        "title.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/TitleCard.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Observation.luau",
+      "name": "Observation",
+      "lines": 151,
+      "purpose": "Observation (spec 21.3): one piece of sensed evidence, as the sensor makes it and the memory keeps it. A port of the frozen",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "perception.luau",
+        "sensor.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Shared/Movement/LockOn.luau",
+        "roblox_port/src/Shared/Perception/ObservationMemory.luau",
+        "roblox_port/src/Shared/Perception/PerceptionMath.luau",
+        "roblox_port/src/Shared/Perception/SensorCore.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/ObservationMemory.luau",
+      "name": "ObservationMemory",
+      "lines": 448,
+      "purpose": "ObservationMemory (spec 7, 21.3): what the observer remembers of what it sensed. A port of the frozen Godot",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Observation",
+        "PerceptionMath",
+        "Signal"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "garden_life.luau",
+        "mating.luau",
+        "nature.luau",
+        "perception.luau",
+        "sensor.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Perception/Sensor.luau",
+        "roblox_port/src/Shared/Perception/SensorCore.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/PerceptionMath.luau",
+      "name": "PerceptionMath",
+      "lines": 171,
+      "purpose": "Pure helpers for the perception layer (spec 7): angles, apparent size, the exposure a classification needs, the evidence's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Observation"
+      ],
+      "tests": [
+        "perception.luau",
+        "sensor.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Perception/ObservationMemory.luau",
+        "roblox_port/src/Shared/Perception/Sensor.luau",
+        "roblox_port/src/Shared/Perception/SensorCore.luau",
+        "roblox_port/src/Shared/Prey/FlySenses.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Sensor.luau",
+      "name": "Sensor",
+      "lines": 414,
+      "purpose": "Sensor: the world half of Godot's SensorSystem (scripts/perception/sensor_system.gd, c87ce00). SensorCore keeps what needs no world (which",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ObservationMemory",
+        "PerceptionMath",
+        "SensorCore"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "eyes.luau",
+        "garden_life.luau",
+        "mating.luau",
+        "nature.luau",
+        "sensor.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/SpiderEyes.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/SensorCore.luau",
+      "name": "SensorCore",
+      "lines": 437,
+      "purpose": "SensorCore: the half of Godot's SensorSystem (scripts/perception/sensor_system.gd, c87ce00) that needs no world. The sensor turns world",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Observation",
+        "ObservationMemory",
+        "PerceptionMath",
+        "Signal"
+      ],
+      "tests": [
+        "perception.luau",
+        "sensor.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Perception/Sensor.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Signal.luau",
+      "name": "Signal",
+      "lines": 34,
+      "purpose": "A minimal in-process signal, the stand-in for a Godot `signal`: handlers run synchronously, in the order they were connected, when",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/Learning/FieldNotebook.luau",
+        "roblox_port/src/Shared/Perception/ObservationMemory.luau",
+        "roblox_port/src/Shared/Perception/SensorCore.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+      "name": "Checkpoint",
+      "lines": 590,
+      "purpose": "The retreat checkpoint (S01-C; Godot's scripts/persistence/checkpoint.gd, T09; ROBLOX-25). A checkpoint is the whole world",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Ant",
+        "Ballooning",
+        "Breakaway",
+        "Cat",
+        "CompactMigration",
+        "Feeding",
+        "Fly",
+        "FlyFlight",
+        "FlySenses",
+        "Garden",
+        "Growth",
+        "Harvestman",
+        "Ladybird",
+        "LifeClock",
+        "LifeLoop",
+        "Mate",
+        "Mating",
+        "Millipede",
+        "Nature",
+        "NeedsModel",
+        "ObjectRecord",
+        "Observation",
+        "ObservationMemory",
+        "PerchGraph",
+        "PreyDirector",
+        "PreyPopulation",
+        "PreyRandom",
+        "RareDirector",
+        "RivalSpider",
+        "Sensor",
+        "SensorCore",
+        "Skater",
+        "Snail",
+        "Species",
+        "WaspDirector",
+        "Water",
+        "Woodlouse",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "mating.luau",
+        "nature.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
+      "name": "CheckpointStore",
+      "lines": 207,
+      "purpose": "Where checkpoints live (S02; Godot's scripts/persistence/checkpoint_store.gd; ROBLOX-25), behind a DataStore-shaped",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json"
+      ],
+      "tests": [
+        "checkpoint.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/CompactMigration.luau",
+      "name": "CompactMigration",
+      "lines": 108,
+      "purpose": "preserve-2 -> preserve-3: relocate habitats, not spider scale or progress.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "WorldMap"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/Json.luau",
+      "name": "Json",
+      "lines": 147,
+      "purpose": "What a Roblox DataStore can hold, checked without the engine (ROBLOX-25), and the canonical text a checksum is taken over",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "client_mating.luau",
+        "compact_layout.luau",
+        "mating.luau",
+        "nature.luau",
+        "rare_sightings.luau",
+        "state.luau",
+        "state_client.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
+        "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
+        "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau",
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
+      "name": "MemoryBackend",
+      "lines": 101,
+      "purpose": "The in-memory store backend (ROBLOX-39): the same interface as the real DataStore backend, with a Roblox DataStore's rules (values",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json",
+        "SaveRules"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": []
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/ObjectRecord.luau",
+      "name": "ObjectRecord",
+      "lines": 329,
+      "purpose": "ObjectRecord (ROBLOX-25): the state of a few live objects as one plain record that a DataStore could hold, and back.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "feeding_survival.luau",
+        "mating.luau",
+        "rare_sightings.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+      "name": "SaveEnvelope",
+      "lines": 153,
+      "purpose": "The versioned envelope every stored save travels in (ROBLOX-39), and how it is opened without ever guessing.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json",
+        "SaveRules"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/SaveProgress.luau",
+        "roblox_port/src/Shared/Persistence/SaveRest.luau",
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveProgress.luau",
+      "name": "SaveProgress",
+      "lines": 187,
+      "purpose": "The player's progress record (ROBLOX-39): the small precious part of a save, kept apart from the world's rests.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "RareLedger",
+        "SaveEnvelope",
+        "SaveRules",
+        "SettingsModel"
+      ],
+      "tests": [
+        "preserve.luau",
+        "rare_sightings.luau",
+        "settings.luau",
+        "state.luau",
+        "state_client.luau",
+        "title.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveRest.luau",
+      "name": "SaveRest",
+      "lines": 99,
+      "purpose": "The last rest of a mode, as the server keeps it (ROBLOX-39): a retreat checkpoint (Checkpoint) in an envelope, one per mode.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Checkpoint",
+        "Json",
+        "SaveEnvelope",
+        "SaveRules",
+        "Species"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "state.luau",
+        "state_client.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveScheduler.luau",
+      "name": "SaveScheduler",
+      "lines": 120,
+      "purpose": "When a save is written (ROBLOX-39): only decisions, no store and no clock of its own (the caller passes `now`, in seconds). It keeps, for",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "SaveRules"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveSession.luau",
+      "name": "SaveSession",
+      "lines": 547,
+      "purpose": "One player's save session (ROBLOX-39): loads their records through a store backend, keeps their progress and rests in memory, and writes",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Json",
+        "SaveEnvelope",
+        "SaveProgress",
+        "SaveRest",
+        "SaveRules",
+        "SaveScheduler",
+        "SaveStores"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/SaveService.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveStores.luau",
+      "name": "SaveStores",
+      "lines": 47,
+      "purpose": "Two small pure rules about the stores (ROBLOX-39): which store a build writes to, and what kind of failure a DataStore error is.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "SaveRules"
+      ],
+      "tests": [
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/Persistence.server.luau",
+        "roblox_port/src/Shared/Persistence/SaveSession.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Bird.luau",
+      "name": "Bird",
+      "lines": 378,
+      "purpose": "The robin of the open ground (ROBLOX-120, docs/PARK_WORLD_DESIGN.md sections 4 and 5: the bird is the danger of the hut garden, the meadow and the open ground",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Cat.luau",
+      "name": "Cat",
+      "lines": 546,
+      "purpose": "The ranger's cat (ROBLOX-118, docs/PARK_WORLD_DESIGN.md section 10: \"the cat and the game room live in the hut\"): a house cat that lives in the ranger hut's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "checkpoint.luau",
+        "feeding_survival.luau",
+        "preserve.luau",
+        "station_debug.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/CrabSpider.luau",
+      "name": "CrabSpider",
+      "lines": 145,
+      "purpose": "The crab spiders of the meadow's edge (ROBLOX-119, docs/PARK_WORLD_DESIGN.md zone 3; the notebook's page \"The crab spider on the flower\" says what is known of them):",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Meadow",
+        "WorldMap"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Frog.luau",
+      "name": "Frog",
+      "lines": 168,
+      "purpose": "The green frog of the pond's edge (ROBLOX-122, docs/PARK_WORLD_DESIGN.md zone 4: \"a frog's tongue\"; the notebook's page \"The green frog\" says what is known of it).",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Pond",
+        "WorldMap"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Mate.luau",
+      "name": "Mate",
+      "lines": 370,
+      "purpose": "The mate (ROBLOX-79): a spider of the opposite sex that comes onto the sill when the played spider is full-grown and well fed, is courted by the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut",
+        "MatingRules",
+        "PreyMath",
+        "PreyRandom",
+        "WorldMap"
+      ],
+      "tests": [
+        "client_mating.luau",
+        "mating.luau",
+        "nature.luau",
+        "rivalnav.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Life/Mating.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Predator/MateDrive.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/MateDrive.luau",
+      "name": "MateDrive",
+      "lines": 86,
+      "purpose": "The mate's legs (ROBLOX-79): the rival's own drive (Predator/RivalDrive: a SpiderMotor over the whole sill, the route graph, the keep-out around the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Mate",
+        "RivalDrive"
+      ],
+      "tests": [
+        "mating.luau",
+        "rivalnav.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalDisplay.luau",
+      "name": "RivalDisplay",
+      "lines": 171,
+      "purpose": "The male rival's contest display (ROBLOX-127): how a male jumping spider meets another spider, drawn on top of the rival's rules. Pure, Vector3-free and",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "look.luau",
+        "rival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalDrive.luau",
+      "name": "RivalDrive",
+      "lines": 498,
+      "purpose": "The rival spider's legs (ROBLOX-69): its own SpiderMotor, the player's proven surface-walking motor with the same collider, drives it over",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom",
+        "RivalRoute",
+        "RivalRules",
+        "SpiderMotor",
+        "StationTerritory",
+        "SupportMath",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "nature.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "station_threats.luau",
+        "wasp.luau"
+      ],
+      "any_casts": 3,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Predator/MateDrive.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalGrip.luau",
+      "name": "RivalGrip",
+      "lines": 77,
+      "purpose": "The grip on a caught rival (ROBLOX-77): the same tapping struggle as the fly's (Prey/Feeding's grip math, so the HUD's grip bar and the Grip button",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Feeding",
+        "PreyRandom",
+        "RivalSpider"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "client_rival.luau",
+        "rival.luau",
+        "rivalnav.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalRoute.luau",
+      "name": "RivalRoute",
+      "lines": 829,
+      "purpose": "Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of a region's box faces (the sill's, ROBLOX-94; any region's, ROBLOX-95, below):",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Region",
+        "RivalRules",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "mating.luau",
+        "nature.luau",
+        "preserve.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "station_threats.luau",
+        "wasp.luau",
+        "worldmap.luau"
+      ],
+      "any_casts": 8,
+      "required_by": [
+        "roblox_port/src/Shared/Predator/RivalDrive.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalSpider.luau",
+      "name": "RivalSpider",
+      "lines": 281,
+      "purpose": "Intraguild predator: the preserve's resident ranger-station patrol, present",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyMath",
+        "PreyRandom",
+        "RivalRules",
+        "StationTerritory",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "client_rival.luau",
+        "growth.luau",
+        "mating.luau",
+        "nature.luau",
+        "rival.luau",
+        "rivalnav.luau",
+        "station_threats.luau",
+        "wasp.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Predator/RivalGrip.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/WaspDirector.luau",
+      "name": "WaspDirector",
+      "lines": 943,
+      "purpose": "WaspDirector: the black-and-yellow mud dauber's visits to the sill, without the engine. A port of the frozen",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom",
+        "StationAir",
+        "Wasp"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "mating.luau",
+        "nature.luau",
+        "station_threats.luau",
+        "wasp.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Ant.luau",
+      "name": "Ant",
+      "lines": 134,
+      "purpose": "Ants (ROBLOX-119, the meadow's edge): ambient, not food. Small brown field ants of a hill in the meadow (World/Meadow.HILL, meadow_b4), out on its floor by day on a",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Feeding.luau",
+      "name": "Feeding",
+      "lines": 89,
+      "purpose": "Frozen feeding_controller.gd: struggle after landing, then conserved nutrition grants. The energy itself belongs to the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Catch",
+        "NeedsModel",
+        "PreyRandom"
+      ],
+      "tests": [
+        "feeding_survival.luau",
+        "preserve.luau",
+        "prey.luau",
+        "rival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Predator/RivalGrip.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Fly.luau",
+      "name": "Fly",
+      "lines": 232,
+      "purpose": "Fly's evidence-owned decisions, reactions, flights, glances and surface bursts.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "FlyFlight",
+        "FlySenses",
+        "PreyKinds",
+        "PreyMath",
+        "PreyRandom"
+      ],
+      "tests": [
+        "feeding_survival.luau",
+        "flies.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/FlyFlight.luau",
+      "name": "FlyFlight",
+      "lines": 59,
+      "purpose": "Frozen FlyFlight: accelerate, sweep every step, brake for landing, reserve the destination.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyMath"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/Fly.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/FlySenses.luau",
+      "name": "FlySenses",
+      "lines": 56,
+      "purpose": "scripts/prey/fly_senses.gd, A-028. No controls, plans or velocity enter this interface.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PerceptionMath",
+        "PreyMath"
+      ],
+      "tests": [
+        "prey.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/Fly.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Harvestman.luau",
+      "name": "Harvestman",
+      "lines": 141,
+      "purpose": "Harvestmen (ROBLOX-105, W3b part B): ambient, not food, not spiders: a small oval body high on eight very long legs. One walks the bed's soil and litter and one",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Ladybird.luau",
+      "name": "Ladybird",
+      "lines": 195,
+      "purpose": "Ladybirds (ROBLOX-105, W3b part B): ambient beetles, not food, that walk the bed's plants among the aphids (World/Garden.plants: one on the dock, one on the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Garden",
+        "PlantWalk",
+        "PreyRandom"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Millipede.luau",
+      "name": "Millipede",
+      "lines": 186,
+      "purpose": "Millipedes (ROBLOX-105, W3b part B): ambient, not food. A seeded few in the bed walk the soil slowly round what stands on it, as the woodlice do (Prey/Woodlouse),",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PerchGraph.luau",
+      "name": "PerchGraph",
+      "lines": 47,
+      "purpose": "Geometry adapter for the frozen PerchGraph. Every planned leg and every flight tick is swept.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyMath"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PlantWalk.luau",
+      "name": "PlantWalk",
+      "lines": 66,
+      "purpose": "A walk along a list of points on surfaces (ROBLOX-105, W3b part B): the aphid's creep from one of its perches to another and the ladybird's rounds over a",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Prey/Ladybird.luau",
+        "roblox_port/src/Shared/Prey/PreyKinds.luau",
+        "roblox_port/src/Shared/Prey/Snail.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyDirector.luau",
+      "name": "PreyDirector",
+      "lines": 219,
+      "purpose": "Solo client world of perceivable flies. Godot order: sensor, prey, motor, capture/feeding.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Feeding",
+        "Fly",
+        "PerchGraph",
+        "PreyMath",
+        "PreyPopulation",
+        "Species"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "garden_life.luau",
+        "mating.luau",
+        "nature.luau",
+        "preserve.luau",
+        "state.luau",
+        "state_client.luau",
+        "station_debug.luau",
+        "verge_litter.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyKinds.luau",
+      "name": "PreyKinds",
+      "lines": 372,
+      "purpose": "The bestiary's prey behaviours (ROBLOX-101, W3b part A), kept out of the frozen fly model: Prey/Fly calls in here only for a profile whose body asks for it",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Garden",
+        "PlantWalk",
+        "Species"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Prey/Fly.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyMath.luau",
+      "name": "PreyMath",
+      "lines": 84,
+      "purpose": "Frozen scripts/prey/prey_math.gd: explicit evidence, utility and swept-contact math.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "prey.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Predator/Mate.luau",
+        "roblox_port/src/Shared/Predator/RivalSpider.luau",
+        "roblox_port/src/Shared/Prey/Fly.luau",
+        "roblox_port/src/Shared/Prey/FlyFlight.luau",
+        "roblox_port/src/Shared/Prey/FlySenses.luau",
+        "roblox_port/src/Shared/Prey/PerchGraph.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyPopulation.luau",
+      "name": "PreyPopulation",
+      "lines": 26,
+      "purpose": "Frozen prey_population.gd: delayed, twice-unseen vent entries; never teleport a replacement onto a perch.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyRandom.luau",
+      "name": "PreyRandom",
+      "lines": 24,
+      "purpose": "A repeatable port stream (Park-Miller); Godot's random inputs are exported for parity fixtures.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "feeding_survival.luau",
+        "garden_life.luau",
+        "nature.luau",
+        "preserve.luau",
+        "prey.luau",
+        "rival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Shared/Life/Mating.luau",
+        "roblox_port/src/Shared/Life/MatingScene.luau",
+        "roblox_port/src/Shared/Life/Nature.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Predator/Mate.luau",
+        "roblox_port/src/Shared/Predator/RivalDisplay.luau",
+        "roblox_port/src/Shared/Predator/RivalDrive.luau",
+        "roblox_port/src/Shared/Predator/RivalGrip.luau",
+        "roblox_port/src/Shared/Predator/RivalSpider.luau",
+        "roblox_port/src/Shared/Predator/WaspDirector.luau",
+        "roblox_port/src/Shared/Prey/Ant.luau",
+        "roblox_port/src/Shared/Prey/Feeding.luau",
+        "roblox_port/src/Shared/Prey/Fly.luau",
+        "roblox_port/src/Shared/Prey/Harvestman.luau",
+        "roblox_port/src/Shared/Prey/Ladybird.luau",
+        "roblox_port/src/Shared/Prey/Millipede.luau",
+        "roblox_port/src/Shared/Prey/PreyPopulation.luau",
+        "roblox_port/src/Shared/Prey/Skater.luau",
+        "roblox_port/src/Shared/Prey/Snail.luau",
+        "roblox_port/src/Shared/Prey/Woodlouse.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyWorld.luau",
+      "name": "PreyWorld",
+      "lines": 391,
+      "purpose": "The prey of the whole world (ROBLOX-96, W3): one Prey/PreyDirector per region that has prey, run only where the spider is. The sill's director is the one the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Ant",
+        "Garden",
+        "Harvestman",
+        "Ladybird",
+        "Millipede",
+        "PreyDirector",
+        "PreyKinds",
+        "Region",
+        "Skater",
+        "Snail",
+        "Species",
+        "Woodlouse"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "foundation.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 6,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Skater.luau",
+      "name": "Skater",
+      "lines": 123,
+      "purpose": "Water striders (ROBLOX-122, the pond's edge): ambient, not the spider's food here. Common water striders (Gerridae) on the open water of the pond's margin",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Snail.luau",
+      "name": "Snail",
+      "lines": 194,
+      "purpose": "The garden snail (ROBLOX-105, W3b part B): ambient, not food, three times the spider's length. It crawls very slowly over the bed's soil and up the foot of the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PlantWalk",
+        "PreyRandom"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/StationMouse.luau",
+      "name": "StationMouse",
+      "lines": 47,
+      "purpose": "One ambient house mouse: authored floor routes, seeded pauses, no prey or",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "station_debug.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Woodlouse.luau",
+      "name": "Woodlouse",
+      "lines": 190,
+      "purpose": "Woodlice (ROBLOX-96, W3): the garden's first ambient bugs, a seeded few in the bed that walk slowly about the soil, go under the big stone, the other stones' feet",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PreyRandom"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "garden_life.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Anatomy.luau",
+      "name": "Anatomy",
+      "lines": 184,
+      "purpose": "Where the parts of the body sit, worked out from the appearance table alone: pure, Vector3 only, so tests/look.luau checks",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "look.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/Setae.luau",
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/AntMimicPose.luau",
+      "name": "AntMimicPose",
+      "lines": 114,
+      "purpose": "The ant-mimicking spider's antennae and walk as a pose (ROBLOX-64): pure and Vector3-free, display only. SpiderRig reads the pose, turns",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "AntMimic"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "look.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/CatPose.luau",
+      "name": "CatPose",
+      "lines": 343,
+      "purpose": "The ranger's cat drawn (ROBLOX-118; its sim is Predator/Cat): a domestic cat at true size, a brown mackerel tabby, posed from what the cat is doing. Pure: a list",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau",
+        "station_debug.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/CatBody.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/DogGait.luau",
+      "name": "DogGait",
+      "lines": 80,
+      "purpose": "Presentation only. Stance paws remain in world space; travel drives the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "dog_gait.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Idle.luau",
+      "name": "Idle",
+      "lines": 77,
+      "purpose": "Idle motion for the drawn spider (display only, never fed back into movement): a slow breathing bob, a small curious head",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "idle.luau",
+        "look.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Living.luau",
+      "name": "Living",
+      "lines": 316,
+      "purpose": "Living motion for the drawn spider (ROBLOX-87): the small things an animal does when it is not being asked to do anything. Display only, full",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "idle.luau",
+        "look.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/PeacockDance.luau",
+      "name": "PeacockDance",
+      "lines": 166,
+      "purpose": "The peacock spider's courtship dance as a pose (ROBLOX-29): pure, Vector3-free, display only. Nothing here moves the body, the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Peacock"
+      ],
+      "tests": [
+        "growth.luau",
+        "look.luau",
+        "peacock.luau"
+      ],
+      "any_casts": 2,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Setae.luau",
+      "name": "Setae",
+      "lines": 420,
+      "purpose": "Where the spider's hairs (setae) go: pure layout from the appearance table, Vector3 only, so tests/run.luau and",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Anatomy"
+      ],
+      "tests": [
+        "look.luau",
+        "run.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Rig/SpiderRig.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/SpiderChoice.luau",
+      "name": "SpiderChoice",
+      "lines": 109,
+      "purpose": "Which spider the player is (ROBLOX-31, ROBLOX-64, ROBLOX-81): the first spider, the peacock spider, the ant-mimicking spider or one of the two",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Appearances"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "inspect.luau",
+        "look.luau",
+        "peacock.luau",
+        "settings.luau",
+        "state.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 4,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/PeacockText.luau",
+        "roblox_port/src/Shared/UI/SettingsModel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/SpiderRig.luau",
+      "name": "SpiderRig",
+      "lines": 1647,
+      "purpose": "The drawn spider for Roblox: a port of scripts/presentation/spider_body.gd and surface_legs.gd (VISUAL-01 look), made cuter in",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Anatomy",
+        "Appearances",
+        "Growth",
+        "Idle",
+        "Living",
+        "Setae"
+      ],
+      "tests": [
+        "feeding_survival.luau",
+        "growth.luau",
+        "idle.luau",
+        "inspect.luau",
+        "look.luau"
+      ],
+      "any_casts": 3,
+      "required_by": [
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/TarantulaPose.luau",
+      "name": "TarantulaPose",
+      "lines": 168,
+      "purpose": "The tarantulas' threat display and silk mat as a pose (ROBLOX-82): pure and Vector3-free, display only. Nothing here moves the body, the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Tarantula"
+      ],
+      "tests": [
+        "look.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/AntMimicText.luau",
+      "name": "AntMimicText",
+      "lines": 35,
+      "purpose": "The words of the ant-mimicking spider's display key for the screen (ROBLOX-64): the prompt, the status line, the touch button and the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText"
+      ],
+      "tests": [
+        "antmimic.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/PeacockText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/BirdText.luau",
+      "name": "BirdText",
+      "lines": 23,
+      "purpose": "The robin in words (ROBLOX-120; the robin is Predator/Bird): its death card, the notice when its bill misses (the gentle rules), and the captions of what tells of it",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/CatText.luau",
+      "name": "CatText",
+      "lines": 24,
+      "purpose": "The ranger's cat in words (ROBLOX-118; the cat is Predator/Cat): its death card, the notice when its pat only knocks the spider aside (the gentle rules), and the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/ContextPrompts.luau",
+      "name": "ContextPrompts",
+      "lines": 36,
+      "purpose": "Only the player-requested meal and dusk prompts enter the minimal play HUD.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "LifeClock",
+        "LifeText"
+      ],
+      "tests": [
+        "feeding_survival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/ControlText.luau",
+      "name": "ControlText",
+      "lines": 268,
+      "purpose": "Words on the screen, written for the device the player is using now: keyboard and mouse, a controller, or touch.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "antmimic.luau",
+        "client_mating.luau",
+        "eyes.luau",
+        "feeding_survival.luau",
+        "growth.luau",
+        "inspect.luau",
+        "lock.luau",
+        "notebook.luau",
+        "peacock.luau",
+        "run.luau",
+        "settings.luau",
+        "tarantula.luau",
+        "title.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/NotebookPanel.luau",
+        "roblox_port/src/Client/SettingsPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/SpiderEyes.luau",
+        "roblox_port/src/Shared/UI/AntMimicText.luau",
+        "roblox_port/src/Shared/UI/ContextPrompts.luau",
+        "roblox_port/src/Shared/UI/InspectText.luau",
+        "roblox_port/src/Shared/UI/LifeText.luau",
+        "roblox_port/src/Shared/UI/MateText.luau",
+        "roblox_port/src/Shared/UI/NotebookText.luau",
+        "roblox_port/src/Shared/UI/PeacockText.luau",
+        "roblox_port/src/Shared/UI/SettingsText.luau",
+        "roblox_port/src/Shared/UI/TarantulaText.luau",
+        "roblox_port/src/Shared/UI/TitleText.luau",
+        "roblox_port/src/Shared/UI/WaspText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/CrabText.luau",
+      "name": "CrabText",
+      "lines": 11,
+      "purpose": "The crab spider in words (ROBLOX-119; the crab spider is Predator/CrabSpider): its death card and the notice when its lunge only knocks the spider off the flower (the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/EyeOptics.luau",
+      "name": "EyeOptics",
+      "lines": 328,
+      "purpose": "EyeOptics: the pure half of the spider-eye picture (ROBLOX-20). From k (how much the principal eyes are in use, 0 to 1) and the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Eyes"
+      ],
+      "tests": [
+        "eyes.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderEyes.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/FrogText.luau",
+      "name": "FrogText",
+      "lines": 11,
+      "purpose": "The green frog in words (ROBLOX-122; the frog is Predator/Frog): its death card and the notice when its tongue misses (the gentle rules). Pure: tests/preserve.luau",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/Heard.luau",
+      "name": "Heard",
+      "lines": 19,
+      "purpose": "What the player can hear or see of something that is not at the spider (ROBLOX-92): a creature on the sill is told of (a notice, a caption, a status line) only to a spider",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Wasp"
+      ],
+      "tests": [
+        "client_mating.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/WaspText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/HudLayout.luau",
+      "name": "HudLayout",
+      "lines": 154,
+      "purpose": "Where the on-screen controls and the prompt panel go, in the safe area (ScreenInsets.CoreUISafeInsets: clear of notches,",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "lock.luau",
+        "notebook.luau",
+        "peacock.luau",
+        "run.luau",
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/SpiderHud.luau",
+        "roblox_port/src/Client/SpiderInput.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/InspectText.luau",
+      "name": "InspectText",
+      "lines": 47,
+      "purpose": "The words of Inspect mode (ROBLOX-90): the Settings row's button (its label and note are in Data/SettingsSpec), the refusal, the name line on entering it, the name line and the controls line on screen, the toast for a",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "PeacockText"
+      ],
+      "tests": [
+        "inspect.luau",
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/SettingsModel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/LifeText.luau",
+      "name": "LifeText",
+      "lines": 267,
+      "purpose": "The words of the life clock and the retreat for the screen (ROBLOX-24), from Godot's habitat_loop.gd caption(): the day and",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "MateText"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "client_mating.luau",
+        "garden_life.luau",
+        "growth.luau",
+        "life.luau",
+        "nature.luau",
+        "nature_client.luau",
+        "peacock.luau",
+        "preserve.luau",
+        "quiet.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/SpiderHud.luau",
+        "roblox_port/src/Shared/UI/ContextPrompts.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/MateText.luau",
+      "name": "MateText",
+      "lines": 186,
+      "purpose": "The words of the mating cycle for the screen (ROBLOX-80): the notices for each beat Life/Mating reports, the status line while courting and while",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText"
+      ],
+      "tests": [
+        "client_mating.luau",
+        "mating.luau",
+        "nature.luau",
+        "preserve.luau",
+        "quiet.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/LifeText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/NotebookText.luau",
+      "name": "NotebookText",
+      "lines": 145,
+      "purpose": "The notebook's words and its layout rules for the screen (ROBLOX-37), from Godot's notebook_panel.gd: the heading, the empty",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "TarantulaText"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "notebook.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/NotebookPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/SettingsText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PeacockText.luau",
+      "name": "PeacockText",
+      "lines": 97,
+      "purpose": "The words of the peacock spider for the screen (ROBLOX-31): choosing the spider in the crack, the dance's prompts and status",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "AntMimicText",
+        "ControlText",
+        "Peacock",
+        "SpiderChoice",
+        "TarantulaText"
+      ],
+      "tests": [
+        "antmimic.luau",
+        "client_mating.luau",
+        "inspect.luau",
+        "lock.luau",
+        "peacock.luau",
+        "settings.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/InspectText.luau",
+        "roblox_port/src/Shared/UI/SettingsModel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionShapes.luau",
+      "name": "PerceptionShapes",
+      "lines": 101,
+      "purpose": "PerceptionShapes: the geometry the perception HUD draws with (ROBLOX-20, the drawer's polish), pure. A last-seen ring is 12 short",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "hud.luau",
+        "lock.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/PerceptionHud.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionText.luau",
+      "name": "PerceptionText",
+      "lines": 10,
+      "purpose": "Frozen perception_text.gd: words belong to presentation, never the sensor.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "perception_view.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/PerceptionHud.luau",
+        "roblox_port/src/Shared/UI/PerceptionView.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionView.luau",
+      "name": "PerceptionView",
+      "lines": 43,
+      "purpose": "Pure build_view from perception_hud.gd. Only memory and a camera adapter enter; never world actors.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "PerceptionText"
+      ],
+      "tests": [
+        "hud.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/PerceptionHud.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PreyText.luau",
+      "name": "PreyText",
+      "lines": 41,
+      "purpose": "What the screen says when a prey gets out of the jaws by its own trick (ROBLOX-101, Prey/PreyKinds.grip, kept by Prey/PreyWorld as `event`): a moth whose",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "garden_life.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/QuietHud.luau",
+      "name": "QuietHud",
+      "lines": 190,
+      "purpose": "The quiet HUD (ROBLOX-113, W5 of docs/OPEN_WORLD_DESIGN.md): what the screen may say in Normal. Nathan: \"minimal HUD\", \"no hand holding\", \"Normal mode should feel",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "quiet.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/PerceptionHud.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/RivalText.luau",
+      "name": "RivalText",
+      "lines": 45,
+      "purpose": "The words of the brown rival's contest for the screen (ROBLOX-73): what the spider's strike did to a rival that had seen it coming. The",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "client_rival.luau",
+        "growth.luau",
+        "quiet.luau",
+        "rival.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SaveText.luau",
+      "name": "SaveText",
+      "lines": 70,
+      "purpose": "The words about saving (ROBLOX-39): what the menu and a short toast say. Plain and honest: saved, saving, or off for this visit and why.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "state_client.luau",
+        "state_offline.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsModel.luau",
+      "name": "SettingsModel",
+      "lines": 267,
+      "purpose": "The settings as logic (ROBLOX-49): looking one up, cleaning a value, stepping it, saying it in words, putting everything back to the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "InspectText",
+        "PeacockText",
+        "SettingsSpec",
+        "SpiderChoice"
+      ],
+      "tests": [
+        "settings.luau",
+        "state.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SettingsPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/SpiderEyes.luau",
+        "roblox_port/src/Shared/Persistence/SaveProgress.luau",
+        "roblox_port/src/Shared/UI/SettingsNav.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsNav.luau",
+      "name": "SettingsNav",
+      "lines": 105,
+      "purpose": "Moving about the settings panel without a mouse (ROBLOX-49): the rows in order (a header per section, the settings, then Reset and Back)",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "SettingsModel"
+      ],
+      "tests": [
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SettingsPanel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsText.luau",
+      "name": "SettingsText",
+      "lines": 119,
+      "purpose": "The settings panel's words for the device in use, and its layout rules for the screen (ROBLOX-49): sizes by kind, how a row is laid out",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "NotebookText"
+      ],
+      "tests": [
+        "settings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SettingsPanel.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/TarantulaText.luau",
+      "name": "TarantulaText",
+      "lines": 36,
+      "purpose": "The words of the tarantulas' display key for the screen (ROBLOX-82): the prompt, the status line, the touch button and the controls card's",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText"
+      ],
+      "tests": [
+        "notebook.luau",
+        "tarantula.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/UI/NotebookText.luau",
+        "roblox_port/src/Shared/UI/PeacockText.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/TitleText.luau",
+      "name": "TitleText",
+      "lines": 72,
+      "purpose": "The words and the typeface of the first minute (ROBLOX-109): the splash while the world streams in (First/SplashScreen), the title card the start",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText"
+      ],
+      "tests": [
+        "title.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/CaughtPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/TitleCard.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/WaspText.luau",
+      "name": "WaspText",
+      "lines": 128,
+      "purpose": "The words of the wasp's visit for the screen (ROBLOX-26): the sound captions, the status line while it visits and the plain screen",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "ControlText",
+        "Heard",
+        "Wasp"
+      ],
+      "tests": [
+        "quiet.luau",
+        "wasp.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/CaughtPanel.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/WaterText.luau",
+      "name": "WaterText",
+      "lines": 13,
+      "purpose": "The water in words (ROBLOX-122; the water is Life/Water): the caption while the spider struggles at the surface, its death card, and the notices when it gets out",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/AntForage.luau",
+      "name": "AntForage",
+      "lines": 35,
+      "purpose": "Clock-derived ambient workers. The carried fragments are presentation, not",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Environment"
+      ],
+      "tests": [
+        "living_world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Shared/World/LivedInSites.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/DogGround.luau",
+      "name": "DogGround",
+      "lines": 42,
+      "purpose": "Cosmetic dog's ground LOD: an index of the same authored physical boxes the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Environment",
+        "Region"
+      ],
+      "tests": [
+        "living_world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Environment.luau",
+      "name": "Environment",
+      "lines": 144,
+      "purpose": "Habitat weather is reconstructed from the saved life clock, not rerolled on load.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "dog_gait.luau",
+        "living_world.luau",
+        "rare_sightings.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Shared/Life/RareDirector.luau",
+        "roblox_port/src/Shared/World/AntForage.luau",
+        "roblox_port/src/Shared/World/DogGround.luau",
+        "roblox_port/src/Shared/World/Verge.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Garden.luau",
+      "name": "Garden",
+      "lines": 2720,
+      "purpose": "The world outside the glass (ROBLOX-95, docs/OPEN_WORLD_DESIGN.md W2): the generators of the three regions under the window, as pure data. Region asks here for every",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Flora",
+        "GardenPocket",
+        "Hut",
+        "Meadow",
+        "Pond",
+        "Verge",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "foundation.luau",
+        "garden_life.luau",
+        "living_world.luau",
+        "preserve.luau",
+        "verge_litter.luau",
+        "world.luau",
+        "worldmap.luau"
+      ],
+      "any_casts": 23,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Prey/Ladybird.luau",
+        "roblox_port/src/Shared/Prey/PreyKinds.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau",
+        "roblox_port/src/Shared/World/LookPlan.luau",
+        "roblox_port/src/Shared/World/Region.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/GardenPocket.luau",
+      "name": "GardenPocket",
+      "lines": 95,
+      "purpose": "A one-metre habitat directly below the window. Juvenile plants retain adult",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut"
+      ],
+      "tests": [
+        "living_world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/LivedInSites.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Hut.luau",
+      "name": "Hut",
+      "lines": 2848,
+      "purpose": "The ranger hut and its garden, walkable (ROBLOX-116, docs/PARK_WORLD_DESIGN.md Phase B round 1): the preserve's first home ranges at full spider detail. Pure",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Preserve"
+      ],
+      "tests": [
+        "compact_layout.luau",
+        "living_world.luau",
+        "preserve.luau",
+        "rivalnav.luau",
+        "station_debug.luau"
+      ],
+      "any_casts": 11,
+      "required_by": [
+        "roblox_port/src/Client/HutLife.luau",
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Shared/Predator/Mate.luau",
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/GardenPocket.luau",
+        "roblox_port/src/Shared/World/Meadow.luau",
+        "roblox_port/src/Shared/World/Pond.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/StationAir.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/LivedInSites.luau",
+      "name": "LivedInSites",
+      "lines": 117,
+      "purpose": "Additive, stable landmarks. Existing pieces/retreats never move. One stud is one centimetre.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "AntForage",
+        "GardenPocket"
+      ],
+      "tests": [
+        "living_world.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/LivingWorld.luau",
+        "roblox_port/src/Shared/World/Region.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/LookPlan.luau",
+      "name": "LookPlan",
+      "lines": 264,
+      "purpose": "Which regions' drawn looks a client holds, and at what detail, from where the spider is (ROBLOX-108). Pure: a plan is a function of the place, the tier, the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Garden",
+        "Region",
+        "WorldMap"
+      ],
+      "tests": [
+        "preserve.luau",
+        "worldmap.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Client/LookStream.luau",
+        "roblox_port/src/Client/SelfTest.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Meadow.luau",
+      "name": "Meadow",
+      "lines": 1271,
+      "purpose": "The meadow's edge and the bench, bin and lamppost, walkable (ROBLOX-119, docs/PARK_WORLD_DESIGN.md Phase C round 1): home ranges 3 and 8 at full spider detail, where",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut"
+      ],
+      "tests": [
+        "compact_layout.luau",
+        "preserve.luau",
+        "rivalnav.luau",
+        "shadows.luau"
+      ],
+      "any_casts": 10,
+      "required_by": [
+        "roblox_port/src/Client/HutLife.luau",
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Shared/Predator/CrabSpider.luau",
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/PreserveLook.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Pond.luau",
+      "name": "Pond",
+      "lines": 1305,
+      "purpose": "The pond's edge and the boardwalk, walkable (ROBLOX-122, docs/PARK_WORLD_DESIGN.md Phase D round 1): home range 4 at full spider detail where the boardwalk runs",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut",
+        "Preserve"
+      ],
+      "tests": [
+        "compact_layout.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 6,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Shared/Predator/Frog.luau",
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/PreserveLook.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Preserve.luau",
+      "name": "Preserve",
+      "lines": 150,
+      "purpose": "The preserve's map (ROBLOX-115, docs/PARK_WORLD_DESIGN.md sections 4 and 10): a nature preserve of 100 by 60 m in an American city, held between a railway",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Shared/Life/Ballooning.luau",
+        "roblox_port/src/Shared/World/Hut.luau",
+        "roblox_port/src/Shared/World/Pond.luau",
+        "roblox_port/src/Shared/World/PreserveLook.luau",
+        "roblox_port/src/Shared/World/PreserveTrain.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/PreserveLook.luau",
+      "name": "PreserveLook",
+      "lines": 1003,
+      "purpose": "The preserve's backdrop (ROBLOX-115, docs/PARK_WORLD_DESIGN.md sections 4, 7 and 10): every zone of World/Preserve drawn, and nothing of it walkable. Pure data",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Meadow",
+        "Pond",
+        "Preserve"
+      ],
+      "tests": [
+        "living_world.luau",
+        "preserve.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/World/Region.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/PreserveTrain.luau",
+      "name": "PreserveTrain",
+      "lines": 98,
+      "purpose": "The trains on the railway beyond the preserve's north fence (ROBLOX-115, docs/PARK_WORLD_DESIGN.md: \"the railway's vibration\", \"trains every few minutes\").",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Preserve"
+      ],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/TrainPass.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Region.luau",
+      "name": "Region",
+      "lines": 165,
+      "purpose": "What a region is made of (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): the generators. Each is pure and deterministic from the region (its kind and its",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Garden",
+        "Hut",
+        "LivedInSites",
+        "Meadow",
+        "Pond",
+        "PreserveLook",
+        "RivalRules",
+        "Verge",
+        "WindowsillLayout",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "garden_life.luau",
+        "living_world.luau",
+        "preserve.luau",
+        "rivalnav.luau",
+        "shadows.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "title.luau",
+        "verge_litter.luau",
+        "world.luau",
+        "worldmap.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 26,
+      "required_by": [
+        "roblox_port/src/Client/LookStream.luau",
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/WorldClient.luau",
+        "roblox_port/src/Client/WorldShadows.luau",
+        "roblox_port/src/Server/Main.server.luau",
+        "roblox_port/src/Shared/Predator/RivalRoute.luau",
+        "roblox_port/src/Shared/Prey/PreyWorld.luau",
+        "roblox_port/src/Shared/World/DogGround.luau",
+        "roblox_port/src/Shared/World/LookPlan.luau",
+        "roblox_port/src/Shared/World/StationAir.luau",
+        "roblox_port/src/Shared/World/WorldBuild.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/StationAir.luau",
+      "name": "StationAir",
+      "lines": 174,
+      "purpose": "Bounded air navigation over the station's actual collision boxes. Grid edges",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut",
+        "Region",
+        "StationTerritory",
+        "WorldMap"
+      ],
+      "tests": [
+        "station_threats.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Shared/Predator/WaspDirector.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/StationTerritory.luau",
+      "name": "StationTerritory",
+      "lines": 29,
+      "purpose": "The inhabited ranger station, excluding its garden and exterior wall/eaves.",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "WorldMap"
+      ],
+      "tests": [
+        "route_preparation.luau",
+        "station_debug.luau",
+        "station_threats.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/WorldClient.luau",
+        "roblox_port/src/Shared/Predator/RivalDrive.luau",
+        "roblox_port/src/Shared/Predator/RivalSpider.luau",
+        "roblox_port/src/Shared/World/StationAir.luau",
+        "roblox_port/src/Shared/World/WorldBuild.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Verge.luau",
+      "name": "Verge",
+      "lines": 232,
+      "purpose": "Walkable infill around the developed garden and its paths. Existing landmarks win",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Environment"
+      ],
+      "tests": [
+        "compact_layout.luau",
+        "living_world.luau",
+        "verge_litter.luau"
+      ],
+      "any_casts": 1,
+      "required_by": [
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/WorldBuild.luau",
+      "name": "WorldBuild",
+      "lines": 86,
+      "purpose": "Builds the physical world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): every region of the map, each as a folder of anchored boxes, all under one `World` folder in the",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Region",
+        "Scenery",
+        "StationTerritory",
+        "WorldMap"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "garden_life.luau",
+        "living_world.luau",
+        "nature_client.luau",
+        "preserve.luau",
+        "rare_sightings.luau",
+        "route_preparation.luau",
+        "scenarios.luau",
+        "selftest.luau",
+        "selftest_preserve.luau",
+        "shadows.luau",
+        "spawn_clearance.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "verge_litter.luau",
+        "world.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Server/Main.server.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/WorldMap.luau",
+      "name": "WorldMap",
+      "lines": 529,
+      "purpose": "The map of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): what regions there are, where each one is, where a life begins in it, where",
+      "side": "Shared",
+      "strict": true,
+      "requires": [
+        "Hut",
+        "Meadow",
+        "Pond",
+        "Preserve",
+        "Verge",
+        "WindowsillLayout",
+        "Worlds"
+      ],
+      "tests": [
+        "checkpoint.luau",
+        "compact_layout.luau",
+        "foundation.luau",
+        "garden_life.luau",
+        "living_world.luau",
+        "nature.luau",
+        "nature_client.luau",
+        "preserve.luau",
+        "rare_sightings.luau",
+        "rivalnav.luau",
+        "route_preparation.luau",
+        "scenarios.luau",
+        "selftest.luau",
+        "selftest_preserve.luau",
+        "shadows.luau",
+        "spawn_clearance.luau",
+        "station_debug.luau",
+        "station_threats.luau",
+        "title.luau",
+        "verge_litter.luau",
+        "world.luau",
+        "worldmap.luau",
+        "world_client.luau"
+      ],
+      "any_casts": 13,
+      "required_by": [
+        "roblox_port/src/Client/LookStream.luau",
+        "roblox_port/src/Client/MateStage.luau",
+        "roblox_port/src/Client/SelfTest.luau",
+        "roblox_port/src/Client/SpiderClient.client.luau",
+        "roblox_port/src/Client/WorldClient.luau",
+        "roblox_port/src/Server/Main.server.luau",
+        "roblox_port/src/Server/WorldFocus.luau",
+        "roblox_port/src/Shared/Life/Water.luau",
+        "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+        "roblox_port/src/Shared/Persistence/CompactMigration.luau",
+        "roblox_port/src/Shared/Predator/CrabSpider.luau",
+        "roblox_port/src/Shared/Predator/Frog.luau",
+        "roblox_port/src/Shared/Predator/Mate.luau",
+        "roblox_port/src/Shared/Predator/RivalDrive.luau",
+        "roblox_port/src/Shared/Predator/RivalRoute.luau",
+        "roblox_port/src/Shared/Predator/RivalSpider.luau",
+        "roblox_port/src/Shared/World/Garden.luau",
+        "roblox_port/src/Shared/World/LookPlan.luau",
+        "roblox_port/src/Shared/World/Region.luau",
+        "roblox_port/src/Shared/World/StationAir.luau",
+        "roblox_port/src/Shared/World/StationTerritory.luau",
+        "roblox_port/src/Shared/World/WorldBuild.luau"
+      ]
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Worlds.luau",
+      "name": "Worlds",
+      "lines": 51,
+      "purpose": "The worlds the engine can run (ROBLOX-115, docs/PARK_WORLD_DESIGN.md). One engine, two worlds:",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "preserve.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/WorldClient.luau",
+        "roblox_port/src/Server/Main.server.luau",
+        "roblox_port/src/Shared/World/WorldMap.luau"
+      ]
+    }
+  ],
+  "cycles": []
+}

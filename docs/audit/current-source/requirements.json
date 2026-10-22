@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T16:09:32.156178+00:00",
+  "as_of_utc": "2026-10-22T16:27:38.305329+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -24,8 +24,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "focused-verified-full-pending",
-      "evidence_boundary": "e315b3a:1072 focused checks across5 suites,217 compilation, strict analysis and runner5 pass. Same expanded state suite:805/26 on predecessor,831/0 on candidate. Windows31770 and Linux39811082793 are active;65/443946 is expected, not yet a completed result. Earlier navigation snapshotbc77830 passed65/443884 on both platforms.",
+      "status": "verified-current",
+      "evidence_boundary": "e315b3a:1072 focused checks across5 suites,217 compilation, strict analysis and runner5 pass. Same expanded state suite:805/26 on predecessor,831/0 on candidate. Linux39811082793 completed65/443946 with zero failures;217 compile/strict/runner5 and tool checksums verified. Windows31770 also completed65/443946, zero failed, exit0; closed log/process result retained. Earlier navigation snapshotbc77830 passed65/443884 on both platforms.",
       "references": [
         "docs/save-lease-cleanup/receipt.json",
         "docs/save-lease-cleanup/progress.json",

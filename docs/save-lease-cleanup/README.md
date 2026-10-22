@@ -18,10 +18,16 @@ The same expanded state suite reports **805 passed /26 failed** on predecessor p
 
 The reusable case block is appended verbatim to the default `state.luau`; no separate optional runner is needed to enforce it. `exercise.py` snapshots every source/test file and runs the same expanded fixture against the predecessor and candidate. `first-attempt/` retains an earlier invalid fixture: it shared one payload table between current and backup values, which the canonical encoder rejects. The corrected fixture makes a storable deep copy and asserts that precondition. No production change was made to accommodate the invalid fixture.
 
-Compilation **217/217**, strict analysis and runner **5/5** pass. Evidence ID `b425324a7f0a8007`. Five integration suites now pass **1072 checks /zero failures**: state831, client162, offline8, storage14 and compression57. Native synthetic verification and full platform gates are still pending. Expected full totals after adding the 62 assertions: 65 suites /443946, not yet an actual full-gate result.
+Compilation **217/217**, strict analysis and runner **5/5** pass. Evidence ID `b425324a7f0a8007`. Five integration suites now pass **1072 checks /zero failures**: state831, client162, offline8, storage14 and compression57. Both full platforms now pass65 suites/443946 checks each. Native synthetic cleanup remains pending.
 
 ## Remaining work
 
 Safe read-only Continue still needs an immutable displayed rest identity, explicit intent bound to that identity, revalidation after ownership acquisition, and delayed/stale response handling. This cleanup removes an unnecessary lock wait; it does not implement that interface or silently authorize a different life. Old-world ecology still must not be discarded or relabeled. Current device, collision, network, performance, audio, online rejoin and release checks remain in `docs/audit/current-source/requirements.json`.
 
 No live DataStore access, publication, FPS improvement or overall completion is claimed.
+
+## Linux full gate completed
+
+CI39811082793 completed successfully on exact sourcee315b3a at2026-10-22T16:19:06Z:65 suites/443946 passed/0 failed,217 compilation, strict analysis, runner5 and all four pinned download checksums verified. Actual metadata and five logs are retained and independently hash-checked. Windows31770 is terminal success65/443946, zero failed; no native cleanup result is claimed. A separate checkout at C:/Users/natha/windowsill-save-continue is implementing the remaining offer-bound Continue protocol; it does not modify this tested source.
+
+Both full gates are now complete on sourcee315b3a:65 suites/443946 passed/0 failed each. Windows31770 exited0; the closed log was normalized to LF before its final hash was recorded and verified. Linux39811082793 is verified terminal success. Native synthetic cleanup, actual online rejoin and broader release requirements remain open. The separate Continue worktree is a newer unfinished feature, not this verified release snapshot.

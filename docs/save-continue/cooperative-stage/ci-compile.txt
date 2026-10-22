@@ -1,0 +1,5 @@
+2026-10-22T18:46:04.4421866Z ##[group]Run bash tools/check.sh compile
+2026-10-22T18:46:04.4422265Z [36;1mbash tools/check.sh compile[0m
+2026-10-22T18:46:04.4488354Z shell: /usr/bin/bash -e {0}
+2026-10-22T18:46:04.4488666Z ##[endgroup]
+2026-10-22T18:46:04.9440125Z compile 221/221

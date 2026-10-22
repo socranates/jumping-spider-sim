@@ -1,0 +1,32 @@
+{
+  "source": "5aec1bc2f3572f54164cf41cd037efdb4959b934",
+  "run_id": "1792695682704",
+  "assertions": 13,
+  "controller_timing": {
+    "steps": 713,
+    "max_controller_update_ms": 64.392,
+    "max_heartbeat_gap_ms": 138.837,
+    "total_controller_update_ms": 1663.482,
+    "elapsed_ms": 12180.467
+  },
+  "synchronous_costs": {
+    "receive_ms": 822.738,
+    "select_ms": 125.694
+  },
+  "record_canonical_chars": 1501296,
+  "region_initialization_attempts": 233,
+  "resident_regions_measured": false,
+  "creator_errors": 0,
+  "creator_warnings": 1,
+  "persistence_disabled": true,
+  "online_save_accessed": false,
+  "continue_worker_enabled": true,
+  "all_save_stalls_resolved": false,
+  "low_system_resources_warning_seen": true,
+  "hard_frame_budget_proven": false,
+  "typical_fps_proven": false,
+  "place_sha256": "1ddaf625185c157f00e55a9dc586aebe91339cb07d3bfb34b13729168d4f723f",
+  "probe_sha256": "e12e9e4159abcc3fd4134633ed0f1e9b2fdc304231710346629e48a5f03ffaa0",
+  "output_sha256": "590ae026c72782fff5c3943505aa014a4c00e150a437a23a5e83516957e32c03",
+  "published": false
+}

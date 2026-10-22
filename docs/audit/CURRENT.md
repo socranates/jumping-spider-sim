@@ -1,3 +1,9 @@
+# Latest unpublished milestone: frame-driven Continue, 5aec1bc
+
+[Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-continue/README.md). Actual Continue now prepares a private world/store behind a cancellable menu and commits once.15 suites/2484,222 compile, strict clean, runner5; actual Studio13 assertions/223 fingerprints/Persistence disabled. Remaining native update spikes64ms; initial receive823ms; local rest still synchronous. Nothing published. Current Linux39836124046 is live; current Windows full awaits terminal prior955 Windows30175. Prior955 Linux70/444440/0 is historical, not current proof. Goal and broader audit remain active.
+
+Earlier status below is historical.
+
 # Latest unpublished milestone: cooperative save preparation, 955d1eb
 
 See [current handoff](../../chet/save-continue.md) and [source-bound worker evidence](../save-continue/cooperative-stage/README.md). 14 focused suites/2450 checks;221 modules compile, strict clean, runner5; actual Studio13 assertions/all222 fingerprints with production saving disabled. Workers are not enabled in gameplay and remaining native steps reach81ms. Nothing published; optimization goal active. Prior fbe4b56 full Windows/Linux gates both69/444391/0. Current source full runs Windows30175/Linux39834230975 are pending; do not substitute earlier evidence. Online/device/broader audit remains open.

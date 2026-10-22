@@ -1,0 +1,1 @@
+Earlier passing attempt before adding the exact epoch cancellation guard and its two menu assertions. Exact snapshot inputs are retained. These are historical receipts, not current proof; use the parent folder.

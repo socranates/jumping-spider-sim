@@ -1,3 +1,9 @@
+# Current milestone: actual Continue across frames, 5aec1bc
+
+See [current implementation and evidence](async-continue/README.md). Continue now prepares privately behind a Cancel menu, then commits once. Current proof:15 suites/2484 checks,222 compilation/strict/runner5, actual Studio13 assertions/all223 fingerprints with production saving disabled. Incoming offer and local rest work remain synchronous; the native controller still had64ms maximum updates. Nothing published, broader goal active. Root verify.py is current-source-bound.
+
+Linux39836124046 is running on current source. Prior955d1eb Linux finished70/444440/0; Windows30175 remains live. Poll before launching a current-source Windows full run; no duplicate heavy run. Older milestones below are historical.
+
 # Current save preparation milestone: 955d1eb
 
 The new cooperative preparation foundation passes **14 suites / 2,450 checks**, 221 compilation, strict analysis and runner5. Actual Studio passed13 assertions on an owned1.5M-character record, with all222 scripts fingerprinted and production saving disabled. Byte/hash/graph identity, cancellation and private staging are verified. **Gameplay workers remain disabled**, and some individual native steps still reach81ms; save stalls are not resolved. Nothing published.

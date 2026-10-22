@@ -30,9 +30,13 @@ WorldShadows.PASS_MOVE = 32
 -- A region not yet whole is looked at again for its arrived boxes this often (seconds); and this many bound boxes have their parent checked each time.
 WorldShadows.BIND_EVERY = 2
 WorldShadows.CHECK_SLICE = 100
+-- Initially hidden/non-casting boxes still need their binding released after
+-- streaming. Keep their checks separate so visible checks retain their cadence.
+WorldShadows.IGNORED_CHECK_SLICE = 100
 
-type Entry = { part: BasePart, folder: Instance, lo: Vector3, hi: Vector3, mid: number, on: boolean }
 type Holder = { id: string, folder: Instance?, expected: number, bound: { [Instance]: boolean }, count: number }
+type Entry = { part: BasePart, folder: Instance, holder: Holder, lo: Vector3, hi: Vector3, mid: number, on: boolean }
+type Ignored = { part: BasePart, folder: Instance, holder: Holder }
 
 -- The middle of a box's three extents: the width of the shadow it throws (a culm's 1 of 1 by 40, a slat's 10 of 164 by 2 by 10).
 function WorldShadows.middle(size: Vector3): number
@@ -68,6 +72,7 @@ function WorldShadows.new(root: Instance, map: any, home: string?): any
 	end
 	return setmetatable({
 		root = root, holders = holders, entries = {} :: { Entry }, at = nil :: Vector3?, boundAt = -math.huge, checkAt = 1,
+		ignored = {} :: { Ignored }, ignoredAt = 1,
 		passes = 0, writes = 0, -- (counts, for the tests and the self-test's INFO line)
 	}, WorldShadows)
 end
@@ -87,7 +92,7 @@ function WorldShadows.bind(self: any)
 						local part = p :: BasePart
 						if part.Transparency < 1 and part.CastShadow ~= false then
 							local size, at = part.Size, part.Position
-							local e: Entry = { part = part, folder = folder, lo = at - size * 0.5, hi = at + size * 0.5, mid = WorldShadows.middle(size), on = true }
+							local e: Entry = { part = part, folder = folder, holder = h, lo = at - size * 0.5, hi = at + size * 0.5, mid = WorldShadows.middle(size), on = true }
 							table.insert(self.entries, e)
 							local pos = self.at
 							if pos ~= nil and not WorldShadows.casts(e.lo, e.hi, e.mid, pos) then
@@ -95,6 +100,8 @@ function WorldShadows.bind(self: any)
 								e.on = false
 								self.writes += 1
 							end
+						else
+							table.insert(self.ignored, { part = part, folder = folder, holder = h })
 						end
 					end
 				end
@@ -106,11 +113,18 @@ end
 -- Lets go of a box that is no longer in its folder (streamed out): its region is looked at again for it.
 local function release(self: any, i: number)
 	local e: Entry = self.entries[i]
-	for _, h: Holder in self.holders do
-		if h.bound[e.part] then h.bound[e.part] = nil; h.count -= 1; break end
-	end
+	local h = e.holder
+	if h.bound[e.part] then h.bound[e.part] = nil; h.count -= 1 end
 	self.entries[i] = self.entries[#self.entries]
 	self.entries[#self.entries] = nil
+end
+
+local function releaseIgnored(self: any, i: number)
+	local e: Ignored = self.ignored[i]
+	local h = e.holder
+	if h.bound[e.part] then h.bound[e.part] = nil; h.count -= 1 end
+	self.ignored[i] = self.ignored[#self.ignored]
+	self.ignored[#self.ignored] = nil
 end
 
 -- Asks the rule of every box with the spider at `pos` and writes the ones whose answer changed. Returns how many it wrote.
@@ -124,7 +138,7 @@ function WorldShadows.pass(self: any, pos: Vector3): number
 		local e: Entry = entries[i]
 		local want = WorldShadows.casts(e.lo, e.hi, e.mid, pos)
 		if want ~= e.on then
-			if e.part.Parent ~= e.folder then
+			if e.part.Parent ~= e.folder or e.folder.Parent ~= self.root then
 				release(self, i)
 				continue
 			end
@@ -148,7 +162,13 @@ function WorldShadows.update(self: any, pos: Vector3, now: number)
 		for _ = 1, n do
 			if self.checkAt > #entries then self.checkAt = 1 end
 			local e: Entry = entries[self.checkAt]
-			if e.part.Parent ~= e.folder then release(self, self.checkAt) else self.checkAt += 1 end
+			if e.part.Parent ~= e.folder or e.folder.Parent ~= self.root then release(self, self.checkAt) else self.checkAt += 1 end
+		end
+		local ignored = self.ignored
+		for _ = 1, math.min(WorldShadows.IGNORED_CHECK_SLICE, #ignored) do
+			if self.ignoredAt > #ignored then self.ignoredAt = 1 end
+			local e: Ignored = ignored[self.ignoredAt]
+			if e.part.Parent ~= e.folder or e.folder.Parent ~= self.root then releaseIgnored(self, self.ignoredAt) else self.ignoredAt += 1 end
 		end
 		self:bind()
 	end

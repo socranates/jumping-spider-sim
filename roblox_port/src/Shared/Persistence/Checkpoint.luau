@@ -301,6 +301,12 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 end
 
 -- The checks on the rebuilt (fresh, not live) world: what a good world must be.
+local V3META: any = if type((Vector3 :: any).zero) == "table" then getmetatable((Vector3 :: any).zero) else nil
+local function finiteVector(value: any): boolean
+	if not (typeof(value) == "Vector3" or (V3META ~= nil and type(value) == "table" and getmetatable(value) == V3META)) then return false end
+	return finite(value.X) and finite(value.Y) and finite(value.Z)
+end
+
 local function checkWorld(roots: { [string]: any }, problems: { string }, legacyCompact: boolean?)
  local pulse=Work.pulse()
 	local function bad(t: string) table.insert(problems, t) end
@@ -367,7 +373,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 			ids[f.id] = f
 			every[f] = true
 			if not states[f.state] then bad(`{label}: {f.id} is in no known state`) end
-			if typeof(f.position) ~= "Vector3" and type(f.position) ~= "table" then bad(`{label}: {f.id} has no position`) end
+			if not finiteVector(f.position) then bad(`{label}: {f.id} has no finite vector position`) end
 			if type(f.profile) ~= "table" or type(f.profile.body) ~= "table" or not finite(f.profile.body.nutrition) then bad(`{label}: {f.id} has no profile`)
 			elseif not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > f.profile.body.nutrition + 1e-9 then bad(`{label}: {f.id}'s nutrition is out of range`) end
 			if f.flight == nil or f.flight.fly ~= f then bad(`{label}: {f.id}'s flight is not its own`) end

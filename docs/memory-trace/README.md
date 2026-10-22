@@ -1,6 +1,6 @@
 # Native memory trace
 
-Status: **90-second rehearsal verified; 30-minute run in progress.** Source `3c8de801e5fab68598e1e5323e7f5e1c8151b0e6` has passed 63 Windows suites / 443,469 checks, successful Linux CI, and native encounter-reset checks. The memory harness is a separate diagnostic; no production source changes here.
+Status: **30-minute run completed and verified; engine-memory growth needs investigation.** Source `3c8de801e5fab68598e1e5323e7f5e1c8151b0e6` has passed 63 Windows suites / 443,469 checks, successful Linux CI, and native encounter-reset checks. The memory harness is a separate diagnostic. Read `RESULTS-v1b.md`; completion of the trace is not a clean memory verdict.
 
 ## Protocol fixed before the long run
 
@@ -29,3 +29,5 @@ Run `1792665646453` completed 90.077 seconds, 29 full visits across all seven ha
 `collect.py LOG --manifest MANIFEST --run-id ID --out NEW_JSON` reconstructs chunk lengths/checksums, source/configuration, ordered visits, memory tags, clock/activity and focus. Incomplete native runs exit nonzero. Ten collector tests cover real captured rehearsal data and deliberately corrupted/missing/mislabelled records, plus synthetic long/growth cases. Synthetic unit records are never native evidence. An initial mutation test changed a string absent from the fixture; that test setup failure is retained in collector-tests-initial.txt, and the corrected mutation now changes an actual payload byte.
 
 `watch.py` only observes the existing native log. It never starts, stops or restarts Studio. An observation timeout does not prove that the native run stopped. Poll the same observer/run, inspect authoritative state, and do not restart on a timeout. long-v1b-origin.json identifies the live run and observer; a metadata file alone is not liveness proof. No completed 30-minute result is claimed until the terminal records and collector gate pass.
+
+The native terminal and collector gates have now passed for run `1792666028145`: 1,800.080 seconds, 121 samples and 59 completed visits. Observer session 52003 exited zero. Studio Play was stopped with Shift+F5 after retaining terminal evidence; the diagnostic place's original SHA-256 still matches. `long-v1b-origin.json` remains unchanged as historical start metadata. The total-memory doorway comparison crossed the predeclared threshold; the result remains `investigate_growth`, not a leak-free pass.

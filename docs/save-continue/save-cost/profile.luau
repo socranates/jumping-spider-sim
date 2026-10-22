@@ -34,6 +34,8 @@ local frame=ClientStubs.renderSteps.SpiderSim
 for _=1,30 do frame(1/60) end
 d.title.seen=true;d.session.finishedMain=true
 assert(d.fresh("main",false,nil))
+d.place(Vector3.new(-25.5,.31,6))
+for _=1,6 do frame(1/60) end
 d.openMenu()
 local attempts=0
 for _,r in Map.regions() do

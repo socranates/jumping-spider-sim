@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T20:41:58.386347+00:00",
+  "as_of_utc": "2026-10-22T20:54:49.007075+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -24,12 +24,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "focused-verified-full-pending",
-      "evidence_boundary": "Current4ee6aec focused matrix27/25294/0; runtime07234ca compiles222, strict/runner5 clean, native22 assertions/all223 fingerprints. Original world timing fixture failure retained and corrected33/0 at matching tick. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Old133aa60 full Windows/Linux74/444632/5 and c4 Linux74/444633/4 are terminal failures in corrected timing fixtures, not current success proof. Historical8db full both72/444582/0.",
+      "status": "full-correction-pending",
+      "evidence_boundary": "Source4ee6aec Linux39849815798 terminated75 suites/444661 passed/3 failed outer assertions in the built-in self-tests. Their fixed-delay local-return check fails before asynchronous completion and leaves the menu open for the music check. Windows87216 is still live on the immutable same source; garden selftest3/2 observed, not terminal full evidence. Sourceab8ca95 updates diagnostic SelfTest to await the exact successful token; Linux39852128734 compile222/222 and strict passed, full suites remain live. Serial Windows follow-up67331 waits for the old run to end before corrected self-tests and the cost diagnostic. Historical4ee6aec focused27/25294/0, runner5 and native22 remain bounded evidence, not a current full pass.",
       "references": [
-        "docs/save-continue/local-return/receipt.json",
-        "docs/save-continue/local-return/README.md",
-        "docs/save-continue/async-rest/windows-full-summary.json"
+        "docs/save-continue/save-cost/README.md",
+        "docs/save-continue/local-return/failed-ci-39849815798/receipt.json",
+        "docs/save-continue/local-return/receipt.json"
       ]
     },
     {
@@ -150,12 +150,13 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Four desktop Studio trials/52 records/44 timed samples exist on earlier source; mixed results do not establish causal speedup. Current-source matched scene comparisons, client/server MicroProfiler, network/startup and phone/tablet emulator checks remain open. Current133aa60 native15: local rest preparation spans frames; large replacement18.5s total/maxupdate52.9ms, synchronous capture139.5ms. Hard frame bound/typical FPS unproven. Local Continue/Backspace/end-screen return still synchronous; overall preparation latency remains open. Runtime07234ca native22 local returns: choice3ms/zero encoding,1.5M record returns4.2s across249 steps/max38ms. No concurrent CLI; Low System Resources; no typical FPS/hard frame ceiling. Coherent capture and total large local-save latency remain open.",
+      "evidence_boundary": "Four desktop Studio trials/52 records/44 timed samples exist on earlier source; mixed results do not establish causal speedup. Current-source matched scene comparisons, client/server MicroProfiler, network/startup and phone/tablet emulator checks remain open. Current133aa60 native15: local rest preparation spans frames; large replacement18.5s total/maxupdate52.9ms, synchronous capture139.5ms. Hard frame bound/typical FPS unproven. Runtime07234ca native22 local returns: choice3ms/zero encoding,1.5M record returns4.2s across249 steps/max38ms. No concurrent CLI; Low System Resources; no typical FPS/hard frame ceiling. Coherent capture and total large local-save latency remain open.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
         "docs/save-continue/async-rest/native-receipt.json",
-        "docs/save-continue/local-return/native-receipt.json"
+        "docs/save-continue/local-return/native-receipt.json",
+        "docs/save-continue/save-cost/README.md"
       ]
     },
     {
@@ -269,16 +270,11 @@
     }
   ],
   "latest_save_milestone": {
-    "runtime_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
-    "verification_source": "4ee6aecc06f4753a85e40fc98a1487dc5126d27d",
-    "focused_suites": 27,
-    "focused_passed": 25294,
-    "native_run": "1792701458910",
-    "native_assertions": 22,
-    "windows_full_session": 87216,
-    "linux_run": 39849815798,
-    "full_gates": "in_progress",
-    "reference": "docs/save-continue/local-return/README.md",
+    "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+    "runtime_behavior_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
+    "status": "diagnostic-correction-full-pending",
+    "evidence": "docs/save-continue/save-cost/README.md",
+    "goal_complete": false,
     "published": false
   }
 }

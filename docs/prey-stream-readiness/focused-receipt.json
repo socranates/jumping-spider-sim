@@ -1,0 +1,14 @@
+{
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "independent_passed": 5,
+  "independent_failed": 0,
+  "garden_life_passed": 256706,
+  "garden_life_failed": 0,
+  "garden_process_exit": 0,
+  "first_attempt_retained": true,
+  "runtime_sha256": "f6b0ec339ab2bfd195a5d4ae20b1dbe825353409333fd7707e8d7df7fc2af28f",
+  "test_sha256": "50cc12e86e116bffa649a3021b5e8e29977bf61613ad4db91d6cd96f2a9c04d3",
+  "garden_output_sha256": "97a4a3074aeb90086b1898f4fc1e7e1f4c432ff01a9713d323919f97bc859133",
+  "native_prepared_not_run": true,
+  "published": false
+}

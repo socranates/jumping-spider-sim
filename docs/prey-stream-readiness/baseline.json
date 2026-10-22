@@ -1,0 +1,10 @@
+{
+  "source": "f0fb6af776a376c730bdd896c1823ebff4877dfb",
+  "runtime_source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+  "exit": 1,
+  "probe_sha256": "cb5b6f446fa9b7a55c48f6969a7cee79f05150f92232bc5fb5afc5b52c584c5e",
+  "runtime_sha256": "16d2d55bc5430989da60883fb02bc8e4612fb54bc20d17b2e05ded3a1b7812f0",
+  "output_sha256": "19be0d0e0eed4d15637650d247826b6405e3b750daf9b3f08929cf99406d0176",
+  "scope": "Existing cached-population before/after/view behavior under CLI shim, not engine streaming",
+  "probe_path": "docs/prey-stream-readiness/probe-baseline.luau"
+}

@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmpkys5yqq_.luau:58085: GARDEN_LIFE failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpkys5yqq_.luau:58085
+FAIL [the world's prey: the sill's director at home, the bed's made when the bed is whole and the spider there or beside it, nothing rerolled by a seam] a bed that has not arrived whole has no prey and no woodlice (the wall and, ROBLOX-107, the bushes beside it, whole, have their own)
+GARDEN_LIFE passed=256705 failed=1

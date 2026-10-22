@@ -1,0 +1,8 @@
+FAIL PREY_STREAM missing region is still active
+FAIL PREY_STREAM existing director advanced while geometry unavailable
+FAIL PREY_STREAM unavailable ecology remains visible/perceived
+PREY_STREAM: 2 passed, 3 failed
+prey stream readiness regression
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmppg7vr9n3.luau:56432

@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-22T22:48:36.680287+00:00",
-  "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+  "as_of_utc": "2026-10-22T23:03:48.212238+00:00",
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -23,13 +23,11 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "stream-readiness-focused-verified-full-running",
-      "evidence_boundary": "Currente51c546: world_client36/0, independent reproduction3/0 versus baseline0/3, compile222/strict/runner5 pass. Windows exec43263 and Linux39866927660 are running, not terminal; expected76/465383 is unverified. Native focused11 assertions/all223 fingerprints passes with production persistence disabled. Previous068a878 both full gates76/465380 and full native274/0/0 are prior-source evidence only.",
+      "status": "prey-readiness-focused-verified-full-pending",
+      "evidence_boundary": "Current032926f: independent5/0, garden256706/0, compile222/strict/runner5 pass. Linux39868843334 running; current Windows not started. Expected76/465388 remains unverified. Prior e51 Linux76/465383/0 terminal, its Windows43263 still live. Current native225-script sequence prepared, not run.",
       "references": [
-        "docs/stream-readiness/README.md",
-        "docs/stream-readiness/candidate.json",
-        "docs/stream-readiness/native-receipt.json",
-        "docs/audit/current-native/full-receipt.json"
+        "docs/prey-stream-readiness/README.md",
+        "docs/prey-stream-readiness/focused-receipt.json"
       ]
     },
     {
@@ -133,9 +131,10 @@
     {
       "id": "network-streaming",
       "status": "partial",
-      "evidence_boundary": "Currente51c546 non-station creature readiness no longer trusts stale first-arrival flags. CLI3/0 and actual-client native11 checks/all223 fingerprints prove refusal of locally removed/partial geometry and resumption after full restoration; gate1000 calls5.287ms in one fixture. No natural server-driven stream-out/rearrival or network-pressure proof yet.",
+      "evidence_boundary": "Current032926f also gates existing prey populations, beyond the e51 roaming-spider gate. Baseline2/3, candidate5/0 proves pause/hidden view, retained ownership/pose/RNG and resume under CLI emulation. Current combined native22 is prepared only. Prior e51 engine-backed creature11 remains historical. Natural server-driven streaming pressure/rearrival is unverified.",
       "references": [
-        "docs/stream-readiness/README.md",
+        "docs/prey-stream-readiness/README.md",
+        "docs/prey-stream-readiness/focused-receipt.json",
         "docs/stream-readiness/native-receipt.json"
       ]
     },
@@ -151,7 +150,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Earlier desktop timing matrix remains mixed, no causal whole-game speedup. Currentab8ca95 native save-cost10 assertions/223 exact fingerprints:1.503M chars, capture123/97ms, first/replacement prep1.604/2.579s CPU over12.988/18.010s elapsed, max37/60ms. Native replacement five canonical encodes1.905s, six copies357ms; CLI2.282M record agrees encoding dominates. Wider Heartbeat gaps1.18-1.27s are unexplained, not worker-only attribution. No hard frame budget/typical FPS/physical-device proof. Identical-source prior rig-cache trial gains remain modest/mixed, not adopted. Encoding optimization and broader native/device gates remain open. Current068a878 adopts an exact-output fragment encoder after20716 CLI differential checks and20738 native paired assertions/all224 fingerprints. Same-record four native pairs average40.27percent lower encoder CPU, lower max step each pair; CLI average31.78percent lower. Heap observations vary, no whole-game FPS/heap gain/hard frame proof. Current full integration and adopted-game end-to-end cost remain pending.",
+      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less encoder CPU; bounded game save/return32 passes with225 fingerprints, capture108/98ms still synchronous and replacement14.34s elapsed. Prior native full walkthrough sill sample23.9ms and shadow-off17.6ms are short sequential observations, not causal FPS gain. Broad sound category includes animal drawing; new attribution driver prepared only, not measured. Current032926f correctness gates pending; no general FPS, heap or hard-budget claim.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -293,9 +292,9 @@
     "scope": "Lexical source/dependency/test-import index, not runtime coverage or release proof"
   },
   "latest_readiness_milestone": {
-    "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
-    "status": "focused-native-verified-full-gates-running",
-    "evidence": "docs/stream-readiness/README.md",
+    "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+    "status": "cached-prey-focused-verified-native-and-full-pending",
+    "evidence": "docs/prey-stream-readiness/README.md",
     "goal_complete": false,
     "published": false
   }

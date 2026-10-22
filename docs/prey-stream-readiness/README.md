@@ -1,0 +1,17 @@
+# Cached prey waits for collision geometry
+
+Current runtime/tests source: `032926fd6e02c68c3f257189d397cbdf2a116bba`, branch `codex/save-continue`.
+
+PreyWorld previously checked geometry when creating a director but reused that director without checking readiness on later ticks. Missing geometry could therefore leave an existing population active, advancing and visible. Before stepping prey, the active list now removes unavailable regions in place, preserving the order of available neighbors. Cached ecology is retained; complete geometry resumes the same objects. The home feeding processor still runs through the existing after path once per tick. No fly senses, capture, nutrition, growth, settings or menu rules changed.
+
+The independent baseline reports2 passed/3 failed: unavailable region remains active, its clock advances, and it remains visible/perceived. The fixed probe passes5/0, including unchanged object ownership, poses and RNG while waiting, and resumption without reroll. Frozen probe-baseline.luau preserves the baseline's exact hashed inputs. The first garden-suite run ended256705/1 because an older assertion expected the unavailable bed on the active list; garden-life-attempt1.txt retains it. The corrected assertion now requires exclusion, keeping the other existing conditions. The rerun ended256706/0, process exit0. All222 production modules compile, strict analysis clean, runner5 pass.
+
+Linux39868843334 is running on this source. Full Windows for this source has not started. The preceding sourcee51c546 Linux39866927660 completed76 suites/465383/0; its immutable full Windows exec43263 remains live. Do not restart or relabel that older job. Wait until it is terminal, then run the prepared native sequence without concurrent heavy CLI work, and run this directory's full.py once. Expected current total76 suites/465388 is not yet a completed result.
+
+The prepared current native sequence has225 unique scripts:222 unchanged production sources, the existing creature-readiness11 checks, the new cached-prey11 checks, and a sequencing wrapper. Both child PASS markers and no FAIL are required; wrapper END is insufficient. It uses real instances and the actual client's PreyWorld, with manual before/after ticks while the menu pauses ordinary movement. That is component evidence, not naturally induced server streaming or a complete natural life cycle. Prepared only; not run yet.
+
+Archive: C:/Users/natha/claude-xfer/Windowsill-prey-readiness-032926f/Windowsill-prey-readiness-review.rbxlx, SHA2565120c0240b248c8a1a88f3a1d7bdd816966625e4f7191516fd3b69b57f154d9e. PlaceId0, production Persistence disabled. Never publish diagnostics. The root save-continue verifier now requires this current snapshot's full gates and native22 proof. The previous readiness verifier is pinned to its historicale51c546 inputs, with a separate current-workspace-match flag.
+
+The broad sound frame category includes several animal drawers. An attribution driver was prepared under ../animal-presentation-cost on the preceding source; it has not run and proves no gain. Finish current correctness gates, then rebuild that diagnostic on the current source before timing. No audio/lighting or animal presentation optimization adopted here.
+
+Older-world migration, natural network stream-out/re-arrival, physical devices, full natural lifecycle, whole-game performance, release rebuilding/publication and laptop synchronization remain open. Goal active; nothing published.

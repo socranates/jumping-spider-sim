@@ -1,0 +1,8 @@
+{
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "exit": 0,
+  "probe_sha256": "976ddd6b7792f715531479176033a4a677ba0df723c241c2f49888672135c159",
+  "runtime_sha256": "f6b0ec339ab2bfd195a5d4ae20b1dbe825353409333fd7707e8d7df7fc2af28f",
+  "output_sha256": "f2363d306db54bb58fe99fb8f7e406b147170abef28a330e47f11f32ad566905",
+  "scope": "Existing cached-population before/after/view behavior under CLI shim, not engine streaming"
+}

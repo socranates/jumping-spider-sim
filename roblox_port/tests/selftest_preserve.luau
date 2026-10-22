@@ -116,7 +116,8 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 		"the bench patch", "the meadow's edge", "the crab spiders", -- (ROBLOX-119)
 		"the robin", "the field crickets", "ballooning's landings", -- (ROBLOX-120)
 		"the mown path and the boardwalk", "the water", "the pond's life", "the green frog", -- (ROBLOX-122)
-		"the nursery: the window put back", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
+		"the nursery: the window put back", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts",
+  "fallbacks clear the shelf books and station boots","visible meal and contextual controls","Normal starvation reaches the life-ending handler" }
 	WorldMap.use("preserve")
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end

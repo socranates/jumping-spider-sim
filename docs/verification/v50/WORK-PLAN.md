@@ -101,3 +101,18 @@ rule application now supplies those missing fields; legacy feeding ticks also
 use safe defaults. An actual capture/decode/commit graph roundtrip reproduces
 the absent fields and verifies a subsequent bite. Meals now88/0. This is a
 restore compatibility fix, not a save-schema change or a ledger reset.
+
+
+Frozen B later exposed stale selftest host expectations: its new two checks
+passed, but the host's expected-name list omitted them, and the new death
+fixture reset the clock/left a death card. Final SelfTest now restores a fresh
+playable main life at noon after checking death; host lists explicitly require
+the added checks (garden41, preserve274). No gate is removed.
+
+Final-source low E run exposed the inherited robin guard requiring>=15 parts,
+although low has11 named core parts. Final guard now requires every named core
+part at low, and every22 named parts at full, after allowing the ground pose to
+render. This strengthens tier correctness instead of weakening a numeric floor.
+The current low E run retains that false-positive failure. Run final F low full
+SelfTest again. Build evidence is now ee4570806e9c8908 (SelfTest/host-only changes
+since E); gameplay remains the previously reviewed source. Strict/compile clean.

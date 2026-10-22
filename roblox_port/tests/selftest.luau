@@ -93,7 +93,8 @@ check("the self-test runs through the real client to END, every check passing he
 	end
 	assert(fails == 0, `{fails} checks failed here (see the FAIL lines above)`)
 	local want = { "new life", "intro", "world folders", "walk on the sill", "the line", "prey on the sill", "lock", "prey in the bed", "woodlice", "frame time in the bed", "frame time in the bed, settled",
-		"moths on the wall", "dusk: the moths fly", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
+		"moths on the wall", "dusk: the moths fly", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts",
+  "visible meal and contextual controls","Normal starvation reaches the life-ending handler" }
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)

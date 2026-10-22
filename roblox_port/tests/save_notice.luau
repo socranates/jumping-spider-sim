@@ -61,9 +61,13 @@ folder.Parent=game:GetService("ReplicatedStorage")
 assert(pcall(function() require("../src/Client/SpiderClient.client") end),"client did not load")
 local d=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
 local function frames(n) for _=1,n do frame(1/60) end end
-frames(3);deliver({kind="loaded",v=1,status="saved",progress=Progress.default(),rests={}});frames(3)
+-- A server cannot answer hello before the client has connected its transport.
+-- Loading navigation now precedes that frame work; await the real connection.
+for _=1,5000 do frames(1);if #handlers>0 then break end end
+assert(#handlers==1,"save transport never connected")
+deliver({kind="loaded",v=1,status="saved",progress=Progress.default(),rests={}});frames(3)
 d.title.seen=true
-local ready=false;for _=1,120 do if d.fresh("free",false,nil) then ready=true;break end;frames(1) end
+local ready=false;for _=1,5000 do if d.fresh("free",false,nil) then ready=true;break end;frames(1) end
 assert(ready,"fresh life did not start")
 d.menu:hide();frames(2)
 for _,reason in {"write_failed","rest_refused","rest_protected"} do

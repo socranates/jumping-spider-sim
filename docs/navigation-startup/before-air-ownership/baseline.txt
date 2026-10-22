@@ -1,0 +1,8 @@
+C:/Users/natha/AppData/Local/Temp/tmp58xqu2sn.luau:57690: navigation startup checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp58xqu2sn.luau:57690
+FAIL NAVIGATION_STARTUP cold client refuses early Begin and holds its state behind loading: C:/Users/natha/AppData/Local/Temp/tmp58xqu2sn.luau:57658: no navigation startup owner
+FAIL NAVIGATION_STARTUP real resident surface and air graphs finish before a playable capture: C:/Users/natha/AppData/Local/Temp/tmp58xqu2sn.luau:57671: no navigation startup owner
+FAIL NAVIGATION_STARTUP controller preparation failure keeps simulation stopped and signals recovery: C:/Users/natha/AppData/Local/Temp/tmp58xqu2sn.luau:57682: no navigation startup owner
+NAVIGATION_STARTUP passed=10 failed=3

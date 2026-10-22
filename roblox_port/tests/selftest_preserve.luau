@@ -49,6 +49,15 @@ WorldMap.use("test_garden") -- (the client must make the preserve active itself,
 local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.client") end)
 if not loaded then print("LOAD ERROR", loadError) end
 local frame = ClientStubs.renderSteps.SpiderSim
+-- Loading is bounded work, not simulated ecology. Await actual TitleReady before
+-- asserting drawn gameplay; fixed30-frame readiness was an obsolete assumption.
+if frame and loaded then
+ for _=1,5000 do
+  frame(1/60)
+  if game:GetService("Players").LocalPlayer:GetAttribute("TitleReady")==true then break end
+ end
+ assert(game:GetService("Players").LocalPlayer:GetAttribute("TitleReady")==true,"preserve startup did not complete")
+end
 
 local preserveRegions = (function() local was = WorldMap.use("preserve"); local n = #WorldMap.regions(); WorldMap.use(was); return n end)()
 check("the world the server built: the sill and the hut's regions in World, a Decor without the test garden's view", function()

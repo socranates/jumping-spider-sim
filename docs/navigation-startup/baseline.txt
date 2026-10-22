@@ -1,0 +1,10 @@
+C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:57712: navigation startup checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:57712
+FAIL NAVIGATION_STARTUP cancel only the closed air builder, then allow a fresh owner: C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:55245: no owned air cancellation API
+FAIL NAVIGATION_STARTUP air preparation error releases its owner without publishing partial data: C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:55258: a failed air build prevented a subsequent owner from starting
+FAIL NAVIGATION_STARTUP cold client refuses early Begin and holds its state behind loading: C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:57680: no navigation startup owner
+FAIL NAVIGATION_STARTUP real resident surface and air graphs finish before a playable capture: C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:57693: no navigation startup owner
+FAIL NAVIGATION_STARTUP controller preparation failure keeps simulation stopped and signals recovery: C:/Users/natha/AppData/Local/Temp/tmp2wxplpgm.luau:57704: no navigation startup owner
+NAVIGATION_STARTUP passed=10 failed=5

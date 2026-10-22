@@ -18771,6 +18771,7 @@ end
 -- Time limits the cost on slower devices; the secondary work quota also
 -- prevents an unusually fast clock/read from making this an unbounded loop.
 function Drive.advance(): (boolean, string?) return Route.advance(2048, .002) end
+function Drive.pending(): number return Route.preparationStats().pending end
 function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?, incremental: boolean?): any
 	local id = region or WorldMap.HOME
 	local g, waypoints = graphAndPoints(id, incremental)
@@ -38763,6 +38764,71 @@ return Meadow
         </Item>
         <Item class="ModuleScript" referent="182">
           <Properties>
+            <string name="Name">NavigationPreparation</string>
+            <string name="Source"><![CDATA[--!strict
+-- Owns bounded loading work, before the first simulation tick. Surface and air
+-- graphs may finish at different real times; neither may activate gameplay early.
+-- Dependencies are supplied so failure/budget tests need no engine scheduler.
+local Preparation = {}
+Preparation.__index = Preparation
+Preparation.FRAME_SECONDS = .008
+Preparation.MAX_SLICES = 64
+Preparation.TIMEOUT_SECONDS = 40
+
+function Preparation.new(config: any): any
+	local now = config.now or os.clock
+	local self: any = setmetatable({ config = config, now = now, started = now(),
+		status = "pending", problem = nil, slices = 0, airTurn = false }, Preparation)
+	self.airThread = coroutine.create(function() config.air.prepare(function() coroutine.yield() end) end)
+	local ok, problem = pcall(config.prepare)
+	if not ok then
+		self.status, self.problem = "failed", tostring(problem)
+		coroutine.close(self.airThread)
+	end
+	return self
+end
+
+local function work(self: any)
+	local deadline = self.now() + Preparation.FRAME_SECONDS
+	for _ = 1, Preparation.MAX_SLICES do
+		if self.now() - self.started >= Preparation.TIMEOUT_SECONDS then error("navigation preparation timed out") end
+		local airDone = coroutine.status(self.airThread) == "dead"
+		local surfaceDone = self.config.pending() == 0
+		if airDone and surfaceDone then
+			assert(self.config.air.ready(), "air navigation did not finish")
+			self.status = "ready"
+			return
+		end
+		if self.now() >= deadline then return end
+		if not airDone and (self.airTurn or surfaceDone) then
+			local ok, problem = coroutine.resume(self.airThread)
+			assert(ok, tostring(problem))
+		else
+			local ok, problem = self.config.advance()
+			assert(ok, tostring(problem))
+		end
+		self.airTurn = not self.airTurn
+		self.slices += 1
+	end
+end
+
+function Preparation.step(self: any): (string, string?)
+	if self.status ~= "pending" then return self.status, self.problem end
+	local ok, problem = pcall(function(): any work(self); return nil end)
+	if not ok then
+		self.status, self.problem = "failed", tostring(problem)
+		if coroutine.status(self.airThread) == "suspended" then coroutine.close(self.airThread) end
+		if self.config.air.cancelPreparation then self.config.air.cancelPreparation(self.airThread) end
+	end
+	return self.status, self.problem
+end
+
+return table.freeze(Preparation)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="183">
+          <Properties>
             <string name="Name">Pond</string>
             <string name="Source"><![CDATA[--!strict
 -- The pond's edge and the boardwalk, walkable (ROBLOX-122, docs/PARK_WORLD_DESIGN.md Phase D round 1): home range 4 at full spider detail where the boardwalk runs
@@ -40072,7 +40138,7 @@ return Pond
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="183">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">Preserve</string>
             <string name="Source"><![CDATA[--!strict
@@ -40228,7 +40294,7 @@ return table.freeze(Preserve)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="184">
+        <Item class="ModuleScript" referent="185">
           <Properties>
             <string name="Name">PreserveLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -41237,7 +41303,7 @@ return table.freeze(PreserveLook)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="185">
+        <Item class="ModuleScript" referent="186">
           <Properties>
             <string name="Name">PreserveTrain</string>
             <string name="Source"><![CDATA[--!strict
@@ -41341,7 +41407,7 @@ return table.freeze(PreserveTrain)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="186">
+        <Item class="ModuleScript" referent="187">
           <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
@@ -41512,7 +41578,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="187">
+        <Item class="ModuleScript" referent="188">
           <Properties>
             <string name="Name">StationAir</string>
             <string name="Source"><![CDATA[--!strict
@@ -41528,6 +41594,7 @@ local RADIUS=.55
 local boxes: {any}={}
 local loaded=false
 local built,preparing=false,false
+local preparingOwner: thread?=nil
 local nodes: {[number]:Vector3}={}
 local links: {[number]:{number}}={}
 local Y={-66.5,-42.5,-18.5,5.5,29.5,53.5,77.5,101.5,125.5,146.5}
@@ -41575,6 +41642,10 @@ local function build(yieldWork: (() -> ())?): boolean
  if built then return true end
  if preparing then return false end
  preparing=true
+ preparingOwner=coroutine.running()
+ -- Keep interrupted/failed construction private. Only a complete graph is cached.
+ local buildingNodes: {[number]:Vector3}={}
+ local buildingLinks: {[number]:{number}}={}
  local work=0
  local function pause()
   work+=1
@@ -41582,28 +41653,43 @@ local function build(yieldWork: (() -> ())?): boolean
  end
  for y,height in Y do for z=0,NZ-1 do for x=0,NX-1 do
   local p=Vector3.new(-134.5+24*x,height,24.5+24*z)
-  if inside(p) and Air.clear(p,p) then nodes[key(x,z,y-1)]=p end
+  if inside(p) and Air.clear(p,p) then buildingNodes[key(x,z,y-1)]=p end
   pause()
  end end end
  for y=0,#Y-1 do for z=0,NZ-1 do for x=0,NX-1 do
-  local id=key(x,z,y);local p=nodes[id]
+  local id=key(x,z,y);local p=buildingNodes[id]
   if p then
    local list={}
    for _,offset in {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}} do
     local a,b,c=x+offset[1],z+offset[2],y+offset[3]
     if a>=0 and a<NX and b>=0 and b<NZ and c>=0 and c<#Y then
      local to=key(a,b,c)
-     if nodes[to] and Air.clear(p,nodes[to]) then table.insert(list,to) end
+     if buildingNodes[to] and Air.clear(p,buildingNodes[to]) then table.insert(list,to) end
     end
    end
-   links[id]=list
+   buildingLinks[id]=list
   end
   pause()
  end end end
- built=true;preparing=false
+ nodes,links=buildingNodes,buildingLinks
+ built=true;preparing=false;preparingOwner=nil
  return true
 end
-function Air.prepare(yieldWork: () -> ()) build(yieldWork) end
+function Air.prepare(yieldWork: () -> ())
+ local ok,problem=pcall(build,yieldWork)
+ if not ok then
+  if preparingOwner==coroutine.running() then preparing=false;preparingOwner=nil end
+  error(tostring(problem))
+ end
+end
+function Air.ready(): boolean return built end
+-- A failed startup owner closes its work first. It cannot cancel another owner
+-- or a live builder; the discarded coroutine's private tables are then collectible.
+function Air.cancelPreparation(owner: thread): boolean
+ if preparingOwner~=owner or coroutine.status(owner)~="dead" then return false end
+ preparing=false;preparingOwner=nil
+ return true
+end
 local function nearest(p: Vector3): number?
  local sorted={}
  for id,node in nodes do table.insert(sorted,{id=id,d=(node-p).Magnitude}) end
@@ -41692,7 +41778,7 @@ return table.freeze(Air)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="188">
+        <Item class="ModuleScript" referent="189">
           <Properties>
             <string name="Name">StationTerritory</string>
             <string name="Source"><![CDATA[--!strict
@@ -41727,7 +41813,7 @@ return table.freeze(Station)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="189">
+        <Item class="ModuleScript" referent="190">
           <Properties>
             <string name="Name">Verge</string>
             <string name="Source"><![CDATA[--!strict
@@ -41965,7 +42051,7 @@ return table.freeze(Verge)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="190">
+        <Item class="ModuleScript" referent="191">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -42057,7 +42143,7 @@ return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="191">
+        <Item class="ModuleScript" referent="192">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -42592,7 +42678,7 @@ return table.freeze(WorldMap)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="192">
+        <Item class="ModuleScript" referent="193">
           <Properties>
             <string name="Name">Worlds</string>
             <string name="Source"><![CDATA[--!strict
@@ -42652,15 +42738,15 @@ return table.freeze(Worlds)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="193">
+  <Item class="ServerScriptService" referent="194">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="194">
+    <Item class="Folder" referent="195">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="195">
+      <Item class="ModuleScript" referent="196">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -42718,7 +42804,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="196">
+      <Item class="Script" referent="197">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -42797,7 +42883,7 @@ WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="197">
+      <Item class="Script" referent="198">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -42895,7 +42981,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="198">
+      <Item class="ModuleScript" referent="199">
         <Properties>
           <string name="Name">RestCompression</string>
           <string name="Source"><![CDATA[--!strict
@@ -43029,7 +43115,7 @@ return RestCompression
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="199">
+      <Item class="ModuleScript" referent="200">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -43251,7 +43337,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="200">
+      <Item class="ModuleScript" referent="201">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -43375,19 +43461,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="201">
+  <Item class="StarterPlayer" referent="202">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="202">
+    <Item class="StarterPlayerScripts" referent="203">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="203">
+      <Item class="Folder" referent="204">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="204">
+        <Item class="ModuleScript" referent="205">
           <Properties>
             <string name="Name">BirdBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -43601,7 +43687,7 @@ return BirdBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="205">
+        <Item class="ModuleScript" referent="206">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -44374,7 +44460,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="206">
+        <Item class="ModuleScript" referent="207">
           <Properties>
             <string name="Name">CatBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44501,7 +44587,7 @@ return CatBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="207">
+        <Item class="ModuleScript" referent="208">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -44688,7 +44774,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="208">
+        <Item class="ModuleScript" referent="209">
           <Properties>
             <string name="Name">CrabBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44811,7 +44897,7 @@ return CrabBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="209">
+        <Item class="ModuleScript" referent="210">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -45467,7 +45553,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="210">
+        <Item class="ModuleScript" referent="211">
           <Properties>
             <string name="Name">FrameProfile</string>
             <string name="Source"><![CDATA[--!strict
@@ -45608,7 +45694,7 @@ return FrameProfile
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="211">
+        <Item class="ModuleScript" referent="212">
           <Properties>
             <string name="Name">HutLife</string>
             <string name="Source"><![CDATA[--!strict
@@ -45863,7 +45949,7 @@ return HutLife
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="212">
+        <Item class="ModuleScript" referent="213">
           <Properties>
             <string name="Name">LivingWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -46351,7 +46437,7 @@ return LivingWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="213">
+        <Item class="ModuleScript" referent="214">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -46633,7 +46719,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="214">
+        <Item class="ModuleScript" referent="215">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -46987,7 +47073,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="215">
+        <Item class="ModuleScript" referent="216">
           <Properties>
             <string name="Name">MealPresentation</string>
             <string name="Source"><![CDATA[--!strict
@@ -47061,7 +47147,7 @@ return Meal
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="216">
+        <Item class="ModuleScript" referent="217">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -47099,7 +47185,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="217">
+        <Item class="ModuleScript" referent="218">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -47602,7 +47688,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="218">
+        <Item class="ModuleScript" referent="219">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -47647,7 +47733,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="219">
+        <Item class="ModuleScript" referent="220">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -47887,7 +47973,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="220">
+        <Item class="ModuleScript" referent="221">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -47932,7 +48018,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="221">
+        <Item class="ModuleScript" referent="222">
           <Properties>
             <string name="Name">PondBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -48100,7 +48186,7 @@ return PondBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="222">
+        <Item class="ModuleScript" referent="223">
           <Properties>
             <string name="Name">RareBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -48192,7 +48278,7 @@ return Body
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="223">
+        <Item class="ModuleScript" referent="224">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -48365,7 +48451,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="224">
+        <Item class="ModuleScript" referent="225">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -50175,7 +50261,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="225">
+        <Item class="ModuleScript" referent="226">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -50876,7 +50962,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="226">
+        <Item class="ModuleScript" referent="227">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -51077,7 +51163,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="227">
+        <Item class="ModuleScript" referent="228">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -51807,7 +51893,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="228">
+        <Item class="LocalScript" referent="229">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -52021,7 +52107,13 @@ local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil,
 	Display = require(Shared.Predator.RivalDisplay), display = nil, event = "", input = {} } -- (ROBLOX-127: the male's contest display, drawn on the rival's rig)
 rivalLegs.incremental = M.World.world == "preserve"
-if rivalLegs.incremental then rivalLegs.Drive.prepare(RivalSpider.roam(), select(2, RivalSpider.arriveAt()) or M.World.home) end
+if rivalLegs.incremental then
+	rivalLegs.navigation = require(Shared.World.NavigationPreparation).new({
+		prepare = function() rivalLegs.Drive.prepare(RivalSpider.roam(), select(2, RivalSpider.arriveAt()) or M.World.home) end,
+		advance = rivalLegs.Drive.advance, pending = rivalLegs.Drive.pending,
+		air = require(Shared.World.StationAir),
+	})
+end
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
@@ -53207,7 +53299,7 @@ function saveState.frame()
 end
 
 controls = SpiderInput.bind({
-	blocked = function(): boolean return modal() or M.title:holding() end, -- (ROBLOX-109: the intro has the controls while it holds)
+	blocked = function(): boolean return (rivalLegs.navigation ~= nil and rivalLegs.navigation.status ~= "ready") or modal() or M.title:holding() end, -- Loading and the intro own the controls.
 	menu = function() if settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
@@ -53585,17 +53677,27 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
-	if rivalLegs.incremental then
-		rivalLegs.navOK, rivalLegs.navError = rivalLegs.Drive.advance()
-		if not rivalLegs.navOK and rivalLegs.navError ~= rivalLegs.navReported then
-			rivalLegs.navReported = rivalLegs.navError
-			warn("[Windowsill] surface route preparation: " .. tostring(rivalLegs.navError))
-		end
-		M.Prof.lap("surface routes")
-	end
+	-- Keep the save handshake/replies live while the loading screen owns play.
+	-- Applying progress/rest slots does not advance the simulation or capture it.
 	saveState.frame()
-	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	M.Prof.lap("save")
+	if rivalLegs.navigation and rivalLegs.navigation.status ~= "ready" then
+		rivalLegs.navStatus, rivalLegs.navError = rivalLegs.navigation:step()
+		M.Prof.lap("navigation startup")
+		if rivalLegs.navStatus ~= "ready" then
+			accumulator = 0 -- Loading time is never simulation time, even on a slow first frame.
+			controls:clear()
+			if rivalLegs.navStatus == "failed" and not rivalLegs.navReported then
+				rivalLegs.navReported = true
+				player:SetAttribute("WorldStartupFailed", true)
+				warn("[Windowsill] navigation startup: " .. tostring(rivalLegs.navError))
+			end
+			M.Prof.finish()
+			return
+		end
+	end
+	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.Prof.lap("appearance")
 	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
 	-- where it comes down is streamed in before the spiderling stands there)
 	M.World:update(if mateLegs.ride ~= nil and mateLegs.ride.at ~= nil then mateLegs.ride.at else motor.pos, rig.root, nil, frameDt)
@@ -53655,9 +53757,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
-			if M.World.world=="preserve" and wasp:useStationRules() then
-				task.spawn(function() wasp.station.prepare(function() task.wait() end) end)
-			end
+			if M.World.world=="preserve" then wasp:useStationRules() end
 			wasp.nature = not needs.gentle -- (ROBLOX-106: the standard rules' wasp: its windows slide, its visits vary and sometimes linger)
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
@@ -54172,7 +54272,7 @@ end)
 M.hooks = function(): any
 	return {
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
+			input = controls, rivalLegs = rivalLegs, navigation = rivalLegs.navigation, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
    rareBody=M.rareBody,rareHistory=M.rareHistory,rareDirector=M.RareDirector,
 			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
@@ -54218,7 +54318,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="229">
+        <Item class="ModuleScript" referent="230">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -54684,7 +54784,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="230">
+        <Item class="ModuleScript" referent="231">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -55121,7 +55221,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="231">
+        <Item class="ModuleScript" referent="232">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -55390,7 +55490,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="232">
+        <Item class="ModuleScript" referent="233">
           <Properties>
             <string name="Name">StationMouseBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -55436,7 +55536,7 @@ return Body
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="233">
+        <Item class="ModuleScript" referent="234">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -55703,7 +55803,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="234">
+        <Item class="ModuleScript" referent="235">
           <Properties>
             <string name="Name">TrainPass</string>
             <string name="Source"><![CDATA[--!strict
@@ -55846,7 +55946,7 @@ return TrainPass
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="235">
+        <Item class="ModuleScript" referent="236">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -56078,7 +56178,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="236">
+        <Item class="ModuleScript" referent="237">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -56422,7 +56522,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="237">
+        <Item class="ModuleScript" referent="238">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -56463,7 +56563,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="238">
+        <Item class="ModuleScript" referent="239">
           <Properties>
             <string name="Name">WorldShadows</string>
             <string name="Source"><![CDATA[--!strict
@@ -56658,7 +56758,7 @@ return WorldShadows
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="239">
+  <Item class="Workspace" referent="240">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

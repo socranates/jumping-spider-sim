@@ -11,6 +11,7 @@ local RADIUS=.55
 local boxes: {any}={}
 local loaded=false
 local built,preparing=false,false
+local preparingOwner: thread?=nil
 local nodes: {[number]:Vector3}={}
 local links: {[number]:{number}}={}
 local Y={-66.5,-42.5,-18.5,5.5,29.5,53.5,77.5,101.5,125.5,146.5}
@@ -58,6 +59,10 @@ local function build(yieldWork: (() -> ())?): boolean
  if built then return true end
  if preparing then return false end
  preparing=true
+ preparingOwner=coroutine.running()
+ -- Keep interrupted/failed construction private. Only a complete graph is cached.
+ local buildingNodes: {[number]:Vector3}={}
+ local buildingLinks: {[number]:{number}}={}
  local work=0
  local function pause()
   work+=1
@@ -65,28 +70,43 @@ local function build(yieldWork: (() -> ())?): boolean
  end
  for y,height in Y do for z=0,NZ-1 do for x=0,NX-1 do
   local p=Vector3.new(-134.5+24*x,height,24.5+24*z)
-  if inside(p) and Air.clear(p,p) then nodes[key(x,z,y-1)]=p end
+  if inside(p) and Air.clear(p,p) then buildingNodes[key(x,z,y-1)]=p end
   pause()
  end end end
  for y=0,#Y-1 do for z=0,NZ-1 do for x=0,NX-1 do
-  local id=key(x,z,y);local p=nodes[id]
+  local id=key(x,z,y);local p=buildingNodes[id]
   if p then
    local list={}
    for _,offset in {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}} do
     local a,b,c=x+offset[1],z+offset[2],y+offset[3]
     if a>=0 and a<NX and b>=0 and b<NZ and c>=0 and c<#Y then
      local to=key(a,b,c)
-     if nodes[to] and Air.clear(p,nodes[to]) then table.insert(list,to) end
+     if buildingNodes[to] and Air.clear(p,buildingNodes[to]) then table.insert(list,to) end
     end
    end
-   links[id]=list
+   buildingLinks[id]=list
   end
   pause()
  end end end
- built=true;preparing=false
+ nodes,links=buildingNodes,buildingLinks
+ built=true;preparing=false;preparingOwner=nil
  return true
 end
-function Air.prepare(yieldWork: () -> ()) build(yieldWork) end
+function Air.prepare(yieldWork: () -> ())
+ local ok,problem=pcall(build,yieldWork)
+ if not ok then
+  if preparingOwner==coroutine.running() then preparing=false;preparingOwner=nil end
+  error(tostring(problem))
+ end
+end
+function Air.ready(): boolean return built end
+-- A failed startup owner closes its work first. It cannot cancel another owner
+-- or a live builder; the discarded coroutine's private tables are then collectible.
+function Air.cancelPreparation(owner: thread): boolean
+ if preparingOwner~=owner or coroutine.status(owner)~="dead" then return false end
+ preparing=false;preparingOwner=nil
+ return true
+end
 local function nearest(p: Vector3): number?
  local sorted={}
  for id,node in nodes do table.insert(sorted,{id=id,d=(node-p).Magnitude}) end

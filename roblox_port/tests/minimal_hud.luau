@@ -64,7 +64,7 @@ assert(loaded,tostring(err))
 local driver=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
 local function frames(n) for _=1,n do frame(1/60) end end
 local player=game:GetService("Players").LocalPlayer
-local ready=false;for _=1,120 do if driver.fresh("free",false,nil) then ready=true;break end;frames(1) end
+local ready=false;for _=1,5000 do if driver.fresh("free",false,nil) then ready=true;break end;frames(1) end
 check(ready,"real preserve client starts a fresh life")
 check(player:GetAttribute("Captions")==nil and driver.setting("Captions")=="off","untouched real client uses preserve caption default")
 driver.place(Vector3.new(2,.31,6));driver.life.clock.day=3;driver.life.clock.hour=12;driver.prey.feeding.mealsFinished=1

@@ -13,7 +13,7 @@ local loaded,err=pcall(function() require("../src/Client/SpiderClient.client") e
 assert(loaded,tostring(err))
 local d=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
 local function frames(n) for _=1,n do frame(1/60) end end
-local ready=false;for _=1,120 do if d.fresh("free",false,nil) then ready=true;break end;frames(1) end
+local ready=false;for _=1,5000 do if d.fresh("free",false,nil) then ready=true;break end;frames(1) end
 assert(ready,"fresh life never became ready")
 local actors={{d.frog,d.Frog,"frog"},{d.crab,d.CrabSpider,"crabs"},{d.bird,d.Bird,"robin"}}
 local function equal(a,b,path)

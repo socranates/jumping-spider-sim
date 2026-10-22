@@ -50,6 +50,7 @@ end
 -- Time limits the cost on slower devices; the secondary work quota also
 -- prevents an unusually fast clock/read from making this an unbounded loop.
 function Drive.advance(): (boolean, string?) return Route.advance(2048, .002) end
+function Drive.pending(): number return Route.preparationStats().pending end
 function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?, incremental: boolean?): any
 	local id = region or WorldMap.HOME
 	local g, waypoints = graphAndPoints(id, incremental)

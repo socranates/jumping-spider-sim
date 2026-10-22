@@ -209,7 +209,13 @@ local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil,
 	Display = require(Shared.Predator.RivalDisplay), display = nil, event = "", input = {} } -- (ROBLOX-127: the male's contest display, drawn on the rival's rig)
 rivalLegs.incremental = M.World.world == "preserve"
-if rivalLegs.incremental then rivalLegs.Drive.prepare(RivalSpider.roam(), select(2, RivalSpider.arriveAt()) or M.World.home) end
+if rivalLegs.incremental then
+	rivalLegs.navigation = require(Shared.World.NavigationPreparation).new({
+		prepare = function() rivalLegs.Drive.prepare(RivalSpider.roam(), select(2, RivalSpider.arriveAt()) or M.World.home) end,
+		advance = rivalLegs.Drive.advance, pending = rivalLegs.Drive.pending,
+		air = require(Shared.World.StationAir),
+	})
+end
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
@@ -1395,7 +1401,7 @@ function saveState.frame()
 end
 
 controls = SpiderInput.bind({
-	blocked = function(): boolean return modal() or M.title:holding() end, -- (ROBLOX-109: the intro has the controls while it holds)
+	blocked = function(): boolean return (rivalLegs.navigation ~= nil and rivalLegs.navigation.status ~= "ready") or modal() or M.title:holding() end, -- Loading and the intro own the controls.
 	menu = function() if settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
@@ -1773,17 +1779,27 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
-	if rivalLegs.incremental then
-		rivalLegs.navOK, rivalLegs.navError = rivalLegs.Drive.advance()
-		if not rivalLegs.navOK and rivalLegs.navError ~= rivalLegs.navReported then
-			rivalLegs.navReported = rivalLegs.navError
-			warn("[Windowsill] surface route preparation: " .. tostring(rivalLegs.navError))
-		end
-		M.Prof.lap("surface routes")
-	end
+	-- Keep the save handshake/replies live while the loading screen owns play.
+	-- Applying progress/rest slots does not advance the simulation or capture it.
 	saveState.frame()
-	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	M.Prof.lap("save")
+	if rivalLegs.navigation and rivalLegs.navigation.status ~= "ready" then
+		rivalLegs.navStatus, rivalLegs.navError = rivalLegs.navigation:step()
+		M.Prof.lap("navigation startup")
+		if rivalLegs.navStatus ~= "ready" then
+			accumulator = 0 -- Loading time is never simulation time, even on a slow first frame.
+			controls:clear()
+			if rivalLegs.navStatus == "failed" and not rivalLegs.navReported then
+				rivalLegs.navReported = true
+				player:SetAttribute("WorldStartupFailed", true)
+				warn("[Windowsill] navigation startup: " .. tostring(rivalLegs.navError))
+			end
+			M.Prof.finish()
+			return
+		end
+	end
+	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.Prof.lap("appearance")
 	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
 	-- where it comes down is streamed in before the spiderling stands there)
 	M.World:update(if mateLegs.ride ~= nil and mateLegs.ride.at ~= nil then mateLegs.ride.at else motor.pos, rig.root, nil, frameDt)
@@ -1843,9 +1859,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
-			if M.World.world=="preserve" and wasp:useStationRules() then
-				task.spawn(function() wasp.station.prepare(function() task.wait() end) end)
-			end
+			if M.World.world=="preserve" then wasp:useStationRules() end
 			wasp.nature = not needs.gentle -- (ROBLOX-106: the standard rules' wasp: its windows slide, its visits vary and sometimes linger)
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
@@ -2360,7 +2374,7 @@ end)
 M.hooks = function(): any
 	return {
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
+			input = controls, rivalLegs = rivalLegs, navigation = rivalLegs.navigation, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
    rareBody=M.rareBody,rareHistory=M.rareHistory,rareDirector=M.RareDirector,
 			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,

@@ -1,0 +1,9 @@
+{
+  "strict_errors": 2,
+  "reason": "pcall inferred a void result; fixed explicit optional return",
+  "targeted": "outdoor and save-notice stopped at obsolete120-frame startup limit; minimal HUD54pass9fail before readiness; selftest preserve early looks assertion failed then remaining run deliberately stopped",
+  "stopped_runner": 25284,
+  "stopped_child": 30092,
+  "session": 50552,
+  "full_success": false
+}

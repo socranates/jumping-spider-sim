@@ -1,0 +1,20 @@
+{
+  "source": "9a1ca2554d1c484e9ac928f24b0da6ae5a429c8c",
+  "scope": "Unfinished A06 private observations and opt-in preview reads only",
+  "modules": 218,
+  "targeted_passed": 916,
+  "targeted_suites": 2,
+  "compile_passed": 218,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "transport_integrated": false,
+  "write_authority_integrated": false,
+  "menu_integrated": false,
+  "feature_complete": false,
+  "release_artifact_rebuilt": false,
+  "native_verified": false,
+  "online_verified": false,
+  "full_current_gates_verified": false,
+  "published": false,
+  "publication_ready": false
+}

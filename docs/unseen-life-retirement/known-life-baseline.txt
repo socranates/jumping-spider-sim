@@ -1,0 +1,5 @@
+KNOWN_LIFE_RETIRE	preserved=false	ack=true	state=active
+C:/Users/natha/AppData/Local/Temp/tmp1thomj1s/probe.luau:43389: a prior observation must not authorize retiring a different life
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp1thomj1s/probe.luau:43389

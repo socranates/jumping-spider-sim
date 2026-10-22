@@ -24,7 +24,7 @@ The shadow suite grows from 25 to **319 passing checks**: hidden, non-casting an
 
 Linux CI **39777487503** completed successfully at 2026-10-22T12:28:58Z for the exact candidate: **64 suites / 443,816 passed / zero failed**, all four tool-download checksums, 216 compilations, strict analysis and five runner regressions. Actual source-bound job metadata and logs are retained in `ci-final.json` and `ci-*.txt`.
 
-Full Windows is still live in exec session **78583**, writing `windows-full.txt` and only after exit `windows-full-process.json`. Revalidate that handle; a poll timeout is not termination. Expected Windows totals are 64 suites / **443,816** checks (294 more than the predecessor), but no Windows completion is claimed until its actual output and exit pass. The previous 443,522-check Windows gate does not cover this edit.
+Full Windows exec session **78583** has now terminated with exit zero: **64 suites / 443,816 passed / zero failed**. The complete closed log is retained in `windows-full.txt`; `windows-full-process.json` records the actual process result. The closed log was normalized to LF only after termination. `verify.py` independently checks the suite count, totals and zero failures; both full CLI gates now cover this candidate. Native execution remains a separate pending gate.
 
 ## Native status
 

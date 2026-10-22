@@ -9,8 +9,13 @@
   "linux_ci_run": 39777487503,
   "native_started": false,
   "native_verified": false,
-  "native_pending_reason": "Two fresh Studio startup attempts showed Low System Resources. Warnings dismissed without proceeding and unused app sessions closed. More headroom requested asynchronously.",
+  "native_pending_reason": "Two fresh Studio startup attempts showed Low System Resources. Warnings dismissed without proceeding and unused app sessions closed. More headroom requested asynchronously. After full Windows completion, free physical memory was 873664 KiB; no targetable Studio window was present on the latest inventory.",
   "intermediate_outputs": "candidate-owner-only and targeted-owner-only are earlier uncommitted intermediate source/test versions, not final-source receipts",
   "published": false,
-  "performance_claim": false
+  "performance_claim": false,
+  "windows_full_complete": true,
+  "windows_full_exit_code": 0,
+  "windows_full_suites": 64,
+  "windows_full_passed": 443816,
+  "windows_full_sha256": "8415458db0be4068f9243d17804dcf806aa7385db1bd278eea6aa6b8cb8f371d"
 }

@@ -78,7 +78,7 @@ panel:close()
 panel.io.set("Captions","normal");frames(2)
 local normalSize=driver.hud.caption.TextSize
 check(driver.hud.caption.Visible and string.find(driver.hud.caption.Text,"[a deep, heavy hum outside, ",1,true)~=nil,"Normal shows the real wasp caption through the minimal client HUD")
-for _,device in {"keyboard","controller","touch"} do driver.setDevice(device);frames(1);check(driver.hud.caption.Visible,"caption survives device "..device) end
+for _,device in {"keyboard","gamepad","touch"} do driver.setDevice(device);frames(1);check(driver.hud.caption.Visible,"caption survives device "..device) end
 panel.io.set("Captions","large");frames(2)
 check(driver.hud.caption.Visible and driver.hud.caption.TextSize>normalSize,"Large changes the real caption size")
 panel.io.set("Captions","off");frames(2)

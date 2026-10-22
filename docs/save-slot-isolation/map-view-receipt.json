@@ -1,0 +1,9 @@
+{
+  "source_sha256": "d0ea26ee6737d1ca0d9cfb04de6cf258fd7f5286dac3d61f9239db7d56581672",
+  "candidate_sha256": "b88b946c55a5c2f6c1540f830e8b35c989b54b13130f469758436d98b0a6a9c5",
+  "exit_code": 0,
+  "production_changed": false,
+  "integrated": false,
+  "migration_implemented": false,
+  "scope": "Private map-view CLI prototype only; no Checkpoint or save schema changes"
+}

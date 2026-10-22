@@ -1,0 +1,16 @@
+{
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "sequence": "1792711120720",
+  "creature_run": "1792711120726",
+  "prey_run": "1792711130110",
+  "assertions": 22,
+  "scripts": 225,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "output_sha256": "b1b9225dc5901c4bc1e8fa89aa34ce5924722c3be35317b6d74a80218a4ed7eb",
+  "place_sha256": "4e080a763a787be516756fbfe6ffd61cb0f6bbe93b77719be40a85dedd37191a",
+  "no_concurrent_cli": true,
+  "manual_ticks_while_menu_paused": true,
+  "scope": "Real client gate and cached PreyWorld objects, locally removed/restored geometry and manual ticks; no naturally induced server streaming or FPS proof",
+  "published": false
+}

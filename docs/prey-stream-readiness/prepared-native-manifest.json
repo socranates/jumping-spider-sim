@@ -1342,9 +1342,9 @@
     },
     {
       "path": "StarterPlayer.StarterPlayerScripts.Client.PreyReadinessMeasurement",
-      "length": 3637,
-      "adler32": 2001668202,
-      "sha256": "172261309f0ca37600ae2224d56069e825c3878d51c1a288afc7aa04a5548f83"
+      "length": 3936,
+      "adler32": 1495690695,
+      "sha256": "b0a4275f79c16a3c88b190c85f029513dd2ddd07be303309935e691f86b48a36"
     },
     {
       "path": "StarterPlayer.StarterPlayerScripts.Client.SilkPlayback",
@@ -1354,6 +1354,6 @@
     }
   ],
   "persistence_disabled": true,
-  "place_sha256": "5120c0240b248c8a1a88f3a1d7bdd816966625e4f7191516fd3b69b57f154d9e",
+  "place_sha256": "4e080a763a787be516756fbfe6ffd61cb0f6bbe93b77719be40a85dedd37191a",
   "scope": "Current actual client creature gate plus cached prey ticks/visibility/RNG through local geometry removal; both child PASS markers required; no natural network streaming or FPS proof; never publish"
 }

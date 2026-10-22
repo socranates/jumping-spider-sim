@@ -12,8 +12,14 @@ return function(d)
  local function check(ok,why) count+=1;assert(ok,why) end
  local ok,err=xpcall(function()
   print("[NATIVE_PREY_READY_BEGIN]",id)
-  local r=assert(Map.region("garden_b4"));local pw=d.world.prey
-  check(d.menu:isShowing() and d.world.region.id==r.id and d.world:regionReady(r.id),"requires paused ready predecessor fixture")
+  assert(d.menu:isShowing(),"requires paused predecessor fixture")
+  local r=assert(Map.region("garden_c3"));local pw=d.world.prey
+  d.place(r.spawn.pos+Vector3.yAxis*.31)
+  local deadline=os.clock()+30
+  while (d.world.region.id~=r.id or not d.world:regionReady(r.id)) and os.clock()<deadline do
+   d.world:report(r.spawn.pos,os.clock());Run.Heartbeat:Wait()
+  end
+  check(d.menu:isShowing() and d.world.region.id==r.id and d.world:regionReady(r.id),"requires paused ready milkweed fixture")
   local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={d.world.root}
   local cast=Sensor.workspaceCast(params);local sensor=Sensor.new(Memory.new());sensor:configureFrom(Species.phidippus_audax_prototype.perception)
   local at=d.motor.pos;local observer={eye=at+Vector3.yAxis*.09,gaze=Vector3.zAxis,up=Vector3.yAxis,heading=Vector3.zAxis}

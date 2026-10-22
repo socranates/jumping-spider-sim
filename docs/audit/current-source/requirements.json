@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T23:03:48.212238+00:00",
+  "as_of_utc": "2026-10-22T23:20:14.975310+00:00",
   "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
   "goal_complete": false,
   "published": false,
@@ -23,11 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "prey-readiness-focused-verified-full-pending",
-      "evidence_boundary": "Current032926f: independent5/0, garden256706/0, compile222/strict/runner5 pass. Linux39868843334 running; current Windows not started. Expected76/465388 remains unverified. Prior e51 Linux76/465383/0 terminal, its Windows43263 still live. Current native225-script sequence prepared, not run.",
+      "status": "linux-and-native-verified-windows-running",
+      "evidence_boundary": "Current032926f: independent5/0, garden256706/0, compile222/strict/runner5 pass. Linux39868843334 completed76/465388/0. Studio22 assertions/all225 fingerprints/zero CreatorErrors pass after correcting a no-prey fixture; first failed attempt retained. Current Windows7806 active. Prior e51 Windows/Linux76/465383/0 both terminal and historically verified.",
       "references": [
         "docs/prey-stream-readiness/README.md",
-        "docs/prey-stream-readiness/focused-receipt.json"
+        "docs/prey-stream-readiness/ci-final.json",
+        "docs/prey-stream-readiness/native-receipt.json"
       ]
     },
     {
@@ -293,9 +294,15 @@
   },
   "latest_readiness_milestone": {
     "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
-    "status": "cached-prey-focused-verified-native-and-full-pending",
+    "status": "cached-prey-linux-native-verified-windows-running",
     "evidence": "docs/prey-stream-readiness/README.md",
     "goal_complete": false,
     "published": false
+  },
+  "legacy_world_policy": {
+    "selected": "import-progress-into-preserve-with-complete-immutable-source-archive",
+    "user_delegated": true,
+    "implemented": false,
+    "design": "docs/save-slot-isolation/migration-design.md"
   }
 }

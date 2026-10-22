@@ -1,0 +1,22 @@
+{
+  "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+  "current_workspace_inputs_verified": false,
+  "historical_snapshot_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 465383,
+  "linux_suites": 76,
+  "linux_passed": 465383,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_readiness_assertions": 11,
+  "native_scripts": 223,
+  "natural_network_stream_out_verified": false,
+  "current_full_native_walkthrough_verified": false,
+  "prior_native_walkthrough_source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "prior_native_walkthrough_passed": 274,
+  "whole_game_fps_gain_proven": false,
+  "goal_complete": false,
+  "published": false
+}

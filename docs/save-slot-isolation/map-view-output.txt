@@ -1,0 +1,1 @@
+MAP_VIEW_PROTOTYPE passed=167 failed=0

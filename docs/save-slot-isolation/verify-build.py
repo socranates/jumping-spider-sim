@@ -11,7 +11,7 @@ def verify(path):
  expected={r['instance']:r['sha256'] for r in manifest['files']};found={};forbidden=[]
  def walk(item,parent=''):
   name=item.findtext("./Properties/string[@name='Name']") or item.attrib['class'];full=parent+'.'+name if parent else name
-  if name in {'ChetAdapterNativeSpec','ChetRetirementNativeSpec','ChetRetirementFixture','ChetIsolatedSaveLab','ChetIsolatedAdapterLab','SilkPlayback','PortTests'}:forbidden.append(full)
+  if name in {'ChetSlotNativeSpec','ChetSlotFixture','ChetAdapterNativeSpec','ChetRetirementNativeSpec','ChetRetirementFixture','ChetIsolatedSaveLab','ChetIsolatedAdapterLab','SilkPlayback','PortTests'}:forbidden.append(full)
   if item.attrib['class'] in {'Script','LocalScript','ModuleScript'}:
    assert full not in found,'duplicate script path: '+full
    text=item.findtext("./Properties/ProtectedString[@name='Source']")

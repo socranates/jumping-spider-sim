@@ -1,0 +1,19 @@
+{
+  "source_commit": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "source_log": "C:\\Users\\natha\\windowsill-publish\\docs\\save-slot-isolation\\native-source-log.txt",
+  "source_log_sha256": "ad24581bb031be1a2030cde47e990bde1b2270408d4665a8af859a34f4d6fa90",
+  "source_guard_pass": true,
+  "diagnostic_artifact_unchanged": true,
+  "probe_pass": true,
+  "probe_cases": 9,
+  "probe_checks": 110,
+  "native_record_canonical_chars": 2276508,
+  "selftest": {
+    "passed": 274,
+    "failed": 0,
+    "skipped": 0
+  },
+  "errors": [],
+  "passed": true,
+  "scope": "Native engine codec and local-memory SaveSession rejoin; foreground preserve self-test. Not actual client disconnect/rejoin or online DataStore evidence."
+}

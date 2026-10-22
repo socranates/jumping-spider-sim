@@ -47,6 +47,7 @@ return function(d)
  assert(Run:IsStudio() and game.PlaceId==0 and WS:GetAttribute("Benchmark")==true,"local benchmark only")
  assert(WS:GetAttribute("SelfTest")~=true and WS:GetAttribute("TestTarget")==false,"other diagnostics must be off")
  assert(Map.world()=="preserve","wrong world")
+ for _,key in {"Wasp","Cat","Bird","Frog"} do assert(WS:GetAttribute(key)==true,"predator disabled: "..key) end
  local runId=tostring(DateTime.now().UnixTimestampMillis)
  local role=assert(WS:GetAttribute("BenchmarkRole"));local revision=assert(WS:GetAttribute("BenchmarkSource"))
  local warm=WS:GetAttribute("BenchmarkWarmSeconds") or 15
@@ -87,6 +88,7 @@ return function(d)
    lua_mb=gcinfo()/1024,engine_mb=ask(function() return Stats:GetTotalMemoryUsageMb() end),
    instances=ask(function() return Stats.InstanceCount end),physics_fps=ask(function() return WS:GetRealPhysicsFPS() end),
    look_parts=if look then look:parts() else nil,look_builds=if look then look.builds else nil,
+   predators={wasp={enabled=d.wasp.enabled,state=d.wasp.state},cat={enabled=d.cat.enabled,state=d.cat.state},bird={enabled=d.bird.enabled,state=d.bird.state},frog={enabled=d.frog.enabled,state=d.frog.state},rival={state=d.life.rival and d.life.rival.state}},
    active=active,actors=actors,environment=Environment.sample(d.life.clock.day,d.life.clock.hour,914)}
  end
  local function compactSnapshot()
@@ -140,8 +142,9 @@ return function(d)
  end
  local ok,err=pcall(function()
   emit(runId,"header",{role=role,source=revision,tier=d.detail,engine=version(),warm_seconds=warm,sample_seconds=seconds,
-   viewport={viewport.X,viewport.Y},mode="Free",trace_seconds=trace,clock="normal active simulation; start/end clocks recorded",rain={rainDay,rainHour},
-   scope="seven static scenes plus three actual region crossings; desktop Studio; not phone evidence"})
+   harness_version=6,viewport={viewport.X,viewport.Y},mode="Free",trace_seconds=trace,clock="normal active simulation; start/end clocks recorded",rain={rainDay,rainHour},
+   predator_flags={Wasp=WS:GetAttribute("Wasp"),Cat=WS:GetAttribute("Cat"),Bird=WS:GetAttribute("Bird"),Frog=WS:GetAttribute("Frog")},
+   scope="seven static scenes, three seam probes and one continuous three-region walk; desktop Studio; not phone evidence"})
   for _,scene in scenes do
    freshScene(scene)
    local anchor=d.motor.pos;local region=d.world.region.id
@@ -164,6 +167,30 @@ return function(d)
     wait(2)
    end)
   end
+  -- Eighth audit scene: one uninterrupted real-input walk. No placement, reset or preloading during it.
+  assert(waitFor(function() return d.fresh("free",false,nil) end,30));d.camera.mouse=false;d.title.seen=true
+  d.life.clock.day,d.life.clock.hour=1,12;d.life:applyLight()
+  local start=Vector3.new(-60,Meadow.GROUND+HEIGHT,-550)
+  setAt("pad_a2",start,-Vector3.zAxis);wait(warm)
+  local path,order,seen={}, {}, {};local routeBegan=os.clock();local lastRead=-1;local routeElapsed=0
+  sample("walk_continuous",function()
+   d.input:simulate("Forward",true)
+   repeat
+    Run.Heartbeat:Wait()
+    local elapsed=os.clock()-routeBegan;local region=d.world.region.id
+    assert(d.motor.mode=="attached","continuous walk detached")
+    assert(math.abs(d.motor.pos.X-start.X)<1,"continuous walk drifted off course")
+    if not seen[region] then seen[region]=true;table.insert(order,region) end
+    if elapsed-lastRead>=1 then table.insert(path,{elapsed=elapsed,pos=xyz(d.motor.pos),region=region});lastRead=elapsed end
+    assert(elapsed<120,"continuous walk stalled")
+   until d.motor.pos.Z<=-720
+   d.input:simulate("Forward",false)
+   local elapsed=os.clock()-routeBegan;routeElapsed=elapsed
+   table.insert(path,{elapsed=elapsed,pos=xyz(d.motor.pos),region=d.world.region.id})
+   assert(elapsed>=60 and seen.pad_a2 and seen.pad_b2 and seen.pad_c2,"continuous walk too short or missing a required region")
+  end)
+  emit(runId,"continuous_route",{elapsed=routeElapsed,start=xyz(start),finish=xyz(d.motor.pos),distance=(d.motor.pos-start).Magnitude,
+   regions=order,path=path,placement_calls_during_walk=0,fresh_calls_during_walk=0,required_regions={"pad_a2","pad_b2","pad_c2"}})
   -- Optional continuous free-play region cycle: no fresh-life resets during the trace.
   if trace>0 then
    local began=os.clock();local nextMove=began;local nextRead=began;local index=0;local reads=0

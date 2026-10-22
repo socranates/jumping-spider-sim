@@ -126,7 +126,7 @@
     }
   },
   "offline_gates_pass": true,
-  "native_studio_verified": false,
+  "native_studio_verified": true,
   "actual_client_rejoin_verified": false,
   "performance_matrix_complete": false,
   "publication_ready": false,

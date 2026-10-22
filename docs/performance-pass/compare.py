@@ -7,22 +7,22 @@ p=argparse.ArgumentParser();p.add_argument('baseline');p.add_argument('candidate
 out=Path(a.out);assert not out.exists(),'choose a new report path'
 b,c=[json.loads(Path(name).read_text(encoding='utf-8')) for name in [a.baseline,a.candidate]]
 for r in [b,c]:
- assert r['complete'] and r['comparison_config'] and r['source_guard_verified'],'full-length verified run required'
+ assert r['complete'] and r['comparison_config'] and r['source_guard_verified'] and r.get('audit_scenes_complete') and r.get('workload_verified'),'full-length verified run including continuous three-region walk required'
  assert len({x['run'] for x in r['records']})==1,'one trial per input required'
 headers=[next(x['value'] for x in r['records'] if x['kind']=='header') for r in [b,c]]
 assert headers[0]['role']=='baseline' and headers[1]['role']=='candidate'
-for k in ['tier','viewport','engine','warm_seconds','sample_seconds','rain','mode','clock']:
+for k in ['predator_flags','harness_version','tier','viewport','engine','warm_seconds','sample_seconds','rain','mode','clock']:
  assert headers[0][k]==headers[1][k],('unmatched configuration',k)
 scenes={x['kind']:x['value'] for x in b['records'] if x['kind']!='header'}
 rows=[]
 for x in c['records']:
- if x['kind']=='header' or x['kind'].startswith('trace_'):continue
+ if x['kind'] in {'header','continuous_route'} or x['kind'].startswith('trace_'):continue
  left=scenes[x['kind']];right=x['value']
  for v in [left,right]:
   assert v['action_ok'] and v['focus_preserved'] and v['viewport_unchanged']
  diffs=[]
  for edge in ['before','after']:
-  for key in ['region','active','actors']:
+  for key in ['region','active','actors','predators']:
    if left[edge].get(key)!=right[edge].get(key):diffs.append(edge+'.'+key)
  rows.append({'scene':x['kind'],'baseline_frames':left['frames'],'candidate_frames':right['frames'],
  'mean_delta_ms':right['frames']['mean_ms']-left['frames']['mean_ms'],

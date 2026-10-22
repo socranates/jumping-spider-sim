@@ -1,0 +1,11 @@
+{
+  "source_commit": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "evidence_id": "1984fdd8e8dee0ad",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-slot-isolation-1984-native-review\\Windowsill-slot-isolation-review.rbxlx",
+  "sha256": "cb1180f0c2a460cb369d78d1e4a8dba0beb24a1188fa5c10a30da90aa718d15c",
+  "guard_path": "C:\\Users\\natha\\claude-xfer\\Windowsill-slot-isolation-1984-native-review\\source-guard.luau",
+  "helper_sha256": "0f4c5a72ce6965c84e66e590a3df1a5735ffb3ab00320ab17834df6fa20a8e86",
+  "fixture_sha256": "d7743248887c9529da805472022ea40f8c8a61bc3d387e6888128007e094b86f",
+  "diagnostic_only": true,
+  "never_publish": true
+}

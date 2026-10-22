@@ -1,0 +1,32 @@
+[
+  {
+    "path": "roblox_port\\TheWindowsillTests.rbxlx",
+    "refused": true,
+    "reason": "diagnostic content: ServerScriptService.PortTests, StarterPlayer.StarterPlayerScripts.Client.SilkPlayback"
+  },
+  {
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-slot-isolation-1984-native-review\\Windowsill-slot-isolation-review.rbxlx",
+    "refused": true,
+    "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+  },
+  {
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\baseline-full.rbxlx",
+    "refused": true,
+    "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+  },
+  {
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\baseline-low.rbxlx",
+    "refused": true,
+    "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+  },
+  {
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\candidate-full.rbxlx",
+    "refused": true,
+    "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+  },
+  {
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-3647a94-v6\\candidate-low.rbxlx",
+    "refused": true,
+    "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+  }
+]

@@ -52,7 +52,7 @@ for role,(src,revision) in sources.items():
  for tier in ["full","low"]:
   project=json.loads((port/"default.project.json").read_text(encoding="utf-8"));absolute_paths(project,port)
   tree=project["tree"];tree["StarterPlayer"]["StarterPlayerScripts"]["Client"]["SilkPlayback"]={"$path":str(driver)}
-  tree["Workspace"]["$attributes"]={"World":"preserve","Detail":tier,"SelfTest":False,"TestTarget":False,"Benchmark":True,"BenchmarkRole":role,"BenchmarkSource":revision,"BenchmarkWarmSeconds":15,"BenchmarkSampleSeconds":20,"BenchmarkTraceSeconds":0}
+  tree["Workspace"]["$attributes"]={"World":"preserve","Detail":tier,"SelfTest":False,"TestTarget":False,"Wasp":True,"Cat":True,"Bird":True,"Frog":True,"Benchmark":True,"BenchmarkRole":role,"BenchmarkSource":revision,"BenchmarkWarmSeconds":15,"BenchmarkSampleSeconds":20,"BenchmarkTraceSeconds":0}
   target=out/(role+"-"+tier+".rbxlx");config=out/(role+"-"+tier+".project.json")
   config.write_text(json.dumps(project,indent=2),encoding="utf-8")
   subprocess.run([a.rojo,"build",str(config),"-o",str(target)],check=True)
@@ -69,6 +69,7 @@ for role,(src,revision) in sources.items():
   guard+='local n=0;for _,r in expected do local it=game;for part in string.gmatch(r[1],"[^.]+") do it=assert(it:FindFirstChild(part),r[1]) end;local text=string.gsub(it.Source,"\\r\\n","\\n");local a,b=1,0;for i=1,#text do a=(a+string.byte(text,i))%65521;b=(b+a)%65521 end;assert(#text==r[2] and b*65536+a==r[3],"SOURCE_MISMATCH "..r[1]);n+=1 end;'
   guard+='local total=0;for _,folder in {game.ReplicatedFirst,game.ReplicatedStorage.Shared,game.ServerScriptService.Server,game.StarterPlayer.StarterPlayerScripts.Client} do for _,it in folder:GetDescendants() do if it:IsA("LuaSourceContainer") then total+=1 end end end;assert(total==n);'
   guard+='assert(workspace:GetAttribute("SelfTest")==false and workspace:GetAttribute("TestTarget")==false and workspace:GetAttribute("BenchmarkSource")=='+json.dumps(revision)+' and workspace:GetAttribute("Detail")=='+json.dumps(tier)+');'
+  guard+='for _,key in {"Wasp","Cat","Bird","Frog"} do assert(workspace:GetAttribute(key)==true,"PREDATOR_DISABLED "..key) end;'
   guard+='print("[CHET_PERF_SOURCE_GUARD]",'+json.dumps(role)+','+json.dumps(revision)+','+json.dumps(tier)+',n,total,'+json.dumps(manifest['driver_sha256'])+')'
   target.with_suffix('.guard.luau').write_text(guard,encoding="utf-8",newline="\n")
   manifest["profiles"].append({"role":role,"tier":tier,"path":str(target),"sha256":hashlib.sha256(target.read_bytes()).hexdigest(),"production_modules":len(rows[role]),"extra_diagnostic_modules":1,"published":False})

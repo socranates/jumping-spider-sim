@@ -57,6 +57,44 @@ for line in guards:
   guard_rows.append({"role":role,"source":revision,"tier":tier,"passed":good,"modules":int(n),"driver_sha256":driver_hash})
 source_guard_verified=bool(headers) and all(any(g["passed"] and all(g[k]==h["value"][k] for k in ["role","source","tier"]) for g in guard_rows) for h in headers)
 complete=complete and source_guard_verified
-result={"source_log":str(source.resolve()),"manifest":str(Path(a.manifest).resolve()),"guards":guard_rows,"source_guard_verified":source_guard_verified,"complete":complete,"comparison_config":comparison_config,"incomplete":incomplete,"failures":failures,"records":results}
+# A complete v5 smoke does not prove the audit's eighth continuous-walk scene.
+audit_routes=[]
+for h in headers:
+ run=h["run"];records={r["kind"]:r["value"] for r in results if r["run"]==run}
+ route=records.get("continuous_route");walk=records.get("walk_continuous")
+ good=False
+ if route and walk and h["value"].get("harness_version")==6:
+  path=route.get("path",[]);required=["pad_a2","pad_b2","pad_c2"]
+  good=(route.get("regions")==required and route.get("required_regions")==required and route.get("elapsed",0)>=60
+   and walk.get("elapsed",0)>=60 and sum(walk.get("frame_times_ms",[]))/1000>=58 and abs(walk["elapsed"]-route["elapsed"])<1
+   and route.get("distance",0)>=169.5 and route.get("placement_calls_during_walk")==route.get("fresh_calls_during_walk")==0
+   and walk.get("action_ok") is True and walk.get("focus_preserved") is True and walk.get("viewport_unchanged") is True
+   and len(path)>=50 and path[0].get("elapsed",99)<=2 and abs(path[-1].get("elapsed",0)-route["elapsed"])<1)
+  if good:
+   for point in path:
+    pos=point.get("pos",[])
+    if len(pos)!=3 or not all(isinstance(v,(float,int)) and math.isfinite(v) for v in pos) or abs(pos[0]+60)>=1 or abs(pos[1]+84.29)>.5:good=False
+   for before,after in zip(path,path[1:]):
+    dt=after["elapsed"]-before["elapsed"]
+    distance=math.dist(before["pos"],after["pos"])
+    if not 0<dt<=2 or distance>5*dt+.5 or after["pos"][2]>before["pos"][2]+.1:good=False
+  if good:good=path[0]["region"]=="pad_a2" and path[-1]["region"]=="pad_c2" and path[-1]["pos"][2]<=-720
+ audit_routes.append({"run":run,"passed":bool(good)})
+ if h["value"].get("harness_version",0)>=6:complete=complete and bool(good)
+audit_scenes_complete=bool(audit_routes) and all(r["passed"] for r in audit_routes)
+workloads=[]
+for h in headers:
+ records=[r["value"] for r in results if r["run"]==h["run"] and "frame_times_ms" in r["value"]]
+ good=h["value"].get("predator_flags")=={name:True for name in ["Wasp","Cat","Bird","Frog"]} and bool(records)
+ for value in records:
+  for edge in ["before","after"]:
+   predators=value.get(edge,{}).get("predators",{})
+   if not all(predators.get(name,{}).get("enabled") is True for name in ["wasp","cat","bird","frog"]):good=False
+ workloads.append({"run":h["run"],"passed":good})
+ if h["value"].get("harness_version",0)>=6:complete=complete and good
+workload_verified=bool(workloads) and all(r["passed"] for r in workloads)
+
+
+result={"source_log":str(source.resolve()),"manifest":str(Path(a.manifest).resolve()),"guards":guard_rows,"source_guard_verified":source_guard_verified,"complete":complete,"comparison_config":comparison_config,"audit_scenes_complete":audit_scenes_complete,"audit_routes":audit_routes,"workload_verified":workload_verified,"workloads":workloads,"incomplete":incomplete,"failures":failures,"records":results}
 target.write_text(json.dumps(result,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"complete":complete,"comparison_config":comparison_config,"source_guard_verified":source_guard_verified,"records":len(results),"incomplete":incomplete,"failures":failures},indent=2))

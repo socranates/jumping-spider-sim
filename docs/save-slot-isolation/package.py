@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib,json,subprocess,zipfile
 ROOT=Path(__file__).resolve().parents[2]
 OUT=Path(__file__).resolve().parent
-DEST=Path(r"C:\Users\natha\claude-xfer\Windowsill-save-slot-isolation-1984fdd8e8dee0ad-candidate.zip")
+DEST=Path(r"C:\Users\natha\claude-xfer\Windowsill-save-slot-isolation-1984fdd8e8dee0ad-native-verified.zip")
 refs={".gitattributes",".gitignore",".github/workflows/roblox-port.yml","README.md","docs/DECISIONS.md","docs/NOTEBOOK_SOURCES.md","data/notebook/pages.json","chet/foundation-audit.md","chet/save-compaction.md","chet/life-retirement.md","chet/save-adapter-errors.md","chet/save-slot-isolation.md"}
 prefixes=("roblox_port/","docs/audit/","docs/save-compaction/","docs/life-retirement/","docs/save-adapter-errors/","docs/save-slot-isolation/","docs/performance-pass/")
 paths=set(subprocess.check_output(["git","ls-files"],cwd=ROOT,text=True).splitlines())

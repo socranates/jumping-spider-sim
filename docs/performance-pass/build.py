@@ -1,14 +1,13 @@
 """Build isolated matched baseline/candidate profiling places. Never publishes.
-Usage: python docs/performance-pass/build.py --rojo ABS_EXE --out ABS_NEW_DIR
+Usage: python docs/performance-pass/build.py --rojo ABS_EXE --out ABS_NEW_DIR --candidate-ref FROZEN_COMMIT
 All source is verified against Git blobs. The baseline archive is read-only input thereafter.
 """
 from pathlib import Path
 import argparse,hashlib,json,subprocess,zipfile,zlib
 ROOT=Path(__file__).resolve().parents[2]
 BASE="14e60991c785c4293c3560e6d8b7ecded7e7ac75"
-CAND="5cf7b4c0f212082342574763aaf5b19e00c4e323"
-parser=argparse.ArgumentParser();parser.add_argument("--rojo",required=True);parser.add_argument("--out",required=True)
-a=parser.parse_args();out=Path(a.out).resolve();assert out.is_absolute() and not out.exists(),"choose a new output directory"
+parser=argparse.ArgumentParser();parser.add_argument("--rojo",required=True);parser.add_argument("--out",required=True);parser.add_argument("--candidate-ref",required=True)
+a=parser.parse_args();CAND=subprocess.check_output(["git","rev-parse",a.candidate_ref+"^{commit}"],cwd=ROOT,text=True).strip();out=Path(a.out).resolve();assert out.is_absolute() and not out.exists(),"choose a new output directory"
 out.mkdir(parents=True)
 archive=out/"baseline-source.zip"
 subprocess.run(["git","archive","--format=zip","--output="+str(archive),BASE,"roblox_port"],cwd=ROOT,check=True)

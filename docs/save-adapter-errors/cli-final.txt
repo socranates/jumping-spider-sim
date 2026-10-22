@@ -699,3 +699,68 @@ PRESERVE passed=1154 failed=0
 [SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
 [SELFTEST] PASS the robin
 [SELFTEST] ... the field crickets (483 s in)
+[SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+[SELFTEST] PASS the field crickets
+[SELFTEST] ... ballooning's landings (488 s in)
+[SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+[SELFTEST] PASS ballooning's landings
+[SELFTEST] ... the mown path and the boardwalk (493 s in)
+[SELFTEST] ... the mown path and the boardwalk (498 s in)
+[SELFTEST] ... the mown path and the boardwalk (503 s in)
+[SELFTEST] ... the mown path and the boardwalk (508 s in)
+[SELFTEST] ... the mown path and the boardwalk (513 s in)
+[SELFTEST] ... the mown path and the boardwalk (518 s in)
+[SELFTEST] ... the mown path and the boardwalk (523 s in)
+[SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n1 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+[SELFTEST] PASS the mown path and the boardwalk
+[SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+[SELFTEST] PASS the water
+[SELFTEST] ... the pond's life (528 s in)
+[SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+[SELFTEST] PASS the pond's life
+[SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+[SELFTEST] PASS the green frog
+[SELFTEST] PASS the nursery: the window put back
+[SELFTEST] PASS notebook
+[SELFTEST] ... rest and checkpoint (533 s in)
+[SELFTEST] PASS rest and checkpoint
+[SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+[SELFTEST] PASS sound
+[SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill: 300 frames, the render step 10.63 ms a frame (worst 33.3): spider rig 4.74/18.0, fly bodies 1.45/8.2, sound 0.98/5.6, wasp 0.81/1.4, light 0.51/2.6, senses 0.50/2.3, camera 0.41/1.2, other rigs 0.33/5.8, hud 0.26/0.5, prey 0.16/0.9, rival 0.14/0.4, life 0.10/0.3, small 0.24 (mean/worst ms); a frame: spider parts placed 658, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2621 KB a frame (percepts 2, senses 79, prey 23, motor 5, nature 3, wasp 35, rival 12, life 3, camera 99, light 148, poses 2, spider rig 1370, other rigs 84, hud 8, lock button 4, fly bodies 484, sound 258)
+[SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 351.6 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census on the sill: 6218 parts, 899 see-through, 494 casting shadows, 1201 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 721/149/42/388, Flies 156/52/0/68, JumpArc 34/0/0/0, LivingHabitat 231/32/3/95, PondAnimals 43/4/0/43, RivalSpider 211/112/60/44, Robin 24/0/0/20, Spider 707/514/86/94, World 2466/1/207/0, WorldDecor 1493/35/64/359, the rest 24/0/0/16)
+[SELFTEST] INFO shadows on the sill: 1491 of 2430 visible walkable boxes cast, 939 too small to see at their distance cast none (305 passes, 32157 writes)
+[SELFTEST] INFO frame time on the sill without the far preserve: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without the far preserve: 180 frames, the render step 12.30 ms a frame (worst 172.4): spider rig 4.68/16.7, fly bodies 1.54/7.6, other rigs 1.39/6.8, rival 1.03/163.3, sound 1.01/5.8, light 0.64/4.6, senses 0.47/13.4, wasp 0.40/1.3, camera 0.38/1.3, hud 0.26/0.4, prey 0.17/0.7, life 0.10/0.3, small 0.23 (mean/worst ms); a frame: spider parts placed 657, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3178 KB a frame (percepts 2, senses 66, prey 23, motor 4, nature 2, wasp 33, rival 270, life 3, camera 94, light 190, poses 2, spider rig 1357, other rigs 374, hud 8, lock button 4, fly bodies 488, sound 257)
+[SELFTEST] INFO engine on the sill without the far preserve: memory ? MB, Lua heap 312.7 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO frame time on the sill without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without shadows: 180 frames, the render step 11.40 ms a frame (worst 34.1): spider rig 4.30/15.4, other rigs 1.64/5.8, fly bodies 1.26/6.8, sound 0.92/5.5, wasp 0.81/1.5, light 0.62/3.3, senses 0.53/16.3, camera 0.39/1.3, hud 0.25/0.4, prey 0.20/0.6, rival 0.15/0.4, life 0.10/0.2, small 0.24 (mean/worst ms); a frame: spider parts placed 643, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3065 KB a frame (percepts 2, senses 80, prey 27, motor 4, nature 3, wasp 35, rival 12, life 3, camera 99, light 196, poses 2, spider rig 1378, other rigs 490, hud 8, lock button 4, fly bodies 459, sound 261)
+[SELFTEST] INFO engine on the sill without shadows: memory ? MB, Lua heap 362.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO the far preserve on the sill: mean ? ms as it is, ? ms without the far preserve (181 folders, 2334 parts out), ? ms without shadows
+[SELFTEST] PASS frame time on the sill
+[SELFTEST] INFO parts at the full tier: 6218 in the workspace (Cat 62, CrabSpiders 46, Decor 721, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, LivingHabitat 231, PondAnimals 43, RivalSpider 211, Robin 24, Spider 707, StationMouse 16, StreetLamp 1, WindowsillAudio 5, World 2466, WorldDecor 1493)
+[SELFTEST] INFO looks outside the window: 1493 parts held of 1493 planned at the full tier, 149135 made and 147618 destroyed this session, 526 plans
+[SELFTEST] PASS part counts
+[SELFTEST] ... fallbacks clear the shelf books and station boots (545 s in)
+[SELFTEST] PASS fallbacks clear the shelf books and station boots
+[SELFTEST] ... visible meal and contextual controls (551 s in)
+[SELFTEST] PASS visible meal and contextual controls
+[SELFTEST] PASS Normal starvation reaches the life-ending handler
+[SELFTEST] INFO took 552 s
+[SELFTEST] END pass=274 fail=0 skip=0
+selftest_preserve: the run took 553.0 s of play (33149 frames)
+SELFTEST_PRESERVE passed=7 failed=0
+SHADOWS: the test garden from the sill, 0 of 23 visible boxes cast none
+SHADOWS passed=25 failed=0
+BODIES passed=908 failed=0
+LIVING_WORLD passed=3978 failed=0
+STATION physical parts=391 regions=51
+STATION wasp circuit visited=14/16
+STATION passed=32883 failed=0
+MINIMAL passed=37 failed=0
+COMPACT passed=295 failed=0 regions=233
+VERGE_LITTER passed=11258 failed=0 shelters=98 colliders=388
+ROUTE_PREPARATION passed=11971 failed=0 slices=5899
+DOG_GAIT passed=29959 failed=0 planted=2604 swing=1918
+STATION DEBUG passed=38 failed=0

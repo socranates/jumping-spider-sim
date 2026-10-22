@@ -12,5 +12,8 @@
   "published": false,
   "native_codec_memory_probe_pass": true,
   "ci_result": "success: 62 suites / 443235 checks",
-  "native_window_closed": true
+  "native_window_closed": true,
+  "windows_exit_code": 0,
+  "windows_result": "62 suites / 443235 passed",
+  "all_verification_runs_completed": true
 }

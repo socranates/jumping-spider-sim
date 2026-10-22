@@ -9,12 +9,17 @@
   "compile_fingerprints_match": true,
   "computed_evidence_id": "e50104232f063255",
   "local_cli": {
-    "completed_summaries": 51,
-    "passed": 351876,
+    "completed_summaries": 62,
+    "passed": 443235,
     "failed": 0,
     "failure_lines": []
   },
-  "local_process": null,
+  "local_process": {
+    "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+    "evidence_id": "e50104232f063255",
+    "exit_code": 0,
+    "finished_at": "2026-10-22T06:49:53.5947775Z"
+  },
   "ci": {
     "id": 39733574738,
     "head_sha": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
@@ -44,7 +49,7 @@
     "matched_scripts": 216,
     "diagnostic_content": false
   },
-  "offline_gates_pass": false,
+  "offline_gates_pass": true,
   "online_store_attempt": {
     "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
     "evidence_id": "e50104232f063255",

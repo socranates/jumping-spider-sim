@@ -18,9 +18,9 @@ All 175 candidate modules used by this probe were checked against frozen source 
 
 This is not a real player disconnect/rejoin test. Keep that gate separate.
 
-## Running verification
+## Completed verification
 
-Linux Actions run 39733574738 completed successfully for the frozen source: **62 suites / 443,235 checks passed**, with strict analysis, compilation and runner regressions green. The foreground local native preserve run matched 216/216 source fingerprints before Play and completed **274/0/0** at 2026-10-22T06:40:10Z. Its native codec/session probe passed with the full synthetic checkpoint, and no CreatorError or script timeout was recorded in the guarded run. Windows exec **24276** is still live: wait for its actual exit and 62-suite / 443,235-check total.
+Linux Actions run 39733574738 completed successfully for the frozen source: **62 suites / 443,235 checks passed**, with strict analysis, compilation and runner regressions green. The foreground local native preserve run matched 216/216 source fingerprints before Play and completed **274/0/0** at 2026-10-22T06:40:10Z. Its native codec/session probe passed with the full synthetic checkpoint, and no CreatorError or script timeout was recorded in the guarded run. Windows exec **24276** completed with exit **0** at 06:49:53Z: **62 suites / 443,235 checks passed**, with no failure lines. `cli-process.json` and `cli-final.txt` record the actual terminal result.
 
 `runs.json` stores the handles. `verify.py` recomputes source/build evidence and leaves missing gates false. The local review file listed in `native-review.json` contains a diagnostic helper and synthetic fixture and **must never be published**. Production XML is generated separately. The active optimization goal remains open: legacy-world/per-slot safety, overlapping-session UX, route activation, captions and controlled performance/manual checks still need work.
 

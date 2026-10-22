@@ -1,0 +1,67 @@
+{
+  "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
+  "run_id": "1792690283994",
+  "cases": [
+    {
+      "index": 1,
+      "name": "rejected unseen retirement releases its acquired lease without changing any saved life",
+      "assertions_so_far": 21
+    },
+    {
+      "index": 2,
+      "name": "session-only cleanup preserves progress, backup and unknown envelope metadata",
+      "assertions_so_far": 26
+    },
+    {
+      "index": 3,
+      "name": "lease cleanup refuses another owner even when its beat is stale",
+      "assertions_so_far": 30
+    },
+    {
+      "index": 4,
+      "name": "retried cleanup callback rechecks the latest owner",
+      "assertions_so_far": 32
+    },
+    {
+      "index": 5,
+      "name": "cleanup retries transient failure with backoff and resolves a lost success response",
+      "assertions_so_far": 42
+    },
+    {
+      "index": 6,
+      "name": "metadata cleanup follows request budget and cannot renew a lease while waiting",
+      "assertions_so_far": 45
+    },
+    {
+      "index": 7,
+      "name": "unknown or damaged progress is never rewritten just to remove its lock",
+      "assertions_so_far": 51
+    },
+    {
+      "index": 8,
+      "name": "successful explicit reload cancels stale cleanup and keeps the renewed active lease",
+      "assertions_so_far": 54
+    },
+    {
+      "index": 9,
+      "name": "departure cleanup preserves dirty candidates and respects its deadline",
+      "assertions_so_far": 62
+    }
+  ],
+  "case_count": 9,
+  "assertions": 62,
+  "creator_errors": 0,
+  "creator_warnings": 1,
+  "place_sha256": "0b5008273f6d694b5e3287bca950c109ec48e70dc941a978164c4b6717c3d712",
+  "probe_sha256": "f231b9c86aaa7a57e988ca9c85a3594a298db4d87548f1dc09fd2a7d3c2a3c36",
+  "fixture_sha256": "9863eab810bf859174da02ca67fec43a375def6cb670cf8bb026c6a6b48c6ee2",
+  "output_sha256": "298e9f944e63a8a43dcada0966dc0a25567973933708d29f3dedc0a9f7384bac",
+  "persistence_disabled": true,
+  "native_synthetic_cleanup_verified": true,
+  "online_save_accessed": false,
+  "online_rejoin_verified": false,
+  "device_verified": false,
+  "performance_verified": false,
+  "published": false,
+  "scope": "Actual native preserve captures for Normal/Free/Easy, then nine synthetic MemoryBackend session cases through Studio-only playback. No online DataStore, physical device, network or performance proof."
+}

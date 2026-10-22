@@ -1306,12 +1306,12 @@
     },
     {
       "path": "StarterPlayer.StarterPlayerScripts.Client.SilkPlayback",
-      "length": 10866,
-      "adler32": 2587166318,
-      "sha256": "f65be0b3d32628cc758f3f72cf9af44377db137c6397e367d39d910f6e5b1765"
+      "length": 10988,
+      "adler32": 752824579,
+      "sha256": "f231b9c86aaa7a57e988ca9c85a3594a298db4d87548f1dc09fd2a7d3c2a3c36"
     }
   ],
   "persistence_disabled": true,
-  "place_sha256": "d686ccfa169bb7c21937d276795cd17e7b2b7bc288969cbdfd50ce476d447a9b",
+  "place_sha256": "0b5008273f6d694b5e3287bca950c109ec48e70dc941a978164c4b6717c3d712",
   "scope": "Native captures through Studio playback hook; nine synthetic MemoryBackend cleanup cases. Persistence disabled; no online save/device/network/FPS claim; never publish"
 }

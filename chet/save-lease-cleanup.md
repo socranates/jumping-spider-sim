@@ -1,3 +1,11 @@
+## Native cleanup verified, 2026-10-22
+
+Guarded Studio run1792690283994 passed9 cases/62 assertions on exact production sourcee315b3a. The probe captured valid Normal/Free/Easy preserve checkpoints before exercising isolated MemoryBackend sessions. Production Persistence was disabled, PlaceId0 and all218 scripts fingerprinted before playback. Zero Creator errors; one asset-type warning for203785492 was retained without claiming its owner is known. This establishes native synthetic cleanup, not live DataStore/rejoin, physical devices, frame-rate improvement or publication.
+
+The initial run1792690129203 stopped after6 cases/45 assertions: its helper tried to JSON-encode an intentionally missing backend value. `native-first-attempt/` retains the failure and original probe/guard/manifest. Only the probe helper changed to compare missing values explicitly; the production source and all9 case bodies stayed identical. The passing v2 place is0b5008273f6d694b5e3287bca950c109ec48e70dc941a978164c4b6717c3d712. Both full Windows/Linux gates remain65 suites/443946 each on sourcee315b3a.
+
+The newer server milestone in `C:/Users/natha/windowsill-save-continue`, branch `codex/save-continue`, is source2d184ee with219 modules and1,319 focused checks. Its real client/menu integration is still unfinished; this native result does not verify that newer source. Earlier pending-status paragraphs below are historical.
+
 # Save lease cleanup handoff
 
 Source `e315b3a048fddd1729461fb92502f73b7d8e2b94`, evidence `b425324a7f0a8007`, branch `codex/save-lease-cleanup`. Unpublished; the overall audit remains active. Start with `docs/save-lease-cleanup/README.md` and `docs/audit/CURRENT.md`.

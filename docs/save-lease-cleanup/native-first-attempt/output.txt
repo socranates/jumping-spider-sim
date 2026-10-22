@@ -1,0 +1,12 @@
+2026-10-22T17:28:31.538Z,156.538177,7688,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_GUARD] e315b3a048fddd1729461fb92502f73b7d8e2b94 218 persistence_disabled
+2026-10-22T17:28:41.050Z,166.050873,7ca0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T17:28:41.061Z,166.061829,7ca0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T17:28:48.750Z,173.750168,1378,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_BEGIN] 1792690129203
+2026-10-22T17:28:49.094Z,174.094254,6824,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T17:28:56.832Z,181.832642,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 1 rejected unseen retirement releases its acquired lease without changing any saved life 21
+2026-10-22T17:28:56.833Z,181.833633,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 2 session-only cleanup preserves progress, backup and unknown envelope metadata 26
+2026-10-22T17:28:56.834Z,181.834625,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 3 lease cleanup refuses another owner even when its beat is stale 30
+2026-10-22T17:28:56.835Z,181.835617,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 4 retried cleanup callback rechecks the latest owner 32
+2026-10-22T17:28:56.838Z,181.838593,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 5 cleanup retries transient failure with backoff and resolves a lost success response 42
+2026-10-22T17:28:56.839Z,181.839584,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690129203 6 metadata cleanup follows request budget and cannot renew a lease while waiting 45
+2026-10-22T17:28:56.841Z,181.841568,4a88,6,Warning [FLog::CreatorWarning] Warning: [LEASE_CLEANUP_NATIVE_FAIL] 1792690129203 Players.socranates.PlayerScripts.Client.SilkPlayback:18: value: a nil

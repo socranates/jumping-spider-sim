@@ -10,7 +10,7 @@
   "windows_full_complete": true,
   "published": false,
   "windows_full_session_id": 31770,
-  "native_attempt": "Studio Low System Resources before opening diagnostic; declined and exited; no native cases executed",
+  "native_attempt": "v1 helper failed on intentional nil; retained. v2 passed9 cases/62 assertions with no production change",
   "studio_closed": true,
   "linux_passed": 443946,
   "linux_failed": 0,
@@ -19,5 +19,8 @@
   "windows_passed": 443946,
   "windows_failed": 0,
   "windows_suites": 65,
-  "windows_log_sha256": "812367cba1c4e69f10828d67da2d9906308cb036a528a44570512d65b0e6bdb0"
+  "windows_log_sha256": "812367cba1c4e69f10828d67da2d9906308cb036a528a44570512d65b0e6bdb0",
+  "native_synthetic_cleanup_verified": true,
+  "native_synthetic_cleanup_assertions": 62,
+  "native_run_id": "1792690283994"
 }

@@ -15,7 +15,8 @@ return function(d)
  local checks,cases=0,0
  local function check(ok,why) checks+=1;assert(ok,why) end
  local function case(name,fn) fn();cases+=1;print("[LEASE_CLEANUP_NATIVE_CASE]",runId,cases,name,checks) end
- local function canon(value) return assert(Json.canonical(value)) end
+ -- Missing backend values are compared explicitly; nil is not a JSON document.
+ local function canon(value) if value==nil then return "<missing>" end;return assert(Json.canonical(value)) end
  local function prog(ids) local p=SaveProgress.default();p.notebook.opened=Json.copy(ids);return p end
  local function newEnv()
   local e={t=100000,backend=MemoryBackend.new(),logs={}}

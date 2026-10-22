@@ -1,0 +1,22 @@
+FAIL MINIMAL minimal view keeps only the sound caption
+FAIL MINIMAL caption retains its fade
+FAIL MINIMAL large accessibility caption retains its text scale
+FAIL MINIMAL preserve defaults and reset are wordless
+FAIL MINIMAL invalid choice falls back to preserve default
+FAIL MINIMAL invalid choice falls back to preserve default
+FAIL MINIMAL invalid choice falls back to preserve default
+FAIL MINIMAL unset preserve captions are off
+FAIL MINIMAL untouched real client uses preserve caption default
+FAIL MINIMAL menu reports the actual preserve default
+FAIL MINIMAL Normal shows the real wasp caption through the minimal client HUD
+FAIL MINIMAL caption survives device keyboard
+FAIL MINIMAL caption survives device controller
+FAIL MINIMAL caption survives device touch
+FAIL MINIMAL Large changes the real caption size
+FAIL MINIMAL Normal can reenable an ongoing sound
+FAIL MINIMAL Reset uses preserve Off rather than legacy Normal
+MINIMAL passed=46 failed=17
+C:/Users/natha/AppData/Local/Temp/tmp1p7byzk2.luau:57445: minimal HUD checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp1p7byzk2.luau:57445

@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import subprocess
+import shutil
 import zipfile
 import zlib
 
@@ -64,10 +65,16 @@ cached = replace(cached, "rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5
 for name, text in [("RigMeasured", measured), ("RigCached", cached)]:
     (out / (name + ".luau")).write_text(text, encoding="utf-8", newline="\n")
 
+# A second Rig node beside the directory-backed Shared path creates duplicate
+# folders in Rojo, even though every script path remains unique. Use one tree.
+shared = out / "shared-source"
+shutil.copytree(frozen / "roblox_port/src/Shared", shared)
+for name in ("RigMeasured", "RigCached"):
+    shutil.copyfile(out / (name + ".luau"), shared / "Rig" / (name + ".luau"))
+
 project = {"name": "WindowsillRigExperimentNeverPublish", "tree": {
     "$className": "DataModel",
-    "ReplicatedStorage": {"Shared": {"$path": str(frozen / "roblox_port/src/Shared"),
-        "Rig": {"$className": "Folder", "RigMeasured": {"$path": str(out / "RigMeasured.luau")}, "RigCached": {"$path": str(out / "RigCached.luau")}}}},
+    "ReplicatedStorage": {"Shared": {"$path": str(shared)}},
     "StarterPlayer": {"StarterPlayerScripts": {"RigExperiment": {"$path": str(HERE / "driver.client.luau")}}},
     "Players": {"$properties": {"CharacterAutoLoads": False}},
     "Workspace": {"$properties": {"StreamingEnabled": False}, "$attributes": {"RigExperiment": True, "RigSource": SOURCE}},
@@ -80,12 +87,15 @@ subprocess.run([a.rojo, "build", str(config), "-o", str(place)], check=True)
 import xml.etree.ElementTree as ET
 root = ET.parse(place).getroot()
 rows = []
+instance_paths = set()
 
 
 def walk(item, path=""):
     props = item.find("Properties")
     name = props.find("string[@name='Name']").text
     path = path + "." + name if path else name
+    assert path not in instance_paths, "duplicate instance path: " + path
+    instance_paths.add(path)
     code = props.find("*[@name='Source']")
     if code is not None:
         text = (code.text or "").replace("\r\n", "\n").encode()

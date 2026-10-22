@@ -1,0 +1,5 @@
+MINIMAL passed=63 failed=0
+SETTINGS passed=1163 failed=0
+  quiet: 53 kinds, 25 needed, 24 on the first day only, 4 in the gentle modes only; 11 notice lines classified
+QUIET passed=10 failed=0
+STATE_CLIENT passed=162 failed=0

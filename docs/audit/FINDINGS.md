@@ -11,6 +11,8 @@ A04 is **partially addressed** in unpublished source `3647a94c67f83076a0c7be09d7
 
 A08 is **partially measured**: the first v6b native desktop full/low baseline/candidate matrix completed on source `3647a94`, four trials / 52 records / 44 timed samples including the continuous three-region walk. Results are mixed; no general speedup is established. Read `docs/performance-pass/RESULTS-v6-trial1.md` for hardware, frame-time tables, script costs, engine warnings and limits. The 30-minute memory session, MicroProfiler, emulator/phone, network and startup measurements remain open. No profiling place was published.
 
+A11 is **partially addressed** in unpublished source `a36789375dd75920c0eca59ac524644b8776477f` (`codex/preserve-captions`, evidence `b5550e7ed240b745`): sound/vibration captions selected as Normal/Large now survive the preserve HUD projection. Fresh/reset preserve settings remain Off; saved explicit choices are honored; the menu uses the same effective default. The real-client shim regression passes, including a forced wasp, sizes, device modes, Off and Reset. Native desktop caption run `1792662057872` passed 18 assertions with persistence disabled and all authored sources guarded. Normal was visually inspected; Large passed native TextFits. Phone/controller comfort and actual saves/rejoin remain unverified. Save-error toast visibility is still open; status remains available in the menu. See `chet/preserve-captions.md` and `docs/preserve-captions/`.
+
 This is a current-source audit of the supplied v48 review. A static finding is not a reproduced Studio defect. Tests, probes and remaining native work are distinguished below.
 
 | Rank / ID | Severity | Current finding and evidence | Status / recommendation |

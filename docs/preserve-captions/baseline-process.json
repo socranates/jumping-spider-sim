@@ -1,0 +1,6 @@
+{
+  "source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "exit_code": 1,
+  "expected_failure": true,
+  "scope": "New regression against frozen old game modules; initial nil-property test failure retained separately; final regression reaches the real client"
+}

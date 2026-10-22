@@ -27,7 +27,7 @@ assert len(scripts)==len(manifest['scripts'])==176
 cached=scripts['ReplicatedStorage.Shared.Rig.RigCached']
 assert receipt['cached_source_sha256']==cached
 assert normalized_hash((HERE/'driver.client.luau').read_bytes())==scripts['StarterPlayer.StarterPlayerScripts.RigExperiment']
-assert hashlib.sha256((HERE/'build.py').read_bytes()).hexdigest()==manifest['builder_sha256']
+assert hashlib.sha256((HERE/'build-v1d.py').read_bytes()).hexdigest()==manifest['builder_sha256']
 original=subprocess.check_output(['git','show',source+':roblox_port/src/Shared/Rig/SpiderRig.luau'],cwd=ROOT)
 assert hashlib.sha256(original).hexdigest()==receipt['reference_source_sha256']
 assert normalized_hash(original)==scripts['ReplicatedStorage.Shared.Rig.SpiderRig']

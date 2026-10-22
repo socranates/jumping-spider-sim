@@ -2255,3 +2255,21 @@ part, including a line bent around something farther away. Supporting a rider
 and delaying departure are explicit game concessions, not biological claims.
 The existing seven/ten full-meal moults, earned abilities, manual jump aiming,
 quiet hunger bar and current lighting are unchanged.
+
+
+## Foundation follow-up - opt-in preserve captions (2026-10-22)
+
+Honor the existing sound/vibration Captions choice in the preserve's minimal HUD.
+A new/unset or invalid preserve choice, and Reset, use Off so the default screen
+stays wordless. Explicit saved Normal/Large choices are honored immediately.
+The settings menu reads the same world-specific default; the legacy test garden
+retains Normal. No new preference key or save-format migration is introduced.
+
+Only captions produced by the sound/vibration/scene path enter the minimal HUD;
+the eye-view tutorial and routine status text do not. Existing caption priority,
+fade and size remain. This reconciles the audited accessibility bug with Nathan's
+quiet-HUD instruction. Hunger remains unlabeled, and the movement/camera/habitat
+rules are unchanged. Native rendering validation and save-error toast visibility
+remain separate gates; no publication is implied by the offline checks.
+
+Caption verification follow-up: native Studio run `1792662057872` passed 18 UI assertions for source `a367893`, with persistence disabled and all 217 authored scripts guarded. Normal/Large reported TextFits, Off/Reset hid captions, and hunger remained wordless. No publication, phone/controller comfort or performance result is implied.

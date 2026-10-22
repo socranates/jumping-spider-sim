@@ -1,0 +1,4 @@
+FAIL MINIMAL minimal view keeps only the sound caption
+C:/Users/natha/AppData/Local/Temp/tmp4532l299.luau:54999: attempt to perform arithmetic (sub) on nil and number
+stacktrace:
+C:/Users/natha/AppData/Local/Temp/tmp4532l299.luau:54999

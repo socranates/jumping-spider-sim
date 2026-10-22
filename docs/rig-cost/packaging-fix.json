@@ -1,0 +1,7 @@
+{
+  "rejected_before_play": true,
+  "cause": "duplicate ReplicatedStorage.Shared.Rig folders: FindFirstChild could not reach RigCached",
+  "production_changed": false,
+  "all_176_sources_identical": true,
+  "fix": "one directory-backed Shared tree; reject duplicate paths for all instances"
+}

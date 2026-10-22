@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "source_commit": "b1be9f1d59650463a0cc82c230dae63afdccb687",
+  "expected_failure": true,
+  "source_archive_sha256": "f7affd3751cda364c69720b70bf42e54022509829350257ba72bf1c6009024bd",
+  "bundle_sha256": "f4823b729c5e4d3969a4e6fb61811d5c996b95bba4bc6962f5a1a3fb118ab601",
+  "test_sha256": "8ed911f5f12d6de43d1b92a00e46ebbbfba9fddb80dfcc9031293f8b04f2c2f8",
+  "scope": "Current regression and shim; all production modules and inline controller from frozen Git source"
+}

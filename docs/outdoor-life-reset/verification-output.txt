@@ -1,0 +1,34 @@
+{
+  "source_commit": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+  "base_source": "b1be9f1d59650463a0cc82c230dae63afdccb687",
+  "evidence_id": "d543592dddf4e621",
+  "changed_modules": [
+    "roblox_port/src/Client/SpiderClient.client.luau",
+    "roblox_port/src/Shared/Predator/Bird.luau",
+    "roblox_port/src/Shared/Predator/CrabSpider.luau",
+    "roblox_port/src/Shared/Predator/Frog.luau"
+  ],
+  "compile": 216,
+  "strict_clean": true,
+  "targeted_checks": 29166,
+  "runner_regressions": 5,
+  "baseline_regression_failed_as_expected": true,
+  "windows_full_complete": false,
+  "windows_full_suites": null,
+  "windows_full_passed": null,
+  "release": {
+    "sha256": "f9259fa225f6fc9df2824fa538c91ff7dd5c86aadc1e08097bbd27613f39e499",
+    "scripts": 216,
+    "diagnostic_content": false
+  },
+  "test_place_rejected": true,
+  "linux_ci_verified": false,
+  "native_studio_verified": true,
+  "native_checks": 46,
+  "native_run": "1792664252632",
+  "native_scope": "Real client callbacks and in-session rest recovery, persistence script disabled; not online rejoin or a performance run",
+  "actual_online_rejoin_verified": false,
+  "performance_claim": false,
+  "publication_ready": false,
+  "published": false
+}

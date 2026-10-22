@@ -2273,3 +2273,5 @@ rules are unchanged. Native rendering validation and save-error toast visibility
 remain separate gates; no publication is implied by the offline checks.
 
 Caption verification follow-up: native Studio run `1792662057872` passed 18 UI assertions for source `a367893`, with persistence disabled and all 217 authored scripts guarded. Normal/Large reported TextFits, Off/Reset hid captions, and hunger remained wordless. No publication, phone/controller comfort or performance result is implied.
+
+Foundation follow-up: unsaved outdoor encounters reset on New Life and successful rest recovery. Frog/crab/robin object identities, seeds and enable flags survive; reactions, signals and diagnostic counters do not. Their next tick follows the restored seeded schedule. No checkpoint schema change or new predator rule. Source `3c8de801`, native run `1792664252632` (46 assertions, persistence disabled); full-run gates remain separate.

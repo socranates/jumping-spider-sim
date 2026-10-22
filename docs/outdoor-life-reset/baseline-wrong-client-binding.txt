@@ -1,0 +1,4 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-reset-baseline-mlg0e2s2/probe.luau:55821: attempt to call missing method 'reset' of table
+stacktrace:
+C:/Users/natha/AppData/Local/Temp/windowsill-reset-baseline-mlg0e2s2/probe.luau:55821 function fresh
+C:/Users/natha/AppData/Local/Temp/windowsill-reset-baseline-mlg0e2s2/probe.luau:57381

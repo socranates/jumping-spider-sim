@@ -1,0 +1,20 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-reset-baseline-k_40cct8/probe.luau:57444: OUTDOOR_RESET failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/windowsill-reset-baseline-k_40cct8/probe.luau:57444
+FAIL OUTDOOR_RESET main starts with constructor state: frog.notices
+FAIL OUTDOOR_RESET main starts with constructor state: crabs.met
+FAIL OUTDOOR_RESET main starts with constructor state: robin.wasHere
+FAIL OUTDOOR_RESET main attack counter starts over for frog
+FAIL OUTDOOR_RESET main attack counter starts over for crabs
+FAIL OUTDOOR_RESET main attack counter starts over for robin
+FAIL OUTDOOR_RESET free starts with constructor state: frog.notices
+FAIL OUTDOOR_RESET free starts with constructor state: crabs.gentle
+FAIL OUTDOOR_RESET free starts with constructor state: robin.wasHere
+FAIL OUTDOOR_RESET free attack counter starts over for frog
+FAIL OUTDOOR_RESET free attack counter starts over for crabs
+FAIL OUTDOOR_RESET free attack counter starts over for robin
+FAIL OUTDOOR_RESET recovery resets unrecorded reactions: frog.notices
+FAIL OUTDOOR_RESET recovery resets unrecorded reactions: crabs.gentle
+FAIL OUTDOOR_RESET recovery resets unrecorded reactions: robin.wasHere
+OUTDOOR_RESET passed=30 failed=15

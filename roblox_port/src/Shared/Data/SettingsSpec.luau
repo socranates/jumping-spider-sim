@@ -67,7 +67,7 @@ SettingsSpec.LIST = {
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },
 	-- ---------------------------------------------------------------- help and hints
 	{ id = "ControlHints", section = "help", label = "Show control hints", kind = "toggle", default = true,
-		note = "Small feeding and dusk/rest prompts, on every catch and each night. Menu, Controls opens the full controls card." },
+		note = "Feeding and dusk/rest prompts, every catch and night. Menu, Controls opens the full controls card." },
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
 } :: { Setting }
 

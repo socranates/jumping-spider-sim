@@ -1,10 +1,14 @@
-# Work in progress: full-gate self-test follow-up
+# Current handoff: full Linux gate passes on ab8ca95
 
-Linux39849815798 has terminated:75 suites/444661 passed/3 failed assertions on4ee6aec. Exact failure receipts are in docs/save-continue/local-return/failed-ci-39849815798. Both built-in self-tests check local returns before asynchronous preparation completes, leaving a menu open for the following music check. SelfTest now waits for the exact local-return result and requires success before retaining the original pose/rest/music assertions. Single-file compile passes; corrected focused/full verification is pending.
+Sourceab8ca9577129e3d9583a0a8ab6824dae1a8cd014 is pushed on codex/save-continue. It adds only the live diagnostic SelfTest completion wait to runtime behavior source07234ca. Linux39852128734 is terminal success:75 suites/444664 checks/zero failures, compile222/222, strict clean, runner5. The two built-in self-tests end41/0/0 and274/0/0 on shim services. Exact current workspace source/tests/workflow match that commit. Root docs/save-continue/verify.py passes and binds the raw CI logs, workflow and source. [Current evidence and continuation](../docs/save-continue/save-cost/README.md).
 
-[Investigation status and safe continuation](../docs/save-continue/save-cost/README.md). Windows exec87216 is still running its immutable4ee6aec archive. Serial follow-up exec67331 waits for its terminal process receipt, records the old full result, then runs the two corrected self-test suites and, only on success, the isolated local-save cost profiler. Never restart these live jobs on an observation timeout. Do not stage the live Windows log. No measured save optimization yet. No release rebuilt/published. Goal active. The prior local-return verifier/native receipts apply to their recorded source; the changed diagnostic SelfTest is not covered yet.
+Windows full exec87216 is still live on the prior immutable4ee6aec source, where the self-tests retain their obsolete fixed-delay return assertion. Do not restart. Serial follow-up exec67331 waits for its terminal receipt, then checks the two corrected self-tests on Windows and runs the save-cost profiler only on success. Never stage the live Windows log. Linux4ee6aec failure75/444661/3 is retained. Local-return/native old receipts are now explicitly pinned to historical4ee6aec/runtime07234ca; they remain verified but do not claim current native fingerprints.
 
-Earlier handoff below is historical; its statement that Linux is active is superseded above.
+A private rig-candidate bundle precomputes each leg hair orientation. It compiles, but is not adopted or measured yet. After the serial save profiler finishes, run docs/save-continue/save-cost/rig-candidate.py for paired presentation equivalence and operation counts, then assess native comparison and adoption. Do not run it concurrently with heavy CLI/native work. No production drawing edit. No fly, feeding or settings edits.
+
+Large saves still need measured latency reduction; synchronous capture previously139ms and replacement preparation18.5s. Current native/device/rejoin/lossless old-world/broad28-item audit and release/laptop synchronization remain open. No publication or rebuilt release. Goal remains active.
+
+Earlier handoff below is historical.
 
 # Current handoff: cancellable local returns, 4ee6aec
 

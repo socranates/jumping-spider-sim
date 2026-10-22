@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T20:54:49.007075+00:00",
+  "as_of_utc": "2026-10-22T21:02:02.146415+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -24,9 +24,10 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "full-correction-pending",
-      "evidence_boundary": "Source4ee6aec Linux39849815798 terminated75 suites/444661 passed/3 failed outer assertions in the built-in self-tests. Their fixed-delay local-return check fails before asynchronous completion and leaves the menu open for the music check. Windows87216 is still live on the immutable same source; garden selftest3/2 observed, not terminal full evidence. Sourceab8ca95 updates diagnostic SelfTest to await the exact successful token; Linux39852128734 compile222/222 and strict passed, full suites remain live. Serial Windows follow-up67331 waits for the old run to end before corrected self-tests and the cost diagnostic. Historical4ee6aec focused27/25294/0, runner5 and native22 remain bounded evidence, not a current full pass.",
+      "status": "linux-full-verified-windows-follow-up-pending",
+      "evidence_boundary": "Sourceab8ca95 Linux39852128734 completed successfully:75 suites/444664 checks/0 failures, compile222/222, strict clean, runner5; actual shim self-tests41/0/0 and274/0/0. Current workspace source/tests/workflow bytes match exact commit; root verifier passes. Old4ee6aec Linux full75/444661/3 failures retained. Windows87216 remains live on immutable4ee6aec, and serial67331 will check the corrected self-tests and profile afterward. Historical local-return focused27/25294/0 and native22 remain pinned evidence, not a current native/full Windows claim.",
       "references": [
+        "docs/save-continue/save-cost/verification.json",
         "docs/save-continue/save-cost/README.md",
         "docs/save-continue/local-return/failed-ci-39849815798/receipt.json",
         "docs/save-continue/local-return/receipt.json"
@@ -272,7 +273,7 @@
   "latest_save_milestone": {
     "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
     "runtime_behavior_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
-    "status": "diagnostic-correction-full-pending",
+    "status": "linux-full-verified-windows-and-profiling-pending",
     "evidence": "docs/save-continue/save-cost/README.md",
     "goal_complete": false,
     "published": false

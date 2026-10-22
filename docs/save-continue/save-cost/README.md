@@ -1,3 +1,9 @@
+# Full Linux gate and pending cost investigation
+
+Current sourceab8ca9577129e3d9583a0a8ab6824dae1a8cd014 has passed Linux39852128734:75 suites/444664 checks/zero failures, compile222/222, strict clean, runner5. Shim self-tests end41/0/0 and274/0/0. verify.py binds all live source/test/workflow bytes to that commit, CI metadata, step outcomes and raw log hashes. Root docs/save-continue/verify.py passes. Earlier native/focused proof is verified separately against its historical source; no current native or Windows full pass is inferred. No release publication. Large-save cost measurements and candidate adoption remain pending.
+
+The following investigation notes record the earlier failures and queued work; statements that Linux is still running are superseded by the terminal receipt above.
+
 # Save cost investigation and self-test completion boundaries
 
 Work in progress, unpublished. No save-performance improvement is claimed yet.
@@ -13,3 +19,8 @@ profile.py uses the existing real-client CLI bundler with a diagnostic body, lea
 Next: collect the closed Windows result and focused correction results; verify their input hashes; investigate the profiler output before choosing an optimization. A fresh full gate is still required for the diagnostic correction. The older local-return verifier is historical proof for4ee6aec, not proof of current changed SelfTest bytes. The bounded native return probe also predates this diagnostic-only edit. No release XML rebuilt, no publication, no typical-device or hard-frame-budget claim. User closed unused apps, but no new resource/FPS measurement has been taken.
 
 Current correction sourceab8ca9577129e3d9583a0a8ab6824dae1a8cd014 is pushed. Linux39852128734 has passed compile222/222 and strict types; suites are live. fetch-ci.py collects only that exact run/source and requires all75 suites/444664 checks plus runner5 before writing success evidence. Profiling includes six settling frames before pausing, so a freshly reset strike timer is not mistaken for a save failure. The old Windows garden selftest has now shown the same3/2 outer result as Linux; its full process is still live.
+
+
+## Next presentation candidate (private bundle only)
+
+rig-candidate.py builds a private alternate SpiderRig without editing production: each leg hair computes its orientation once in the constructor instead of calling lookAt each draw. The complete58K-line paired bundle compiles. Execution must wait for the serial save profiler to finish. It compares every BasePart position/basis/size to unchanged SpiderRig over all appearance profiles, both detail tiers, exact and tolerance drawing, walking, grooming, growth stages, scale/condition changes, and a far translation. Living seeds are matched, drawing order alternates, and the position/basis tolerance is1e-8 with exact sizes. It counts actual lookAt calls and reports inclusive shim CPU time; neither proves native FPS. Input hashes and output hashes accompany a terminal result. There is no comparison result yet and no game rig change. A native paired check and normal rig tests remain necessary before adoption. This is a candidate found while reviewing the existing CLI profile, where drawing dominates; it is not evidence that Roblox's rendering bottleneck is the same.

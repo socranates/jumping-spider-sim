@@ -1,0 +1,24 @@
+{
+  "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+  "current_workspace_inputs_verified": true,
+  "linux_run": 39852128734,
+  "linux_suites": 75,
+  "linux_passed": 444664,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "shim_selftest_checks": [
+    41,
+    274
+  ],
+  "native_historical_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
+  "native_historical_assertions": 22,
+  "current_source_native_verified": false,
+  "current_source_windows_full_verified": false,
+  "save_cost_measurements_pending": true,
+  "rig_candidate_adopted": false,
+  "hard_frame_budget_proven": false,
+  "goal_complete": false,
+  "published": false
+}

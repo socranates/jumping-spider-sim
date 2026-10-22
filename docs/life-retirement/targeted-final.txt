@@ -1,0 +1,15 @@
+C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:45044: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:45044
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.8 s
+FAIL [rest messages cannot forge retirement and foreign epochs cannot race equal timestamps] foreign life identity prevents overwrite even with equal timestamps
+FAIL [real SaveClient and SaveService carry durable intent and same-life rest end to end] raised: C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:45026: attempt to index nil with 'new'
+C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:45026
+C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:43116 function case
+C:/Users/natha/AppData/Local/Temp/tmp_w9dd6m_.luau:45020
+
+STATE passed=551 failed=2
+STATE_CLIENT passed=152 failed=0
+REST_COMPRESSION passed=44 failed=0

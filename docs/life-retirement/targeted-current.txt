@@ -1,0 +1,5 @@
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.3 s
+STATE passed=558 failed=0
+STATE_CLIENT passed=152 failed=0
+REST_COMPRESSION passed=44 failed=0

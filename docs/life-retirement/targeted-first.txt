@@ -1,0 +1,14 @@
+C:/Users/natha/AppData/Local/Temp/tmpmse5acs2.luau:44905: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpmse5acs2.luau:44905
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+FAIL [oversized and malformed things from the client never reach the store] play carries on but the rejected save is never called Saved
+FAIL [leaving: whatever is waiting is written with retries inside the deadline, the lock is released; a session-only visit writes nothing] both were written after two failures
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.3 s
+FAIL [service: the real DataStore backend, against a fake DataStore, behaves as the in-memory one: update, cancel, errors, and a whole visit] and the rest
+FAIL [leaving holds the lock until both rest writes have finished] lock is released after the rest completes
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] write: player is told saving is off
+FAIL [a permanent write rejection never reports Saved] R_87_main: explicitly session-only
+STATE passed=510 failed=6
+REST_COMPRESSION passed=44 failed=0

@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmpzulnqv9r.luau:57837: state_client checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpzulnqv9r.luau:57837
+FAIL [the real client waits for the server before the start menu: the world holds, hello goes up, then the saved state is applied] title-screen replacement of an old rest requires truthful confirmation
+STATE_CLIENT passed=153 failed=1

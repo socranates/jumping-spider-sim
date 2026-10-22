@@ -1,0 +1,39 @@
+REST_COMPRESSION passed=44 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=11 failed=0
+FOUNDATION passed=4 failed=0 avoided_scans=2000
+RARE passed=265 failed=0
+SPAWN passed=20 failed=0
+MEALS passed=88 failed=0
+fuzz: 402 body hairs, 80 leg hairs, 32 white
+SUMMARY passed=196 failed=0
+PERCEPTION passed=4669 failed=0
+SENSOR passed=507 failed=0
+PREY feel: fruit fly idle 1.68 s, 2 taps/s won 60/60, 4 taps/s 1.00 s; house fly idle 1.15 s, 4 taps/s 4.61 s
+PREY feel (ROBLOX-96): gnat idle 1.94 s, aphid idle 2.34 s
+PREY feel (ROBLOX-101): crane fly idle 0.99 s, won 33/60 at 4 taps/s and 60/60 at 6; house fly 60/60 at 4
+PREY passed=1668 failed=0
+LIFE passed=20922 failed=0
+checkpoint: 17947 characters, 87 tables
+CHECKPOINT passed=545 failed=0
+WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+WASP passed=16884 failed=0
+GAZE passed=74 failed=0
+PRESENTATION passed=11 failed=0
+  1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+  2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+  3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+  5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+  7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+  8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+  9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+  10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+  the let-down past the wall: skin 0.310 from Studio's place, 0.310 with the engine's miss, on the soil after 118.9 s
+  the tangent touch: 0.753 studs a second exact, 0.753 with a touch on every sweep (360 let pass), 0.000 without the rule (360 stops, 4.111 taken off)
+BOXWORLD passed=21 failed=0
+CLIENT passed=27 failed=0
+PERCEPTION_CLIENT passed=1 failed=0
+CLIENT_ANT passed=3 failed=0
+CLIENT_RIVAL passed=9 failed=0

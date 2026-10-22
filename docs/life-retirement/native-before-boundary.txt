@@ -1,0 +1,3 @@
+2026-10-22T05:20:48.591Z,121.591820,81b0,6,Info [FLog::CreatorOutput] [CHET_LIFE_SOURCE_FINGERPRINTS] 216 216 814995da610e0a83f41fb894690e16b65e43edfd
+2026-10-22T05:20:48.594Z,121.594826,81b0,6,Info [FLog::CreatorOutput] [CHET_LIFE_NATIVE_READY] beac88198aaceb8f
+2026-10-22T05:21:19.403Z,152.403870,8ef0,6,Info [FLog::CreatorOutput] [CHET_LIFE_NATIVE_PASS] 2276508 227282 native codec; local memory backend; retirement backup; quit/rejoin; stale rest refused; exact checkpoint

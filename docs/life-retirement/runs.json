@@ -1,0 +1,15 @@
+{
+  "source_commit": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+  "evidence_id": "b3b1a047e958d966",
+  "windows_exec_session": 30676,
+  "ci_run": 39728136498,
+  "final_results_pending": true,
+  "superseded": {
+    "source_commit": "814995da610e0a83f41fb894690e16b65e43edfd",
+    "windows_exec_session": 67801,
+    "exit_code": -1,
+    "ci_run": 39727205382,
+    "ci_result": "cancelled",
+    "reason": "Stamped size boundary and title-screen confirmation fixes"
+  }
+}

@@ -1,2 +1,6 @@
-[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools/globalTypes.d.luau
 [WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+
+exit=0
+source=5938aac41371ca005f73e4c21e7089404496b9a6
+evidence=542472fc2539e00f

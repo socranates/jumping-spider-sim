@@ -1,5 +1,17 @@
 # Verification checkpoint — not published
 
+## Latest correction and helper interruption
+
+Production commit is now **5938aac41371ca005f73e4c21e7089404496b9a6**, rebuilt evidence **542472fc2539e00f**. Final strict clean; compile **209/209**; rebuilt XML/source comparison **209/209**. `playable-source-comparison.json` records current archive and playable hashes.
+
+The continuing predecessor full run (session **18183**) found **one preserve assertion**: low station decoration 153 exceeded the unchanged 150 cap. Fixed by making the three dark inset rug drawings full-detail-only; continuous physical rug, full appearance, new thermos and transparent window are retained. Final-source preserve rerun **1154 pass / 0 fail**, station debug **38/38**, minimal HUD **37/37**. Final frozen affected-client run is session **45753**, raw `C:\Users\natha\claude-xfer\v49-final-5938aac-affected.txt` (world_client still running). Preserve raw rerun is `v49-low-budget-recheck.txt`. Neither run should be restarted merely because output is buffered.
+
+Native self-test on `1f81d7c` completed at **2026-10-21T23:56:09.613Z**, **271 pass / 0 fail / 0 skip**, 562 seconds. Saved complete latest-run marker stream in `native-selftest-final.txt`. The final change only affects low decoration; do not relabel this as a native run on `5938aac`.
+
+After completion, the Windows helper timed out on Shift+F5, then two lightweight window-list retries; after kernel reset and successful window listing, activation/state capture timed out again. **Stop outcome and current attributes are unknown.** No further Windows inputs issued after recovery failed. Recover fresh state before cleanup/publication. Local self-test overrides may remain. Cloud Studio remains disconnected on v48 unless reverified. No v49 publication claim.
+
+Remaining: terminal full regression and affected-client results, final low-native check and ordinary station performance, source/debug cleanup, correct-cloud-place source comparison, publication/Dashboard proof and bounded final package. Earlier sections below are historical checkpoints.
+
 ## Current final-source verification
 
 Final production commit is **`1f81d7c`**, rebuilt evidence **`5818d38f61841238`**. Frozen archive: `C:\Users\natha\claude-xfer\v49-final-1f81d7c.zip`, SHA256 `b487ace3b6fc18b39fac0b1dc06beb28e5513c6f38404f2f5044df9b1ef811ee`. Immutable extraction: `v49-final-1f81d7c\roblox_port`; separate rebuilt copy: `v49-release-1f81d7c\roblox_port`.

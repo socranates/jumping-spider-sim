@@ -2,6 +2,14 @@
 
 Branch: `codex/v49-ranger-station`. This is not a published release receipt.
 
+Latest state: `docs/verification/v49/IN-PROGRESS.md`. Final production freeze is **5938aac41371ca005f73e4c21e7089404496b9a6**, rebuilt evidence **542472fc2539e00f**. **Not published.** The native self-test finished **271 pass / 0 fail / 0 skip** on predecessor `1f81d7c`; the full CLI is still running. Subsequent single production change: three dark inset rug drawings are full-detail-only, retaining the physical rug and full-tier appearance while bringing low decoration from 153 back to the unchanged 150 cap. Final preserve rerun **1154/1154**, station **38/38**, HUD **37/37**; final strict clean and compile **209/209**. These supersede early counts below. Do not publish the older v49 candidates.
+
+The Windows control helper timed out during stop/state capture after the self-test, including recovery retries and a kernel reset. **Stop outcome and current debug attributes are unknown.** Recover with fresh observation before cleanup or publication. Cloud Studio was disconnected on v48. Native performance samples overlapped CLI work and are not a final performance claim.
+
+Final archive: `C:\Users\natha\claude-xfer\v49-final-5938aac.zip`, SHA256 `b9d5ad3dea54899df2c07e19c6466334b8cb1e06520c8b78da5787b6a2833fab`. Rebuilt outputs: `C:\Users\natha\claude-xfer\v49-release-5938aac\roblox_port`; playable SHA256 `66200ccf3b206653385d5254f17f1954bb65aaf38665f81d4d76d5c08309870c`. XML matches **209/209** source files. The regenerated `C:\Users\natha\claude-xfer\v49-final-source-audit.luau` targets this source/evidence; use it to verify stopped Studio. Tracked repository `.rbxlx` files are older: use rebuilt outputs or build from source.
+
+Cloud Claude can clone `codex/v49-ranger-station` from `https://github.com/socranates/jumping-spider-sim.git`. Local C: links alone do not transfer files. Preserve the failed predecessor budget record and passing final-source rerun; do not describe them as a single 56/56 final-source run. See `native-selftest-final.txt` for the complete latest native output.
+
 ## Player requests implemented
 
 - A slightly larger, wordless reserve bar: 150 × 6 pixels.

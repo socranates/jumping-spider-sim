@@ -1,6 +1,6 @@
 # Ranger station acceptance — verification in progress
 
-Production source: `1f81d7c`; rebuilt evidence: `5818d38f61841238`. Publication and the complete regression are not yet confirmed.
+Production source: **5938aac**, rebuilt evidence **542472fc2539e00f**. Final strict clean, compile/source comparison **209/209**. Native predecessor self-test completed **271/0/0**. Final low-budget correction passes preserve **1154/0**, station **38/0**, HUD **37/0**. Full regression and affected-client jobs remain live. Windows helper recovery failed after the native test: stop outcome/debug cleanup are unknown. Publication, final low-native review and ordinary station performance remain unconfirmed. Latest details supersede table entries below; see `IN-PROGRESS.md`.
 
 | Requested result | Current evidence | State |
 | --- | --- | --- |

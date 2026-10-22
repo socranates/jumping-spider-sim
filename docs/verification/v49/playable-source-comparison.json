@@ -1,10 +1,10 @@
 {
-  "source_commit": "1f81d7c",
-  "evidence_id": "5818d38f61841238",
-  "sources": 209,
-  "matched": 209,
-  "missing": [],
-  "extra": [],
-  "mismatch": [],
-  "playable_sha256": "5dc6f27428555f2c26d8b94ae2c0060192b5109416e2f355e7585a96b891c1bb"
+  "source_commit": "5938aac41371ca005f73e4c21e7089404496b9a6",
+  "evidence_id": "542472fc2539e00f",
+  "source_matches": 209,
+  "source_files": 209,
+  "archive": "C:\\Users\\natha\\claude-xfer\\v49-final-5938aac.zip",
+  "archive_sha256": "b9d5ad3dea54899df2c07e19c6466334b8cb1e06520c8b78da5787b6a2833fab",
+  "release_path": "C:\\Users\\natha\\claude-xfer\\v49-release-5938aac\\roblox_port",
+  "playable_sha256": "66200ccf3b206653385d5254f17f1954bb65aaf38665f81d4d76d5c08309870c"
 }

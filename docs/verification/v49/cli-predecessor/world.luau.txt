@@ -1,0 +1,5 @@
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 1261 parts at full detail, 363 at low (view 45 items at full), dust 7 -> 2.8 per second
+world: the looks outside the window (full/low): outer_sill 116/39, house_wall 127/69, bed_a 466/113, wall_west 93/59, wall_west_upper 73/66, wall_upper 49/28, eaves_west 46/31, eaves 149/42, shrub_west_a 260/80, shrub_west_b 260/80, shrub_west_c 260/80, shrub_west_d 260/80, shrub_west_e 260/80, shrub_west_f 260/80, shrub_west_g 260/80, shrub_west_h 260/80, shrub_west_i 260/80, shrub_west_j 260/80, kitchen_counter 83/19, kitchen_floor 34/10
+WORLD passed=355 failed=0

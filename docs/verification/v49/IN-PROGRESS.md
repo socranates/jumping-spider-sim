@@ -1,5 +1,15 @@
 # Verification checkpoint — not published
 
+## Current state after recovery and completed predecessor run
+
+Final source/test commit **5e2964d27309c4db5220ed0705e76cb9506b7a02**, evidence **35bf178f68118c38**. Runtime source is byte-identical to `5938aac`; later changes correct two test fixtures. Strict clean, compile and XML/source comparison **209/209**. Final archive/playable hashes are in `playable-source-comparison.json`.
+
+Predecessor session **18183 is terminal exit 1**: **56 suites, 53 pass, 3 fail** (preserve, selftest_preserve, route_preparation). Full raw logs and summary copied to `cli-predecessor/`. Preserve final rerun **1154/0**; final affected-client session **45753 terminal exit 0**, station **38/0**, HUD **37/0**, world-client **30/0**. Route final rerun **11971/0**: only four intentionally changed station-region reference rows refreshed through the independent legacy graph; 47 old fingerprints retained. Self-test host count updated from 232 to 233 with explicit `room_exit` assertion; its **corrected frozen rerun is live in session 70225**, raw `C:\Users\natha\claude-xfer\v49-final-5e2964d-selftest-preserve.txt`. Wait for terminal outcome; do not restart due to buffering.
+
+Helper recovered. Final native low replay ended **00:12:27.255Z** on byte-identical gameplay source: wake/creep/HUD, 0 detached route ticks, live mouse movement. Ordinary full-tier normal-rules sample completed **00:16:10.985Z**, with CLI stopped and local Studio foreground: 511 frames/10.003 s, mean19.58ms (~51fps), p95 30.89ms, worst96.31ms, 2 frames >50ms; alive/attached, preceding two-second real input moved5.04cm. Default camera, controlled initial placement, live threats; this is a local diagnostic, not a completed hunt/escape or every-device guarantee.
+
+Local playtest stopped and temporary playback/Workspace overrides removed. Cloud source/identity/cleanup verified, final fingerprint stamp **209/209 at 00:17:49.493Z**, correct place120119801868085/universe10771103250. Cloud is stopped and **Rojo disconnected**. No v49 publication yet. Final publication guard is staged in the cloud command bar but must be run after remaining gate. Main handoff now contains the current coherent state; old sections below are retained historical checkpoints.
+
 ## Latest correction and helper interruption
 
 Production commit is now **5938aac41371ca005f73e4c21e7089404496b9a6**, rebuilt evidence **542472fc2539e00f**. Final strict clean; compile **209/209**; rebuilt XML/source comparison **209/209**. `playable-source-comparison.json` records current archive and playable hashes.

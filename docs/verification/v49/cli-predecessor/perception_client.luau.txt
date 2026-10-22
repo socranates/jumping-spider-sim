@@ -1,0 +1,1 @@
+PERCEPTION_CLIENT passed=1 failed=0

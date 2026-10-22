@@ -1,0 +1,1 @@
+CLIENT_RIVAL passed=9 failed=0

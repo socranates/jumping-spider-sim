@@ -1,0 +1,3 @@
+FAIL [the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, the standard rest is untouched, and the menu offers it] Easy: the next moult is at 3 meals in the hud
+FAIL [the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, the standard rest is untouched, and the menu offers it] standard: the next moult is at 5 meals in the hud
+STATE_CLIENT passed=138 failed=2

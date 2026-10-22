@@ -1,0 +1,13 @@
+C:/Users/natha/AppData/Local/Temp/tmptfbgllqr.luau:42765: route preparation checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmptfbgllqr.luau:42765
+FAIL ROUTE_PREPARATION room_window retains counts
+FAIL ROUTE_PREPARATION room_window retains every face, standing sample, seam and waypoint
+FAIL ROUTE_PREPARATION hut_floor_a retains counts
+FAIL ROUTE_PREPARATION hut_floor_a retains every face, standing sample, seam and waypoint
+FAIL ROUTE_PREPARATION hut_shelf retains counts
+FAIL ROUTE_PREPARATION hut_shelf retains every face, standing sample, seam and waypoint
+FAIL ROUTE_PREPARATION hut_desk retains counts
+FAIL ROUTE_PREPARATION hut_desk retains every face, standing sample, seam and waypoint
+ROUTE_PREPARATION passed=11963 failed=8 slices=5899

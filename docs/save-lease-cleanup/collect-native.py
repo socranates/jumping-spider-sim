@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,hashlib,json,re,subprocess
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
-p=argparse.ArgumentParser();p.add_argument('log',type=Path);p.add_argument('folder',type=Path);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('log',type=Path);p.add_argument('folder',type=Path);p.add_argument('--run',help='Explicit run id when the Studio log contains multiple attempts');a=p.parse_args()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 m=json.loads((HERE/'prepared-native-manifest.json').read_text(encoding='utf8'))
 source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
@@ -10,7 +10,7 @@ assert m['source']==source and m['case']=='cleanup' and m['persistence_disabled'
 assert sha((a.folder/'Windowsill-lease-cleanup-review.rbxlx').read_bytes())==m['place_sha256']
 rows=a.log.read_text(encoding='utf8',errors='replace').splitlines()
 begin=[(i,re.search(r'\[LEASE_CLEANUP_NATIVE_BEGIN\] (\d+)$',s)) for i,s in enumerate(rows) if '[FLog::CreatorOutput]' in s]
-begin=[(i,b) for i,b in begin if b];assert len(begin)==1
+begin=[(i,b) for i,b in begin if b and (a.run is None or b[1]==a.run)];assert len(begin)==1, 'choose one exact run with --run'
 start_run,b=begin[0];run=b[1]
 guards=[i for i,s in enumerate(rows[:start_run]) if '[FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_GUARD] '+source+' 218 persistence_disabled' in s]
 assert guards;start=guards[-1]

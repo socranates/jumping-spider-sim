@@ -1,0 +1,15 @@
+2026-10-22T17:31:07.329Z,312.329193,642c,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_GUARD] e315b3a048fddd1729461fb92502f73b7d8e2b94 218 persistence_disabled
+2026-10-22T17:31:16.456Z,321.456573,7ca0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T17:31:16.467Z,321.467590,7ca0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T17:31:23.537Z,328.537292,1378,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_BEGIN] 1792690283994
+2026-10-22T17:31:23.731Z,328.731354,5758,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T17:31:31.401Z,336.401825,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 1 rejected unseen retirement releases its acquired lease without changing any saved life 21
+2026-10-22T17:31:31.401Z,336.401825,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 2 session-only cleanup preserves progress, backup and unknown envelope metadata 26
+2026-10-22T17:31:31.402Z,336.402832,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 3 lease cleanup refuses another owner even when its beat is stale 30
+2026-10-22T17:31:31.402Z,336.402832,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 4 retried cleanup callback rechecks the latest owner 32
+2026-10-22T17:31:31.403Z,336.403839,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 5 cleanup retries transient failure with backoff and resolves a lost success response 42
+2026-10-22T17:31:31.403Z,336.403839,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 6 metadata cleanup follows request budget and cannot renew a lease while waiting 45
+2026-10-22T17:31:31.403Z,336.403839,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 7 unknown or damaged progress is never rewritten just to remove its lock 51
+2026-10-22T17:31:31.405Z,336.405853,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 8 successful explicit reload cancels stale cleanup and keeps the renewed active lease 54
+2026-10-22T17:31:31.406Z,336.406860,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_CASE] 1792690283994 9 departure cleanup preserves dirty candidates and respects its deadline 62
+2026-10-22T17:31:31.406Z,336.406860,4a88,6,Info [FLog::CreatorOutput] [LEASE_CLEANUP_NATIVE_DONE] 1792690283994 9 62

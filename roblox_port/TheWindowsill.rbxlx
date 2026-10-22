@@ -30380,14 +30380,16 @@ function SettingsModel.sections(): { { id: string, title: string, items: { Setti
 	return out
 end
 
-function SettingsModel.default(id: string): Value?
+-- Preserve keeps the default play screen wordless; explicit saved choices still win.
+function SettingsModel.default(id: string, world: string?): Value?
+	if id == "Captions" and world == "preserve" then return "off" end
 	local s = BY_ID[id]
 	return if s then s.default else nil
 end
 
-function SettingsModel.defaults(): { [string]: Value }
+function SettingsModel.defaults(world: string?): { [string]: Value }
 	local out: { [string]: Value } = {}
-	for _, s in SettingsSpec.LIST do out[s.id] = s.default end
+	for _, s in SettingsSpec.LIST do out[s.id] = SettingsModel.default(s.id, world) :: Value end
 	return out
 end
 
@@ -30413,13 +30415,14 @@ function SettingsModel.clean(id: any, value: any): (Value?, string?)
 end
 
 -- A value for a client's use: the clean one, else the default. `read(id)` gives whatever is held (a Player attribute) or nil.
-function SettingsModel.get(read: (string) -> any, id: string): Value
+function SettingsModel.get(read: (string) -> any, id: string, world: string?): Value
 	local s = BY_ID[id]
 	if s == nil then error(`unknown setting {id}`) end
+	local fallback = SettingsModel.default(id, world) :: Value
 	local raw = read(id)
-	if raw == nil then return s.default end
+	if raw == nil then return fallback end
 	local v = SettingsModel.clean(id, raw)
-	if v == nil then return s.default end
+	if v == nil then return fallback end
 	return v
 end
 
@@ -51887,7 +51890,7 @@ local player = Players.LocalPlayer
 -- A setting's value now (ROBLOX-49): the Player attribute of its name if it holds a clean value, else the default. Every consumer below reads
 -- its setting here each frame, so a change in the settings panel (or a saved one arriving) takes effect at once.
 local function setting(id: string): any
-	return M.SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id)
+	return M.SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id, M.World.world)
 end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
@@ -52926,7 +52929,7 @@ settingsPanel=M.SettingsPanel.new(player:WaitForChild("PlayerGui"),{
   player:SetAttribute(id,value)
   return nil
  end,
- reset=function() for _,id in M.SettingsModel.ids() do player:SetAttribute(id,M.SettingsModel.default(id)) end end,
+ reset=function() for _,id in M.SettingsModel.ids() do player:SetAttribute(id,M.SettingsModel.default(id,M.World.world)) end end,
  status=function(): string? if saveState.broken then return "session" end;local status=saveClient:status();return status end,
 },function(to: string?)
  if to=="menu" then openMenu() else setHudShown(true) end
@@ -53284,6 +53287,7 @@ local function updateHud(frameDt: number)
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
 	local captionScale = M.SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
+	view.eyeCaption = view.caption -- preserve sound captions without admitting the eye-view tutorial
 	view.captionScale = if captionScale > 0 then captionScale else 1
 	local hints = setting("ControlHints")
 	if helpUntil ~= math.huge and not Q("controls_card_start") then helpVisible = false end -- (ROBLOX-113: Normal after the first day puts no card up by itself; H and the menu's Controls still do)
@@ -53362,6 +53366,7 @@ local function updateHud(frameDt: number)
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
   if mateLegs.phase=="ride" and captionScale>0 then view.caption={text=mateLegs.Text.RIDE_CAPTION,alpha=1} end -- (ROBLOX-120)
  end
+ view.soundCaption = if captionScale>0 and view.caption~=view.eyeCaption then view.caption else nil
  if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) and Q("feeding_lines") then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
 	if rivalLegs.Grip.active(rivalLegs.grip) and Q("feeding_lines") then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
@@ -54895,7 +54900,8 @@ end
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 -- Active preserve play: the food reserve, a tiny manual aiming dot, and earned ability
 -- notices explicitly requested by the player. An opened controls card is modal
--- reference material; automatic hints never enter this projection.
+-- reference material; automatic hints never enter this projection. Sound/vibration
+-- captions are an explicit accessibility choice, distinct from the eye tutorial.
 function Hud.minimalView(view: any): any
 	local notice=nil
 	for line in string.gmatch(view.notice or "", "[^\n]+") do
@@ -54903,7 +54909,8 @@ function Hud.minimalView(view: any): any
 	end
 	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
-		helpText=view.helpText,prompt=view.contextPrompt,status={}}
+		helpText=view.helpText,prompt=view.contextPrompt,status={},
+		caption=view.soundCaption,captionScale=view.captionScale}
 end
 function Hud.update(self: any, view: any, dt: number)
 	local minimal=view.minimal==true

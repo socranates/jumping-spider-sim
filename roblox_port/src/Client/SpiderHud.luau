@@ -320,7 +320,8 @@ end
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 -- Active preserve play: the food reserve, a tiny manual aiming dot, and earned ability
 -- notices explicitly requested by the player. An opened controls card is modal
--- reference material; automatic hints never enter this projection.
+-- reference material; automatic hints never enter this projection. Sound/vibration
+-- captions are an explicit accessibility choice, distinct from the eye tutorial.
 function Hud.minimalView(view: any): any
 	local notice=nil
 	for line in string.gmatch(view.notice or "", "[^\n]+") do
@@ -328,7 +329,8 @@ function Hud.minimalView(view: any): any
 	end
 	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
-		helpText=view.helpText,prompt=view.contextPrompt,status={}}
+		helpText=view.helpText,prompt=view.contextPrompt,status={},
+		caption=view.soundCaption,captionScale=view.captionScale}
 end
 function Hud.update(self: any, view: any, dt: number)
 	local minimal=view.minimal==true

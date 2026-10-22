@@ -90,14 +90,16 @@ function SettingsModel.sections(): { { id: string, title: string, items: { Setti
 	return out
 end
 
-function SettingsModel.default(id: string): Value?
+-- Preserve keeps the default play screen wordless; explicit saved choices still win.
+function SettingsModel.default(id: string, world: string?): Value?
+	if id == "Captions" and world == "preserve" then return "off" end
 	local s = BY_ID[id]
 	return if s then s.default else nil
 end
 
-function SettingsModel.defaults(): { [string]: Value }
+function SettingsModel.defaults(world: string?): { [string]: Value }
 	local out: { [string]: Value } = {}
-	for _, s in SettingsSpec.LIST do out[s.id] = s.default end
+	for _, s in SettingsSpec.LIST do out[s.id] = SettingsModel.default(s.id, world) :: Value end
 	return out
 end
 
@@ -123,13 +125,14 @@ function SettingsModel.clean(id: any, value: any): (Value?, string?)
 end
 
 -- A value for a client's use: the clean one, else the default. `read(id)` gives whatever is held (a Player attribute) or nil.
-function SettingsModel.get(read: (string) -> any, id: string): Value
+function SettingsModel.get(read: (string) -> any, id: string, world: string?): Value
 	local s = BY_ID[id]
 	if s == nil then error(`unknown setting {id}`) end
+	local fallback = SettingsModel.default(id, world) :: Value
 	local raw = read(id)
-	if raw == nil then return s.default end
+	if raw == nil then return fallback end
 	local v = SettingsModel.clean(id, raw)
-	if v == nil then return s.default end
+	if v == nil then return fallback end
 	return v
 end
 

@@ -174,7 +174,7 @@ local player = Players.LocalPlayer
 -- A setting's value now (ROBLOX-49): the Player attribute of its name if it holds a clean value, else the default. Every consumer below reads
 -- its setting here each frame, so a change in the settings panel (or a saved one arriving) takes effect at once.
 local function setting(id: string): any
-	return M.SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id)
+	return M.SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id, M.World.world)
 end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
@@ -1213,7 +1213,7 @@ settingsPanel=M.SettingsPanel.new(player:WaitForChild("PlayerGui"),{
   player:SetAttribute(id,value)
   return nil
  end,
- reset=function() for _,id in M.SettingsModel.ids() do player:SetAttribute(id,M.SettingsModel.default(id)) end end,
+ reset=function() for _,id in M.SettingsModel.ids() do player:SetAttribute(id,M.SettingsModel.default(id,M.World.world)) end end,
  status=function(): string? if saveState.broken then return "session" end;local status=saveClient:status();return status end,
 },function(to: string?)
  if to=="menu" then openMenu() else setHudShown(true) end
@@ -1571,6 +1571,7 @@ local function updateHud(frameDt: number)
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
 	local captionScale = M.SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
+	view.eyeCaption = view.caption -- preserve sound captions without admitting the eye-view tutorial
 	view.captionScale = if captionScale > 0 then captionScale else 1
 	local hints = setting("ControlHints")
 	if helpUntil ~= math.huge and not Q("controls_card_start") then helpVisible = false end -- (ROBLOX-113: Normal after the first day puts no card up by itself; H and the menu's Controls still do)
@@ -1649,6 +1650,7 @@ local function updateHud(frameDt: number)
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
   if mateLegs.phase=="ride" and captionScale>0 then view.caption={text=mateLegs.Text.RIDE_CAPTION,alpha=1} end -- (ROBLOX-120)
  end
+ view.soundCaption = if captionScale>0 and view.caption~=view.eyeCaption then view.caption else nil
  if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) and Q("feeding_lines") then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
 	if rivalLegs.Grip.active(rivalLegs.grip) and Q("feeding_lines") then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end

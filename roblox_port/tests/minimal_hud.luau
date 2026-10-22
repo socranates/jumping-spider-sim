@@ -33,5 +33,60 @@ view.helpRequested=false;view.notice=nil;hud:update(view,1/60)
 check(not hud.help.Visible and not hud.notice.Visible,"closing reference returns to the reserve alone")
 view.dot=false;hud:update(view,1/60)
 check(not hud.reticle.Visible,"sleep, menus and death can suppress the dot")
+-- Accessibility captions are explicit, not the eye-view tutorial or routine prose.
+view.dot=true;view.caption={text="Eye-view tutorial",alpha=1};view.soundCaption={text="A hum ahead-left",alpha=.4};view.captionScale=1
+hud:update(view,1/60)
+check(hud.caption.Visible and hud.caption.Text=="A hum ahead-left" and hud.caption.TextSize==15,"minimal view keeps only the sound caption")
+check(type(hud.caption.TextTransparency)=="number" and math.abs(hud.caption.TextTransparency-.6)<1e-8,"caption retains its fade")
+view.captionScale=1.5;hud:update(view,1/60)
+check(hud.caption.TextSize==23,"large accessibility caption retains its text scale")
+view.soundCaption=nil;hud:update(view,1/60)
+check(not hud.caption.Visible,"ending a sound hides the caption rather than exposing the tutorial")
+local Model=require("../src/Shared/UI/SettingsModel")
+check(Model.default("Captions","preserve")=="off" and Model.defaults("preserve").Captions=="off","preserve defaults and reset are wordless")
+check(Model.default("Captions")=="normal" and Model.default("Captions","test_garden")=="normal","legacy caption default remains intact")
+for _,choice in {"off","normal","large"} do
+ check(Model.get(function() return choice end,"Captions","preserve")==choice,"saved explicit caption choice survives: "..choice)
+end
+for _,bad in {false,7,"tiny"} do check(Model.get(function() return bad end,"Captions","preserve")=="off","invalid choice falls back to preserve default") end
+check(Model.get(function() return nil end,"Captions","preserve")=="off","unset preserve captions are off")
+-- Run the real client in the preserve, not just the HUD projection.
+local Map=require("../src/Shared/World/WorldMap")
+local Build=require("../src/Shared/World/WorldBuild")
+local Scenery=require("../src/Shared/Habitat/Scenery")
+workspace:ClearAllChildren();workspace:SetAttribute("World","preserve");workspace:SetAttribute("SelfTest",false)
+Map.use("preserve")
+local decor,replaced=Scenery.decor(nil,"preserve");decor.Parent=workspace
+local hidden={};for id in replaced do hidden[id]=true end
+Build.world(workspace,Map.SEED,hidden)
+local loaded,err=pcall(function() require("../src/Client/SpiderClient.client") end)
+assert(loaded,tostring(err))
+local driver=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
+local function frames(n) for _=1,n do frame(1/60) end end
+local player=game:GetService("Players").LocalPlayer
+local ready=false;for _=1,120 do if driver.fresh("free",false,nil) then ready=true;break end;frames(1) end
+check(ready,"real preserve client starts a fresh life")
+check(player:GetAttribute("Captions")==nil and driver.setting("Captions")=="off","untouched real client uses preserve caption default")
+driver.place(Vector3.new(2,.31,6));driver.life.clock.day=3;driver.life.clock.hour=12;driver.prey.feeding.mealsFinished=1
+workspace:SetAttribute("WaspForce","floor_middle");frames(30)
+check(driver.wasp:isVisiting() and not driver.hud.caption.Visible,"a real audible wasp does not add default HUD words")
+local panel=driver.settingsPanel
+panel:open("game","keyboard",1)
+local captionRow=nil;for _,w in panel.widgets do if w.kind=="setting" and w.id=="Captions" then captionRow=w end end
+check(captionRow~=nil and captionRow.value.Text=="Off","menu reports the actual preserve default")
+panel:close()
+panel.io.set("Captions","normal");frames(2)
+local normalSize=driver.hud.caption.TextSize
+check(driver.hud.caption.Visible and string.find(driver.hud.caption.Text,"[a deep, heavy hum outside, ",1,true)~=nil,"Normal shows the real wasp caption through the minimal client HUD")
+for _,device in {"keyboard","controller","touch"} do driver.setDevice(device);frames(1);check(driver.hud.caption.Visible,"caption survives device "..device) end
+panel.io.set("Captions","large");frames(2)
+check(driver.hud.caption.Visible and driver.hud.caption.TextSize>normalSize,"Large changes the real caption size")
+panel.io.set("Captions","off");frames(2)
+check(not driver.hud.caption.Visible,"Off hides an active sound immediately")
+panel.io.set("Captions","normal");frames(2)
+check(driver.hud.caption.Visible,"Normal can reenable an ongoing sound")
+panel.io.reset();frames(2)
+check(driver.setting("Captions")=="off" and not driver.hud.caption.Visible,"Reset uses preserve Off rather than legacy Normal")
+check(driver.hud.food.Visible and not driver.hud.foodText.Visible and driver.hud.foodText.Text=="","caption settings never label the hunger reserve")
 print(`MINIMAL passed={passed} failed={failed}`)
 if failed>0 then error("minimal HUD checks failed") end

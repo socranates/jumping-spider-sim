@@ -1636,6 +1636,10 @@ local function checks(): { Check }
 		pause(r, 1.0)
 		need(not life.resting and ctx.world:inRetreat(ctx.motor.pos) == nil, "the rest did not end on leaving the crack")
 		input:simulate("Reset", true); pause(r, 0); input:simulate("Reset", false)
+		local returned = ctx.saveState.localReturnResult
+		need(returned ~= nil, "no local return was requested")
+		need(waitUntil(r, 120, function() return not returned.pending end), "local return preparation did not finish")
+		need(returned.ok == true, "local return failed: " .. tostring(returned.message))
 		pause(r, 0.5)
 		need(ctx.world:inRetreat(ctx.motor.pos) == "sill_crevice" and life.resting, `not back resting in the crack after the return (at {fmt(ctx.motor.pos)})`)
 		put(r, SelfTest.SILL, nil)

@@ -1,3 +1,11 @@
+# Work in progress: full-gate self-test follow-up
+
+Linux39849815798 has terminated:75 suites/444661 passed/3 failed assertions on4ee6aec. Exact failure receipts are in docs/save-continue/local-return/failed-ci-39849815798. Both built-in self-tests check local returns before asynchronous preparation completes, leaving a menu open for the following music check. SelfTest now waits for the exact local-return result and requires success before retaining the original pose/rest/music assertions. Single-file compile passes; corrected focused/full verification is pending.
+
+[Investigation status and safe continuation](../docs/save-continue/save-cost/README.md). Windows exec87216 is still running its immutable4ee6aec archive. Serial follow-up exec67331 waits for its terminal process receipt, records the old full result, then runs the two corrected self-test suites and, only on success, the isolated local-save cost profiler. Never restart these live jobs on an observation timeout. Do not stage the live Windows log. No measured save optimization yet. No release rebuilt/published. Goal active. The prior local-return verifier/native receipts apply to their recorded source; the changed diagnostic SelfTest is not covered yet.
+
+Earlier handoff below is historical; its statement that Linux is active is superseded above.
+
 # Current handoff: cancellable local returns, 4ee6aec
 
 Branch github/codex/save-continue is pushed through verification source4ee6aecc06f4753a85e40fc98a1487dc5126d27d. Runtime source07234cae75b5a62b820dc6dda830dce7e503c36b. [Implementation and evidence](../docs/save-continue/local-return/README.md). Local Continue/Free play, nonempty-store Backspace and end-screen Back now read/check/decode privately across frames behind a Cancel menu. Each valid candidate decodes once. Publication checks world generation, target/active store pointers and revisions; no current world/store is replaced early. Cancellation returns to the original end screen when needed. Failures/newer-schema data preserve current spider and all stored bytes. Local returns still work after network failure. Empty-store Backspace fallback remains lightweight.

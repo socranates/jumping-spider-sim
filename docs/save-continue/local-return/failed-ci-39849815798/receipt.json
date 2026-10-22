@@ -1,0 +1,71 @@
+{
+  "id": 39849815798,
+  "head_sha": "4ee6aecc06f4753a85e40fc98a1487dc5126d27d",
+  "status": "completed",
+  "conclusion": "failure",
+  "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39849815798",
+  "suites": 75,
+  "passed": 444661,
+  "failed": 3,
+  "failed_suites": [
+    [
+      "SELFTEST",
+      "3",
+      "2"
+    ],
+    [
+      "SELFTEST_PRESERVE",
+      "6",
+      "1"
+    ]
+  ],
+  "log_sha256": "d595e25ab69ba5bf8ec7a0ce89d012523b75dd2ea9cc2e7f2b10d4b34e7997c0",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Every module compiles",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Strict types",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "All suites",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Runner failure and cleanup regressions",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "published": false
+}

@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 -- Inspect mode (ROBLOX-90): a slow, close look at the drawn spider. The pure numbers first (Movement/InspectView: the orbit, the zoom, the three framings, the
 -- ease, Reduced Motion) and the words (UI/InspectText), then the real client on the box world with stub Roblox services (tests/shim.luau): the entry from the Settings
 -- row and by holding the choose key or button (and a tap still changing spider), the refusals, the camera's ease in, orbit, zoom and framings, the lock on the
@@ -942,6 +943,7 @@ check("a wasp's warning ends it at once, with its notice: the camera is cut back
 	frames(10)
 	if d.caughtPanel:isShowing() then -- (a visit that was not dodged ends at the catch screen: back to the last rest)
 		assert(d.caughtPanel:choose("Back"), "the catch screen's Back")
+		awaitReturn(d,function() frame(0) end)
 		frames(5)
 	end
 	assert(not d.caughtPanel:isShowing(), "(the game goes on)")
@@ -997,6 +999,7 @@ check("the rival's windup ends it at once, as does anything that makes the spide
 	begin()
 	services.actions["SpiderReset"]("SpiderReset", Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode.Backspace, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
 	services.actions["SpiderReset"]("SpiderReset", Enum.UserInputState.End, { KeyCode = Enum.KeyCode.Backspace, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	awaitReturn(ClientStubs.driver,function() frame(0) end)
 	assert(not d.spiderPick.inspecting and cam.inspect == nil and cam.inspectT == 0, "Backspace: ended, with a cut")
 	frames(10)
 end)

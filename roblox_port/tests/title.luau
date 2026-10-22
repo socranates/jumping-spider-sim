@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 -- The first minute (ROBLOX-109): the splash (First/SplashScreen) and every way it ends, the drift and the intro's shots (Movement/TitleShots), the words
 -- (UI/TitleText), the two looks of CaughtPanel, the progress record's intro_seen, and through the real client in a place that is not the test place: the
 -- title card over the drift with the music rising, the menu's choices and a controller's keys, the intro of a new life (its walk out of the crack, its
@@ -554,6 +555,7 @@ check("Continue from the title card begins the life: the drift lets the camera g
 	frames(2)
 	assert((camera.CFrame.Position - ctx.motor.pos).Magnitude > 20, "the drift has the camera")
 	assert(ctx.menu:choose("Continue"), "Continue")
+	awaitReturn(ctx,function() frame(0) end)
 	frames(30)
 	assert(ctx.session.started and not ctx.menu:isShowing() and not ctx.title:playing(), "the life runs, with no intro")
 	assert((camera.CFrame.Position - ctx.motor.pos).Magnitude < 8, "the game's camera")

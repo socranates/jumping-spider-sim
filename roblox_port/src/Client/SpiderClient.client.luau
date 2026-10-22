@@ -345,6 +345,7 @@ end
 local stores = {main=newStore(), free=newStore(), easy=newStore()}
 local checkpoints = stores.main
 function saveState.invalidateRest()
+ if saveState.localRestore then saveState.localRestore:cancel() end
  saveState.worldGeneration+=1
  if saveState.rest then saveState.rest:cancel() end
  life:cancelCheckpoint()
@@ -777,6 +778,9 @@ end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?): boolean
+ if offered==nil and next(checkpoints.store.data)~=nil then
+  return saveState.beginLocalReturn(nil,"reset")
+ end
  if saveState.restore then saveState.restore:cancel() end
  saveState.invalidateRest()
 	spiderPick.finish(nil, true) -- (a close look does not survive a return to the last rest)
@@ -841,6 +845,7 @@ local function applyRules()
  life.growth:useGameRules(needs.gentle)
 end
 local function closeScreens()
+ if saveState.localRestore then saveState.localRestore:cancel() end
  if saveState.restore then saveState.restore:cancel() end
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
  if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
@@ -897,7 +902,7 @@ panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  elseif choice=="Carry" then mateLegs.carryOn()
  elseif choice=="Follow" then mateLegs.follow() -- (ROBLOX-120: one spiderling on the wind)
  elseif choice=="Another" then lastEnd=nil;continueAnother()
- elseif choice=="Back" then lastEnd=nil;closeScreens();wasp:clearVisit();returnToCheckpoint() end
+ elseif choice=="Back" then saveState.beginLocalReturn(nil,"end") end
 end)
 local function presentEnd(immediate: boolean)
  local rec=lastEnd
@@ -1128,7 +1133,10 @@ local openMenu: (boolean?) -> ()
 local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
- if choice=="CancelRestore" then saveState.restore:cancel();openMenu(true);return end
+ if choice=="CancelRestore" then
+  if saveState.localRestore.job then saveState.cancelLocalReturn(false) else saveState.restore:cancel();openMenu(true) end
+  return
+ end
  if choice=="Notebook" then openNotebook("menu");return end
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
@@ -1136,7 +1144,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Continue" or choice=="ContinueEasy" or choice=="RemoteMain" or choice=="RemoteEasy" or choice=="RemoteFree" then
   local mode=if choice=="ContinueEasy" or choice=="RemoteEasy" then "easy" elseif choice=="RemoteFree" then "free" else "main"
   if mode=="easy" and not session.finishedMain then return end
-  local remote=string.sub(choice,1,6)=="Remote" or not stores[mode]:loadBest().ok
+  local remote=string.sub(choice,1,6)=="Remote" or not stores[mode]:hasKnownRest()
   if remote then
    if session.started and confirming~=choice then
     confirming=choice;saveState.confirmOffer=saveState.menuOffers[mode]
@@ -1151,15 +1159,14 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
     openMenu(true)
    end
   else
-   checkpoints=stores[mode]
-   if returnToCheckpoint() then closeScreens() end
+   saveState.beginLocalReturn(mode,"menu")
   end
   return
  end
  if choice=="Free" then
-  local saved=stores.free:loadBest()
+  local saved=stores.free:hasKnownRest()
   local info=saveClient:offerInfo("free")
-  if saved.ok then checkpoints=stores.free;if returnToCheckpoint() then closeScreens() end
+  if saved then saveState.beginLocalReturn("free","menu")
   elseif info and info.playable then
    if session.started then
     confirming="RemoteFree";saveState.confirmOffer=saveState.menuOffers.free
@@ -1177,7 +1184,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   local slot=if choice=="Easy" then "easy" else "main"
   if choice=="Easy" and not session.finishedMain then return end
   local info=saveClient:offerInfo(slot)
-  if (session.started or stores[slot]:loadBest().ok or (info and info.playable)) and confirming~=choice then
+  if (session.started or stores[slot]:hasKnownRest() or (info and info.playable)) and confirming~=choice then
    confirming=choice;saveState.confirmOffer=saveState.menuOffers[slot]
    menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
@@ -1198,7 +1205,7 @@ end
 -- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
 -- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
 openMenu=function(renderOnly: boolean?)
- if saveState.restore and saveState.restore.job then
+ if (saveState.restore and saveState.restore.job) or (saveState.localRestore and saveState.localRestore.job) then
   menu:showChoices("Returning to the last rest","Preparing the saved spider. Your current spider stays until this finishes.","",{{id="CancelRestore",text="Cancel"}},true,"CancelRestore")
   return
  end
@@ -1359,7 +1366,7 @@ local function progressSnapshot(): any
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or stores[mode] == nil then return end
-	if session.started or stores[mode]:loadBest().ok then return end -- this visit has begun, or already has a rest of its own
+	if session.started or stores[mode]:hasKnownRest() then return end -- this visit has begun, or already has a rest of its own
 	local r = stores[mode]:save(record)
 	if not r.ok then warn("[Windowsill] saved " .. mode .. " rest not used: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
 end
@@ -1433,6 +1440,74 @@ saveState.rest=require(script.Parent.SaveRestore).new({
   life:finishCheckpoint(stamp.result,{ok=true,message=M.LifeText.restKept(stamp.retreat,"Last rest kept.")..stamp.hungry})
   if session.ended and lastEnd~=nil and panel:isShowing() then presentEnd(true) end
   refreshMenu()
+ end,
+})
+-- Local returns use private store reads too: even checksum/backup selection can
+-- be expensive. The original current world and all store bytes survive cancellation.
+function saveState.localReturnScreen(stamp:any,resume:boolean?)
+ menu:hide()
+ if stamp.fromEnd and session.ended and lastEnd~=nil then
+  presentEnd(true)
+  if saveState.restoreError then panel.summary.Text..="\n"..saveState.restoreError end
+ elseif resume then closeScreens()
+ else openMenu(true) end
+end
+function saveState.cancelLocalReturn(resume:boolean?)
+ local j=saveState.localRestore.job
+ if not j then return end
+ saveState.localRestore:cancel()
+ saveState.localReturnScreen(j.stamp,resume)
+end
+function saveState.beginLocalReturn(mode:string?,action:string):boolean
+ local slot=mode
+ if not slot then for name,st in stores :: {[string]:any} do if st==checkpoints then slot=name end end end
+ if not slot or (slot=="easy" and not session.finishedMain) then return false end
+ if saveState.restore then saveState.restore:cancel() end
+ local source=stores[slot]
+ local token={pending=true,ok=false}
+ saveState.localRestore:begin(nil,{mode=slot,source=source,revision=source.store.revision,activeStore=checkpoints,
+  activeRevision=checkpoints.store.revision,generation=saveState.worldGeneration,result=token,
+  action=action,fromEnd=panel:isShowing() and session.ended and lastEnd~=nil})
+ saveState.localReturnResult=token;saveState.restoreError=nil
+ panel:hide();controls:clear();dropAll();setHudShown(false);openMenu(true)
+ return true
+end
+saveState.localRestore=require(script.Parent.SaveRestore).new({
+ workOptions={budget=.002,maxSeconds=120},
+ prepare=function(_record:any,stamp:any):any
+  local private=stamp.source:forkMemory()
+  -- Decode each checksum-valid candidate once, retaining only its private
+  -- commit closure. Backup selection still rejects invalid/newer records.
+  local prepared:any=nil
+  private.validate=function(record:any):{string}
+   local commit,problems=Checkpoint.prepare(record,checkpointWorld)
+   prepared=commit
+   return problems
+  end
+  local best=private:loadBest()
+  if not best.ok or not prepared then return nil,best.message end
+  local commit=prepared
+  return function():boolean
+   if not returnToCheckpoint(best.record,commit) then return false end
+   checkpoints=stamp.source;checkpoints.knownRest=true
+   saveState.restoreError=nil
+   return true
+  end
+ end,
+ current=function(stamp:any):boolean
+  return stamp.generation==saveState.worldGeneration and stores[stamp.mode]==stamp.source and checkpoints==stamp.activeStore
+   and stamp.source.store.revision==stamp.revision and stamp.activeStore.store.revision==stamp.activeRevision
+   and (not saveState.restore or saveState.restore.job==nil)
+ end,
+ cancelled=function(stamp:any) stamp.result.pending=nil;stamp.result.cancelled=true end,
+ failed=function(stamp:any,_problem:any)
+  stamp.result.pending=nil;stamp.result.cancelled=nil;stamp.result.ok=false
+  saveState.restoreError="That rest could not be loaded. Your current spider and its local rests are kept."
+  saveState.localReturnScreen(stamp)
+ end,
+ completed=function(stamp:any)
+  stamp.result.pending=nil;stamp.result.cancelled=nil;stamp.result.ok=true
+  lastEnd=nil;closeScreens()
  end,
 })
 saveState.restore=require(script.Parent.SaveRestore).new({
@@ -1551,6 +1626,16 @@ function saveState.fail(err: any)
 end
 -- Saving cannot stop the frame. A failed network path stays off for the visit; local last rests still prepare.
 function saveState.frame()
+ local localJob=saveState.localRestore.job
+ local localOk,localError=pcall(function() saveState.localRestore:update() end)
+ if not localOk then
+  saveState.localRestore:cancel()
+  if localJob then saveState.localRestore.cfg.failed(localJob.stamp,localError) end
+  warn("[Windowsill] local return preparation: "..tostring(localError))
+ elseif localJob and localJob.stamp.result.cancelled and saveState.localRestore.job==nil then
+  saveState.restoreError="That local rest changed while it was being prepared. Your current spider is kept; choose again."
+  saveState.localReturnScreen(localJob.stamp)
+ end
  -- Local last rests remain available even if network saving failed this visit.
  local okRest,restError=pcall(function() saveState.rest:update() end)
  if not okRest then
@@ -1566,7 +1651,7 @@ end
 
 controls = SpiderInput.bind({
 	blocked = function(): boolean return (rivalLegs.navigation ~= nil and rivalLegs.navigation.status ~= "ready") or modal() or M.title:holding() end, -- Loading and the intro own the controls.
-	menu = function() if settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
+	menu = function() if saveState.localRestore.job then saveState.cancelLocalReturn(true) elseif settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
 	focus = function(phase: string)

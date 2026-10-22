@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 local awaitRest=require("./studio/AwaitRest")
 -- (the mating cycle's part of the client smoke run, in a file of its own: the whole smoke run is close to the time one check may take)
 -- The mate on the sill and drawn, the courtship meter in the hud, the egg sac, the hatching scene, the ending card and the next generation, through the real
@@ -585,6 +586,7 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	-- Returning to it brings the generation back, with no mate or sac.
 	life.generation = 7
 	d.returnToCheckpoint()
+	awaitReturn(d,function() frame(0) end)
 	frames(3)
 	assert(life.generation == 1 and life.mating.stage == "none", `the checkpoint holds generation 1 (got {life.generation})`)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
@@ -1161,6 +1163,7 @@ check("a record returned to during the scene's world, a reset and a new life lea
 	untilScene(d, 2.0)
 	assert(legs.couple.active and snd.swell > 1, "mid-scene")
 	d.returnToCheckpoint()
+	awaitReturn(d,function() frame(0) end)
 	frames(3)
 	assert(not legs.couple.active and cam.shot == nil and legs.couple.turn == nil and legs.couple.focus == nil, "a return to the last rest ends the scene's presentation")
 	wait(1.2)
@@ -1171,10 +1174,11 @@ check("a record returned to during the scene's world, a reset and a new life lea
 	untilScene(d, 1.5)
 	assert(legs.couple.active, "mid-scene again")
 	local store = d.currentStore()
-	local loadBest = store.loadBest
-	store.loadBest = function() return { ok = false, message = "no last rest to return to" } end
+	local originalData = store.store.data
+	store.store.data = {} -- fixture: no local rest exists; an availability hint is not proof
 	d.returnToCheckpoint()
-	store.loadBest = loadBest
+	awaitReturn(d,function() frame(0) end)
+	store.store.data = originalData
 	frames(3)
 	assert(not legs.couple.active and cam.shot == nil and third.state == "leaving" and third.scene == false and life.mating.stage == "mated", "back to the start: the pair part, the scene is over")
 	wait(1.2)

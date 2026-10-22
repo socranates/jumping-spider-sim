@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 local awaitRest=require("./studio/AwaitRest")
 -- Persistent saves, the client's side (ROBLOX-39): the words, SaveClient on a fake clock and fake remotes, and the real SpiderClient on the
 -- shim with a scripted server: it waits for the server's word before the start menu, applies the notebook, the adult life, the spider, the
@@ -475,6 +476,7 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	feeding.game, feeding.startGrip = false, 0.123
 	check(awaitRest(driver.life.save(),function() frames(1) end).ok, "a rest with another struggle in it is kept")
 	driver.returnToCheckpoint()
+	awaitReturn(driver,function() frame(0) end)
 	feeding = driver.prey.feeding
 	check(feeding.game == true and feeding.startGrip ~= 0.123, `the game's struggle is on after a return to the last rest (game {tostring(feeding.game)}, grip {feeding.startGrip})`)
 	driver.openMenu()

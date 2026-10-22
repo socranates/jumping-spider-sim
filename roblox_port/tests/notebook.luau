@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 local awaitRest=require("./studio/AwaitRest")
 -- The naturalist's notebook (LEARN-01, ported as ROBLOX-37). NOTEBOOK passed=N failed=M.
 -- Which expectations come from where: Godot's own hand-written tests (tests/integration/test_learn01_notebook.gd) are hand-ported
@@ -1022,7 +1023,7 @@ if loaded and d then
 	book:notice("felt") -- a page found after the checkpoint (no event of the port opens this one, so it stands for any)
 	local after = opened()
 	check(after ~= before, "a page found after the rest")
-	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
 	check(d.lifeSpider().inRetreat and d.life.resting, "back resting in the crack")
 	check(opened() == after, "a return to the rest erases no page and opens none: " .. opened())
 	check(book:isOpen("felt") and book:isOpen("retreat"), "the page found after the checkpoint is still there")

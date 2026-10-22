@@ -1,3 +1,4 @@
+local awaitReturn=require("./studio/AwaitReturn")
 local awaitRest=require("./studio/AwaitRest")
 -- Real preserve client: New Life must not inherit another spider's predator reactions.
 local Map=require("../src/Shared/World/WorldMap")
@@ -74,6 +75,7 @@ if saved.ok then
  arm()
  for _,row in actors do row[1].enabled=false end
  d.returnToCheckpoint()
+ awaitReturn(d,function() frame(0) end)
  check(d.life.clock.day==day and d.life.clock.hour==hour,"recovery restores the saved clock")
  for _,row in actors do
   local clean=row[2].new(row[1].seed);clean.enabled=false;clean.gentle=true

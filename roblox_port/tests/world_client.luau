@@ -1,3 +1,5 @@
+local awaitRest=require("./studio/AwaitRest")
+local awaitReturn=require("./studio/AwaitReturn")
 -- The client's world (ROBLOX-94, Client/WorldClient): where the boxes are (the server's World folder, or a sill straight in the workspace as the box worlds have it), which region
 -- the spider is in and the pace of its day, the streaming focus, and what the sim does about instance streaming; then the real client on the folders the server really builds
 -- (Shared/World/WorldBuild, with the drawn sill beside them): the spider stands and walks, its rays include the World folder and nothing else, the rival and the flies find their
@@ -467,6 +469,11 @@ local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.c
 if not loaded then print("LOAD ERROR", loadError) end
 local frame = ClientStubs.renderSteps.SpiderSim
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
+local function settleRest()
+ local d=ClientStubs.driver
+ if d.life.checkpointResult then awaitRest(d.life.checkpointResult,function() frame(0) end) end
+ frame(0)
+end
 local KEYS = { Feed = "E", Forward = "W", Reset = "Backspace", Drop = "F" }
 local function key(action: string, down: boolean)
 	local fn = ClientStubs.actions["Spider" .. action]
@@ -528,7 +535,7 @@ check("the drawn spider's root is the replication focus, set again after a retur
 	localPlayer.ReplicationFocus = nil
 	frames(3)
 	assert(localPlayer.ReplicationFocus == nil, "a steady frame does not write it again")
-	key("Reset", true); frames(1); key("Reset", false); frames(2) -- (no last rest yet: back to the start)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2) -- (no last rest yet: back to the start)
 	assert(localPlayer.ReplicationFocus == drawnRoot(), "after Backspace it is set again")
 	localPlayer.ReplicationFocus = nil
 	assert(driver.fresh("main", false, nil), "a new life begins")
@@ -575,13 +582,13 @@ check("a rest from another revision of the world is put back at the sill's spawn
 	driver.place(Vector3.new(-25.5, 0.31, 6.0))
 	frames(30)
 	life.clock.hour = 12
-	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting, "no rest: " .. tostring(life.notice))
 	local best = driver.currentStore():loadBest()
 	assert(best.ok and best.record.world_map.region == "sill" and best.record.world_map.retreat == "sill_crevice" and best.record.world_map.revision == WorldMap.REVISION, "the rest carries the world it was in")
 	-- Walk away, and come back: the same world puts the spider back in the crack.
 	key("Forward", true); frames(90); key("Forward", false); frames(30)
-	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
 	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
 	-- The same rest, kept by another revision of the world: the world has changed since, so the spider stands where a life begins.
 	local other = Json.copy(best.record)
@@ -589,7 +596,7 @@ check("a rest from another revision of the world is put back at the sill's spawn
 	local saved = driver.currentStore():save(other)
 	assert(saved.ok, "the old revision's rest was not kept: " .. tostring(saved.message))
 	key("Forward", true); frames(90); key("Forward", false); frames(30)
-	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
 	local at = drawnRoot().Position
 	assert((at - (sill.spawn.pos + Vector3.new(0, 0.31, 0))).Magnitude < 0.5, `at {at}, not at the sill's spawn {sill.spawn.pos}`)
 	assert(not driver.lifeSpider().inRetreat, "put back in the crack of a world that has changed")
@@ -647,7 +654,7 @@ check("a rest under the bed's stone keeps the world it was in (bed_a, bed_a_ston
 	frames(30)
 	assert(driver.world.region.id == "bed_a" and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "under the stone")
 	life.clock.hour = 12
-	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting, "no rest under the stone: " .. tostring(life.notice))
 	local best = driver.currentStore():loadBest()
 	assert(best.ok and best.record.world_map.region == "bed_a" and best.record.world_map.retreat == "bed_a_stone" and best.record.player.retreat_id == "bed_a_stone"
@@ -657,7 +664,7 @@ check("a rest under the bed's stone keeps the world it was in (bed_a, bed_a_ston
 	driver.camera:snap()
 	key("Forward", true); frames(120); key("Forward", false); frames(30)
 	assert(driver.world:inRetreat(driver.motor.pos) == nil, "walked out from under the stone")
-	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
 	assert(driver.lifeSpider().inRetreat and life.resting and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "back resting under the stone")
 	assert(driver.world.region.id == "bed_a" and LifeClock.game.clockScale == 0.33 and string.find(life.notice, "the world has changed", 1, true) == nil, "in the bed, at its pace, with no word of a changed world")
 	-- home again, for the checks that follow
@@ -842,7 +849,7 @@ check("the stone is a home in the words: near it the line says so, under it the 
 	frames(5)
 	assert(hud.promptTitle.Text == "Under the stone", `under it, able to rest: "{hud.promptTitle.Text}"`)
 	life.clock.hour = 12
-	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting and life.notice == "Last rest kept, under the stone.", `the kept rest says where: "{life.notice}"`)
 	assert(hud.promptTitle.Text == "Resting under the stone", `resting: "{hud.promptTitle.Text}"`)
 	local best = driver.currentStore():loadBest()
@@ -855,7 +862,7 @@ check("the stone is a home in the words: near it the line says so, under it the 
 	driver.place(Vector3.new(-25.5, 0.31, 6))
 	frames(5)
 	assert(hud.promptTitle.Text == "The silk-lined crack", `in the crack: "{hud.promptTitle.Text}"`)
-	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting and life.notice == "Last rest kept." and hud.promptTitle.Text == "Resting in the silk-lined crack", `the crack's rest: "{life.notice}" / "{hud.promptTitle.Text}"`)
 	life.clock.day = day
 end)
@@ -870,7 +877,7 @@ check("a return to a rest under the stone puts the bed's prey back where it was"
 	driver.place(Vector3.new(11, -89.69, -50))
 	frames(30)
 	life.clock.hour = 12
-	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting, "resting under the stone: " .. tostring(life.notice))
 	local d = garden.bed_a.prey
 	local kept = {}
@@ -884,7 +891,7 @@ check("a return to a rest under the stone puts the bed's prey back where it was"
 	local moved = false
 	for i, f in d.flies do if kept[i] == nil or kept[i].id ~= f.id or (kept[i].pos - f.position).Magnitude > 0.01 then moved = true end end
 	assert(moved, "the prey moved on meanwhile")
-	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
 	assert(life.resting and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "back under the stone")
 	local d2 = garden.bed_a.prey
 	assert(d2 ~= nil and #d2.flies == #kept, "the bed's prey is back")

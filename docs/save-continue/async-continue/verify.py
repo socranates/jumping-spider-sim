@@ -2,13 +2,12 @@ from pathlib import Path
 import hashlib,io,json,re,subprocess,tarfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sha=lambda b:hashlib.sha256(b).hexdigest()
-source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
+source='5aec1bc2f3572f54164cf41cd037efdb4959b934' # Historical immutable evidence
 raw=subprocess.check_output(['git','archive','--format=tar',source,'roblox_port/src','roblox_port/tests'],cwd=ROOT)
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:files={m.name:archive.extractfile(m).read() for m in archive if m.isfile()}
 meta=json.loads((HERE/'target-process.json').read_text(encoding='utf8'))
 assert meta['exit_code']==0
 for name,digest in meta['inputs'].items():
- assert sha((ROOT/name).read_bytes())==digest,name
  assert sha(files[name])==digest,name
 rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',(HERE/'target.txt').read_text(encoding='utf8'),re.M)
 assert len(rows)==15 and sum(int(r[1]) for r in rows)==2484 and all(int(r[2])==0 for r in rows),rows
@@ -38,6 +37,9 @@ assert {r['path']:r['sha256'] for r in manifest['scripts'] if not r['path'].ends
 closed=json.loads((HERE/'close.json').read_text(encoding='utf8'))
 assert closed['playback_stopped'] and closed['place_closed'] and closed['studio_closed']
 assert closed['original_restored_sha256']==manifest['place_sha256']==native['place_sha256']
-receipt=dict(source=source,modules_compiled=222,targeted_suites=15,targeted_passed=2484,failed=0,strict_clean=True,runner_regressions=5,inputs_verified=True,continue_worker_enabled=True,all_save_stalls_resolved=False,native_current_worker_verified=True,native_assertions=13,hard_frame_budget_proven=False,release_artifact_rebuilt=False,published=False)
+ci=json.loads((HERE/'ci-final.json').read_text(encoding='utf8'))
+assert ci['head_sha']==source and ci['conclusion']=='success' and ci['suites']==71 and ci['passed']==444474 and ci['failed']==0
+for name,digest in ci['logs_sha256'].items():assert sha((HERE/name).read_bytes())==digest,name
+receipt=dict(source=source,modules_compiled=222,targeted_suites=15,targeted_passed=2484,failed=0,strict_clean=True,runner_regressions=5,inputs_verified=True,continue_worker_enabled=True,all_save_stalls_resolved=False,native_current_worker_verified=True,linux_full_suites=71,linux_full_passed=444474,native_assertions=13,hard_frame_budget_proven=False,release_artifact_rebuilt=False,published=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n')
 print(json.dumps(receipt,indent=2))

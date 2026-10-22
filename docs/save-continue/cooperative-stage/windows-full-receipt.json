@@ -1,0 +1,10 @@
+{
+  "source": "955d1eb32319a3eb84375835ab0d7e669a65de70",
+  "suites": 70,
+  "passed": 444440,
+  "failed": 0,
+  "snapshot_inputs_verified": true,
+  "elapsed_seconds": 1287.826773405075,
+  "log_sha256": "b0a1ecb550fce24ea4bf613cf7d0f928efed7ff08df2b0a21da8b67e2c1f3b87",
+  "published": false
+}

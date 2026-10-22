@@ -1,3 +1,9 @@
+# Latest unpublished milestone: owned offer preparation, 8db0f6d
+
+[Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-offers/README.md).16 focused suites/2592,222 compile, strict clean, runner5; actual Studio20 assertions/223 fingerprints/Persistence disabled. Protocol3 owned offers now prepare across frames; menu availability no longer decodes saves. Initial receive18ms/replacement5ms/menu7ms inone native1.5M case; worker spikes/overall Continue latency and synchronous local save/return remain. No typical-FPS claim. Current Windows95122/Linux39839306311 live. Prior955 both70/444440/0,5aec Linux71/444474/0 historical. Nothing published; broader audit/goal active.
+
+Earlier status below is historical.
+
 # Latest unpublished milestone: frame-driven Continue, 5aec1bc
 
 [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-continue/README.md). Actual Continue now prepares a private world/store behind a cancellable menu and commits once.15 suites/2484,222 compile, strict clean, runner5; actual Studio13 assertions/223 fingerprints/Persistence disabled. Remaining native update spikes64ms; initial receive823ms; local rest still synchronous. Nothing published. Current Linux39836124046 is live; current Windows full awaits terminal prior955 Windows30175. Prior955 Linux70/444440/0 is historical, not current proof. Goal and broader audit remain active.

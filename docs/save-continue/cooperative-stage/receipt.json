@@ -12,6 +12,7 @@
   "native_current_worker_verified": true,
   "linux_full_suites": 70,
   "linux_full_passed": 444440,
+  "windows_full_passed": 444440,
   "native_assertions": 13,
   "hard_frame_budget_proven": false,
   "release_artifact_rebuilt": false,

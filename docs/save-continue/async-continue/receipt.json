@@ -10,6 +10,8 @@
   "continue_worker_enabled": true,
   "all_save_stalls_resolved": false,
   "native_current_worker_verified": true,
+  "linux_full_suites": 71,
+  "linux_full_passed": 444474,
   "native_assertions": 13,
   "hard_frame_budget_proven": false,
   "release_artifact_rebuilt": false,

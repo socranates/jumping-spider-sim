@@ -1,3 +1,9 @@
+# Current milestone: owned offers across frames, 8db0f6d
+
+[Current implementation/evidence](async-offers/README.md). Protocol3 network-owned offers now validate privately across frames; status/authority remain immediate, and menu renders use advisory availability rather than decoding full local rests. Current proof:16 suites/2592,222 compilation/strict/runner5; actual Studio20 assertions/all223 fingerprints with production saving disabled.1.5M native initial receive18ms, replacement5ms, populated menu7ms; remaining update spikes/large Continue latency/local-save and local-return stalls remain. No hard-budget/typical-FPS claim. Nothing published; goal active. Root verify.py is current-source-bound.
+
+Current full gates: Windows95122 (immutable8db archive), Linux39839306311. Prior955 completed both70/444440/0 and5aec Linux71/444474/0. A separate5aec Windows run was superseded by this newer full run. Older milestones below are historical.
+
 # Current milestone: actual Continue across frames, 5aec1bc
 
 See [current implementation and evidence](async-continue/README.md). Continue now prepares privately behind a Cancel menu, then commits once. Current proof:15 suites/2484 checks,222 compilation/strict/runner5, actual Studio13 assertions/all223 fingerprints with production saving disabled. Incoming offer and local rest work remain synchronous; the native controller still had64ms maximum updates. Nothing published, broader goal active. Root verify.py is current-source-bound.

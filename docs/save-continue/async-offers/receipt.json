@@ -1,0 +1,18 @@
+{
+  "source": "8db0f6d7b6b91534c3275dff5833cbb3bbe1dab5",
+  "modules_compiled": 222,
+  "targeted_suites": 16,
+  "targeted_passed": 2592,
+  "failed": 0,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "inputs_verified": true,
+  "continue_worker_enabled": true,
+  "all_save_stalls_resolved": false,
+  "native_current_worker_verified": true,
+  "owned_offer_worker_enabled": true,
+  "native_assertions": 20,
+  "hard_frame_budget_proven": false,
+  "release_artifact_rebuilt": false,
+  "published": false
+}

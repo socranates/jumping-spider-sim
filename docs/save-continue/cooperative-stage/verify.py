@@ -40,6 +40,11 @@ assert closed['original_restored_sha256']==manifest['place_sha256']==native['pla
 ci=json.loads((HERE/'ci-final.json').read_text(encoding='utf8'))
 assert ci['head_sha']==source and ci['conclusion']=='success' and ci['suites']==70 and ci['passed']==444440 and ci['failed']==0
 for name,digest in ci['logs_sha256'].items():assert sha((HERE/name).read_bytes())==digest,name
-receipt=dict(source=source,modules_compiled=221,targeted_suites=14,targeted_passed=2450,failed=0,strict_clean=True,runner_regressions=5,inputs_verified=True,gameplay_worker_enabled=False,save_stalls_resolved=False,native_current_worker_verified=True,linux_full_suites=70,linux_full_passed=444440,native_assertions=13,hard_frame_budget_proven=False,release_artifact_rebuilt=False,published=False)
+win=json.loads((HERE/'windows-full-process.json').read_text(encoding='utf8'))
+wr=json.loads((HERE/'windows-full-receipt.json').read_text(encoding='utf8'))
+assert win['source']==source and win['exit_code']==0 and wr['source']==source and wr['passed']==444440 and wr['failed']==0
+for name,digest in win['inputs'].items():assert sha(files[name])==digest,name
+assert sha((HERE/'windows-full.txt').read_bytes())==wr['log_sha256']
+receipt=dict(source=source,modules_compiled=221,targeted_suites=14,targeted_passed=2450,failed=0,strict_clean=True,runner_regressions=5,inputs_verified=True,gameplay_worker_enabled=False,save_stalls_resolved=False,native_current_worker_verified=True,linux_full_suites=70,linux_full_passed=444440,windows_full_passed=444440,native_assertions=13,hard_frame_budget_proven=False,release_artifact_rebuilt=False,published=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n')
 print(json.dumps(receipt,indent=2))

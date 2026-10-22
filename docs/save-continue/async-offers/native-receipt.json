@@ -1,0 +1,54 @@
+{
+  "source": "8db0f6d7b6b91534c3275dff5833cbb3bbe1dab5",
+  "run_id": "1792696992730",
+  "assertions": 20,
+  "stages": [
+    {
+      "name": "initial_offer",
+      "steps": 219,
+      "max_update_ms": 30.678,
+      "max_heartbeat_gap_ms": 520.759,
+      "total_update_ms": 526.026,
+      "elapsed_ms": 3670.128
+    },
+    {
+      "name": "actual_continue",
+      "steps": 618,
+      "max_update_ms": 60.934,
+      "max_heartbeat_gap_ms": 471.678,
+      "total_update_ms": 1454.194,
+      "elapsed_ms": 10489.875
+    },
+    {
+      "name": "replacement_offer",
+      "steps": 219,
+      "max_update_ms": 13.567,
+      "max_heartbeat_gap_ms": 61.068,
+      "total_update_ms": 490.271,
+      "elapsed_ms": 3677.623
+    }
+  ],
+  "synchronous_costs_ms": {
+    "initial_owned_receive": 17.978,
+    "five_known_repeats": 10.131,
+    "populated_menu": 6.584,
+    "replacement_owned_receive": 4.656
+  },
+  "record_canonical_chars": 1501296,
+  "region_initialization_attempts": 233,
+  "resident_regions_measured": false,
+  "creator_errors": 0,
+  "creator_warnings": 1,
+  "persistence_disabled": true,
+  "online_save_accessed": false,
+  "continue_worker_enabled": true,
+  "owned_offer_worker_enabled": true,
+  "all_save_stalls_resolved": false,
+  "low_system_resources_warning_seen": true,
+  "hard_frame_budget_proven": false,
+  "typical_fps_proven": false,
+  "place_sha256": "2f672f11b3ed7d79c715bc1b8bff1dad913efcf7d7457b6b7dde26be3d002db1",
+  "probe_sha256": "1eb6a1d5fa5a0383dd327758b5bf7c83b6ef42f1f9794cea20194ce186ee1a50",
+  "output_sha256": "1fce5005995fa577c5c2fea2fc018e255b52936149aba7a909bb1b53c0ab79f3",
+  "published": false
+}

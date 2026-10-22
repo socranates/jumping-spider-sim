@@ -1,4 +1,4 @@
-"""Verify the current server milestone; prior phase receipts remain historical."""
+"""Current milestone verifier; prior source-bound receipts stay historical."""
 import runpy
 from pathlib import Path
-runpy.run_path(str(Path(__file__).resolve().parent/'server-ready/verify.py'))
+runpy.run_path(str(Path(__file__).resolve().parent/'client-final/verify.py'))

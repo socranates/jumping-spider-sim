@@ -1,6 +1,6 @@
 # Newer unfinished work
 
-The active branch is now `codex/save-continue`. See [Save/Continue status](../save-continue/README.md): server-only219 modules,1,319 focused checks, client/menu still unfinished. The older status below is historical. Its e315b3a full Windows/Linux gates subsequently completed65 suites/443946, retained in the separate `windowsill-observed-life` checkout; they do not verify this newer feature.
+The active branch is now `codex/save-continue`. See [Save/Continue status](../save-continue/README.md): 220 modules with opt-in client transport and scripted client/service coverage; actual game/menu still unfinished. Current focused receipts in client-final/ verify1,457 checks across8 suites,220 compilation, clean strict analysis and runner5 on source da111f7; the source-bound verifier passed. The older status below is historical. Its e315b3a full Windows/Linux gates subsequently completed65 suites/443946, retained in the separate `windowsill-observed-life` checkout; they do not verify this newer feature.
 
 # Current foundation audit status
 

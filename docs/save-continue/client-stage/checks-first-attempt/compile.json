@@ -1,0 +1,1326 @@
+{
+  "total": 220,
+  "passed": 220,
+  "files": [
+    {
+      "path": "roblox_port/src/Client/BirdBody.luau",
+      "sha256": "e290e574c9064832dd822ab008e9dc247bbb44512b5a381c13b1ea6674b801c7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/BugBodies.luau",
+      "sha256": "889696d55ad001e610d3c8885402141faa3b9d48c5b478a63dc94fd7611dcf24",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/CatBody.luau",
+      "sha256": "42239c8a504a920be01228cf3fb147ffedffdcb3c77ebbe794b71a502c2e950c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/CaughtPanel.luau",
+      "sha256": "d93b8905305be924183919edde3e9dc0511109913109188c7c43a3c75b3dadf7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/CrabBody.luau",
+      "sha256": "3e562e7ae8e1d38edd9662b6c5a5a8139a662c5a208c6b4fab92c204998fe383",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/FlyBodies.luau",
+      "sha256": "3aa18fabc5a5b49912a9e0ef0887dcc110b8b29e5a7a201763abbba299dab977",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/FrameProfile.luau",
+      "sha256": "039adb3277928384ccb2a9add7b7f0d55f7ca5975013d9e04aceb08914ade9b0",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/HutLife.luau",
+      "sha256": "4fa40d51d324bb8cdd0fb9ee94015f3699e62890ce23dab05750229da8985f23",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/LivingWorld.luau",
+      "sha256": "270664ccf742dbbeeffe2944bfc8b583cae33b7754837d2a02ebbe708c65d7d5",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/LookStream.luau",
+      "sha256": "2effb1e7d6a302cfc35c5e574c3c372453c195b3b260e37107c537d15b7a5b93",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/MateStage.luau",
+      "sha256": "d94bd815a627aea40d08f8395015ac636a25636bf4f33bbbd4268a0f219a2310",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/MealPresentation.luau",
+      "sha256": "79895cdbf10ac8018cd116ada76c23cb6ad63408e609da0b46e3fcf37082a9d6",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/NotebookArt.luau",
+      "sha256": "8412c1a40ce6a48c5e4696fed703ae7465aef0b165f4809d4deacc37443e499c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/NotebookPanel.luau",
+      "sha256": "93b2e0fb3dfca309a58ac9ec64db0dfe6f9b1a2aa9ad1172e3bbed5ccfd22b53",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/OldSkins.luau",
+      "sha256": "1df75fdbd4d88c9023401f18c99f369fc7980791f583b4065c6b0eb160f9ded2",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/PerceptionHud.luau",
+      "sha256": "b0a77d9fee4d8a56d06751d8eb0bd7f254cb7d6928781ccb743b9d88f79ae773",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/PerceptionStage.luau",
+      "sha256": "55311bc6c1ac554efef6c6e06b91825fd790923b7bf446677201c552210134ae",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/PondBodies.luau",
+      "sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/RareBody.luau",
+      "sha256": "0582fe30cc0b30f6054832128bdbe8a61ade74c937d5e245917ba7359e216e69",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SaveClient.luau",
+      "sha256": "ab57950980bc0ca7913f4cf31c6fb38b8491fdec1f88955ce24c099c30c78f53",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SaveContinuation.luau",
+      "sha256": "e988bfd8cf7925cbd62997d824ee4c3c991e9faefd8f4208a1b1e69aeab59533",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SelfTest.luau",
+      "sha256": "fb34d2c680a90450cc3d9e702478a1a127c9e5ce269015e88dd6446bfde2817f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SettingsPanel.luau",
+      "sha256": "0a14c23718aba1f9e0dda835df7dd57aa6fd4609db75ba39f36bd3d284413b1b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/Soundscape.luau",
+      "sha256": "ac199914b97b81a722037aae56ad228807ecf0fefcdb1ff5a1aa241be42ad561",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderCamera.luau",
+      "sha256": "353c77d2ff37f457a67c52224eb3f7617679c58ccbba07c2e93d98544422f484",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderClient.client.luau",
+      "sha256": "1baa1f1d07401928e4acb9064aa195c37a1ae2728c31e3f666e4c8f87e6db582",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderEyes.luau",
+      "sha256": "3dc323eda15ddf9b79c1991029209b96cb14f89b6ce20df278e4bdcebd047689",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderHud.luau",
+      "sha256": "917e92dbd5b987a860124c1274ec6a19efaf1e5a3d778d1cebbd834a6d701642",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/SpiderInput.luau",
+      "sha256": "2e2d2d3acea655fc495c4781c040980f901c5187cdefdb8a8128047b90d2ccee",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/StationMouseBody.luau",
+      "sha256": "8098b4e62f9448efc904da1258f700320e436b99d013900615bfc32d37f54a49",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/TitleCard.luau",
+      "sha256": "1d2610a86aceda23f08d8c97ddb319ccc6d70318e3b37872f92ca6a48d37922b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/TrainPass.luau",
+      "sha256": "470799097fe6c6fd28bc4996f0fbf4c2f6924c3268dd227feddb3cec07045f72",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/WaspBody.luau",
+      "sha256": "5838e07272bd80e0ca7062e458eb5f498f9d79f613ef81268b948502c40c9a8f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/WorldClient.luau",
+      "sha256": "f2fda201bc86a5e7d0826669a9996997be275155bfd99595efebc562eab051df",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/WorldDetail.luau",
+      "sha256": "6b1fbb565552376295dd3a372b527e99d577aa9b0ce211de89edaa54b0910e80",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Client/WorldShadows.luau",
+      "sha256": "85846e9d3b65e422bb4a58ebddecd895ddc1328f70673d205f3bc21863584233",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/First/Splash.client.luau",
+      "sha256": "d2e93bf198bb882d578fce5c93c6ac4473356ac569752bd95ee35e5e1dc8cd4b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/First/SplashScreen.luau",
+      "sha256": "635d21ed8638fb64fbcdf6b37b5561321a34a710b6921e7a9f68b641c7271c9b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/DataStoreBackend.luau",
+      "sha256": "9a0a140ed3837222deed02063f8df14c36d91e0151b5c41295a3816971356552",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/Main.server.luau",
+      "sha256": "ac73f0d2988ba23b00cd8e0bb01a4668d75b48160595d1d7531a62f141ed4b9b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/Persistence.server.luau",
+      "sha256": "f62032b53eafad45d6e95f8ea87635354a07961d70e7277eb634e235b4fd3edd",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/RestCompression.luau",
+      "sha256": "10887f494c2afefa679cf2956f5f478d1390bd34e4169e20aa18b25d528cc413",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/SaveService.luau",
+      "sha256": "7bca22a20add702e5ef73743545a5bed7b2d0565e22730a4332e5315f7aa2eb0",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Server/WorldFocus.luau",
+      "sha256": "aa0b9347a9fa859f36be3adf5193c1a38c8a5cb9239ea7d6ce307160cb357255",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/AntMimic.luau",
+      "sha256": "d489dbb7e3dd71ad7beede937f11f40d0f4e202ca5e75e234d5118b8b0aee979",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Appearances.luau",
+      "sha256": "b5b3b0558a65bf0ba9d5b7fdd82f56c5fdc53e21f06d476522c92b132c179d9a",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Catch.luau",
+      "sha256": "7529fd215d25512b86a5248f517c30fb1db94be106deb43cd34d0f0b22d910e7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Detail.luau",
+      "sha256": "379018f2217e184a31a92dfb598be346db74ed6895a977d7f752c80a86b363be",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Eyes.luau",
+      "sha256": "bbb919497f5818b9040d6f25959d91bd9584165b6699b2082f9afa50770f94e4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Flora.luau",
+      "sha256": "efbf508dd9b26e9d5a20c1f3de49f58b2b4ae46ee4993db3fd5493d4e246a761",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/FlyLook.luau",
+      "sha256": "6d01910acec5b6fb23d3a4dc25faf949f324f8b04d2b12e328b17a067fb90154",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Graphics.luau",
+      "sha256": "9e0389258bc72c2122e94272cf95d4695dbfbfec714bea0610e4f218f8be899b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/MatingRules.luau",
+      "sha256": "18cb89d1fb01cda7b13b09184730708543ce262dc61531c03ce256a4c94c15f7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Meshes.luau",
+      "sha256": "5205ad7d10f3df7b5dd98884491f8cee8e3212262081e35f24081f00e713934b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/NotebookPages.luau",
+      "sha256": "25265c53af9dba13aebc8d36af41868def5d0e45c75318a2bab8234b5d3300ef",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Peacock.luau",
+      "sha256": "414137eafb2036a0b31aed37ae7c102f2fd9ecde72d66ed5e1ea5d8b84ff2292",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/RareSightings.luau",
+      "sha256": "9c9ecae3407a6cd386b73d03033063275f5856b5a7cefebd74e64c4bab302b78",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/RivalRules.luau",
+      "sha256": "d8e65efb2ae3390a127cc4ec748a7b37f5f97166ec4f8674f535ee6d6cc95349",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/SaveRules.luau",
+      "sha256": "12900acd1094a534af630762090ba3def738a197c7c2a3a771f9607a611a5b68",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/SettingsSpec.luau",
+      "sha256": "cc65643f67d93badc92daa7e40c9a0bdbdf91716ea5ab838f56ea82b82023b90",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Species.luau",
+      "sha256": "d1d0aeab2c11c5396346ad5bc75a04bf3773000e672409347548996c9f5c10a8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Surfaces.luau",
+      "sha256": "5a7acd8fb49ce6e3ef329d2764926d328676fc0252e2ab8712dc598328b2fb24",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Tarantula.luau",
+      "sha256": "5c4cbf233df1eec332420e5b9fdc8dd3ed1f872a85eb25d66081e1049988e728",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Wasp.luau",
+      "sha256": "6cbaac25aeb33c7e9b4582049d773934e05785352e0aacc18bf94fe97211ea6e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/WaspLook.luau",
+      "sha256": "159de9a9640d65aa38448be324475a02620ca2893fb49d29f619615339c1a9aa",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Data/Wear.luau",
+      "sha256": "b527af0abef34fdb526ec79a5ce570f97efcf8aa5434eba5594c800c5f222630",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Breakaway.luau",
+      "sha256": "f9bc28ce5db072d480b55b8eaca60ef12f97c992104fd841faa47c4f77be4074",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/DayLight.luau",
+      "sha256": "4d203cced3491a558962e7eff247b2a123ecdf5b6bceab4752b7ab1831c7ee79",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Dressing.luau",
+      "sha256": "f1941469981ac14d14495f40544e0fd93a962f4256d31659eba3a66ba5f9678a",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Lit.luau",
+      "sha256": "8ec39b3976c2763f01932e7ba91fa63798755b3c69a293cb8e9d882f64e5d0a7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Materials.luau",
+      "sha256": "7c91152f9edab0bf0884cb810424f5fa84b2fc03efcde90fd5251ee13470a566",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Patina.luau",
+      "sha256": "fa539469ef058190b90170b24c5f3f2e64eb9aeed5fb999a6d67d4bbbb35ae86",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Plants.luau",
+      "sha256": "71c433c62a073b282e27f3972d91cc7f1c09a5b815e1a4a1a86ca6a954998a4f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Scenery.luau",
+      "sha256": "7ff347f6c1af9bfcd21f2fc140cecb5379cb181efcf3e142a339baa8045bad7f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/Shapes.luau",
+      "sha256": "4a10bb56b7aabfe4a524b9233661376428ef49b489421fb2efd4d8c97f5809c7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/SunPick.luau",
+      "sha256": "ff1c46727a47a1999716007c4e612538694740f9d06c151c454386e000b70524",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/TestTarget.luau",
+      "sha256": "518287f2411ca068df4b21ad8323f22b0c28a0c5c89a4ab2579a992760249df8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Habitat/WindowsillLayout.luau",
+      "sha256": "2e2de156471e13853d2d3511af3186d74708dcce7becdad4c72c3b921f1dd831",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Learning/FieldNotebook.luau",
+      "sha256": "263ef25afc6e4960d1fff78c4cec933f79dd830de64b38bf80cffa0d52caa6c1",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Learning/NotebookWatch.luau",
+      "sha256": "88a81f8402a63d167ebc3065d6633149841aebdcc38ec6e5cf8bb5c8410e7679",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Ballooning.luau",
+      "sha256": "a840cb3031c2c0188a4ecefaa710b31a98ffcf0687885d41e9737749a6a58311",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Growth.luau",
+      "sha256": "8044619a893e29d795eb6a4c9c9c1c1c80daa6ddc9cf9015013cc054de894e84",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeClock.luau",
+      "sha256": "87c5d5518af1def9da1f0c911bdee53a2852547370732196baaf2867edf1586e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeLoop.luau",
+      "sha256": "2b05cd0ec002b062c91e7f156d899229728baab374fbf8798c35680481f813e9",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/LifeSession.luau",
+      "sha256": "f697141ffe5a21f4c6524967306759a41fe9677c81fcf58bf7732874e54f4fe7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Mating.luau",
+      "sha256": "a92bbd24f2a1328010387a5d3f27b276cd04dd4cfe435e3491e147527345b5b3",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/MatingScene.luau",
+      "sha256": "1d75aea13afcd25ad39f9a6c7b4256c39cf220b241659827b315563ac761c96b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Nature.luau",
+      "sha256": "6343684e766da7f95fe8984b6bd06c1f1044b69fe2bc6906a6efeaf9ca46ad8c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/NeedsModel.luau",
+      "sha256": "04a0c694dadc9e86c1d30d78d203debd2694bc9dc8c74798ad90759367e87add",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Nursery.luau",
+      "sha256": "05ebef04c5f15f2df58b56c4ce32c575d9d34b4c7257f70499e24d667975cd36",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/RareDirector.luau",
+      "sha256": "cbfb412e4b543f8987a8f4e08a4bbce6280bfe2a66ef229329ca0fae15275a0d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/RareLedger.luau",
+      "sha256": "c5a3ee78ad05a8934db08021c08aa307b12cad72db70dedf857eb8c7dfb49b2e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Life/Water.luau",
+      "sha256": "7d23c05c703a351a2ab4f015a84e8aa81934fbe18fe59a44d7a6da3070485da8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/CameraMath.luau",
+      "sha256": "114cd1b40bc5fe816f7461414844c83893724c740ddcabed3ee91ddad6617f55",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/FocusState.luau",
+      "sha256": "ed54fd709f6a73a1e6e27c3fae9e69618bc390da2c6892a8d5a7d2657bc46a9e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/InputState.luau",
+      "sha256": "40359cf98ee7d135c15fef41ad1aa364d48e6380249c0ce923360efb85aa699e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/InspectView.luau",
+      "sha256": "1a1c4509ec9c8fddfb82e45754b15c88a02b0eb36caa01772da58ac5c82c08c2",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/JumpInput.luau",
+      "sha256": "59a1ac78bb8aa393954014eab6fc46cfd4009f711243eb33340794fc636c79bd",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/JumpMath.luau",
+      "sha256": "c49605f33dcb3d3560ec428a56d9bfffb894654a3f0194dde1402448f18e77f8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/LineFraming.luau",
+      "sha256": "1f7fbe3c4648e3ffd724f8d05c73eef681df6571cfd998f8a7dce64b5f492de7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/LockOn.luau",
+      "sha256": "100bde62a89a4d3e7b96b1d2237a1538b1465105fc5d2c49c6b6c6edcfecc575",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SilkController.luau",
+      "sha256": "0d876582e4da523db3038d94a2b7a3769c8441a7a7728602c3c60c6468fcc37c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SpiderMotor.luau",
+      "sha256": "0da8a0068e3992fd0efcfd8dcfcc9c76781cc43ba3095ae69cf448cebbb8949d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/StickCarry.luau",
+      "sha256": "7f6d9183e53c089929c7760a775e7487234bc731c0eb090a2b2a5d64d2263a46",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/SupportMath.luau",
+      "sha256": "d9eb67e99feaa450dc6fad7f4922e6ef9a2bd3013bb364628ee206b901f8f131",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/TetherMath.luau",
+      "sha256": "7678cac3aa20522fc7ce39bac21b361bf519a976b9543f56412c70e99d6b05a4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Movement/TitleShots.luau",
+      "sha256": "481bdb453457c57d2c41e6dca7b033dbfbeeccd5319d334d7e4d6eac7f282fb2",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Observation.luau",
+      "sha256": "d69fc436e52a53921c11967ccb4334e0efb956b2f79538cdf146bd96182560c2",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/ObservationMemory.luau",
+      "sha256": "5c68842b2e9a8fe6b1d9b42bdc38898c03732167e2f9ab888963416ba0bf4c29",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/PerceptionMath.luau",
+      "sha256": "91e88bdf30ed9818c675b6cbfb5f35ce6d40cc26e5971269d9e32f0e48feef4f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Sensor.luau",
+      "sha256": "0687a48526aa879bf9525f7822a7c7c6a53a361d518abe593f7f6d6feb5b7da6",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/SensorCore.luau",
+      "sha256": "5b28ada981c51d24e022ffa43a5934023bd33a5d586704a9b100d46386c4daaf",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Perception/Signal.luau",
+      "sha256": "9158c302b5a68b307dadd7e42d7e74efa69e757ab5856cf1775b7f1fe951b4d1",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/Checkpoint.luau",
+      "sha256": "d42c3e376966e1361a54d15255ca987b4551efffca0cbdff1ea16e93d42cd5b8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/CheckpointStore.luau",
+      "sha256": "80f88d2a4164b5f79dae0d2f25c8a60a0e950cfde09e1af8aa8e2dd3cdaeb9b2",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/CompactMigration.luau",
+      "sha256": "049b956b02e957e7f8cd33e5819166db933e213677cffcf2463ba19eb15c259c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/Json.luau",
+      "sha256": "dd91c183535b6c596b0fd741e461bfd60dac1301cfcd51eee538dc85d80d2642",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/MemoryBackend.luau",
+      "sha256": "4f27e644fdd2ba7a20a79e283f4ec27267d5c1d56685ab3f1f52f536aa15c1f5",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/ObjectRecord.luau",
+      "sha256": "f05d14238470ea8302b2537b236dc742e1e8a119543ccd3a564b321372113a87",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveEnvelope.luau",
+      "sha256": "5d15ecee3f8e5d0a0203e26aa41ab850aad370f2bc241e2c3eecf6be4829cada",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveIntent.luau",
+      "sha256": "c6001916ba2356736127ace646a995a848a73a6f8f96fa75d9f65c0e2fe07b02",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveObservation.luau",
+      "sha256": "d383f22738da5c06e1f7a1bd62991035343692cd186a9020f62fc64a37b49bae",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveProgress.luau",
+      "sha256": "60f089b363f0648fd1ef1464d7bbc797b1afeb490160c3b58d28134b2df0e86d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveRest.luau",
+      "sha256": "653e605308a78f2e8cee18206c3726f4b5109bcd21132786919d76b356d4c067",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveScheduler.luau",
+      "sha256": "5d2c739936adc5f8fdc7e91c6105346db1c99c70b99aa6ec246c54d34dd144bb",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveSession.luau",
+      "sha256": "b3a566210743c40e2ac146cd9e7adab4a0e76c85ce758cfc285379a3952e2886",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Persistence/SaveStores.luau",
+      "sha256": "07a1052dac47e5c9f6d4b916a0c5a6e65907f5d6406f5fa375f2788150550399",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Bird.luau",
+      "sha256": "8fa4903dcf28f9bc8ff6f7687fb49a39d8f4198548857cf0d56c3c4fb5bdb7d7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Cat.luau",
+      "sha256": "84596af0c0f2babc8aada48bac6b0768caa4f91e0e4a1e7bcdd46236d0e491f5",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/CrabSpider.luau",
+      "sha256": "b8c2bcd3c6aa213e467ed69bcac6ecefb2e1a841c48754e30aba5f8a9c25f6b1",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Frog.luau",
+      "sha256": "46e671e78918819ce4dadb0b58570faea60396125753f406aaa7d080f4a6c201",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/Mate.luau",
+      "sha256": "e111195d36eded003ec17e148b218d11525ab3199f9649752dda058a279f4269",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/MateDrive.luau",
+      "sha256": "20c585eae2933e62bbb35ba87c99c7adbdff28bef3addc670f5049587224940c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalDisplay.luau",
+      "sha256": "45af4852fafd066322cf73fab32ff533e83ff656d870a20fc365ed5498a113fb",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalDrive.luau",
+      "sha256": "d98991e98c3d93b46de7cf0e26c905e43d1828c3e5230e5f14428d1e1b6e00f9",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalGrip.luau",
+      "sha256": "52f4e8a5833448cf1da0d2d35da078f81be89a0430a6eea65fcb554e61889230",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalRoute.luau",
+      "sha256": "252e7e331236200e5f30fed45d4c44c8c8cfb9529a6a099c7eeb3207aa53e852",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/RivalSpider.luau",
+      "sha256": "b37f67c321fc5e902f0a785c9806a3dde7822b5f8d4af9a0abbc6bf7d079c1c4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Predator/WaspDirector.luau",
+      "sha256": "64bdb25cbe04214c2562ce00eade3197d681f380f9fcabb9ea422b0672a8ddb4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Ant.luau",
+      "sha256": "e734fae74cdd93e37ba9bc1dc531e36a36ee56b3257788741343b0d65cfb0123",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Feeding.luau",
+      "sha256": "507594c6f4917b182e2ee05c6d144d18cbdd19cb1cc927d429a2cc9be15aecd7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Fly.luau",
+      "sha256": "1304fb04925ad4118ff44a6c8b62c63cd0d254dfbf36615682b10ae4c1ef318e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/FlyFlight.luau",
+      "sha256": "0f84cf2a6bf05a42134c1a87a5f49313f9ea4c8eef502cb497f63de51f4fe7a1",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/FlySenses.luau",
+      "sha256": "d0357fe9e8dc7a6fc3cd1caba9d6ce5ffc66978f126b8ed1ece10017244ba658",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Harvestman.luau",
+      "sha256": "3e4406be3359b06f4400f469053ef568fe7923e1caa79731927a8fdbf434073a",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Ladybird.luau",
+      "sha256": "5eaca901716e5e816a2e7189968b278d31e27873405d835c8521d1a118c2e01d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Millipede.luau",
+      "sha256": "c7cfa65e9bc82c5535337a96fb97e6248cf59cf8826883453ba2bf7b3bd3c96d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PerchGraph.luau",
+      "sha256": "e01c45447f499c039d1f1fdfe26edf59be5396cb929659eb93148c6424f1e676",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PlantWalk.luau",
+      "sha256": "48ec5683db87032db05e7287fcaba2049838f57a558d516257584d83d908072e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyDirector.luau",
+      "sha256": "a0de1b49979a960bc93907d4c86a27121d81d0a0fba672183e0cd04ed06080ca",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyKinds.luau",
+      "sha256": "cdb663fa41a3aa0a26bde7f747d910223de7f6c83a5bfbf02bdc47a1b1d30a88",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyMath.luau",
+      "sha256": "0ebc0fad87697058ea660bf0e45c078c83d57318c29f527a34877e3b13e78d0d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyPopulation.luau",
+      "sha256": "a8685b10fcedf88b458810983eaed5931c13282fcca2f1a40839cba0489bcdbf",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyRandom.luau",
+      "sha256": "0b3623956e15206235da786a802561464e31266fd4ea01af0083ae37da8e200b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/PreyWorld.luau",
+      "sha256": "16d2d55bc5430989da60883fb02bc8e4612fb54bc20d17b2e05ded3a1b7812f0",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Skater.luau",
+      "sha256": "8213a7cd6b603661c8a8a9073c6834cfb93143424389dc2ce115046a0b1f9210",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Snail.luau",
+      "sha256": "ba7ce5f5a0abc0a232fcc1c7469593499530a2b80e0b8264f736229ae4653536",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/StationMouse.luau",
+      "sha256": "c226e67f5e060ba3345f3c7f5fc7c5ec3051dfba9d159635b1451994764d3ebb",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Prey/Woodlouse.luau",
+      "sha256": "6762ce554cc331e3dc2df0301405f8578106bc3a13babc592e01ce644af7f6ac",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Anatomy.luau",
+      "sha256": "98cbdadd445e427863b57b584835ae3553abd33a41a35877b29b48a33b28e60e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/AntMimicPose.luau",
+      "sha256": "0bcf8d10725b7f38e0646a1617a1577121b586b027a0e605d43f696d5d2c6f28",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/CatPose.luau",
+      "sha256": "afde056e0d6c2d9d2c15e4efc325893ca1432638b0d319c384296f6698b4d9fd",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/DogGait.luau",
+      "sha256": "eb282888b436f3c260a66fa297b566a3b5350642f79a342741382059bace2595",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Idle.luau",
+      "sha256": "1da2c7cc046de1175ca2e0b6ba73274d4aa637dec64eee641c07df2e20e62705",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Living.luau",
+      "sha256": "218965167424ececf5c953860eb38412582c3208a0b90e02cd73a0d9a7e6e6f1",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/PeacockDance.luau",
+      "sha256": "8f79ee569bd0efe31c7b12476fa0fd08cb1b8f72c311881f292a1b896a594375",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/Setae.luau",
+      "sha256": "638606450f52eaa87110ee2a1c1d61c3003f67e026c95c797f97ccec38917504",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/SpiderChoice.luau",
+      "sha256": "68ffa8369927f98e5e063742401c71c971c63070b73d487c1cc002c59e4bb2c4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/SpiderRig.luau",
+      "sha256": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/Rig/TarantulaPose.luau",
+      "sha256": "0b8c8dc963aac985d827b9f75325bc45b30baaae1f3d6308c8513ce10f2f630f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/AntMimicText.luau",
+      "sha256": "553985d3f08813f557e1030cc9b64934e17e062ef92b09b8d2aa903f5170fcbe",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/BirdText.luau",
+      "sha256": "74340b8a0867d490c9f9069e39f389773bcd5cf4cd40f6dd23ac71467ca5d2ed",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/CatText.luau",
+      "sha256": "5a516be7feb51dba274c2428ffaaceed98e85158bdcd1a80bb9b17d3e3b1c765",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/ContextPrompts.luau",
+      "sha256": "a41644859d0c0621933f788a4ccc371c0984ada817b8a06c8db827fcf199079d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/ControlText.luau",
+      "sha256": "2b606e59a1c6825ab0fdcf3111829a82d989a72473a54d29561bce4a88c798f0",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/CrabText.luau",
+      "sha256": "9155a758ae66acecd4bd4379e785bbc03de41084b2756935a401caab991f9670",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/EyeOptics.luau",
+      "sha256": "3575998a2217a89e55988d50ce4cffcc1f2dea5df8756e839e748477796235ca",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/FrogText.luau",
+      "sha256": "7f4a8ea96d1a2da0201aab6430025d2e2c698eda4ec3819910c3b4691d6739c9",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/Heard.luau",
+      "sha256": "4deeee99a59feb57c14753db800c9934df81544ad44a38ce24ebf9c0e9ebb1ec",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/HudLayout.luau",
+      "sha256": "2044c3d7c940889835df60632493b20dc81f2e5eb931e1ec8da21c456b6b230a",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/InspectText.luau",
+      "sha256": "54e255ec94550b283fdec66d15cac6f2c5281fef40d8186e499aec12904f9db8",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/LifeText.luau",
+      "sha256": "3f9abccf13cfe0f71ec946325f3444ec1e876e087211072347d55033403f7f71",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/MateText.luau",
+      "sha256": "56f3385443c21a3580acce72a303f702f1db06aab9d6b7639974dda99cbe42e4",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/NotebookText.luau",
+      "sha256": "44623b4ecb52ff6609a67dc8ab32e55cd2f2fc9922b2e998bbf4e457441ff752",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PeacockText.luau",
+      "sha256": "b357fe3f7729fabf1e765817960d3c326b43393d80fe0c5f6502e856cf4c72e6",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionShapes.luau",
+      "sha256": "10addc9fc73639ab74eb3bda20d75a7e203990842900213242ac80be7b9992b7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionText.luau",
+      "sha256": "214c2c980b92efdf1f82dd43b3a7ed1c69d426037a65c4c29f48f16a9713c847",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PerceptionView.luau",
+      "sha256": "632477980aaf1410602ed58de7ca7a5023f49c6cc7128352b43845fa28c091ae",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/PreyText.luau",
+      "sha256": "fc3a7eff6833b9274f88fe84dc1588fede45c59f44a31f076f601977a728daca",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/QuietHud.luau",
+      "sha256": "93db1e9b65134d9b7db0c10ecd32dce7f473936a00acfc05e4002b940c5c11bc",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/RivalText.luau",
+      "sha256": "32cfa69cff63a6982b6b4f2fd42bf8111305ecf08c90cb4ce466821f27483518",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SaveText.luau",
+      "sha256": "677792ea3ce81f52171050787aa1313eab173cbac54b2de893565f6f66a52ff3",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsModel.luau",
+      "sha256": "3790a3575e37dcb7156c9e30e8daa9db1273fcf179472fba06eae7ed97de4cbf",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsNav.luau",
+      "sha256": "9bd3a39f86efd5f5739366105cbc31b51c3c0ee44375add1bde689e88c06590d",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/SettingsText.luau",
+      "sha256": "90f5f8068c7b87ff8863ff5a864a35c39b597ccf44c091745b4cd28d7bc6421a",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/TarantulaText.luau",
+      "sha256": "b355e94d9ba3abef5678979d564c7002fe06694f463b3732b9338b2b0a5be3e7",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/TitleText.luau",
+      "sha256": "fc403bf3baca72e67e72240c3498bebed0be495f0cb652e64fb2217f600a5831",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/WaspText.luau",
+      "sha256": "e8bc2d3ba2d21f731eb9a2f5557c2257d71d5b12f204d96e96e34c601be34496",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/UI/WaterText.luau",
+      "sha256": "65797a619ed65fd3249bdcc899c814a10214ad965efe04b294d8f4b20e1bef3e",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/AntForage.luau",
+      "sha256": "f098f529fe11c7d95f84e2899ec311e7980e981f03279e1ee28353f122a343b5",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/DogGround.luau",
+      "sha256": "093d7ce881af9709eab17ac47b9a128741083ededc7eec2f3c31db41a8da9c3f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Environment.luau",
+      "sha256": "33f67ac8a4f7fb8d5948ae70ddae39b9c10bd1a4bf7c2a61264e5b09ecbfed64",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Garden.luau",
+      "sha256": "c9308f5b4952fbfbc6948a4b3598a3ed152eadecf778204e6e930f04aa52541f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/GardenPocket.luau",
+      "sha256": "80d22923c1d3241d193ba385d1e7523f420dbdd82fb2d9ab70060ae09c8d35ad",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Hut.luau",
+      "sha256": "4c453c704cd072da8505e5f942321789b44b2679c3526a4d563323fb4666c83b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/LivedInSites.luau",
+      "sha256": "37149083c261716823c4cf49170a472bd0ecc87be8e8e6ea39aed77dbe7fe3f3",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/LookPlan.luau",
+      "sha256": "bc105269c00b11393c4accf576ed37a17efc4c8d34b8e30c4945b47fd766dcc9",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Meadow.luau",
+      "sha256": "5159e1ab961dfeeee90ec9091deeb20e40853c8c01795dfee2eb457cf15ffbeb",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/NavigationPreparation.luau",
+      "sha256": "ab6c0aeec2351f063a7bb235675be95426d6f72dcbd9736786899cfe4c865174",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Pond.luau",
+      "sha256": "3a0ab3b343c4f73292b420f3a9faebf03750698b2fabf3d68cc846d06ff00f4f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Preserve.luau",
+      "sha256": "ee276cf45c5c27ac277c3e69f64b8b6f360d9297b7cf15289769939318d0007c",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/PreserveLook.luau",
+      "sha256": "e24536af30e3568b404d3f8e44c1f0635aa8d008b8825f93e3896d4f84219a4b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/PreserveTrain.luau",
+      "sha256": "7042e344b4f1d9d9b30a2ad9dd6689dd8d16053818d5c95fb3a0f2d06140d35b",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Region.luau",
+      "sha256": "3854417660816d5922a261b3b3c93674ba334af0e83e3c7883903410792bba14",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/StationAir.luau",
+      "sha256": "ac0ebc96a183fb7d8409d63ce490d9ceea1f0d6f37f89a7ae9818dc2759d7b05",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/StationTerritory.luau",
+      "sha256": "57231a28000809a4d1eebe9397866e3fec313dd990fc3dc863ef3759551e7f4f",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Verge.luau",
+      "sha256": "68c68b768a1a879d341e5b76a3897c5587b98c54db43edfa8813af429b044e97",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/WorldBuild.luau",
+      "sha256": "86ff266765dad8626d3ea3a44118a193b6b818bd2845bc7a21a938cb58367f41",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/WorldMap.luau",
+      "sha256": "d0ea26ee6737d1ca0d9cfb04de6cf258fd7f5286dac3d61f9239db7d56581672",
+      "exit_code": 0,
+      "errors": ""
+    },
+    {
+      "path": "roblox_port/src/Shared/World/Worlds.luau",
+      "sha256": "fb3b78fc2819bece7bbce766b124021c33c553a9306a9abafb2dc0290f5571a3",
+      "exit_code": 0,
+      "errors": ""
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Next: client protocol and controller integration
 
-The server side is implemented and tested; the actual SaveClient/SpiderClient still request legacy protocol2. Do not change the game's preference to OFFER_PROTOCOL3 until the receiver, queue, callbacks and menu flow below are complete. Current runtime XML/BuildInfo still belong to the older release snapshot.
+The server and opt-in SaveClient receiver/queue are implemented and tested. Actual SpiderClient still uses legacy protocol2. Source da111f7 adds the helper and scripted integration; the controller/menu is next. Do not change the game's preference to OFFER_PROTOCOL3 until the receiver, queue, callbacks and menu flow below are complete. Current runtime XML/BuildInfo still belong to the older release snapshot.
 
 ## Wire contract now implemented
 
@@ -34,8 +34,12 @@ Newer client with an older server must not pretend offer-bound revalidation exis
 
 ## Game integration and validation
 
-Use a separate client continuation helper if needed to keep SaveClient's legacy path readable. Inject actual checkpoint validation/copy functions instead of adding unbounded startup waits for shared modules. Then add protocol3 preference in SpiderClient only when callbacks and UI are ready. Controller/menu edits were already announced to Nathan; fly, feeding and settings remain outside scope.
+The separate Client/SaveContinuation helper now keeps the legacy path readable. Inject actual checkpoint validation/copy functions instead of adding unbounded startup waits for shared modules. Then add protocol3 preference in SpiderClient only when callbacks and UI are ready. Controller/menu edits were already announced to Nathan; fly, feeding and settings remain outside scope.
 
 Offer arrival may refresh menu choices, but must not recursively issue another refresh RPC from that refresh callback. Request refresh on deliberate menu opening/action; render-only updates remain local. Continue without saving loads the explicitly accepted snapshot. Changed recovery offers a confirmed choice to load the newer rest or keep this spider temporary. It must not auto-restore from loaded/offer callbacks once play has begun.
 
 Required tests include delivery permutations/duplicates across all channels, old epochs, local supersession during callback reentrancy, immutable ticket retries/coalescing/refusals, throttling, lost storage replies, all modes/Easy unlock, older peer fallback, menu selection and one-time restoration through the real controller. Native engine/online rejoin, representative preserve-record copy/network cost and the broader audit remain distinct unverified gates. Do not claim A06 complete after only the server milestone.
+
+## Current adapter API
+
+Supply SaveClient.new cfg.continuation={copy,validate,onOffer,onDecision,onRestore} only after the game/menu is ready. validate(mode,record,allowRetired) must bound/check ordinary checkpoints and allow only a valid retirement marker when allowRetired is true. beginLife(mode,displayedOfferId) deliberately binds New; omitted id means physically missing only, never auto-latest. continueLife(mode,displayedOfferId) restores through onRestore immediately once after committing the choice. offer returns a private copy; refreshOffer queues bounded work. sendRest holds a private immutable candidate until a matching stored/refused response. Consumer restoration failures and menu confirmation still need game-level handling. Older-peer temporary fallback currently uses offline wording; refine it accurately in SaveText during menu integration.

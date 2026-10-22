@@ -84,7 +84,7 @@ end
 SaveRest.stubWorld = stubWorld
 
 -- Every problem with a rest filed under slot `mode` ("main", "easy" or "free", SaveRules.slotOf); an empty list for a good one. Never raises.
-function SaveRest.check(mode: any, record: any): { string }
+function SaveRest.check(mode: any, record: any, world: Checkpoint.World?): { string }
 	if mode ~= "main" and mode ~= "free" and mode ~= "easy" then return { "unknown mode" } end
 	if type(record) ~= "table" then return { "the rest is not a table" } end
  if rawget(record,"save_retired")~=nil or (rawget(record,"save_life")~=nil and not SaveRest.validLife(rawget(record,"save_life"))) then return {"reserved or invalid life identity"} end
@@ -99,7 +99,7 @@ function SaveRest.check(mode: any, record: any): { string }
 		return { `the rules in this rest are not {mode}'s` }
 	end
 	local ok, result = pcall(function(): { string }
-		local found = Checkpoint.check(record, stubWorld())
+		local found = Checkpoint.check(record, world or stubWorld())
 		return found
 	end)
 	if not ok then return { "the check raised: " .. tostring(result) } end

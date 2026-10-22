@@ -38,10 +38,18 @@ function Continuation.decision(self:any,mode:string):any
 end
 local function applyOffer(self:any,mode:any,value:any,seq:number,events:any)
  if not slot(self,mode) or seq<=(self.offerSeq[mode] or 0) then return end
+ local previous=self.offers[mode]
+ -- The id names an immutable server observation. Repeated deliveries cannot
+ -- replace our already validated private record, even if their body differs.
+ if previous and type(value)=="table" and type(value.record)=="table" and value.id==previous.id then
+  if value.protected~=previous.protected then return end
+  self.offerSeq[mode]=seq;return
+ end
  local v=if value~=nil then offerValue(self,mode,value) else nil
  if value~=nil and not v then return end
+ if seq<=(self.offerSeq[mode] or 0) then return end
  self.offerSeq[mode]=seq;self.offers[mode]=v
- table.insert(events,function() if self.offerSeq[mode]==seq then callback(self.cfg.onOffer,mode,self:offer(mode)) end end)
+ table.insert(events,function() if self.offerSeq[mode]==seq then callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end end)
 end
 local function applyDecision(self:any,d:any,seq:number,events:any)
  if type(d)~="table" or not slot(self,d.mode) or seq<=(self.decisionSeq[d.mode] or 0) then return end

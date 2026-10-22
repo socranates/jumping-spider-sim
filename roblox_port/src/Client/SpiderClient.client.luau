@@ -1389,9 +1389,12 @@ saveClient = SaveClient.new({
 	rules = M.SaveRules, now = os.clock,
  continuation={copy=M.SaveJson.copy,
   validate=function(mode: string,record: any,allowRetired: boolean): boolean
-   if M.SaveRest.bounded(record,M.SaveRules.MAX_REST_NODES,M.SaveRules.MAX_DEPTH) then return false end
-   if allowRetired and M.SaveRest.isRetired(record) then return #M.SaveRest.SPECS[mode].validate(record)==0 end
-   return #M.SaveRest.check(mode,record)==0 and #Checkpoint.check(record,checkpointWorld)==0
+   if allowRetired and M.SaveRest.isRetired(record) then
+    if M.SaveRest.bounded(record,10,3) then return false end
+    return #M.SaveRest.SPECS[mode].validate(record)==0
+   end
+   -- Size/type/mode and the complete graph are checked once against this world.
+   return #M.SaveRest.check(mode,record,checkpointWorld)==0
   end,
   onRestore=function(mode: string,record: any): boolean
    if mode=="easy" and not session.finishedMain then return false end

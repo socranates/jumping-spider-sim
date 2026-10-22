@@ -114,8 +114,8 @@ do
  c:receive({kind="status",epoch="one",sequence=5,status="session",reason="other_session"})
  decision(c,"main",4,1,"writable","old")
  check(c.requests.main.credential==nil,"old grant cannot defeat newer loss status")
- c:receive({kind="offer",epoch="one",sequence=6,mode="main",offer={id="a",protected=false,record={save_retired=true,save_life="marker"}}})
- check(not c:choose("main","continue","a") and c:choose("main","new","a"),"marker permits deliberate New only")
+ c:receive({kind="offer",epoch="one",sequence=6,mode="main",offer={id="marker-a",protected=false,record={save_retired=true,save_life="marker"}}})
+ check(not c:choose("main","continue","marker-a") and c:choose("main","new","marker-a"),"marker permits deliberate New only")
 end
 -- Exercise the actual SaveClient adapter with callback reentrancy and legacy fallback.
 do
@@ -199,6 +199,23 @@ do
  local c=setup();loaded(c,1,"main",1)
  local info=c:offerInfo("main");info.id="mutated"
  check(c:offerInfo("main").id=="a" and c:offerInfo("main").record==nil,"menu metadata is private and carries no full world copy")
+end
+do
+ local copies,validations,events=0,0,0
+ local c=Continuation.new({rules=Rules,copy=function(v) copies+=1;return Json.copy(v) end,
+  validate=function(mode,r) validations+=1;return type(r)=="table" and r.mode==mode and type(r.value)=="number" end,
+  onOffer=function(mode,info) if info then events+=1;check(mode=="main" and info.record==nil and info.playable,"offer callback carries metadata, not an unused full world copy") end end})
+ loaded(c,1,"main",7)
+ check(copies==1 and validations==1,"new offer is validated and privately copied once")
+ local n=copies;local v=validations
+ c:receive({kind="offer",epoch="one",sequence=5,mode="main",offer=offer("main","a",999)})
+ check(copies==n and validations==v and c:offerInfo("main").id=="a","repeat id reuses validated private observation without extra work")
+ check(c:offer("main").record.value==7,"changed repeat body cannot mutate immutable accepted offer")
+ c:receive({kind="offer",epoch="one",sequence=4,mode="main",offer=nil})
+ check(c:offerInfo("main")~=nil and events==1,"repeat watermark rejects stale withdrawal without repaint")
+ local clash=offer("main","a",9);clash.protected=true
+ c:receive({kind="offer",epoch="one",sequence=6,mode="main",offer=clash})
+ check(not c:offerInfo("main").protected,"conflicting protection cannot redefine the same immutable id")
 end
 print(`SAVE_CONTINUATION passed={passed} failed={failed}`)
 assert(failed==0,"continuation failures")

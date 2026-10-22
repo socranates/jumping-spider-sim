@@ -1,4 +1,4 @@
-"""Current milestone verifier; prior source-bound receipts stay historical."""
+"""Current source-bound milestone; historical receipts retain their scope."""
 import runpy
 from pathlib import Path
-runpy.run_path(str(Path(__file__).resolve().parent/'client-final/verify.py'))
+runpy.run_path(str(Path(__file__).resolve().parent/'menu-ready/verify.py'))

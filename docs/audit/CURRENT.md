@@ -1,3 +1,7 @@
+# Current work: actual Save/Continue menu integrated
+
+Source ac898f4 on codex/save-continue has11 focused suites/1,567 passing checks,220 compiled modules, strict clean and runner5. Full Windows exec63820 and Linux run39827147497 are running; no completed current full/native/network/performance result is claimed. The large-preserve CLI diagnostic exposes synchronous validation/copy work still to improve. Start at [Save/Continue status](../save-continue/README.md). Earlier status sections below are historical. Nothing published; overall goal remains active.
+
 # Newer unfinished work
 
 The active branch is now `codex/save-continue`. See [Save/Continue status](../save-continue/README.md): 220 modules with opt-in client transport and scripted client/service coverage; actual game/menu still unfinished. Current focused receipts in client-final/ verify1,457 checks across8 suites,220 compilation, clean strict analysis and runner5 on source da111f7; the source-bound verifier passed. The older status below is historical. Its e315b3a full Windows/Linux gates subsequently completed65 suites/443946, retained in the separate `windowsill-observed-life` checkout; they do not verify this newer feature.

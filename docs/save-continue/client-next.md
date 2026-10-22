@@ -1,3 +1,7 @@
+# Current status: game/menu connected
+
+Source ac898f4 now supplies the actual validator/copy/restore callbacks and menu choices. The earlier next-step design below is retained as the contract, not a statement that every bullet is still unimplemented. Current results and remaining cost/native/network/full gates are in README.md and menu-ready/.
+
 # Next: client protocol and controller integration
 
 The server and opt-in SaveClient receiver/queue are implemented and tested. Actual SpiderClient still uses legacy protocol2. Source da111f7 adds the helper and scripted integration; the controller/menu is next. Do not change the game's preference to OFFER_PROTOCOL3 until the receiver, queue, callbacks and menu flow below are complete. Current runtime XML/BuildInfo still belong to the older release snapshot.

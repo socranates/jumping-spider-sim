@@ -415,16 +415,11 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 		check(driver.life.rules == "gentle", "gentle rules")
 	end
 	check(canon(driver.stores.main:loadBest().record) == before, "the standard rest is still untouched after the Easy rest")
-	-- the gentle goal is three meals, the standard one five, in the hud's own words
-	local function anyText(needle: string): boolean
-		for _, d in gui:GetDescendants() do
-			local ok, t = pcall(function() return (d :: any).Text end)
-			if ok and type(t) == "string" and string.find(t, needle, 1, true) then return true end
-		end
-		return false
-	end
+	-- Nathan's first moult is seven full-fly equivalents in every mode.
+	-- Check the active growth line, not stale text in hidden menu labels.
 	frames(5)
-	check(anyText("of 3 meals") and not anyText("of 5 meals"), "Easy: the next moult is at 3 meals in the hud")
+	check(driver.life.growth.stage==0 and driver.life.growth:mealGoal()==7,"Easy: first moult asks for seven full-fly equivalents")
+ check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 7 meals",1,true)~=nil,"Easy: visible growth line uses the seven-meal goal")
 	-- a restore always puts the game's struggle back, whatever the record held
 	local feeding: any = driver.prey.feeding
 	feeding.game, feeding.startGrip = false, 0.123
@@ -438,7 +433,8 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	-- a standard life afterwards uses the main slot again
 	check(driver.fresh("main", false, nil) and driver.currentStore() == driver.stores.main and driver.life.rules == "standard", "a standard life goes back to the main slot")
 	frames(5)
-	check(anyText("of 5 meals") and not anyText("of 3 meals"), "standard: the next moult is at 5 meals in the hud")
+	check(driver.life.growth.stage==0 and driver.life.growth:mealGoal()==7,"standard: first moult asks for seven full-fly equivalents")
+ check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 7 meals",1,true)~=nil,"standard: visible growth line uses the seven-meal goal")
 end)
 
 case("the menu has a Controls entry that puts the controls card back up and keeps it until H (ROBLOX-92)", function()

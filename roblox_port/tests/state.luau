@@ -2318,5 +2318,64 @@ case("departure cleanup preserves dirty candidates and respects its deadline",fu
  end
 end)
 
+
+case("negotiated previews reveal a leased rest without loading it for writes",function()
+ for i,mode in SaveRules.MODES do
+  local e=newEnv();local uid=1300+i;local owner=newSession(e,uid,"owner")
+  owner:load();owner:beginLife(mode,1);run(e,owner,15)
+  assert(owner:setRestForLife(mode,realRest(120,mode),owner.lifeTokens[mode]));run(e,owner,15)
+  local visitor=newSession(e,uid,"visitor");assert(visitor:load()=="session")
+  local requests=e.backend.requests;visitor:step();visitor:step()
+  check(e.backend.requests==requests,mode..": legacy transport performs no preview requests")
+  local beforeP=canon(e.backend.data[visitor.pkey]);local beforeR=canon(e.backend.data[visitor.rkey[mode]]);local writes=e.backend.writes
+  visitor:enableOffers()
+  for _=1,3 do local n=e.backend.requests;visitor:step();check(e.backend.requests==n+1,mode..": one preview request per step") end
+  local offer=visitor:offer(mode)
+  check(offer~=nil and #SaveRest.check(mode,offer.record)==0,mode..": leased snapshot is a valid playable rest")
+  check(not visitor.restLoaded[mode] and visitor.rests[mode]==nil and visitor.lifeTokens[mode]==nil and visitor.restBase[mode]==nil and visitor.restRevision[mode]==nil,mode..": preview grants no owned write base or credential")
+  check(canon(e.backend.data[visitor.pkey])==beforeP and canon(e.backend.data[visitor.rkey[mode]])==beforeR and e.backend.writes==writes,mode..": preview preserves every stored byte and owner lock")
+  local oldLife=offer.record.save_life;offer.record.save_life="mutated-view"
+  check(visitor:offer(mode).record.save_life==oldLife,mode..": caller cannot edit private preview")
+  requests=e.backend.requests;visitor:enableOffers();visitor:step();visitor:step()
+  check(e.backend.requests==requests,mode..": repeated negotiation never rescans all three slots")
+ end
+end)
+case("preview failures back off without manufacturing an empty owned slot",function()
+ local e=newEnv();local owner=newSession(e,1310,"owner");owner:load()
+ local s=newSession(e,1310,"visitor");s:load();s:enableOffers()
+ e.backend:fail({op="read",key=s.rkey.main,times=1,message="502 offline"})
+ s:step();local requests=e.backend.requests
+ check(s.previewPending.main and s:offer("main")==nil and not s.restLoaded.main,"failed read remains pending, not missing/owned")
+ s:step();s:step();local afterOtherSlots=e.backend.requests;s:step()
+ check(afterOtherSlots==requests+2 and e.backend.requests==afterOtherSlots,"other slots progress once, failed slot waits")
+ e.t+=2;s:step()
+ check(s.previewPending.main==nil and not s.restLoaded.main,"successful missing preview is still not an owned empty slot")
+end)
+case("preview request budget and closed read completion",function()
+ local e=newEnv();local owner=newSession(e,1311,"owner");owner:load()
+ local s=newSession(e,1311,"visitor");s:load();s:enableOffers()
+ s.sched.started=table.create(SaveRules.REQUESTS_PER_MINUTE,e.t)
+ local requests=e.backend.requests;s:step()
+ check(e.backend.requests==requests,"exhausted request budget blocks previews")
+ s.sched.started={};local read=e.backend.read
+ e.backend.read=function(self,key) s.closed=true;return read(self,key) end
+ local notifications=0;s.cfg.onOffer=function() notifications+=1 end;s:step()
+ check(s:offer("main")==nil and notifications==0,"read finishing after departure cannot publish or callback")
+end)
+case("read-only backup remains protected and unknown future rest stays untouched",function()
+ local e=newEnv();local owner=newSession(e,1312,"owner");owner:load()
+ owner:setRest("main",realRest(120,"main"));run(e,owner,15)
+ owner:setRest("main",realRest(240,"main"));run(e,owner,15)
+ local raw=Json.copy(e.backend.data[owner.rkey.main]);raw.checksum="damaged"
+ e.backend:poke(owner.rkey.main,raw)
+ local s=newSession(e,1312,"visitor");s:load();s:enableOffers();local before=canon(raw);local writes=e.backend.writes;s:step()
+ local offer=s:offer("main")
+ check(offer and offer.protected and #SaveRest.check("main",offer.record)==0,"readable backup is explicitly protected")
+ check(canon(e.backend.data[s.rkey.main])==before and e.backend.writes==writes,"preview never repairs or replaces damaged primary")
+ raw=Json.copy(raw);raw.schema=SaveRest.SPECS.main.current+1;e.backend:poke(s.rkey.main,raw)
+ local future=newSession(e,1312,"future-viewer");future:load();future:enableOffers();future:step()
+ check(future:offer("main")==nil and canon(e.backend.data[s.rkey.main])==canon(raw),"future schema never falls back to a writable/ordinary preview")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

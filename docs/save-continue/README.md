@@ -1,0 +1,18 @@
+# A06 work in progress: private observations and opt-in preview reads
+
+Checkout `C:/Users/natha/windowsill-save-continue`, branch `codex/save-continue`, based on `6bcf535`/production `e315b3a`. This is an unfinished feature, not a release candidate. Runtime artifacts and BuildInfo deliberately still belong to the previous snapshot. Do not publish them as this feature or claim Continue is implemented.
+
+Implemented so far:
+
+- SaveObservation keeps a latest immutable offer and a selected immutable observation per slot. It copies input/output boundaries, binds increasing intents to exact offered ids, refuses stale choices and distinguishes checksum/time/life/source-kind/protection. Refreshing or withdrawing an offer never rebases the selected world. Identity agreement itself grants no write credential.
+- SaveSession has an explicitly enabled preview path. Legacy behavior issues no preview reads or extra whole-world copies. Enabled previews use the existing request budget/backoff, one backend request per eligible step. They can expose a valid leased rest or explicitly protected readable backup, while leaving owned rests/bases/revisions/life credentials and stored bytes untouched. Missing/future/unreadable values provide no ordinary offer. Reads finishing after closure cannot publish/callback. Duplicate negotiation does not rescan slots.
+
+Actual focused result: **50 observation checks +866 state checks =916 passed, zero failed**. The state total includes all831 predecessor checks and35 new preview assertions. Compilation **218/218**, strict analysis and runner **5/5** pass. The target runner snapshots all inputs; its hashes are compared to the current source/tests. A nullable Opened annotation was corrected after the first successful behavioral run; the retained snapshot reruns the exact corrected source and passes916.
+
+No transport capability/ordering implementation, Continue decision acknowledgement, resumed-life write credential or menu integration exists yet. SaveService does not enable this path for live clients. Do not expose previews through ordinary loaded/rest messages: the existing lifeTokens/adoption logic is exactly the boundary this feature must replace safely. No new save schema, gameplay, fly, feeding or settings changes.
+
+Next implement offer-bound session selection and recovery decisions, then versioned server/client transport, then controller/menu choices. Use `../save-lease-cleanup/continue-contract.md` for the complete acceptance matrix. Both New Life and Continue must share supersession rules. A read-only selected rest cannot upload until unchanged revalidation under ownership and an acknowledged credential; changed recovery remains temporary and requires a new explicit choice. Metadata comparisons alone are not authority. Delayed replies, repeated atomic callbacks, protected backups and older peers need end-to-end tests before exposure.
+
+The prior lock-cleanup sourcee315b3a has separately completed65 suites/443946 on Windows/Linux. Its final receipts live in `C:/Users/natha/windowsill-observed-life`, branch `codex/save-lease-cleanup`, docs commit7e04602. Those results do not verify this newer218-module feature. Its native synthetic cleanup diagnostic is still unexecuted because Studio reported low resources; no online save/rejoin was touched.
+
+This draft still needs full integration, a rebuilt source-bound release/test artifact pair and BuildInfo, exact-source full gates, native synthetic verification and the remaining device/network/rejoin/performance audit. The overall goal remains active.

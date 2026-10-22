@@ -22,6 +22,7 @@ local SaveRest = require(script.Parent.SaveRest)
 local SaveScheduler = require(script.Parent.SaveScheduler)
 local SaveStores = require(script.Parent.SaveStores)
 local Json = require(script.Parent.Json)
+local SaveObservation = require(script.Parent.SaveObservation)
 
 local function canonical(v: any): string
 	return (Json.canonical(v)) or ""
@@ -34,6 +35,7 @@ export type Config = {
 	backend: any, userId: number | string, sessionId: string, now: () -> number,
 	sleep: ((number) -> ())?, log: ((string) -> ())?, progressSpec: SaveEnvelope.Spec?, -- (a test may hand in a later schema)
 	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?, onLife: ((string,number,string) -> ())?,
+	onOffer: ((string,any) -> ())?,
 }
 
 
@@ -51,6 +53,8 @@ function SaveSession.new(cfg: Config): any
 		pkey = SaveRules.KEY_PROGRESS .. tostring(cfg.userId),
 		rkey = rkey,
 		sched = sched,
+		observations = SaveObservation.new(cfg.sessionId), offersEnabled = false,
+		previewPending = {}, previewNextAt = {}, previewFailures = {},
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
 		rests = {} :: { [string]: any }, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any},
@@ -182,6 +186,42 @@ end
 
 function SaveSession.protectedSlots(self: any): {[string]:string}
  return Json.copy(self.restProtected)
+end
+
+-- Negotiated transport enables previews explicitly. Legacy sessions do not
+-- allocate/copy additional whole-world records or issue preview backend reads.
+function SaveSession.enableOffers(self: any)
+ if self.closed or self.offersEnabled then return end
+ self.offersEnabled=true
+ for _,mode in SaveRules.MODES do self.previewPending[mode]=true end
+end
+function SaveSession.offer(self: any,mode: string): any
+ return self.observations:offer(mode)
+end
+
+local function previewOne(self: any,mode: string)
+ local now=self.now()
+ self.sched:begin(nil,now);self.counters.requests+=1
+ local ok,value,err=self.backend:read(self.rkey[mode])
+ if self.closed then return end -- departure can reach its deadline while a read yields
+ if not ok then
+  local failures=(self.previewFailures[mode] or 0)+1;self.previewFailures[mode]=failures
+  self.previewNextAt[mode]=self.now()+SaveScheduler.backoff(failures,SaveStores.classify(err))
+  return -- failed read does not invent an empty snapshot or change write bases
+ end
+ self.previewPending[mode],self.previewNextAt[mode],self.previewFailures[mode]=nil,nil,nil
+ local op=SaveEnvelope.open(SaveRest.SPECS[mode],value)
+ local opened: SaveEnvelope.Opened?=op
+ local raw,protected,kind=value,false,"primary"
+ if op.status~="ok" and op.status~="migrated" then
+  opened,raw,protected,kind=op.backup,if type(value)=="table" then value.backup else nil,true,"backup"
+ end
+ if opened and (opened.status=="ok" or opened.status=="migrated") and not SaveRest.isRetired(opened.payload) and type(raw)=="table" then
+  self.observations:publish(mode,opened.payload,{checksum=raw.checksum,updatedAt=opened.updatedAt,life=opened.payload.save_life,kind=kind},protected)
+ else self.observations:withdraw(mode) end
+ -- Never set rests/restLoaded/restBase/restRevision/lifeTokens from a preview.
+ local callback=self.cfg.onOffer
+ if callback then pcall(callback,mode,self.observations:offer(mode)) end
 end
 
 local function readRests(self: any)
@@ -622,6 +662,13 @@ local function stepInner(self: any): boolean
 		end
 	else
 		did = false
+	end
+	if not did and self.offersEnabled and (self.state=="session" or self.state=="active") and self.sched:budgetOk(now) then
+		for _,mode in SaveRules.MODES do
+			if self.previewPending[mode] and now>=(self.previewNextAt[mode] or 0) then
+				previewOne(self,mode);did=true;break -- at most one preview request per step
+			end
+		end
 	end
 	return did
 end

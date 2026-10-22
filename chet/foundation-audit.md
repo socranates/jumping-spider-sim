@@ -1,8 +1,10 @@
+Current working candidate: [save lease cleanup](save-lease-cleanup.md), source `e315b3a048fddd1729461fb92502f73b7d8e2b94`, evidence `b425324a7f0a8007`. Earlier sections below are historical.
+
 > Current handoff: [navigation-startup.md](navigation-startup.md), sourcebc77830 (production identical to8f16a40), evidenceab5a28c0ff450435. Linux65/443884 green; local489 focused, native18 startup assertions and bounded30/60/120Hz controller replay verified. Windows28050 remains active. Older status paragraphs below are historical.
 
 > New current implementation: source8f16a40, branch codex/navigation-startup. See [navigation handoff](navigation-startup.md) and ../docs/audit/CURRENT.md.224 focused checks and217 compile/strict/runner gates pass; full Windows2814/Linux39800818953 and native startup remain pending. The older source results below are historical.
 
-# Current foundation health — 2026-10-22
+# Current foundation health â€” 2026-10-22
 
 Candidate source `8e02b5ee5f443ab332cf7e70f5951a304cb89eea`, evidence `58063ec00de84212`, branch `codex/startup-world-readiness`. **Not published; not yet reasonably problem-free.** Last publication verified by retained evidence is v51/place140, not a fresh Dashboard check.
 

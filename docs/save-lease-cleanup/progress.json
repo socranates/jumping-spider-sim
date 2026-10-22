@@ -1,0 +1,15 @@
+{
+  "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
+  "evidence_id": "b425324a7f0a8007",
+  "linux_ci_run": 39811082793,
+  "linux_ci_verified": false,
+  "targeted_passed": 1072,
+  "targeted_suites": 5,
+  "native_prepared": true,
+  "native_verified": false,
+  "windows_full_complete": false,
+  "published": false,
+  "windows_full_session_id": 31770,
+  "native_attempt": "Studio Low System Resources before opening diagnostic; declined and exited; no native cases executed",
+  "studio_closed": true
+}

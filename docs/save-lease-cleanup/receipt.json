@@ -1,0 +1,31 @@
+{
+  "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
+  "base": "4ed6375d3fb05166739b7757fecffb8d0cb90cad",
+  "evidence_id": "b425324a7f0a8007",
+  "production_modules": 217,
+  "changed_modules": [
+    "roblox_port/src/Shared/Persistence/SaveSession.luau"
+  ],
+  "baseline_passed": 805,
+  "baseline_failed": 26,
+  "candidate_state_passed": 831,
+  "new_state_checks": 62,
+  "new_cases": 9,
+  "targeted_suites": 5,
+  "targeted_passed": 1072,
+  "compile_passed": 217,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "production_sha256": "1de8cae08eae8e10f5aeb195d759ac0d886daa1837611a11f802ddf220d73393",
+  "test_artifact_rejected": true,
+  "windows_full_complete": false,
+  "windows_log_sha256": null,
+  "linux_ci_verified": false,
+  "native_prepared": true,
+  "native_verified": false,
+  "online_rejoin_verified": false,
+  "foreign_lease_continue_implemented": false,
+  "legacy_world_restoration_implemented": false,
+  "published": false,
+  "publication_ready": false
+}

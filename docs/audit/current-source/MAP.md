@@ -1,9 +1,9 @@
 # Foundation map
-Current source `bc7783098ef256d08306eb7f7191015d721c6ad1`, branch `codex/navigation-startup`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
+Current source `e315b3a048fddd1729461fb92502f73b7d8e2b94`, branch `codex/save-lease-cleanup`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
 
 See `../CURRENT.md` for current verification gaps; `../DATA.md` remains the historical schema discussion. This is a lexical index, not a line-by-line review.
 
-Static index: 217 source files, 55,337 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
+Static index: 217 source files, 55,386 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
 ## Source inventory
 
 | Source | Lines | Side | Purpose from source | Required by | Direct tests | Flags |
@@ -130,7 +130,7 @@ Static index: 217 source files, 55,337 lines. Shared means available to either s
 | `roblox_port/src/Shared/Persistence/SaveProgress.luau` | 187 | Shared | The player's progress record (ROBLOX-39): the small precious part of a save, kept apart from the world's rests. | SpiderClient.client.luau, SaveSession.luau | preserve.luau, rare_sightings.luau, rest_storage.luau, save_notice.luau, settings.luau, state.luau, state_client.luau, title.luau |  |
 | `roblox_port/src/Shared/Persistence/SaveRest.luau` | 120 | Shared | The last rest of a mode, as the server keeps it (ROBLOX-39): a retreat checkpoint (Checkpoint) in an envelope, one per mode. | SaveSession.luau | checkpoint.luau, rest_storage.luau, state.luau, state_client.luau |  |
 | `roblox_port/src/Shared/Persistence/SaveScheduler.luau` | 120 | Shared | When a save is written (ROBLOX-39): only decisions, no store and no clock of its own (the caller passes `now`, in seconds). It keeps, for | SaveSession.luau | state.luau |  |
-| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 655 | Shared | One player's save session (ROBLOX-39): loads their records through a store backend, keeps their progress and rests in memory, and writes | SaveService.luau | rest_storage.luau, state.luau |  |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 704 | Shared | One player's save session (ROBLOX-39): loads their records through a store backend, keeps their progress and rests in memory, and writes | SaveService.luau | rest_storage.luau, state.luau |  |
 | `roblox_port/src/Shared/Persistence/SaveStores.luau` | 47 | Shared | Two small pure rules about the stores (ROBLOX-39): which store a build writes to, and what kind of failure a DataStore error is. | Persistence.server.luau, SaveSession.luau | state.luau |  |
 | `roblox_port/src/Shared/Predator/Bird.luau` | 387 | Shared | The robin of the open ground (ROBLOX-120, docs/PARK_WORLD_DESIGN.md sections 4 and 5: the bird is the danger of the hut garden, the meadow and the open ground | SpiderClient.client.luau | preserve.luau |  |
 | `roblox_port/src/Shared/Predator/Cat.luau` | 546 | Shared | The ranger's cat (ROBLOX-118, docs/PARK_WORLD_DESIGN.md section 10: "the cat and the game room live in the hut"): a house cat that lives in the ranger hut's | SpiderClient.client.luau, Checkpoint.luau | checkpoint.luau, feeding_survival.luau, preserve.luau, station_debug.luau |  |
@@ -504,10 +504,12 @@ Each line below is a call site, not an assertion that it runs each frame. Inspec
 | `roblox_port/src/Shared/Persistence/ObjectRecord.luau` | 111 | `while q <= #queue and not problem do` |
 | `roblox_port/src/Shared/Persistence/SaveEnvelope.luau` | 84 | `while from < spec.current do` |
 | `roblox_port/src/Shared/Persistence/SaveScheduler.luau` | 83 | `else -- changed while it was being written: still dirty, due once the interval has passed` |
-| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 225 | `self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world` |
-| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 248 | `self.restLoaded = {} -- read again: another session may have written a rest while this one could not` |
-| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 623 | `while self.busy and self.now() < limit and sleep do sleep(0.25) end` |
-| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 631 | `while attempt < SaveRules.FLUSH_ATTEMPTS and self.state == "active" and self.now() < limit do` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 230 | `self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 254 | `self.restLoaded = {} -- read again: another session may have written a rest while this one could not` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 528 | `released = false -- UpdateAsync may invoke this callback more than once` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 659 | `while self.busy and self.now() < limit and sleep do sleep(0.25) end` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 667 | `while attempt < SaveRules.FLUSH_ATTEMPTS and self.state == "active" and self.now() < limit do` |
+| `roblox_port/src/Shared/Persistence/SaveSession.luau` | 692 | `while attempt < SaveRules.FLUSH_ATTEMPTS and self.now() < limit do` |
 | `roblox_port/src/Shared/Predator/Bird.luau` | 141 | `while t < forage do` |
 | `roblox_port/src/Shared/Predator/Cat.luau` | 110 | `while true do` |
 | `roblox_port/src/Shared/Predator/Cat.luau` | 125 | `while n ~= nil do` |

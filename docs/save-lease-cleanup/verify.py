@@ -67,9 +67,17 @@ if (HERE/'windows-full-process.json').exists():
  b=(HERE/'windows-full.txt').read_bytes();windows_hash=sha(b)
  rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',b.decode(),re.M)
  assert len(rows)==65 and sum(int(r[1]) for r in rows)==443946 and all(int(r[2])==0 for r in rows);windows=True
+prepared=False
+if (HERE/'prepared-native-manifest.json').exists():
+ m=read('prepared-native-manifest.json');assert m['source']==SOURCE and m['case']=='cleanup' and m['persistence_disabled']
+ scripts={r['path']:r['sha256'] for r in m['scripts']};assert len(scripts)==len(m['scripts'])==218
+ assert {p:scripts[p] for p in expected}==expected
+ probe=(HERE/'native-probe.luau').read_bytes();assert probe.count(fixture)==1
+ assert scripts['StarterPlayer.StarterPlayerScripts.Client.SilkPlayback']==sha(probe)
+ prepared=True
 receipt=dict(source=SOURCE,base=BASE,evidence_id=evidence,production_modules=217,changed_modules=changed,
  baseline_passed=805,baseline_failed=26,candidate_state_passed=831,new_state_checks=62,new_cases=9,targeted_suites=5,targeted_passed=1072,
  compile_passed=217,strict_clean=True,runner_regressions=5,production_sha256=production,test_artifact_rejected=True,
- windows_full_complete=windows,windows_log_sha256=windows_hash,linux_ci_verified=False,native_verified=False,online_rejoin_verified=False,
+ windows_full_complete=windows,windows_log_sha256=windows_hash,linux_ci_verified=False,native_prepared=prepared,native_verified=False,online_rejoin_verified=False,
  foreign_lease_continue_implemented=False,legacy_world_restoration_implemented=False,published=False,publication_ready=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(receipt,indent=2))

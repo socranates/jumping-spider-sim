@@ -1,6 +1,6 @@
 {
-  "source": "bc7783098ef256d08306eb7f7191015d721c6ad1",
-  "branch": "codex/navigation-startup",
+  "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
+  "branch": "codex/save-lease-cleanup",
   "baseline": {
     "published": true,
     "release": "v51",
@@ -2914,10 +2914,10 @@
       ]
     },
     {
-      "sha256": "7d8e66bf3bf0bea8364e04772c0bf0d2286ddfd6526d972eeb84cc458083a184",
+      "sha256": "b8cb9095e9b7c2bddc187a1bd4b704dc35f20b67e94c75f9cea895a6cc92be02",
       "path": "roblox_port/src/Shared/Persistence/SaveSession.luau",
       "name": "SaveSession",
-      "lines": 655,
+      "lines": 704,
       "purpose": "One player's save session (ROBLOX-39): loads their records through a store backend, keeps their progress and rests in memory, and writes",
       "side": "Shared",
       "strict": true,

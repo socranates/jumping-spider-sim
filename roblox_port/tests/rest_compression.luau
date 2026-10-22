@@ -8,7 +8,7 @@ local function check(ok,why) assert(ok,why);passed+=1 end
 local function copy(v) if type(v)~="table" then return v end local out={} for k,x in v do out[k]=copy(x) end return out end
 local values,texts={},{}
 local decompressions=0
-local codec=Compression.new({canonical=Json.canonical,
+local codec=Compression.new({serialize=Json.canonical,
  compress=function(text) local id="packed-"..tostring(#texts+1);texts[#texts+1]=text;values[id]=text;return id end,
  expandedSize=function(id) return if values[id] then #values[id] else nil end,
  decompress=function(id) decompressions+=1;return assert(values[id]) end,
@@ -72,4 +72,35 @@ Compression.MAX_STORED_CHARS=1
 ok=backend:update("R_1_main",function(old) return old end)
 check(not ok and assert(Json.canonical(ds.data.R_1_main))==previous,"oversize output replaced prior save")
 Compression.MAX_STORED_CHARS=max
+-- Independent blobs preserve the pre-compression checksum/backup recovery behavior.
+local withBackup=Envelope.make(spec,copy(raw.payload),20,raw,nil)
+local currentOnly=copy(withBackup);currentOnly.backup=nil
+values[assert(Json.canonical(currentOnly))]=currentOnly
+local backupFull=copy(raw)
+values[assert(Json.canonical(backupFull))]=backupFull
+local two=codec:encode(withBackup)
+check(two.backup~=nil and two.backup.data~=two.data,"backup is not independently compressed")
+check(assert(Json.canonical(codec:decode(two)))==assert(Json.canonical(withBackup)),"backup round-trip changed the envelope")
+local brokenCurrent=copy(two);brokenCurrent.data="damaged-current"
+local recovered=codec:decode(brokenCurrent,true)
+local opened=Envelope.open(spec,recovered)
+check(opened.status=="corrupt" and opened.backup and opened.backup.status=="ok","good backup was lost when current blob broke")
+check(opened.backup.payload.rng==914,"wrong backup recovered")
+check(not pcall(function() codec:decode(brokenCurrent) end),"corrupt current reached a write callback")
+ds.data.R_1_main=brokenCurrent
+ok,read=backend:read("R_1_main")
+check(ok and Envelope.open(spec,read).backup.status=="ok","backend did not offer recovered backup")
+local brokenBytes=assert(Json.canonical(ds.data.R_1_main))
+ok=backend:update("R_1_main",function() error("must not transform corrupt storage") end)
+check(not ok and assert(Json.canonical(ds.data.R_1_main))==brokenBytes,"corrupt current storage was overwritten")
+local brokenBackup=copy(two);brokenBackup.backup.data="damaged-backup"
+opened=Envelope.open(spec,codec:decode(brokenBackup))
+check(opened.status=="ok" and opened.backup.status=="corrupt","damaged backup hid valid current")
+local futureBackup=copy(two);futureBackup.backup.schema=3
+check(codec:decode(futureBackup)==futureBackup,"future backup was decoded or made writable")
+local unknown=copy(two);unknown.futureMetadata={keep=true}
+check(codec:decode(unknown)==unknown,"unknown transport metadata was silently discarded")
+local nested=copy(two);nested.backup.backup=copy(two.backup)
+opened=Envelope.open(spec,codec:decode(nested))
+check(opened.status=="ok" and opened.backup.status=="corrupt","nested backup accepted")
 print(`REST_COMPRESSION passed={passed} failed=0`)

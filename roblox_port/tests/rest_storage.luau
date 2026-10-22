@@ -16,6 +16,12 @@ local Checkpoint=require("../src/Shared/Persistence/Checkpoint")
 local SaveRest=require("../src/Shared/Persistence/SaveRest")
 local Rules=require("../src/Shared/Data/SaveRules")
 local Json=require("../src/Shared/Persistence/Json")
+local Compression=require("../src/Server/RestCompression")
+local Backend=require("../src/Server/DataStoreBackend")
+local Session=require("../src/Shared/Persistence/SaveSession")
+local fullRecord
+local passed=0
+local function check(ok,why) assert(ok,why);passed+=1 end
 Map.use("preserve")
 local root=Build.world(workspace)
 local lo,hi=Map.bounds()
@@ -34,7 +40,8 @@ local function measure(label)
  if string.find(label,"visited_all_",1,true) then
   local rec=assert(Checkpoint.capture(world,0))
   local problems=SaveRest.check("main",rec)
-  assert(#problems==0,problems[1])
+  check(#problems==0,problems[1])
+  fullRecord=rec
   print(`REST_STORAGE full_world_chars={#assert(Json.canonical(rec))} regions=233`)
  end
 end
@@ -48,4 +55,53 @@ for _,r in Map.regions() do
  if n==10 or n==30 or n==60 or n%25==0 then measure(`visited_{n}`) end
 end
 measure(`visited_all_{n}`)
-print(`REST_STORAGE passed=1 failed=0`)
+-- Real session/backend integration; the adapter is a reversible store, not a claim of CLI Zstd support.
+local function copy(v)
+ if type(v)~="table" then return v end
+ local out={};for k,x in v do out[k]=copy(x) end;return out
+end
+local records,texts={},{}
+local seq=0
+local codec=Compression.new({
+ serialize=function(v) local text=assert(Json.canonical(v));records[text]=v;return text end,
+ compress=function(text) seq+=1;local id="frame-"..seq;texts[id]=text;return id end,
+ expandedSize=function(id) return if texts[id] then #texts[id] else nil end,
+ decompress=function(id) return assert(texts[id]) end,
+ parse=function(text) return copy(assert(records[text])) end,
+})
+local ds={data={}}
+function ds:GetAsync(key) return copy(self.data[key]) end
+function ds:UpdateAsync(key,fn)
+ local value=fn(copy(self.data[key]))
+ if value~=nil then self.data[key]=copy(value) end
+ return copy(self.data[key])
+end
+local backend=Backend.new(ds,codec)
+local now=100
+local function visit(id)
+ return Session.new({backend=backend,userId="full-world",sessionId=id,now=function() return now end,
+  sleep=function(dt) now+=dt end})
+end
+local first=visit("first")
+check(first:load()=="active","first session did not load")
+check(first:setRest("main",fullRecord),"full-world rest rejected by session")
+first:flush()
+check(ds.data["R_full-world_main"].encoding==Compression.ENCODING,"session did not store compressed rest")
+now+=40
+local second=visit("second")
+check(second:load()=="active","second session did not load")
+check(assert(Json.canonical(second.rests.main))==assert(Json.canonical(fullRecord)),"rejoin changed full-world rest")
+local secondRecord=assert(Checkpoint.capture(world,1))
+check(second:setRest("main",secondRecord),"replacement full-world rest refused")
+second:flush()
+local stored=ds.data["R_full-world_main"]
+check(stored.backup~=nil,"replacement lacks independent backup")
+stored.data="damaged-current"
+local before=assert(Json.canonical(stored))
+now+=40
+local recovered=visit("recovered")
+check(recovered:load()=="session" and recovered.reason=="corrupt","damaged current was not read-only")
+check(assert(Json.canonical(recovered.rests.main))==assert(Json.canonical(fullRecord)),"valid full-world backup was not offered")
+recovered:step();recovered:flush()
+check(assert(Json.canonical(ds.data["R_full-world_main"]))==before,"recovery overwrote damaged stored bytes")
+print(`REST_STORAGE passed={passed} failed=0`)

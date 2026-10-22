@@ -16,7 +16,7 @@ function DataStoreBackend.read(self: any, key: string): (boolean, any, string?)
 	local ok, value = pcall(function(): any return self.ds:GetAsync(key) end)
 	if not ok then return false, nil, tostring(value) end
 	if self.restCodec and restKey(key) then
-		local decoded, result=pcall(function(): any return self.restCodec:decode(value) end)
+		local decoded, result=pcall(function(): any return self.restCodec:decode(value,true) end)
 		if not decoded then return false,nil,tostring(result) end
 		value=result
 	end

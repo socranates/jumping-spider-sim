@@ -1,0 +1,40 @@
+{
+  "kind": "review checkpoint - NOT published",
+  "source_commit": "5938aac41371ca005f73e4c21e7089404496b9a6",
+  "documentation_commit": "914d36ae64318098c17d9a4a8eb72248071db45a",
+  "evidence_id": "542472fc2539e00f",
+  "github_branch": "codex/v49-ranger-station",
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "published_v49_version": null,
+  "pending": [
+    "Terminal full predecessor CLI and final affected-client results",
+    "Final low native check, ordinary station performance and debug cleanup",
+    "Correct cloud source comparison, publish and Dashboard proof"
+  ],
+  "native_predecessor_selftest": {
+    "source": "1f81d7c",
+    "pass": 271,
+    "fail": 0,
+    "skip": 0
+  },
+  "final_preserve": {
+    "pass": 1154,
+    "fail": 0
+  },
+  "final_station": {
+    "pass": 38,
+    "fail": 0
+  },
+  "final_hud": {
+    "pass": 37,
+    "fail": 0
+  },
+  "compile": "209/209",
+  "strict": "clean",
+  "playable_source_matches": "209/209",
+  "package": "C:\\Users\\natha\\claude-xfer\\Windowsill-v49-review-542472fc2539e00f.zip",
+  "sha256": "035fb538ec238ea4b21899c7335486267779e0020e4c1cf5c35a78f6f0d4fc0f",
+  "bytes": 11651363,
+  "files": 424
+}

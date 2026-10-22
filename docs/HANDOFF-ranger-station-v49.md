@@ -10,6 +10,8 @@ Final archive: `C:\Users\natha\claude-xfer\v49-final-5938aac.zip`, SHA256 `b9d5a
 
 Cloud Claude can clone `codex/v49-ranger-station` from `https://github.com/socranates/jumping-spider-sim.git`. Local C: links alone do not transfer files. Preserve the failed predecessor budget record and passing final-source rerun; do not describe them as a single 56/56 final-source run. See `native-selftest-final.txt` for the complete latest native output.
 
+Portable review package (explicitly **not a published release**): `C:\Users\natha\claude-xfer\Windowsill-v49-review-542472fc2539e00f.zip`, SHA256 `035fb538ec238ea4b21899c7335486267779e0020e4c1cf5c35a78f6f0d4fc0f`. It contains active Roblox source/assets/tests/tools, rebuilt playable/test places and current review evidence, 424 files. Its root `REVIEW-STATUS.json` states pending gates. External manifest: `docs/verification/v49/REVIEW-PACKAGE.json`. It captures documentation commit `914d36a`; this later link is outside the archive to avoid circular hashing.
+
 ## Player requests implemented
 
 - A slightly larger, wordless reserve bar: 150 × 6 pixels.

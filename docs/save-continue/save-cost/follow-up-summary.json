@@ -1,0 +1,13 @@
+{
+  "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+  "exit_code": 0,
+  "suites": 2,
+  "passed": 12,
+  "failed": 0,
+  "internal_checks": [
+    41,
+    274
+  ],
+  "log_sha256": "8db243b81076ebcd2008040602c4db727a497b3d7bb036cd6c68b34fa369c69c",
+  "process_sha256": "60c0aec1cbe2c39ff924e10f01ec911176975d3df23513948512ec95583cb9e1"
+}

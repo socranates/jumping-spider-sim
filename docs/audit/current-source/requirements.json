@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T21:07:53.528312+00:00",
+  "as_of_utc": "2026-10-22T21:31:26.584731+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -24,8 +24,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "linux-full-verified-windows-follow-up-pending",
-      "evidence_boundary": "Sourceab8ca95 Linux39852128734 completed successfully:75 suites/444664 checks/0 failures, compile222/222, strict clean, runner5; actual shim self-tests41/0/0 and274/0/0. Current workspace source/tests/workflow bytes match exact commit; root verifier passes. Old4ee6aec Linux full75/444661/3 failures retained. Windows87216 has terminated on immutable4ee6aec with the same75/444661/3 failure counts; archived input hashes/log/summary are verified. Serial67331 now runs corrected Windows self-tests (garden41/0/0, outer5/0, preserve pending), followed by cost profiling only on success. Historical local-return focused27/25294/0 and native22 remain pinned evidence, not a current native/full Windows claim.",
+      "status": "linux-full-and-windows-combined-verified",
+      "evidence_boundary": "Sourceab8ca95 Linux39852128734 passes75/444664/0, compile222/strict/runner5. Windows old4ee6aec full75/444661/3 is retained; current corrected self-tests5/0 and7/0, internal41/0/0 and274/0/0. Root verifier binds exact source/workflow/inputs/logs, proving combined75/444664/0 Windows coverage with only SelfTest changed, not a fresh single current full Windows run. Current native save-cost probe10 asserts/223 fingerprints is separate from broader lifecycle/performance proof.",
       "references": [
         "docs/save-continue/save-cost/verification.json",
         "docs/save-continue/save-cost/README.md",
@@ -151,13 +151,16 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Four desktop Studio trials/52 records/44 timed samples exist on earlier source; mixed results do not establish causal speedup. Current-source matched scene comparisons, client/server MicroProfiler, network/startup and phone/tablet emulator checks remain open. Current133aa60 native15: local rest preparation spans frames; large replacement18.5s total/maxupdate52.9ms, synchronous capture139.5ms. Hard frame bound/typical FPS unproven. Runtime07234ca native22 local returns: choice3ms/zero encoding,1.5M record returns4.2s across249 steps/max38ms. No concurrent CLI; Low System Resources; no typical FPS/hard frame ceiling. Coherent capture and total large local-save latency remain open.",
+      "evidence_boundary": "Earlier desktop timing matrix remains mixed, no causal whole-game speedup. Currentab8ca95 native save-cost10 assertions/223 exact fingerprints:1.503M chars, capture123/97ms, first/replacement prep1.604/2.579s CPU over12.988/18.010s elapsed, max37/60ms. Native replacement five canonical encodes1.905s, six copies357ms; CLI2.282M record agrees encoding dominates. Wider Heartbeat gaps1.18-1.27s are unexplained, not worker-only attribution. No hard frame budget/typical FPS/physical-device proof. Identical-source prior rig-cache trial gains remain modest/mixed, not adopted. Encoding optimization and broader native/device gates remain open.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
         "docs/save-continue/async-rest/native-receipt.json",
         "docs/save-continue/local-return/native-receipt.json",
-        "docs/save-continue/save-cost/README.md"
+        "docs/save-continue/save-cost/README.md",
+        "docs/save-continue/save-cost/native-receipt.json",
+        "docs/save-continue/save-cost/preserve/receipt.json",
+        "docs/save-continue/save-cost/rig-prior-evidence.json"
       ]
     },
     {
@@ -244,11 +247,11 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Sourcee315b3a on codex/save-lease-cleanup is pushed, with generated source-bound builds and immutable historical receipts. Current handoff/requirements updated. Full current platform and native/rejoin/release/laptop gates remain incomplete; no publication, branch deletion or main rewrite.",
+      "evidence_boundary": "Runtime/testsab8ca95 is pushed on codex/save-continue, current handoff and source-bound CI/Windows/native-cost receipts retained. No production optimization adopted in the attribution round. Release XML/BuildInfo still old; broad audit, publication/laptop synchronization and main integration remain open.",
       "references": [
-        "chet/save-lease-cleanup.md",
-        "docs/save-lease-cleanup/receipt.json",
-        "docs/audit/current-source/branches.txt"
+        "chet/save-continue.md",
+        "docs/save-continue/save-cost/verification.json",
+        "docs/save-continue/save-cost/README.md"
       ]
     },
     {
@@ -273,7 +276,7 @@
   "latest_save_milestone": {
     "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
     "runtime_behavior_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
-    "status": "linux-full-verified-windows-and-profiling-pending",
+    "status": "cost-attribution-complete-encoding-optimization-next",
     "evidence": "docs/save-continue/save-cost/README.md",
     "goal_complete": false,
     "published": false

@@ -1,0 +1,6 @@
+2026-10-22T21:20:09.347Z,72.347717,186c,6,Error [FLog::CreatorError] Error: CommandBar:2: ReplicatedStorage.Shared.Life.LifeLoop
+2026-10-22T21:20:09.433Z,72.433952,80ec,6,Error [FLog::CreatorError] Error: CommandBar:2: ReplicatedStorage.Shared.Life.LifeLoop
+2026-10-22T21:21:52.407Z,175.407410,186c,6,Error [FLog::CreatorError] Error: CommandBar:1: ReplicatedStorage.Shared.Life.LifeLoop
+2026-10-22T21:21:52.476Z,175.476898,80ec,6,Error [FLog::CreatorError] Error: CommandBar:1: ReplicatedStorage.Shared.Life.LifeLoop
+2026-10-22T21:23:37.179Z,280.179901,186c,6,Error [FLog::CreatorError] Error: CommandBar:1: ReplicatedStorage.Shared.Life.LifeLoop
+2026-10-22T21:23:37.187Z,280.187958,80ec,6,Error [FLog::CreatorError] Error: CommandBar:1: ReplicatedStorage.Shared.Life.LifeLoop

@@ -1,0 +1,13 @@
+{
+  "current_rig_sha256": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20",
+  "prior_source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "source_identical": true,
+  "native_cases": 16,
+  "prior_results_sha256": "fa14c04a84446643461dc0bafd4d58bc572dcc6ed569aad3c29c02691a503cf6",
+  "raw_event_sha256": "50c665886ca4eefbe26cd8298c912bb0420d0e075ba02d70e0f9fc22d7ce0c4a",
+  "summary_means_recomputed": true,
+  "duplicate_candidate_removed": true,
+  "production_rig_changed": false,
+  "performance_gain_proven": false,
+  "published": false
+}

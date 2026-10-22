@@ -1,0 +1,42 @@
+{
+  "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+  "run": "1792704319579",
+  "assertions": 10,
+  "creator_errors_during_guarded_run": 0,
+  "preflight_refusals_retained": 6,
+  "preflight_cause": "stale lexical costGuard; correct explicit scoped file guard passed unchanged expected fingerprints",
+  "scripts": 223,
+  "persistence_disabled": true,
+  "online_save_accessed": false,
+  "output_sha256": "873c66c34db866ebf175ef8e314a2b72c5c08588b2fecb0e0a2481a438b20acb",
+  "probe_sha256": "79ce5025020fdf2da48278f3459c156d4921eeb90a5a83c38a13ac8de0997c73",
+  "place_sha256": "353bc3bc0cc01a1fbd92a89e72ddf7d16b6057f0384774a16517cdec8fe660db",
+  "no_concurrent_cli": true,
+  "prior_stopped_rig_window_remained": true,
+  "low_resource_warning_observed": false,
+  "typical_fps_proven": false,
+  "hard_frame_budget_proven": false,
+  "published": false,
+  "first": {
+    "capture_ms": 123.06,
+    "steps": 692,
+    "cpu_ms": 1603.768,
+    "max_update_ms": 36.943,
+    "max_heartbeat_gap_ms": 1269.288,
+    "elapsed_ms": 12988.403,
+    "chars": 1503075,
+    "initialization_attempts": 233,
+    "resident_regions_measured": false
+  },
+  "replacement": {
+    "capture_ms": 97.212,
+    "steps": 1064,
+    "cpu_ms": 2579.373,
+    "max_update_ms": 60.322,
+    "max_heartbeat_gap_ms": 1179.185,
+    "elapsed_ms": 18009.843,
+    "chars": 1503219,
+    "initialization_attempts": 233,
+    "resident_regions_measured": false
+  }
+}

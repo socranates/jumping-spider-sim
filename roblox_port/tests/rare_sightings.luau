@@ -118,6 +118,15 @@ check(body.model and #body.parts==24 and #body.supports:GetChildren()==2,"bounde
 for _,part in body.supports:GetChildren() do check(not part.CanQuery and not part.CanCollide,"arrival supports inactive") end
 visitor.ageHours=1;body:update(visitor,.1,at,false,false)
 for _,part in body.supports:GetChildren() do check(part.CanQuery and part.CanCollide and not part.CanTouch,"settled wings support motor and silk") end
+local Silk=require("../src/Shared/Movement/SilkController")
+local Surfaces=require("../src/Shared/Data/Surfaces")
+local Species=require("../src/Shared/Data/Species")
+local wingPart=body.supports:GetChildren()[1]
+check(body:holdsAnchor(wingPart) and not body:holdsAnchor(root) and not body:holdsAnchor(nil),"only a wing attachment delays departure")
+local silk=Silk.new(root,Surfaces,Species.phidippus_audax_prototype.silk,35)
+check(silk:anchorAt({Instance=wingPart,Position=wingPart.Position+Vector3.yAxis*.06,Normal=Vector3.yAxis},at),"real silk controller accepts wing profile")
+silk.bend=at+Vector3.new(40,-20,0)
+check((silk:pivot()-at).Magnitude>7 and body:holdsAnchor(silk.anchorPart),"far-away line bend retains original wing attachment")
 for _,part in body.parts do check(not part.CanQuery and not part.CanCollide and not part.CastShadow,"drawing cannot become prey or cast small shadows") end
 local book=Book.new();check(book:view("rare_luna_moth")==nil,"no undiscovered page or checklist")
 local camera=workspace.CurrentCamera;camera.CFrame=CFrame.lookAt(at+Vector3.new(0,4,12),at)
@@ -127,7 +136,9 @@ body:observe(1,camera,at,book);check(not book:isOpen("rare_luna_moth") and body.
 wall:Destroy();body:observe(.8,camera,at,book)
 check(book:isOpen("rare_luna_moth"),"continuous unobstructed look opens page")
 local inherited=Book.new();inherited:load(book:toRecord());check(inherited:isOpen("rare_luna_moth"),"page persists to next generation")
-body:update(nil,4,at,true,false);check(body.model~=nil and body.leaving==0,"departure waits for spider or silk on wing")
+body:update(nil,4,at+Vector3.new(30,0,0),body:holdsAnchor(silk.anchorPart),false)
+check(body.model~=nil and body.leaving==0,"departure waits for remote spider whose line bends away from wing")
+silk:clear()
 body:update(nil,1,at+Vector3.new(30,0,0),false,true)
 for _,part in body.supports:GetChildren() do check(not part.CanQuery,"departure removes abandoned supports") end
 body:update(nil,3,at+Vector3.new(30,0,0),false,true)

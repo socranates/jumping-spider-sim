@@ -13,6 +13,11 @@ function Body.clear(self: any)
  if self.supports then self.supports:Destroy() end
  self.model=nil;self.supports=nil;self.serial=nil;self.position=nil;self.seen=0;self.leaving=0
 end
+function Body.holdsAnchor(self: any,part: Instance?): boolean
+ -- A silk bend can be far from the original attachment. Follow the actual
+ -- attachment part, never the current pivot or distance to the animal.
+ return part~=nil and self.supports~=nil and part:IsDescendantOf(self.supports)
+end
 local function build(self: any,visitor: any)
  local model=Instance.new("Folder");model.Name="RareLuna";model.Parent=Workspace;self.model=model
  local supports=Instance.new("Folder");supports.Name="RareLunaSupport";supports.Parent=self.root;self.supports=supports

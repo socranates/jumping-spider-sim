@@ -36,6 +36,7 @@ return function(d)
  check(d.notebook:isOpen("rare_luna_moth"),"visible unobstructed encounter opens notebook")
  local supports=d.rareBody.supports
  for _,part in supports:GetChildren() do check(part.CanQuery and part.CanCollide,"settled wing is queryable support") end
+ check(d.rareBody:holdsAnchor(supports:GetChildren()[1]) and not d.rareBody:holdsAnchor(d.world.root),"departure tracks actual wing attachment")
  d.place(Spec.at+Vector3.new(-2.05,.39,.3));task.wait(2)
  check(d.motor.mode=="attached" and d.motor.pos.Y>Spec.at.Y+.25,"motor settles on wing without falling through")
  local floorY=d.motor.pos.Y

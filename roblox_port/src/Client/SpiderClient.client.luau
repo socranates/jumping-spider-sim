@@ -2141,7 +2141,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if M.rareBody and session.started then
   local paused=GuiService.MenuIsOpen or modal() or life.resting or life.lifeOver or M.title:holding()
   if not paused then
-   local anchor=M.rareBody.base and motor:onLine() and (motor.silk:pivot()-M.rareBody.base).Magnitude<7
+   local anchor=motor:onLine() and M.rareBody:holdsAnchor(motor.silk.anchorPart)
    M.rareBody:update(M.rareVisitor,frameDt*(if slow then SLOW_SPEED else 1),motor.pos,anchor==true,setting("ReducedMotion")==true)
    M.rareBody:observe(frameDt*(if slow then SLOW_SPEED else 1),cam.camera,motor.pos,book)
   else M.rareBody.seen=0 end

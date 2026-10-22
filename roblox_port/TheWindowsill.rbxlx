@@ -47710,6 +47710,11 @@ function Body.clear(self: any)
  if self.supports then self.supports:Destroy() end
  self.model=nil;self.supports=nil;self.serial=nil;self.position=nil;self.seen=0;self.leaving=0
 end
+function Body.holdsAnchor(self: any,part: Instance?): boolean
+ -- A silk bend can be far from the original attachment. Follow the actual
+ -- attachment part, never the current pivot or distance to the animal.
+ return part~=nil and self.supports~=nil and part:IsDescendantOf(self.supports)
+end
 local function build(self: any,visitor: any)
  local model=Instance.new("Folder");model.Name="RareLuna";model.Parent=Workspace;self.model=model
  local supports=Instance.new("Folder");supports.Name="RareLunaSupport";supports.Parent=self.root;self.supports=supports
@@ -53492,7 +53497,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if M.rareBody and session.started then
   local paused=GuiService.MenuIsOpen or modal() or life.resting or life.lifeOver or M.title:holding()
   if not paused then
-   local anchor=M.rareBody.base and motor:onLine() and (motor.silk:pivot()-M.rareBody.base).Magnitude<7
+   local anchor=motor:onLine() and M.rareBody:holdsAnchor(motor.silk.anchorPart)
    M.rareBody:update(M.rareVisitor,frameDt*(if slow then SLOW_SPEED else 1),motor.pos,anchor==true,setting("ReducedMotion")==true)
    M.rareBody:observe(frameDt*(if slow then SLOW_SPEED else 1),cam.camera,motor.pos,book)
   else M.rareBody.seen=0 end

@@ -14,7 +14,7 @@ The Normal caption was also visually inspected in Studio at a desktop viewport. 
 
 ## Evidence boundaries
 
-The initial regression used an invalid device name `controller` instead of `gamepad`; it did not demonstrate gamepad coverage. Native uses the correct name. The test-only correction passed a separate 1,398-check targeted run, five runner regressions, 216-module compilation and strict types. Final-source Linux CI run 39758249693 is tracked separately. The initial full Windows run passed 62 suites / 443,424 checks, exit zero; it remains bound to a367893, not relabeled as a run of corrected tests. Initial build/type/targeted receipts are retained under initial/.
+The initial regression used an invalid device name `controller` instead of `gamepad`; it did not demonstrate gamepad coverage. Native uses the correct name. The test-only correction passed a separate 1,398-check targeted run, five runner regressions, 216-module compilation and strict types. Final-source Linux CI run 39758249693 completed successfully (compile, strict types, all suites and runner regressions); ci-final.json retains its metadata and steps. The initial full Windows run passed 62 suites / 443,424 checks, exit zero; it remains bound to a367893, not relabeled as a run of corrected tests. Initial build/type/targeted receipts are retained under initial/.
 
 The earlier baseline regression's first attempt hit a test assertion on an absent shim property; its log is retained as `baseline-regression-initial.txt`. The hardened final old-source run reaches the actual client and fails 17 caption assertions (46 pass), versus 63 passing on the candidate.
 

@@ -24,7 +24,7 @@
     "diagnostic_content": false
   },
   "test_place_rejected": true,
-  "linux_ci_verified": false,
+  "linux_ci_verified": true,
   "linux_ci": {
     "id": 39758249693,
     "name": "roblox-port",
@@ -35,8 +35,8 @@
     "display_title": "Use the valid gamepad mode in caption regression",
     "run_number": 78,
     "event": "push",
-    "status": "in_progress",
-    "conclusion": null,
+    "status": "completed",
+    "conclusion": "success",
     "workflow_id": 390194035,
     "check_suite_id": 107749643703,
     "check_suite_node_id": "CS_kwDOU8Ep6M8AAAAZFmEVtw",
@@ -44,7 +44,7 @@
     "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39758249693",
     "pull_requests": [],
     "created_at": "2026-10-22T09:48:25Z",
-    "updated_at": "2026-10-22T09:48:29Z",
+    "updated_at": "2026-10-22T10:00:11Z",
     "actor": {
       "login": "socranates",
       "id": 259234217,
@@ -262,11 +262,11 @@
           "head_sha": "bd91ee2ec2f4db1dad296cd2be9fc1ee23f4938e",
           "url": "https://api.github.com/repos/socranates/jumping-spider-sim/actions/jobs/119755640455",
           "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39758249693/job/119755640455",
-          "status": "in_progress",
-          "conclusion": null,
+          "status": "completed",
+          "conclusion": "success",
           "created_at": "2026-10-22T09:48:26Z",
           "started_at": "2026-10-22T09:48:28Z",
-          "completed_at": null,
+          "completed_at": "2026-10-22T10:00:11Z",
           "name": "checks",
           "steps": [
             {
@@ -311,27 +311,35 @@
             },
             {
               "name": "All suites",
-              "status": "in_progress",
-              "conclusion": null,
+              "status": "completed",
+              "conclusion": "success",
               "number": 6,
               "started_at": "2026-10-22T09:48:39Z",
-              "completed_at": null
+              "completed_at": "2026-10-22T10:00:08Z"
             },
             {
               "name": "Runner failure and cleanup regressions",
-              "status": "pending",
-              "conclusion": null,
+              "status": "completed",
+              "conclusion": "success",
               "number": 7,
-              "started_at": null,
-              "completed_at": null
+              "started_at": "2026-10-22T10:00:08Z",
+              "completed_at": "2026-10-22T10:00:08Z"
             },
             {
               "name": "Post Run actions/checkout@v4",
-              "status": "pending",
-              "conclusion": null,
+              "status": "completed",
+              "conclusion": "success",
               "number": 14,
-              "started_at": null,
-              "completed_at": null
+              "started_at": "2026-10-22T10:00:08Z",
+              "completed_at": "2026-10-22T10:00:08Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-22T10:00:08Z",
+              "completed_at": "2026-10-22T10:00:08Z"
             }
           ],
           "check_run_url": "https://api.github.com/repos/socranates/jumping-spider-sim/check-runs/119755640455",

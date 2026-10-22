@@ -16,7 +16,7 @@ Four production modules change: SpiderClient, Frog, CrabSpider and Bird. There i
 - Targeted suites: OUTDOOR_RESET 45, NATURE 28,890, NATURE_CLIENT 6, MINIMAL 63, STATE_CLIENT 162: **29,166 passed**, exit zero.
 - All 216 production modules compile with -O0; strict analysis is clean; five runner regressions pass.
 - Native Studio run `1792664252632` passed **46 assertions** after a guard verified all 217 authored scripts (216 production plus one probe) and confirmed Persistence.Disabled=true. The native probe uses real client callbacks, model-generated attack fixtures, Normal/Free Play, enabled and disabled flags, and a real in-session local rest/recovery. No CreatorError occurred. The probe was stopped afterward.
-- Full Windows run and Linux CI run `39761460756` are tracked separately. Their status is authoritative only in receipt.json and the completed process/CI metadata. Do not treat a partial log as a finished suite.
+- Full Windows run completed: **63 suites / 443,469 passed / zero failed**, process exit zero. Linux CI run `39761460756` succeeded on compile, strict types, all suites and runner checks. `verify.py --require-full` passes against the retained receipts.
 
 The diagnostic place is `C:\Users\natha\claude-xfer\Windowsill-outdoor-reset-native-v1\Windowsill-outdoor-reset-review.rbxlx`, SHA-256 `d828dc8708a1d0abd16cbdaa5f6e35e87b19cd02242f456e0854fb6bb7a2a81b`. Never publish it. Its injected probe, diagnostic attributes and disabled persistence are absent from the release XML. This is not online DataStore rejoin, native performance, physical input comfort, or manual playthrough evidence.
 

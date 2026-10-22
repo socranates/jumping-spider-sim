@@ -9,3 +9,5 @@ The old frozen source fails 15 assertions in the new preserve integration regres
 See docs/outdoor-life-reset/README.md and receipt.json for exact bindings, test limitations and unfinished full-run/CI gates. The local native review place is diagnostic and must never be published. Continue polling the existing Windows process and CI run 39761460756; do not restart a live test because an observation times out. Resolve any failures before promotion.
 
 The animation cache remains an isolated experiment with modest/mixed timings; it is not integrated. Remaining audit work includes the long memory session, legacy-world save policy, foreign-lock Continue UX, AI preparation timing, save-error presentation, toolchain pinning and native/phone checks. No claim of overall problem-free status or release readiness is made.
+
+Full gates now completed for source 3c8de801: Windows 63 suites / 443,469 passed / zero failed, process exit zero; Linux CI 39761460756 succeeded on compilation, strict types, all suites and runner regressions. verify.py --require-full passes. No publication or online rejoin is implied.

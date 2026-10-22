@@ -1,0 +1,22 @@
+{
+  "source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
+  "paired_probe_test_hash_matches": true,
+  "baseline_failed": 9,
+  "candidate_passed": 769,
+  "changed_production_modules": [
+    "roblox_port/src/Shared/Persistence/SaveSession.luau"
+  ],
+  "compiled": 216,
+  "integration_verified": true,
+  "integration_passed": 241,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "windows_full_complete": false,
+  "windows_full_passed": null,
+  "linux_ci_verified": false,
+  "native_verified": false,
+  "release_sha256": "fc5ed3dd88a83705507dcb020910ba358b938a41fa666735282a1a7b1e954bd8",
+  "published": false,
+  "publication_ready": false,
+  "foreign_lock_continue_ux_complete": false
+}

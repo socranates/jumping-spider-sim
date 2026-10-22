@@ -1,0 +1,5 @@
+STATE_CLIENT passed=162 failed=0
+STATE_OFFLINE passed=8 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=14 failed=0
+REST_COMPRESSION passed=57 failed=0

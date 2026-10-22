@@ -1,0 +1,16 @@
+{
+  "source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
+  "evidence_id": "95802440d548b8c2",
+  "targeted_passed": 1010,
+  "targeted_suites": 5,
+  "prior_full_windows_session": 85596,
+  "prior_full_source": "5760c67627449de61fc18801007a3739ff0cc75b",
+  "current_full_windows_started": false,
+  "linux_ci_run": 39783315341,
+  "native_verified": false,
+  "shadow_native_verified": false,
+  "published": false,
+  "foreign_lock_continue_ux_complete": false,
+  "linux_ci_status": "in_progress",
+  "current_full_windows_pending_reason": "Prior full Windows session 85596 is confirmed live; keep full Windows runs serial on this memory-constrained host."
+}

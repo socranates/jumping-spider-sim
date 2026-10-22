@@ -1,3 +1,7 @@
+# Current callback/validator contract
+
+Source47241c9: onOffer(mode,infoOrNil) carries metadata only (id/protected/playable), never a full record. offerInfo is the cheap menu accessor; offer explicitly returns a private full copy. Use SaveRest.check(mode,record,checkpointWorld) once for ordinary client validation; server callers omit the world and retain stand-in validation. Immutable-id repeats retain the earlier private record. Root README/cost-reduction receipts are current; older design/status text below is historical.
+
 # Current status: game/menu connected
 
 Source ac898f4 now supplies the actual validator/copy/restore callbacks and menu choices. The earlier next-step design below is retained as the contract, not a statement that every bullet is still unimplemented. Current results and remaining cost/native/network/full gates are in README.md and menu-ready/.

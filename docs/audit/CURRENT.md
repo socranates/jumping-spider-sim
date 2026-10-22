@@ -1,3 +1,7 @@
+# Current source:47241c9 repeated-offer optimization
+
+11 focused suites/1,591 checks pass,220 compile/strict/runner5 verified. First full-preserve validation remains roughly0.7s in a CLI sample; native/frame/network and current full gates are not complete. Earlier ac898f4 Windows exec63820 and Linux39827147497 are still live at last poll. Start at [current Save/Continue status](../save-continue/README.md); older status sections below retain their own sources and scope. Nothing published; overall goal remains active.
+
 # Current work: actual Save/Continue menu integrated
 
 Source ac898f4 on codex/save-continue has11 focused suites/1,567 passing checks,220 compiled modules, strict clean and runner5. Full Windows exec63820 and Linux run39827147497 are running; no completed current full/native/network/performance result is claimed. The large-preserve CLI diagnostic exposes synchronous validation/copy work still to improve. Start at [Save/Continue status](../save-continue/README.md). Earlier status sections below are historical. Nothing published; overall goal remains active.

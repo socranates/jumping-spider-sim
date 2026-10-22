@@ -1,0 +1,11 @@
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=14 failed=0
+COPY_COST stage=receive_one_full_preserve_offer elapsed_ms=683.4475999930874 heap_kib_before=222582 heap_kib_after=192706
+COPY_COST stage=repeat_unchanged_offer_5 elapsed_ms=0.010299962013959885 heap_kib_before=192706 heap_kib_after=192709
+COPY_COST stage=menu_metadata_100_reads elapsed_ms=0.020599982235580683 heap_kib_before=192709 heap_kib_after=192726
+COPY_COST stage=explicit_continue_core elapsed_ms=210.34879999933764 heap_kib_before=192726 heap_kib_after=228231
+COPY_COST stage=queue_full_checkpoint elapsed_ms=699.4721000082791 heap_kib_before=228232 heap_kib_after=205131
+COPY_COST stage=copy_outgoing_full_checkpoint_only elapsed_ms=52.23139998270199 heap_kib_before=205133 heap_kib_after=219431
+COPY_COST outgoing_canonical_chars=2277178 record_chars=2277087
+COPY_COST validation_calls=2 nonempty_offer_callbacks=1
+COPY_COST_DONE one_full_preserve_slot metadata_reads_100_full_copies_0 restores_1

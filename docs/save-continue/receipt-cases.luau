@@ -1,0 +1,66 @@
+case("checkpoint receipts follow durable storage and duplicate retry preserves backup",function()
+ local e,s=authorityFixture(1600,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(mode,serial,credential,ticket) table.insert(receipts,{mode=mode,serial=serial,credential=credential,ticket=ticket}) end
+ local candidate=realRest(240,"main");assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1))
+ check(#receipts==0,"queueing never claims the checkpoint is stored")
+ e.backend:fail({op="update",key=s.rkey.main,times=1,message="offline"});run(e,s,1)
+ check(#receipts==0 and r.storedSerial==0,"failed storage produces no receipt")
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));check(#receipts==0,"duplicate queued ticket is not an acknowledgement")
+ run(e,s,3)
+ check(#receipts==1 and receipts[1].ticket==1 and receipts[1].serial==1 and receipts[1].credential==r.credential,"only durable completion emits the exact granted ticket")
+ local before=canon(e.backend.data[s.rkey.main]);local requests=e.backend.requests
+ assert(s:setRestForIntent("main",realRest(360,"main"),r.life,1,r.credential,1))
+ check(#receipts==2 and e.backend.requests==requests and canon(e.backend.data[s.rkey.main])==before,"replayed immutable ticket repeats receipt without accepting different contents or rewriting backup")
+end)
+case("newer queued checkpoint wins over delayed older tickets",function()
+ local e,s=authorityFixture(1601,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(_,_,_,ticket) table.insert(receipts,ticket) end
+ local first,newer=realRest(240,"main"),realRest(360,"main")
+ assert(s:setRestForIntent("main",first,r.life,1,r.credential,1));assert(s:setRestForIntent("main",newer,r.life,1,r.credential,2))
+ check(not s:setRestForIntent("main",first,r.life,1,r.credential,1) and #receipts==0,"late older uncommitted ticket cannot replace a newer pending candidate")
+ run(e,s,1);local expected=Json.copy(newer);expected.save_life=r.life
+ check(#receipts==1 and receipts[1]==2 and canon(e.backend.data[s.rkey.main].payload)==canon(expected),"coalesced storage acknowledges only its actual latest ticket")
+ local before=canon(e.backend.data[s.rkey.main]);assert(s:setRestForIntent("main",first,r.life,1,r.credential,1))
+ check(receipts[#receipts]==2 and canon(e.backend.data[s.rkey.main])==before,"older retry can learn latest stored ticket without rolling back the world")
+end)
+case("ambiguous storage response never emits a premature receipt for a newer queued world",function()
+ local e,s=authorityFixture(1602,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(_,_,_,ticket) table.insert(receipts,ticket) end
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,r.credential,1))
+ e.backend:fail({op="update",key=s.rkey.main,times=1,afterWrite=true,message="lost response"});run(e,s,1)
+ check(#receipts==0,"unconfirmed commit is not acknowledged")
+ assert(s:setRestForIntent("main",realRest(360,"main"),r.life,1,r.credential,2));run(e,s,3)
+ check(#receipts==1 and receipts[1]==2 and r.storedSerial==2,"retry advances only a known authored ambiguous revision and acknowledges the newer checkpoint")
+end)
+case("new grant rejects old receipt credentials and idempotently confirms the same checkpoint",function()
+ local e,s=authorityFixture(1603,"main",false,false);local r=grantContinue(e,s,"main",1);local candidate=realRest(240,"main")
+ local receipts={};s.cfg.onStored=function(_,_,credential,ticket) table.insert(receipts,{credential=credential,ticket=ticket}) end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1);local oldCredential=r.credential
+ s:demote("other_session",true);s:load();run(e,s,70)
+ local count=#receipts;local before=canon(e.backend.data[s.rkey.main])
+ check(not s:setRestForIntent("main",candidate,r.life,1,oldCredential,1) and #receipts==count,"old grant cannot solicit a new-current receipt")
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1)
+ check(#receipts==count+1 and receipts[#receipts].credential==r.credential and receipts[#receipts].ticket==1,"fresh grant confirms the immutable candidate using its current credential")
+ check(canon(e.backend.data[s.rkey.main])==before,"idempotent confirmation preserves timestamp, checksum and backup")
+end)
+case("receipt callback failure can be recovered without another storage write",function()
+ local e,s=authorityFixture(1604,"main",false,false);local r=grantContinue(e,s,"main",1);local candidate=realRest(240,"main")
+ s.cfg.onStored=function() error("synthetic dropped reply") end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1)
+ local before=canon(e.backend.data[s.rkey.main]);local requests=e.backend.requests;local receipt=0
+ s.cfg.onStored=function(_,_,_,ticket) receipt=ticket end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1))
+ check(receipt==1 and e.backend.requests==requests and canon(e.backend.data[s.rkey.main])==before,"lost outbound receipt is retransmitted from confirmed state")
+end)
+case("throttled wire upload can retry its ticket and receive actual storage confirmation",function()
+ local e=newEnv();local owner=newSession(e,1605,"owner");owner:load();owner:setRest("main",realRest(120,"main"));run(e,owner,15);owner:flush()
+ local srv=newServer(e);local p=player(1605);srv.service:addPlayer(p);srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL});tickServer(e,srv,3)
+ local offer=assert(serviceOffer(srv,p,"main"));srv.service:onMessage(p,{kind="life_intent",intent="continue",mode="main",serial=1,offerId=offer.id});tickServer(e,srv,2)
+ local d=srv.last(p,"decision").decision;assert(d.state=="writable")
+ local msg={kind="rest",mode="main",record=realRest(240,"main"),life=d.life,serial=1,credential=d.credential,restSerial=1}
+ local bucket=srv.service.entries[p].restBucket;bucket.tokens=0;bucket.last=e.t
+ srv.service:onMessage(p,msg)
+ check(srv.last(p,"stored")==nil,"throttled admission cannot pretend the packet was stored")
+ e.t+=5;srv.service:onMessage(p,msg);tickServer(e,srv,1);local stored=srv.last(p,"stored")
+ check(stored and stored.restSerial==1 and stored.serial==1 and stored.credential==d.credential and type(stored.sequence)=="number","retry receives a sequence-stamped exact storage receipt")
+end)

@@ -54,6 +54,7 @@ SaveRules.MAX_LIFE_SERIAL = 1000000000
 SaveRules.MAX_LIFE_TOKEN_CHARS = 160
 SaveRules.CLIENT_LIFE_GAP = 5 -- retry one idempotent retirement intent until durable acknowledgement
 SaveRules.PROTOCOL = 2 -- the version of the messages between client and server
+SaveRules.OFFER_PROTOCOL = 3 -- explicit opt-in; older peers keep protocol 2 behavior
 SaveRules.CLIENT_HELLO_GAP = 2.5 -- the client says hello again this often until the server answers
 SaveRules.CLIENT_HELLO_TRIES = 6
 SaveRules.CLIENT_PROGRESS_GAP = 2 -- the client sends at most one progress message in this time

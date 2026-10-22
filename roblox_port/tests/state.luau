@@ -2377,5 +2377,352 @@ case("read-only backup remains protected and unknown future rest stays untouched
  check(future:offer("main")==nil and canon(e.backend.data[s.rkey.main])==canon(raw),"future schema never falls back to a writable/ordinary preview")
 end)
 
+-- Appended to default state.luau; real checkpoints and scripted store failures.
+local function authorityFixture(uid,mode,foreign,legacy)
+ local e=newEnv();local owner=newSession(e,uid,"original-owner");assert(owner:load()=="active")
+ if mode=="easy" then owner:setProgress(prog({},{finished=true})) end
+ if not legacy then owner:beginLife(mode,1);run(e,owner,15) end
+ assert(owner:setRestForLife(mode,realRest(120,mode),owner.lifeTokens[mode]));run(e,owner,15)
+ if not foreign then owner:flush(e.t+20) end
+ local decisions={};local s=newSession(e,uid,"bound-visitor",{onDecision=function(value) table.insert(decisions,value) end})
+ s:load();s:enableOffers();run(e,s,3)
+ assert(s:offer(mode),"fixture requires an actual observed rest")
+ return e,s,owner,decisions
+end
+local function grantContinue(e,s,mode,serial)
+ local offer=assert(s:offer(mode));assert(s:requestLife("continue",mode,serial,offer.id));run(e,s,2)
+ local r=assert(s.intents.requests[mode]);assert(r.state=="writable","fixture did not grant continuation")
+ return r
+end
+
+case("bound Continue requires a separate acknowledged credential in all slots",function()
+ for i,mode in SaveRules.MODES do
+  local e,s,_,decisions=authorityFixture(1400+i,mode,false,false);local offer=s:offer(mode)
+  local before=canon(e.backend.data[s.rkey[mode]])
+  check(not s:setRestForLife(mode,realRest(240,mode),offer.record.save_life) and not s:beginLife(mode,1),mode..": persisted identity cannot use legacy write/retirement paths")
+  check(s:requestLife("continue",mode,1,offer.id),mode..": exact displayed choice is accepted")
+  check(decisions[#decisions].state=="readonly" and decisions[#decisions].credential==nil,mode..": choice alone grants no write credential")
+  check(not s:setRestForIntent(mode,realRest(240,mode),offer.record.save_life,1,nil),mode..": nil acknowledgement never authorizes")
+  check(canon(e.backend.data[s.rkey[mode]])==before,mode..": pre-validation messages do not write")
+  run(e,s,2);local r=s.intents.requests[mode]
+  check(r.state=="writable" and type(r.credential)=="string" and r.credential~=r.life,mode..": validation issues a separate credential")
+  check(not s:setRestForIntent(mode,realRest(240,mode),r.life,1,"stale"),mode..": wrong credential refused")
+  check(s:setRestForIntent(mode,realRest(240,mode),r.life,1,r.credential),mode..": exact credential queues a valid rest")
+  run(e,s,15)
+  check(e.backend.data[s.rkey[mode]].checksum==r.expected.checksum and canon(e.backend.data[s.rkey[mode]])~=before,mode..": stored revision follows the acknowledged world")
+ end
+end)
+
+case("read-only Continue promotes only an unchanged foreign rest after recovery",function()
+ for i,changed in {false,true} do
+  local e,s,owner=authorityFixture(1410+i,"main",true,false);local offer=s:offer("main")
+  assert(s:requestLife("continue","main",1,offer.id));local r=s.intents.requests.main
+  check(r.state=="readonly" and not s:setRestForIntent("main",realRest(240,"main"),offer.record.save_life,1,"guess"),"leased play has no permission")
+  if changed then owner:beginLife("main",2);run(e,owner,15);owner:setRestForLife("main",realRest(240,"main"),owner.lifeTokens.main);run(e,owner,15) end
+  owner:flush(e.t+20);local before=canon(e.backend.data[s.rkey.main]);run(e,s,70)
+  if changed then
+   check(r.state=="changed" and r.credential==nil and not s.canRetry,"changed recovery needs a fresh explicit choice")
+   check(canon(e.backend.data[s.rkey.main])==before,"foreign rest and backup never rebased or overwritten")
+   check(e.backend.data[s.pkey].lock==nil,"refused recovery releases only its acquired lease")
+  else check(r.state=="writable" and r.life==offer.record.save_life,"unchanged recovery is acknowledged") end
+ end
+end)
+
+case("New Life is writable only after durable retirement and recovers without a second retirement",function()
+ local e,s=authorityFixture(1420,"main",false,false);local offer=s:offer("main");local original=e.backend.data[s.rkey.main]
+ assert(s:requestLife("new","main",1,offer.id));local r=s.intents.requests.main
+ run(e,s,1)
+ check(r.state=="readonly" and r.credential==nil and r.retireReady,"validated intent still waits for its durable marker")
+ run(e,s,1);local marker=e.backend.data[s.rkey.main]
+ check(r.state=="writable" and marker.payload.save_retired and marker.backup.checksum==original.checksum,"marker and previous rest precede acknowledgement")
+ local credential=r.credential;local writes=e.backend.writes;s:requestLife("new","main",1,offer.id)
+ check(r.credential==credential and e.backend.writes==writes,"duplicate intent neither mints permission nor rewrites backup")
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,credential));run(e,s,15)
+ local before=canon(e.backend.data[s.rkey.main]);s:demote("other_session",true)
+ check(not s:setRestForIntent("main",realRest(240,"main"),r.life,1,credential),"ownership loss revokes the old credential immediately")
+ s:load();run(e,s,70)
+ check(r.state=="writable" and r.credential~=credential,"established New Life receives a fresh continuation credential")
+ check(canon(e.backend.data[s.rkey.main])==before and not e.backend.data[s.rkey.main].payload.save_retired,"recovery never retires the already played life again")
+end)
+
+case("empty-only New cannot retire an unseen record, but a missing slot and observed marker work",function()
+ local e,s=authorityFixture(1421,"main",false,false);local before=canon(e.backend.data[s.rkey.main])
+ assert(s:requestLife("new","main",1,nil));run(e,s,2)
+ check(s.intents.requests.main.state=="changed" and canon(e.backend.data[s.rkey.main])==before,"no offer means physically missing only")
+ e=newEnv();s=newSession(e,1422,"empty");s:load();s:enableOffers();run(e,s,3)
+ assert(s:requestLife("new","main",1,nil));run(e,s,2)
+ check(s.intents.requests.main.state=="writable" and e.backend.data[s.rkey.main].payload.save_retired,"genuinely missing slot can acknowledge New")
+ local markerOffer=s:offer("main");assert(markerOffer and markerOffer.record.save_retired)
+ check(s:requestLife("continue","main",2,markerOffer.id) and s.intents.requests.main.state=="changed","retirement marker is not a playable Continue")
+ assert(s:requestLife("new","main",3,markerOffer.id));run(e,s,70)
+ check(s.intents.requests.main.state=="writable" and s.lifeRequests.main.serial==3,"explicit New can bind an observed nonplayable marker")
+end)
+
+case("delayed validation cannot grant an intent superseded during its read",function()
+ local e,s,_,decisions=authorityFixture(1430,"main",false,false);local offer=s:offer("main")
+ assert(s:requestLife("continue","main",1,offer.id));local read=e.backend.read;local injected=false
+ e.backend.read=function(self,key)
+  if key==s.rkey.main and not injected then injected=true;assert(s:requestLife("new","main",2,offer.id)) end
+  return read(self,key)
+ end
+ run(e,s,1);e.backend.read=read
+ local stale=false;for _,d in decisions do if d.serial==1 and d.state=="writable" then stale=true end end
+ check(injected and not stale,"old read completion emits no stale writable decision")
+ run(e,s,70)
+ check(s.intents.requests.main.serial==2 and s.intents.requests.main.state=="writable","only newer New intent can finish")
+end)
+
+case("atomic callback retries recheck the current selected intent",function()
+ local e,s=authorityFixture(1431,"main",false,false);local r=grantContinue(e,s,"main",1)
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,r.credential))
+ local before=canon(e.backend.data[s.rkey.main]);local update=e.backend.update;local injected=false
+ e.backend.update=function(self,key,transform)
+  if key==s.rkey.main and not injected then
+   injected=true;assert(transform(Json.copy(self.data[key]))~=nil)
+   assert(s:requestLife("new","main",2,s:offer("main").id))
+  end
+  return update(self,key,transform)
+ end
+ run(e,s,1);e.backend.update=update
+ check(injected and canon(e.backend.data[s.rkey.main])==before,"discarded speculative callback cannot commit old rest after a newer choice")
+ check(s.intents.requests.main.serial==2 and s.intents.requests.main.state=="readonly","old callback cannot acknowledge newer intent")
+end)
+
+case("commit before revocation preserves the authored revision without resurrecting permission",function()
+ local e,s=authorityFixture(1432,"main",false,false);local r=grantContinue(e,s,"main",1);local credential=r.credential
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,credential))
+ local update=e.backend.update;local revoked=false
+ e.backend.update=function(self,key,transform)
+  local ok,value,err=update(self,key,transform)
+  if key==s.rkey.main and not revoked then revoked=true;s:demote("other_session",true) end
+  return ok,value,err
+ end
+ run(e,s,1);e.backend.update=update
+ check(revoked and r.state=="readonly" and r.credential==nil,"late successful response never restores permission after loss")
+ local before=canon(e.backend.data[s.rkey.main]);s:load();run(e,s,70)
+ check(r.state=="writable" and r.credential~=credential and canon(e.backend.data[s.rkey.main])==before,"fresh revalidation can recover our confirmed authored checkpoint")
+end)
+
+case("lost write response can advance to a newer queued checkpoint without rebasing foreign data",function()
+ local e,s=authorityFixture(1433,"main",false,false);local r=grantContinue(e,s,"main",1)
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,r.credential))
+ e.backend:fail({op="update",key=s.rkey.main,times=1,afterWrite=true,message="lost response"})
+ run(e,s,1);local newer=realRest(360,"main")
+ assert(s:setRestForIntent("main",newer,r.life,1,r.credential));run(e,s,5)
+ local expected=Json.copy(newer);expected.save_life=r.life
+ check(r.state=="writable" and canon(e.backend.data[s.rkey.main].payload)==canon(expected),"only our known authored ambiguous revision permits advancing a newer queued rest")
+ check(r.expected.checksum==e.backend.data[s.rkey.main].checksum and r.ambiguous==nil,"successful retry settles exact revision")
+end)
+
+case("missing and equal-time foreign records cannot pass an acknowledged write callback",function()
+ for i,missing in {false,true} do
+  local e,s=authorityFixture(1440+i,"main",false,false);local r=grantContinue(e,s,"main",1)
+  assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,r.credential))
+  local old=e.backend.data[s.rkey.main];local replacement=nil
+  if not missing then
+   local payload=realRest(360,"main");payload.save_life=r.life
+   replacement=SaveEnvelope.make(SaveRest.SPECS.main,payload,old.updatedAt,old,{session="foreign"})
+  end
+  e.backend:poke(s.rkey.main,replacement);local before=canon(replacement);run(e,s,1)
+  check(r.state=="changed" and r.credential==nil,"changed revision revokes current authority")
+  check(canon(e.backend.data[s.rkey.main])==before,"callback cannot recreate a deleted rest or replace an equal-time foreign revision")
+ end
+end)
+
+case("protected backups and legacy nil identity never bypass the new credential gate",function()
+ local e,s=authorityFixture(1450,"main",false,false);local old=e.backend.data[s.rkey.main]
+ local raw=SaveEnvelope.make(SaveRest.SPECS.main,realRest(240,"main"),e.t,old,{session="foreign"});raw.checksum="damaged"
+ e.backend:poke(s.rkey.main,raw);s.previewPending.main=true;s:step()
+ local offer=s:offer("main");assert(offer and offer.protected);local before=canon(raw)
+ assert(s:requestLife("continue","main",1,offer.id));run(e,s,15)
+ check(s.intents.requests.main.state=="readonly" and canon(e.backend.data[s.rkey.main])==before,"readable backup stays temporary and preserves damaged primary")
+ e,s=authorityFixture(1451,"main",false,true);local r=grantContinue(e,s,"main",1)
+ check(r.life==nil and not s:setRestForIntent("main",realRest(240,"main"),nil,1,nil),"legacy nil life identity alone remains powerless")
+ check(s:setRestForIntent("main",realRest(240,"main"),nil,1,r.credential),"legacy life can continue with an independent acknowledgement")
+end)
+
+case("validation is budgeted, backs off and respects Easy unlock",function()
+ local e,s=authorityFixture(1452,"main",false,false);local offer=s:offer("main")
+ check(not s:requestLife("new","easy",1,nil),"locked Easy cannot request a new authority")
+ assert(s:requestLife("continue","main",1,offer.id));local r=s.intents.requests.main
+ s.sched.started=table.create(SaveRules.REQUESTS_PER_MINUTE,e.t);local requests=e.backend.requests;s:step()
+ check(e.backend.requests==requests and r.state=="readonly","budget exhaustion cannot grant or start a validation read")
+ s.sched.started={};e.backend:fail({op="read",key=s.rkey.main,times=1,message="offline"});s:step()
+ requests=e.backend.requests;s:step()
+ check(e.backend.requests==requests and r.needsCheck and r.credential==nil,"failed validation backs off without permission")
+ run(e,s,3);check(r.state=="writable","later successful read can acknowledge the same explicit observation")
+end)
+
+case("departure validates New before durable acknowledgement",function()
+ local e,s=authorityFixture(1453,"main",false,false);local offer=s:offer("main")
+ assert(s:requestLife("new","main",1,offer.id));s:flush(e.t+20)
+ check(s.closed and e.backend.data[s.rkey.main].payload.save_retired and s.lifeRequests.main.done,"departure stores only a validated explicit retirement")
+end)
+
+local function serviceOffer(srv,p,mode)
+ local list=srv.sent[p] or {}
+ for i=#list,1,-1 do if list[i].kind=="offer" and list[i].mode==mode then return list[i].offer end end
+ return nil
+end
+case("offer protocol transports observations separately and requires current intent credentials",function()
+ local e=newEnv();local owner=newSession(e,1500,"owner");owner:load();owner:setRest("main",realRest(120,"main"));run(e,owner,15);owner:flush()
+ local srv=newServer(e);local p=player(1500);srv.service:addPlayer(p);srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL})
+ local loaded=srv.last(p,"loaded")
+ check(loaded.v==SaveRules.OFFER_PROTOCOL and loaded.rests==nil and loaded.lives==nil,"negotiation never treats preview/life identities as ordinary loaded write credentials")
+ check(loaded.sequence==1 and type(loaded.epoch)=="string","initial reply establishes sequence and owner epoch")
+ tickServer(e,srv,3);local offer=assert(serviceOffer(srv,p,"main"));local before=canon(e.backend.data.R_1500_main)
+ check(#SaveRest.check("main",offer.record)==0 and srv.count(p,"rest")==0,"valid rest travels only as an explicit offer")
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(240,"main"),life=offer.record.save_life})
+ srv.service:onMessage(p,{kind="begin_life",mode="main",serial=1});tickServer(e,srv,1)
+ check(canon(e.backend.data.R_1500_main)==before and srv.count(p,"life")==0,"legacy upload/retirement cannot bypass negotiated authority")
+ e.t+=5;srv.service:onMessage(p,{kind="life_intent",intent="continue",mode="main",serial=1,offerId=offer.id})
+ check(srv.last(p,"decision").decision.state=="readonly","selected view is initially read-only")
+ tickServer(e,srv,2);local d=srv.last(p,"decision").decision
+ check(d.state=="writable" and d.serial==1 and type(d.credential)=="string","server replies with validated separate credential")
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(240,"main"),life=d.life,serial=d.serial,credential=d.credential,restSerial=1});tickServer(e,srv,15)
+ check(canon(e.backend.data.R_1500_main)~=before,"acknowledged rest is stored through the new route")
+ local last=0;local ordered=true
+ for _,m in srv.sent[p] do if m.epoch~=loaded.epoch or m.sequence<=last then ordered=false end;last=m.sequence end
+ check(ordered,"all new-protocol status/offer/decision/loaded replies share a monotonic epoch sequence")
+ local n=srv.count(p,"loaded");local dropped=srv.service.stats.dropped
+ srv.service:onMessage(p,{kind="hello",v=SaveRules.PROTOCOL})
+ check(srv.count(p,"loaded")==n and srv.service.stats.dropped==dropped+1,"compatible negotiation cannot be downgraded to regain legacy writes")
+ local stable=canon(e.backend.data.R_1500_main)
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(360,"main"),life=d.life});tickServer(e,srv,1)
+ check(canon(e.backend.data.R_1500_main)==stable,"downgrade attempt does not restore the old rest API")
+end)
+case("older negotiated peers keep their original save route",function()
+ local e=newEnv();local srv=newServer(e);local p=player(1501);srv.service:addPlayer(p)
+ srv.service:onMessage(p,{kind="hello",v=1});local loaded=srv.last(p,"loaded")
+ check(loaded.v==SaveRules.PROTOCOL and type(loaded.rests)=="table" and type(loaded.lives)=="table" and loaded.sequence==nil,"legacy reply shape remains unchanged")
+ srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL})
+ check(not srv.service.entries[p].session.offersEnabled,"later hello cannot silently upgrade a playing legacy session")
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(120,"main")});tickServer(e,srv,15)
+ check(e.backend.data.R_1501_main~=nil and srv.count(p,"offer")==0,"older peer still saves without preview copies or messages")
+end)
+case("pre-negotiation and unsupported peers cannot queue candidates or retain an owned lease",function()
+ local e=newEnv();local srv=newServer(e);local p=player(1502);srv.service:addPlayer(p)
+ srv.service:onMessage(p,{kind="progress",progress=prog({"unnegotiated"})})
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(120,"main")})
+ srv.service:onMessage(p,{kind="begin_life",mode="main",serial=1})
+ tickServer(e,srv,2)
+ check(e.backend.data.R_1502_main==nil and #e.backend.data.P_1502.payload.notebook.opened==0 and srv.sent[p]==nil,"before hello no rest/progress/retirement candidate is admitted")
+ srv.service:onMessage(p,{kind="hello",v=999});tickServer(e,srv,2)
+ check(e.backend.data.P_1502.lock==nil and not srv.service.entries[p].session.canRetry,"unsupported peer releases only its lease and stops renewing/retrying it")
+ srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL});tickServer(e,srv,70)
+ check(srv.service.entries[p].session.state=="active" and srv.last(p,"loaded").v==SaveRules.OFFER_PROTOCOL,"later supported negotiation can recover without a stale lock wait")
+end)
+case("a new-protocol intent arriving before the stored rest is read cannot retire an unseen life",function()
+ local e=newEnv();local owner=newSession(e,1503,"owner");owner:load();owner:setRest("main",realRest(120,"main"));run(e,owner,15);owner:flush()
+ local before=canon(e.backend.data.R_1503_main);local srv=newServer(e);srv.deferSpawn=true;local p=player(1503);srv.service:addPlayer(p)
+ srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL})
+ srv.service:onMessage(p,{kind="life_intent",intent="new",mode="main",serial=1})
+ srv.deferSpawn=false;srv.drain();tickServer(e,srv,70)
+ check(canon(e.backend.data.R_1503_main)==before,"deferred load preserves unseen primary and backup")
+ local writable=false
+ for _,m in srv.sent[p] or {} do if m.kind=="decision" and m.decision.state=="writable" then writable=true end end
+ check(not writable and srv.last(p,"decision").decision.state=="changed","empty-only early intent never receives a write acknowledgement for discovered life")
+end)
+case("preview refresh requests are rate limited and issue no synchronous backend calls",function()
+ local e=newEnv();local srv=newServer(e);local p=player(1504);srv.service:addPlayer(p);srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL});tickServer(e,srv,3)
+ local requests=e.backend.requests;local limited=srv.service.stats.limited
+ for _=1,40 do srv.service:onMessage(p,{kind="refresh_offer",mode="main"}) end
+ check(e.backend.requests==requests and srv.service.stats.limited>=limited+38,"refresh burst is bounded and never reads from a RemoteEvent callback")
+ tickServer(e,srv,1)
+ check(e.backend.requests<=requests+1,"periodic refresh consumes at most one budgeted backend request")
+end)
+
+case("checkpoint receipts follow durable storage and duplicate retry preserves backup",function()
+ local e,s=authorityFixture(1600,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(mode,serial,credential,ticket) table.insert(receipts,{mode=mode,serial=serial,credential=credential,ticket=ticket}) end
+ local candidate=realRest(240,"main");assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1))
+ check(#receipts==0,"queueing never claims the checkpoint is stored")
+ e.backend:fail({op="update",key=s.rkey.main,times=1,message="offline"});run(e,s,1)
+ check(#receipts==0 and r.storedSerial==0,"failed storage produces no receipt")
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));check(#receipts==0,"duplicate queued ticket is not an acknowledgement")
+ run(e,s,3)
+ check(#receipts==1 and receipts[1].ticket==1 and receipts[1].serial==1 and receipts[1].credential==r.credential,"only durable completion emits the exact granted ticket")
+ local before=canon(e.backend.data[s.rkey.main]);local requests=e.backend.requests
+ assert(s:setRestForIntent("main",realRest(360,"main"),r.life,1,r.credential,1))
+ check(#receipts==2 and e.backend.requests==requests and canon(e.backend.data[s.rkey.main])==before,"replayed immutable ticket repeats receipt without accepting different contents or rewriting backup")
+end)
+case("newer queued checkpoint wins over delayed older tickets",function()
+ local e,s=authorityFixture(1601,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(_,_,_,ticket) table.insert(receipts,ticket) end
+ local first,newer=realRest(240,"main"),realRest(360,"main")
+ assert(s:setRestForIntent("main",first,r.life,1,r.credential,1));assert(s:setRestForIntent("main",newer,r.life,1,r.credential,2))
+ check(not s:setRestForIntent("main",first,r.life,1,r.credential,1) and #receipts==0,"late older uncommitted ticket cannot replace a newer pending candidate")
+ run(e,s,1);local expected=Json.copy(newer);expected.save_life=r.life
+ check(#receipts==1 and receipts[1]==2 and canon(e.backend.data[s.rkey.main].payload)==canon(expected),"coalesced storage acknowledges only its actual latest ticket")
+ local before=canon(e.backend.data[s.rkey.main]);assert(s:setRestForIntent("main",first,r.life,1,r.credential,1))
+ check(receipts[#receipts]==2 and canon(e.backend.data[s.rkey.main])==before,"older retry can learn latest stored ticket without rolling back the world")
+end)
+case("ambiguous storage response never emits a premature receipt for a newer queued world",function()
+ local e,s=authorityFixture(1602,"main",false,false);local r=grantContinue(e,s,"main",1)
+ local receipts={};s.cfg.onStored=function(_,_,_,ticket) table.insert(receipts,ticket) end
+ assert(s:setRestForIntent("main",realRest(240,"main"),r.life,1,r.credential,1))
+ e.backend:fail({op="update",key=s.rkey.main,times=1,afterWrite=true,message="lost response"});run(e,s,1)
+ check(#receipts==0,"unconfirmed commit is not acknowledged")
+ assert(s:setRestForIntent("main",realRest(360,"main"),r.life,1,r.credential,2));run(e,s,3)
+ check(#receipts==1 and receipts[1]==2 and r.storedSerial==2,"retry advances only a known authored ambiguous revision and acknowledges the newer checkpoint")
+end)
+case("new grant rejects old receipt credentials and idempotently confirms the same checkpoint",function()
+ local e,s=authorityFixture(1603,"main",false,false);local r=grantContinue(e,s,"main",1);local candidate=realRest(240,"main")
+ local receipts={};s.cfg.onStored=function(_,_,credential,ticket) table.insert(receipts,{credential=credential,ticket=ticket}) end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1);local oldCredential=r.credential
+ s:demote("other_session",true);s:load();run(e,s,70)
+ local count=#receipts;local before=canon(e.backend.data[s.rkey.main])
+ check(not s:setRestForIntent("main",candidate,r.life,1,oldCredential,1) and #receipts==count,"old grant cannot solicit a new-current receipt")
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1)
+ check(#receipts==count+1 and receipts[#receipts].credential==r.credential and receipts[#receipts].ticket==1,"fresh grant confirms the immutable candidate using its current credential")
+ check(canon(e.backend.data[s.rkey.main])==before,"idempotent confirmation preserves timestamp, checksum and backup")
+end)
+case("receipt callback failure can be recovered without another storage write",function()
+ local e,s=authorityFixture(1604,"main",false,false);local r=grantContinue(e,s,"main",1);local candidate=realRest(240,"main")
+ s.cfg.onStored=function() error("synthetic dropped reply") end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1));run(e,s,1)
+ local before=canon(e.backend.data[s.rkey.main]);local requests=e.backend.requests;local receipt=0
+ s.cfg.onStored=function(_,_,_,ticket) receipt=ticket end
+ assert(s:setRestForIntent("main",candidate,r.life,1,r.credential,1))
+ check(receipt==1 and e.backend.requests==requests and canon(e.backend.data[s.rkey.main])==before,"lost outbound receipt is retransmitted from confirmed state")
+end)
+case("throttled wire upload can retry its ticket and receive actual storage confirmation",function()
+ local e=newEnv();local owner=newSession(e,1605,"owner");owner:load();owner:setRest("main",realRest(120,"main"));run(e,owner,15);owner:flush()
+ local srv=newServer(e);local p=player(1605);srv.service:addPlayer(p);srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL});tickServer(e,srv,3)
+ local offer=assert(serviceOffer(srv,p,"main"));srv.service:onMessage(p,{kind="life_intent",intent="continue",mode="main",serial=1,offerId=offer.id});tickServer(e,srv,2)
+ local d=srv.last(p,"decision").decision;assert(d.state=="writable")
+ local msg={kind="rest",mode="main",record=realRest(240,"main"),life=d.life,serial=1,credential=d.credential,restSerial=1}
+ local bucket=srv.service.entries[p].restBucket;bucket.tokens=0;bucket.last=e.t
+ srv.service:onMessage(p,msg)
+ check(srv.last(p,"stored")==nil,"throttled admission cannot pretend the packet was stored")
+ e.t+=5;srv.service:onMessage(p,msg);tickServer(e,srv,1);local stored=srv.last(p,"stored")
+ check(stored and stored.restSerial==1 and stored.serial==1 and stored.credential==d.credential and type(stored.sequence)=="number","retry receives a sequence-stamped exact storage receipt")
+end)
+
+case("permanent checkpoint refusal identifies only its own immutable ticket",function()
+ local e=newEnv();local owner=newSession(e,1610,"owner");owner:load();owner:setRest("main",realRest(120,"main"));run(e,owner,15);owner:flush()
+ local srv=newServer(e);local p=player(1610);srv.service:addPlayer(p);srv.service:onMessage(p,{kind="hello",v=SaveRules.OFFER_PROTOCOL});tickServer(e,srv,3)
+ local offer=assert(serviceOffer(srv,p,"main"));srv.service:onMessage(p,{kind="life_intent",intent="continue",mode="main",serial=1,offerId=offer.id});tickServer(e,srv,2)
+ local d=srv.last(p,"decision").decision;assert(d.state=="writable");local before=canon(e.backend.data.R_1610_main)
+ srv.service:onMessage(p,{kind="rest",mode="main",record={broken=true},life=d.life,serial=1,credential=d.credential,restSerial=1})
+ local refused=srv.last(p,"refused")
+ check(refused and refused.serial==1 and refused.restSerial==1 and refused.credential==d.credential and refused.reason=="invalid_checkpoint","permanent failure is scoped to the exact offending ticket and grant")
+ check(canon(e.backend.data.R_1610_main)==before and srv.last(p,"stored")==nil,"refusal never changes the stored record or invents storage success")
+ srv.service:onMessage(p,{kind="rest",mode="main",record=realRest(240,"main"),life=d.life,serial=1,credential=d.credential,restSerial=2});tickServer(e,srv,1)
+ check(srv.last(p,"stored").restSerial==2,"a later valid candidate can succeed independently of an older refusal")
+end)
+
+
+case("repeated validation failures never claim Saved and can recover unchanged authority",function()
+ local e,s=authorityFixture(1611,"main",false,false);local offer=s:offer("main");local before=canon(e.backend.data[s.rkey.main])
+ assert(s:requestLife("continue","main",1,offer.id));local r=s.intents.requests.main
+ e.backend:fail({op="read",key=s.rkey.main,times=3,message="offline"});run(e,s,10)
+ local status,reason=s:status()
+ check(r.state=="readonly" and r.credential==nil and status=="saving" and reason=="write_failed","unresolved repeated validation is not falsely Saved")
+ check(canon(e.backend.data[s.rkey.main])==before,"failed validation changes no stored rest")
+ run(e,s,70) -- initial reads/failures also consumed the one-minute request budget
+ check(r.state=="writable" and select(1,s:status())=="saved","unchanged successful recovery clears the failure state")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

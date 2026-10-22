@@ -1,3 +1,7 @@
+# Newer unfinished work
+
+The active branch is now `codex/save-continue`. See [Save/Continue status](../save-continue/README.md): server-only219 modules,1,319 focused checks, client/menu still unfinished. The older status below is historical. Its e315b3a full Windows/Linux gates subsequently completed65 suites/443946, retained in the separate `windowsill-observed-life` checkout; they do not verify this newer feature.
+
 # Current foundation audit status
 
 Candidate source `e315b3a048fddd1729461fb92502f73b7d8e2b94`, evidence `b425324a7f0a8007`, branch `codex/save-lease-cleanup`. **Unpublished; the optimization/audit goal remains active.** Last publication retained by evidence is v51/place140, not a fresh Dashboard check.

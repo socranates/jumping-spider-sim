@@ -23,6 +23,7 @@ local SaveScheduler = require(script.Parent.SaveScheduler)
 local SaveStores = require(script.Parent.SaveStores)
 local Json = require(script.Parent.Json)
 local SaveObservation = require(script.Parent.SaveObservation)
+local SaveIntent = require(script.Parent.SaveIntent)
 
 local function canonical(v: any): string
 	return (Json.canonical(v)) or ""
@@ -36,6 +37,9 @@ export type Config = {
 	sleep: ((number) -> ())?, log: ((string) -> ())?, progressSpec: SaveEnvelope.Spec?, -- (a test may hand in a later schema)
 	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?, onLife: ((string,number,string) -> ())?,
 	onOffer: ((string,any) -> ())?,
+	onDecision: ((any) -> ())?,
+	onStored: ((string,number,string,number) -> ())?,
+	onRefused: ((string,number,string,number,string) -> ())?,
 }
 
 
@@ -54,6 +58,7 @@ function SaveSession.new(cfg: Config): any
 		rkey = rkey,
 		sched = sched,
 		observations = SaveObservation.new(cfg.sessionId), offersEnabled = false,
+		intents = SaveIntent.new(cfg.sessionId,cfg.onDecision),
 		previewPending = {}, previewNextAt = {}, previewFailures = {},
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
@@ -61,6 +66,7 @@ function SaveSession.new(cfg: Config): any
 		restRevision = {} :: { [string]: string }, -- checksum of the last successfully read/written envelope
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
+		restPendingTag = {} :: {[string]:any},
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
 		restProtected = {} :: {[string]:string}, -- unreadable rest slots remain read-only for this visit
 		restRejected = {} :: { [string]: boolean }, -- a locally kept rest the server could not accept
@@ -94,6 +100,11 @@ end
 function SaveSession.status(self: any): (string, string?)
 	if self.state == "session" then return SaveRules.STATUS.session, self.reason end
 	if self.state == "loading" then return SaveRules.STATUS.saving, nil end
+	if self.offersEnabled then
+		for _,r in self.intents.requests do
+			if r.needsCheck and (r.failures or 0)>=3 then return SaveRules.STATUS.saving,"write_failed" end
+		end
+	end
 	if next(self.restRejected) ~= nil then return SaveRules.STATUS.saving, "rest_refused" end
 	if self.busy or self.sched:anyDirty() or not SaveSession.restsLoaded(self) then
 		local trouble = false
@@ -118,9 +129,21 @@ function SaveSession.notify(self: any)
 	end
 end
 
+local function revokeIntents(self: any,reason: string?)
+ if not self.offersEnabled then return end
+ for mode,r in self.intents.requests do
+  self.intents:readonly(r,reason)
+  local pending=self.restPending[mode]
+  if pending and not SaveRest.isRetired(pending) then
+   self.restPending[mode],self.restPendingTime[mode],self.restPendingTag[mode]=nil,nil,nil;self.sched:abandon("rest_"..mode)
+  end
+ end
+end
+
 -- Goes session-only. Gameplay records stay in memory until ownership is recovered
 -- (when `retry` is true); a queued metadata-only request may release our old lock.
 function SaveSession.demote(self: any, reason: string, retry: boolean)
+	revokeIntents(self,reason)
 	-- No yielding store call here: demotion can run inside a message callback.
 	-- A later step/flush releases only a lock still owned by this exact session.
 	if self.lockHeld then self.sched:markDirty("release", self.now()) end
@@ -179,7 +202,7 @@ end
 
 local function protectRest(self: any,mode: string,reason: string)
  self.restProtected[mode]=reason
- self.restPending[mode],self.restPendingTime[mode],self.restRejected[mode]=nil,nil,nil
+ self.restPending[mode],self.restPendingTime[mode],self.restRejected[mode],self.restPendingTag[mode]=nil,nil,nil,nil
  self.sched:abandon("rest_"..mode)
  -- Retain life request serials so delayed older intents cannot become fresh requests.
 end
@@ -193,10 +216,20 @@ end
 function SaveSession.enableOffers(self: any)
  if self.closed or self.offersEnabled then return end
  self.offersEnabled=true
- for _,mode in SaveRules.MODES do self.previewPending[mode]=true end
+ -- Negotiation closes the legacy write path, including messages queued before
+ -- negotiation. A preview's persisted life identity is not a write credential.
+ self.lifeRequests={}
+ for _,mode in SaveRules.MODES do
+  self.restPending[mode],self.restPendingTime[mode],self.restPendingTag[mode]=nil,nil,nil
+  self.sched:abandon("rest_"..mode);self.previewPending[mode]=true
+ end
 end
 function SaveSession.offer(self: any,mode: string): any
  return self.observations:offer(mode)
+end
+function SaveSession.refreshOffer(self: any,mode: any): boolean
+ if self.closed or not self.offersEnabled or type(mode)~="string" or SaveRest.SPECS[mode]==nil then return false end
+ self.previewPending[mode]=true;self.previewNextAt[mode]=0;return true
 end
 
 local function previewOne(self: any,mode: string)
@@ -216,7 +249,7 @@ local function previewOne(self: any,mode: string)
  if op.status~="ok" and op.status~="migrated" then
   opened,raw,protected,kind=op.backup,if type(value)=="table" then value.backup else nil,true,"backup"
  end
- if opened and (opened.status=="ok" or opened.status=="migrated") and not SaveRest.isRetired(opened.payload) and type(raw)=="table" then
+ if opened and (opened.status=="ok" or opened.status=="migrated") and (kind=="primary" or not SaveRest.isRetired(opened.payload)) and type(raw)=="table" then
   self.observations:publish(mode,opened.payload,{checksum=raw.checksum,updatedAt=opened.updatedAt,life=opened.payload.save_life,kind=kind},protected)
  else self.observations:withdraw(mode) end
  -- Never set rests/restLoaded/restBase/restRevision/lifeTokens from a preview.
@@ -259,13 +292,13 @@ local function readRests(self: any)
     -- Bind consent to the life AND revision observed when New Life was chosen.
     -- Reacquiring a lease must not silently authorize retiring a different save.
     -- Own retirement markers remain idempotent after an ambiguous write response.
-    if request and not request.done and (op.status=="ok" or op.status=="migrated")
+    if not self.offersEnabled and request and not request.done and (op.status=="ok" or op.status=="migrated")
      and (not request.observed or request.baseLife~=op.payload.save_life
       or request.baseTime~=(op.updatedAt or 0) or request.baseRevision~=value.checksum) and op.session~=self.id then
      self:demote("other_session",false)
     end
     local queued=self.restPending[mode]
-    if not self.restProtected[mode] and ((request and request.done and request.token~=self.lifeTokens[mode])
+    if not self.offersEnabled and not self.restProtected[mode] and ((request and request.done and request.token~=self.lifeTokens[mode])
      or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode])) then
      self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world
     end
@@ -273,7 +306,7 @@ local function readRests(self: any)
     -- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
 				local pending = self.restPendingTime[mode]
 				if pending ~= nil and not SaveRest.isRetired(self.restPending[mode]) and (self.restBase[mode] or 0) > pending then
-					self.restPending[mode], self.restPendingTime[mode] = nil, nil
+					self.restPending[mode], self.restPendingTime[mode],self.restPendingTag[mode] = nil, nil,nil
 					self.sched.items["rest_" .. mode].dirty = false
 				end
 			end
@@ -284,6 +317,7 @@ end
 -- Loads the player's records. Yields (backend calls). Returns the state: "active" or "session".
 function SaveSession.load(self: any): string
 	if self.closed then return self.state end
+	revokeIntents(self,"revalidating")
 	local verdict, info = attemptLock(self)
 	local first = self.state == "loading"
 	if verdict == "ok" then
@@ -347,7 +381,7 @@ end
 
 -- A session-local increasing intent makes retries idempotent and later New Life choices supersede earlier ones.
 -- The marker goes through the same guarded UpdateAsync and backup path as a rest; never DeleteAsync.
-function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
+local function beginLife(self: any,mode: string,serial: any): boolean
  if self.closed or SaveRest.SPECS[mode]==nil or type(serial)~="number" or serial~=serial or serial<1 or serial>SaveRules.MAX_LIFE_SERIAL or serial~=math.floor(serial) then return false end
  if self.restProtected[mode] then self.counters.rejected+=1;return false end
  local prior=self.lifeRequests[mode]
@@ -359,10 +393,39 @@ function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
  local token=`{self.id}:{mode}:{serial}`
  if not SaveRest.validLife(token) then return false end
  self.lifeRequests[mode]={serial=serial,token=token,done=false,observed=self.restLoaded[mode]==true,baseLife=self.lifeTokens[mode],baseTime=self.restBase[mode] or 0,baseRevision=self.restRevision[mode]}
- self.rests[mode],self.restRejected[mode]=nil,nil
+ self.rests[mode],self.restRejected[mode],self.restPendingTag[mode]=nil,nil,nil
  self.restPending[mode]={save_retired=true,save_life=token}
  self.restPendingTime[mode]=self.now()
  self.sched:markDirty("rest_"..mode,self.now());self:notify()
+ return true
+end
+
+function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
+ if self.offersEnabled then return false end
+ return beginLife(self,mode,serial)
+end
+
+-- Never yields. Only an exact displayed observation (or an explicitly empty-
+-- only New Life request) can be bound. Ownership validation is budgeted later.
+function SaveSession.requestLife(self: any,kind: any,mode: any,serial: any,offerId: any): boolean
+ if self.closed or not self.offersEnabled then return false end
+ if mode=="easy" and not self.progress.finished_main then return false end
+ local r,created=self.intents:choose(mode,kind,serial,offerId)
+ if not r then return false end
+ if not created then self.intents:notify(r);return true end
+ self.restPending[mode],self.restPendingTime[mode],self.restRejected[mode],self.lifeRequests[mode],self.restPendingTag[mode]=nil,nil,nil,nil,nil
+ self.sched:abandon("rest_"..mode)
+ if offerId~=nil then
+  local selected=self.observations:select(mode,serial,offerId)
+  if not selected then self.intents:changed(r,"offer_changed");return true end
+  if kind=="continue" and SaveRest.isRetired(selected.record) then self.intents:changed(r,"no_rest");return true end
+  r.base,r.protected=selected.identity,selected.protected
+ else
+  self.observations:clearSelection(mode,serial);r.missingOnly=true
+ end
+ if kind=="continue" and r.protected then r.needsCheck=false;r.reason="rest_protected" end
+ if self.state=="session" and self.reason=="other_session" then self.canRetry=true;self.retryAt=self.now() end
+ self.intents:notify(r)
  return true
 end
 
@@ -370,7 +433,7 @@ end
 function SaveSession.setRest(self: any,mode: string,record: any): boolean
  return self:setRestForLife(mode,record,nil)
 end
-function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeToken: string?): boolean
+local function queueRest(self: any, mode: string, record: any,lifeToken: string?,tag: any?): boolean
 	if self.closed or SaveRest.SPECS[mode] == nil then return false end
  if self.restProtected[mode] then self.counters.rejected+=1;return false end
  local request=self.lifeRequests[mode]
@@ -396,15 +459,108 @@ function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeTok
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
 		self.restRejected[mode] = true
+		if tag and self.cfg.onRefused then pcall(self.cfg.onRefused,mode,tag.serial,tag.credential,tag.restSerial,"invalid_checkpoint") end
 		self:notify()
 		return false
 	end
 	local now = self.now()
+	if tag then
+		local r=self.intents.requests[mode]
+		if not r or not self.intents:authorized(mode,tag.serial,tag.credential,lifeToken) then return false end
+		r.receivedSerial=tag.restSerial
+	end
 	self.restRejected[mode] = nil
  self.restPending[mode], self.restPendingTime[mode] = stamped, now
+ self.restPendingTag[mode]=tag
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()
 	return true
+end
+
+function SaveSession.setRestForLife(self: any,mode: string,record: any,lifeToken: string?): boolean
+ if self.offersEnabled then self.counters.rejected+=1;return false end
+ return queueRest(self,mode,record,lifeToken)
+end
+local function storedReceipt(self: any,mode: string,r: any)
+ if self.intents.requests[mode]~=r or r.state~="writable" or (r.storedSerial or 0)<1 or r.storedCredential~=r.credential then return end
+ if self.cfg.onStored then pcall(self.cfg.onStored,mode,r.serial,r.credential,r.storedSerial) end
+end
+function SaveSession.setRestForIntent(self: any,mode: string,record: any,lifeToken: any,serial: any,credential: any,restSerial: any?): boolean
+ if self.closed or not self.offersEnabled or self.state~="active" or not self.lockHeld or not self.intents:authorized(mode,serial,credential,lifeToken) then
+  self.counters.rejected+=1;return false
+ end
+ local r=self.intents.requests[mode]
+ -- Direct trusted model callers may omit a ticket. The wire service always
+ -- requires one; each ticket denotes one immutable candidate for this grant.
+ local ticket=if restSerial==nil then (r.receivedSerial or 0)+1 else restSerial
+ if type(ticket)~="number" or ticket~=ticket or ticket<1 or ticket>SaveRules.MAX_LIFE_SERIAL or ticket~=math.floor(ticket) then return false end
+ if ticket<=(r.receivedSerial or 0) then
+  if ticket<=(r.storedSerial or 0) then storedReceipt(self,mode,r);return true end
+  return ticket==r.receivedSerial -- duplicate queued candidate, never replace it
+ end
+ return queueRest(self,mode,record,lifeToken,{serial=serial,credential=credential,restSerial=ticket})
+end
+
+local function identityOf(op: any,raw: any): any
+ if op.status=="missing" then return {missing=true} end
+ if op.status~="ok" and op.status~="migrated" then return nil end
+ return {checksum=raw.checksum,updatedAt=op.updatedAt or 0,life=op.payload.save_life,kind="primary"}
+end
+local function sameIdentity(a: any,b: any): boolean
+ if not a or not b then return false end
+ if a.missing or b.missing then return a.missing==true and b.missing==true end
+ return a.checksum==b.checksum and a.updatedAt==b.updatedAt and a.life==b.life and a.kind==b.kind
+end
+local function intentAllows(self: any,mode: string,record: any,r: any,tag: any?): boolean
+ if not r or self.intents.requests[mode]~=r or self.state~="active" or not self.lockHeld or r.needsCheck then return false end
+ if SaveRest.isRetired(record) then
+  local request=self.lifeRequests[mode]
+  return r.kind=="new" and r.retireReady==true and request~=nil and request.serial==r.serial and request.token==record.save_life
+ end
+ return r.state=="writable" and r.credential~=nil and r.life==record.save_life and tag~=nil and tag.serial==r.serial and tag.credential==r.credential
+end
+
+-- One read under ownership, never a write or an implicit rebase to a foreign
+-- observation. New without an offer means "only if physically missing".
+local function validateIntent(self: any,r: any)
+ local mode=r.mode
+ if r.protected or self.restProtected[mode] then
+  if r.kind=="new" then self.intents:changed(r,"rest_protected") else self.intents:readonly(r,"rest_protected");r.needsCheck=false end
+  return
+ end
+ local now=self.now();self.sched:begin(nil,now);self.counters.requests+=1
+ local ok,raw,err=self.backend:read(self.rkey[mode])
+ if self.closed or self.intents.requests[mode]~=r or self.state~="active" or not self.lockHeld then return end
+ if not ok then
+  r.failures=(r.failures or 0)+1;r.nextAt=self.now()+SaveScheduler.backoff(r.failures,SaveStores.classify(err));return
+ end
+ local op=SaveEnvelope.open(SaveRest.SPECS[mode],raw)
+ local identity=identityOf(op,raw)
+ local request=self.lifeRequests[mode]
+ local ownMarker=r.kind=="new" and request and op.status=="ok" and op.session==self.id
+  and SaveRest.isRetired(op.payload) and op.payload.save_life==request.token
+ local basis=r.expected or r.base
+ local agrees=(basis~=nil and sameIdentity(basis,identity)) or (basis==nil and r.missingOnly and op.status=="missing")
+ local knownOwn=op.session==self.id and sameIdentity(r.ambiguous,identity)
+ if not agrees and not ownMarker and not knownOwn then
+  self.intents:changed(r,"rest_changed");self.previewPending[mode]=true;self.previewNextAt[mode]=0
+  self:demote("other_session",false);return
+ end
+ r.failures,r.nextAt,r.needsCheck,r.expected,r.ambiguous=0,nil,false,identity,nil
+ self.restLoaded[mode]=true;self.restBase[mode]=op.updatedAt or 0
+ self.restRevision[mode]=if type(raw)=="table" then raw.checksum else nil
+ self.lifeTokens[mode]=if op.payload then op.payload.save_life else nil
+ if ownMarker then
+  request.done=true;self.restPending[mode],self.restPendingTime[mode],self.restPendingTag[mode]=nil,nil,nil;self.sched:abandon("rest_"..mode)
+  r.established=true
+  self.intents:grant(r,request.token)
+ elseif r.kind=="continue" or r.established then
+  if not op.payload or (SaveRest.isRetired(op.payload) and not r.established) then self.intents:changed(r,"rest_changed");return end
+  self.intents:grant(r,self.lifeTokens[mode])
+ else
+  r.retireReady=true
+  if not beginLife(self,mode,r.serial) then self.intents:changed(r,"rest_protected") end
+ end
 end
 
 -- ---------------------------------------------------------------- writing
@@ -470,12 +626,15 @@ local function writeRest(self: any, mode: string): boolean
 	if self.restProtected[mode] or not self.restLoaded[mode] or self.restBase[mode] == nil then return false end
 	local name = "rest_" .. mode
 	local record = self.restPending[mode]
+	local tag=self.restPendingTag[mode]
 	if record == nil then
 		self.sched.items[name].dirty = false
 		return true
 	end
+	local bound=if self.offersEnabled then self.intents.requests[mode] else nil
+	if self.offersEnabled and not intentAllows(self,mode,record,bound,tag) then return false end
 	if not SaveRest.isRetired(record) and record.save_life~=self.lifeTokens[mode] then
-  self.restPending[mode],self.restPendingTime[mode]=nil,nil
+  self.restPending[mode],self.restPendingTime[mode],self.restPendingTag[mode]=nil,nil,nil
   self.sched:abandon(name);self:demote("other_session",false)
   return false
  end
@@ -488,12 +647,22 @@ local function writeRest(self: any, mode: string): boolean
  local expectedLife=self.lifeTokens[mode]
  local expectedRevision=self.restRevision[mode]
  local writtenRevision: string?=nil
+ local observed: any=nil
 	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
 		outcome = ""
+  observed=nil
+  if self.offersEnabled and not intentAllows(self,mode,record,bound,tag) then outcome="intent_changed";return nil end
   if self.restProtected[mode] then outcome="protected";return nil end
 		local op = SaveEnvelope.open(spec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
 		if op.status == "corrupt" or op.status == "invalid" then outcome = "corrupt"; return nil end
+  if bound then
+   local identity=identityOf(op,old)
+   local knownAmbiguous=op.session==self.id and sameIdentity(bound.ambiguous,identity)
+   local sameOwnRecord=op.session==self.id and op.payload~=nil and canonical(op.payload)==canonical(record)
+   if not sameIdentity(bound.expected,identity) and not knownAmbiguous and not sameOwnRecord then outcome="superseded";return nil end
+   observed=identity
+  end
 		if (op.status=="ok" or op.status=="migrated") and op.payload.save_life~=expectedLife and op.session~=self.id then
    outcome="superseded";return nil -- life identities protect even simultaneous writes with equal timestamps
   end
@@ -519,10 +688,14 @@ local function writeRest(self: any, mode: string): boolean
   return made
 	end)
 	if not ok then
+  if bound and self.intents.requests[mode]==bound then
+   if observed then bound.expected=observed end
+   if writtenRevision then bound.ambiguous={checksum=writtenRevision,updatedAt=newTime,life=record.save_life,kind="primary"} end
+  end
 		local class = SaveStores.classify(err)
 		if class == "value" then
 			log(self, `the {mode} rest cannot be stored: {tostring(err)}`)
-			self.restPending[mode], self.restPendingTime[mode] = nil, nil
+			self.restPending[mode], self.restPendingTime[mode],self.restPendingTag[mode] = nil, nil,nil
 			self.sched:abandon(name)
 			self:demote("write_failed", false)
 			return false
@@ -532,6 +705,12 @@ local function writeRest(self: any, mode: string): boolean
 		return false
 	end
 	if outcome == "ok" then
+  if bound and self.intents.requests[mode]==bound then
+   -- The store may finish before ownership is revoked but answer afterward.
+   -- Remember our confirmed authored revision without re-enabling permission.
+   bound.expected={checksum=writtenRevision,updatedAt=newTime,life=record.save_life,kind="primary"};bound.ambiguous=nil
+  end
+  if bound and not intentAllows(self,mode,record,bound,tag) then return false end
 		self.restBase[mode] = newTime
   self.restRevision[mode] = writtenRevision
 		self.lifeTokens[mode]=record.save_life
@@ -539,15 +718,23 @@ local function writeRest(self: any, mode: string): boolean
   local request=self.lifeRequests[mode]
   if SaveRest.isRetired(record) and request and request.token==record.save_life then
    request.done=true
-   if self.cfg.onLife then pcall(self.cfg.onLife,mode,request.serial,request.token) end
+   if not self.offersEnabled and self.cfg.onLife then pcall(self.cfg.onLife,mode,request.serial,request.token) end
   end
-  if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode] = nil, nil end
+  if bound then
+   bound.expected={checksum=writtenRevision,updatedAt=newTime,life=record.save_life,kind="primary"};bound.ambiguous=nil
+   if SaveRest.isRetired(record) then bound.established=true;self.intents:grant(bound,record.save_life) end
+   if tag then bound.storedSerial=tag.restSerial;bound.storedCredential=tag.credential;storedReceipt(self,mode,bound) end
+   self.observations:publish(mode,record,bound.expected,false)
+   if self.cfg.onOffer then pcall(self.cfg.onOffer,mode,self.observations:offer(mode)) end
+  end
+  if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode],self.restPendingTag[mode] = nil, nil,nil end
 		self.sched:succeeded(name, now, version)
 		self.counters.writes += 1
 		return true
 	end
 	if outcome == "superseded" then
-		self:demote("other_session", true)
+		if bound then self.intents:changed(bound,"rest_changed");self.previewPending[mode]=true;self.previewNextAt[mode]=0 end
+		self:demote("other_session", bound==nil)
 	elseif outcome == "newer" then
 		protectRest(self,mode,"newer")
 	elseif outcome == "corrupt" then
@@ -652,11 +839,19 @@ local function stepInner(self: any): boolean
 			end
 		else
 			did = false
-			for _, mode in SaveRules.MODES do
-				if self.sched:due("rest_" .. mode, now) then
-					writeRest(self, mode)
-					did = true
-					break
+			if self.offersEnabled and self.sched:budgetOk(now) then
+				for _,mode in SaveRules.MODES do
+					local r=self.intents.requests[mode]
+					if r and r.needsCheck and now>=(r.nextAt or 0) then validateIntent(self,r);did=true;break end
+				end
+			end
+			if not did then
+				for _, mode in SaveRules.MODES do
+					if self.sched:due("rest_" .. mode, now) then
+						writeRest(self, mode)
+						did = true
+						break
+					end
 				end
 			end
 		end
@@ -717,6 +912,13 @@ function SaveSession.flush(self: any, deadline: number?)
 			local progressDone = writeProgress(self, false)
 			local restsDone = true
 			if progressDone and self.state == "active" then
+				if self.offersEnabled then
+					for _,mode in SaveRules.MODES do
+						local r=self.intents.requests[mode]
+						if r and r.needsCheck and self.state=="active" and self.now()<limit then validateIntent(self,r) end
+						if r and r.needsCheck then restsDone=false end
+					end
+				end
 				for _, mode in SaveRules.MODES do
 					if self.restPending[mode] ~= nil then
 						if self.now() >= limit or self.state ~= "active" or not writeRest(self, mode) then restsDone = false end

@@ -51,12 +51,21 @@ local function take(b: any, now: number): boolean
 end
 
 local function sendTo(self: any, player: Player, msg: { [string]: any })
+	local entry=self.entries[player]
+	if entry and entry.protocol==SaveRules.OFFER_PROTOCOL then
+		entry.sequence+=1;msg.sequence=entry.sequence;msg.epoch=entry.session.id
+	end
 	local ok, err = pcall(self.cfg.send, player, msg)
 	if not ok then log(self, "send failed: " .. tostring(err)) end
 end
 
-local function loadedMessage(session: any): { [string]: any }
+local function loadedMessage(entry: any): { [string]: any }
+	local session=entry.session
 	local snap = session:snapshot()
+	if entry.protocol==SaveRules.OFFER_PROTOCOL then
+		local offers={};for _,mode in SaveRules.MODES do offers[mode]=session:offer(mode) end
+		return {kind="loaded",v=SaveRules.OFFER_PROTOCOL,status=snap.status,reason=snap.reason,progress=snap.progress,protected=snap.protected,offers=offers,decisions=session.intents:snapshot()}
+	end
 	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives, protected = snap.protected }
 end
 
@@ -66,7 +75,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	self.counter += 1
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
-	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
+	local entry: any = { player = player, hello = false, loaded = false, leaving = false, sequence=0, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
 	entry.session = SaveSession.new({
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
@@ -74,13 +83,28 @@ function SaveService.addPlayer(self: any, player: Player)
 			if entry.loaded and entry.hello and not entry.leaving then sendTo(self, player, { kind = "status", status = status, reason = reason, protected = entry.session:protectedSlots() }) end
 		end,
 		onLoaded = function(_snap: any)
-			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry.session)) end
+			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry)) end
 		end,
 		onLife = function(mode: string,serial: number,token: string)
-   if entry.hello and not entry.leaving then sendTo(self,player,{kind="life",mode=mode,serial=serial,token=token}) end
+   if entry.hello and not entry.leaving and entry.protocol~=SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="life",mode=mode,serial=serial,token=token}) end
+  end,
+  onOffer=function(mode: string,offer: any)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="offer",mode=mode,offer=offer}) end
+  end,
+  onDecision=function(decision: any)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="decision",decision=decision}) end
+  end,
+  onStored=function(mode: string,serial: number,credential: string,restSerial: number)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="stored",mode=mode,serial=serial,credential=credential,restSerial=restSerial}) end
+  end,
+  onRefused=function(mode: string,serial: number,credential: string,restSerial: number,reason: string)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="refused",mode=mode,serial=serial,credential=credential,restSerial=restSerial,reason=reason}) end
   end,
   onRest = function(mode: string, record: any)
-			if entry.hello and not entry.leaving then sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
+			if entry.hello and not entry.leaving then
+				if entry.protocol==SaveRules.OFFER_PROTOCOL then entry.session:refreshOffer(mode)
+				else sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
+			end
 		end,
 	})
 	self.entries[player] = entry
@@ -91,6 +115,9 @@ function SaveService.addPlayer(self: any, player: Player)
 			entry.session:demote("load_failed", true)
 		end
 		entry.loaded = true
+		if entry.unsupported then
+			if entry.session.state=="active" then entry.session:demote("offline",false) else entry.session.canRetry=false end
+		end
 		if entry.leaving then
 			local flushed, flushError = pcall(function() entry.session:flush() end)
 			-- (ROBLOX-91: only a departure that was counted is uncounted: shutdown also marks a still-loading entry as leaving, and the count went negative)
@@ -101,7 +128,7 @@ function SaveService.addPlayer(self: any, player: Player)
 			if not flushed then log(self, "flush raised: " .. tostring(flushError)) end
 			return
 		end
-		if entry.hello then sendTo(self, player, loadedMessage(entry.session)) end
+		if entry.hello then sendTo(self, player, loadedMessage(entry)) end
 	end)
 end
 
@@ -110,8 +137,22 @@ local function handle(self: any, entry: any, msg: any)
 	local kind = msg.kind
 	if kind == "hello" then
 		if not take(entry.helloBucket, now) then self.stats.limited += 1; return end
+		local protocol=if msg.v==SaveRules.OFFER_PROTOCOL then SaveRules.OFFER_PROTOCOL elseif msg.v==1 or msg.v==SaveRules.PROTOCOL then SaveRules.PROTOCOL else nil
+		if protocol==nil or (entry.hello and entry.protocol~=protocol) then
+			self.stats.dropped+=1
+			if not entry.hello then
+				entry.unsupported=true
+				if entry.session.state=="active" or entry.session.state=="loading" then entry.session:demote("offline",false) else entry.session.canRetry=false end
+			end
+			return
+		end
+		local wasUnsupported=entry.unsupported;entry.unsupported=false;entry.protocol=protocol
+		if protocol==SaveRules.OFFER_PROTOCOL then entry.session:enableOffers() end
+		if entry.session.state=="session" and (entry.session.reason=="offline" or (wasUnsupported and (entry.session.reason=="other_session" or entry.session.reason=="load_failed"))) then entry.session.canRetry=true;entry.session.retryAt=now end
 		entry.hello = true
-		if entry.loaded then sendTo(self, entry.player, loadedMessage(entry.session)) end
+		if entry.loaded then sendTo(self, entry.player, loadedMessage(entry)) end
+	elseif not entry.hello then
+		self.stats.dropped+=1 -- no candidates/permissions before compatible negotiation
 	elseif kind == "progress" then
 		if not take(entry.progressBucket, now) then self.stats.limited += 1; return end
 		if not entry.session:setProgress(msg.progress) then self.stats.dropped += 1 end
@@ -124,10 +165,18 @@ local function handle(self: any, entry: any, msg: any)
     sendTo(self,entry.player,{kind="status",status=status,reason=reason,protected=entry.session:protectedSlots()})
    end
   end
+ elseif kind=="life_intent" or kind=="refresh_offer" then
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if entry.protocol~=SaveRules.OFFER_PROTOCOL then self.stats.dropped+=1;return end
+  local accepted=if kind=="life_intent" then entry.session:requestLife(msg.intent,msg.mode,msg.serial,msg.offerId) else entry.session:refreshOffer(msg.mode)
+  if not accepted then self.stats.dropped+=1 end
  elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
 		local mode = msg.mode
-		if type(mode) ~= "string" or not entry.session:setRestForLife(mode, msg.record,msg.life) then self.stats.dropped += 1 end
+		if type(mode)~="string" then self.stats.dropped+=1;return end
+		if entry.protocol==SaveRules.OFFER_PROTOCOL and (type(msg.restSerial)~="number" or msg.restSerial~=msg.restSerial or msg.restSerial<1 or msg.restSerial>SaveRules.MAX_LIFE_SERIAL or msg.restSerial~=math.floor(msg.restSerial)) then self.stats.dropped+=1;return end
+		local accepted=if entry.protocol==SaveRules.OFFER_PROTOCOL then entry.session:setRestForIntent(mode,msg.record,msg.life,msg.serial,msg.credential,msg.restSerial) else entry.session:setRestForLife(mode,msg.record,msg.life)
+		if not accepted then self.stats.dropped+=1 end
 	else
 		self.stats.dropped += 1
 	end

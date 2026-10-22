@@ -76,6 +76,13 @@ function Observation.selection(self: any,mode: string): any
  return value
 end
 
+function Observation.clearSelection(self: any,mode: string,intentSerial: any): boolean
+ if not slot(mode) or not serial(intentSerial) then return false end
+ local old=self.choices[mode]
+ if old and intentSerial<=old.serial then return false end
+ self.choices[mode]={serial=intentSerial,offer=nil};return true
+end
+
 -- Identity agreement only, NEVER permission to write: the session must also
 -- own the lease and durably acknowledge the appropriate life/intent credential.
 function Observation.matches(self: any,mode: string,identity: any): boolean

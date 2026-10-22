@@ -16243,6 +16243,13 @@ local function readRests(self: any)
 					protectRest(self,mode,if op.status == "newer" then "newer" else "corrupt")
 				end
 				local request=self.lifeRequests[mode]
+    -- A local New Life chosen before this slot was ever read is not consent
+    -- to erase a life discovered later, after acquiring a foreign session's lease.
+    -- Own retirement markers remain idempotent after an ambiguous write response.
+    if request and not request.done and not request.observed
+     and (op.status=="ok" or op.status=="migrated") and op.session~=self.id then
+     self:demote("other_session",false)
+    end
     local queued=self.restPending[mode]
     if not self.restProtected[mode] and ((request and request.done and request.token~=self.lifeTokens[mode])
      or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode])) then
@@ -16336,7 +16343,7 @@ function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
  end
  local token=`{self.id}:{mode}:{serial}`
  if not SaveRest.validLife(token) then return false end
- self.lifeRequests[mode]={serial=serial,token=token,done=false}
+ self.lifeRequests[mode]={serial=serial,token=token,done=false,observed=self.restLoaded[mode]==true}
  self.rests[mode],self.restRejected[mode]=nil,nil
  self.restPending[mode]={save_retired=true,save_life=token}
  self.restPendingTime[mode]=self.now()

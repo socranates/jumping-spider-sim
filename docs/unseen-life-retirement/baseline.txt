@@ -1,0 +1,15 @@
+C:/Users/natha/AppData/Local/Temp/tmp469m3tyn.luau:45488: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp469m3tyn.luau:45488
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 8.1 s
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] late ownership never retires the unseen stored life
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] no durable acknowledgement for refused unseen retirement
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] conflict stays read-only for this visit
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] later retries never erase the protected life
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] late ownership never retires the unseen stored life
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] no durable acknowledgement for refused unseen retirement
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] conflict stays read-only for this visit
+FAIL [unseen New Life intent survives no foreign save after delayed ownership] later retries never erase the protected life
+STATE passed=733 failed=8

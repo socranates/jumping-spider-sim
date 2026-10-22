@@ -1,0 +1,5 @@
+Building project 'TheWindowsill'
+Built project to TheWindowsill.rbxlx
+Building project 'TheWindowsillTests'
+Built project to TheWindowsillTests.rbxlx
+evidence_id: 3ef9d94e5cae48bf

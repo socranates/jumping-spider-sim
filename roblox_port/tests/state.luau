@@ -2084,5 +2084,36 @@ case("service transports protected slots and refuses a stale intent without ackn
  check(srv.count(p,"life")==0 and canon(e.backend.data.R_904_main)==canon({invalid=true}),"no ack or replacement")
 end)
 
+-- An intent chosen before reading a slot cannot retire a subsequently discovered life.
+case("unseen New Life intent survives no foreign save after delayed ownership",function()
+ for _,changed in {false,true} do
+  local e=newEnv();local uid=if changed then 982 else 981
+  local a=newSession(e,uid,"owner");a:load();a:setRest("main",realRest(120,"main"));run(e,a,15)
+  local ack=0;local b=newSession(e,uid,"visitor",{onLife=function() ack+=1 end})
+  check(b:load()=="session" and not b.restLoaded.main,"visitor has not read the leased slot")
+  check(b:beginLife("main",1),"local intent accepted while waiting")
+  if changed then
+   a:beginLife("main",1);run(e,a,15)
+   check(a:setRestForLife("main",realRest(240,"main"),a.lifeTokens.main),"owner starts and saves another life")
+  end
+  a:flush(e.t+20)
+  local before=canon(e.backend.data["R_"..uid.."_main"])
+  run(e,b,40)
+  check(canon(e.backend.data["R_"..uid.."_main"])==before,"late ownership never retires the unseen stored life")
+  check(ack==0 and not b.lifeRequests.main.done,"no durable acknowledgement for refused unseen retirement")
+  check(b.state=="session" and b.reason=="other_session" and not b.canRetry,"conflict stays read-only for this visit")
+  run(e,b,SaveRules.LOCK_STALE+30)
+  check(canon(e.backend.data["R_"..uid.."_main"])==before and ack==0,"later retries never erase the protected life")
+ end
+end)
+case("preload New Life on a genuinely empty slot remains usable",function()
+ local e=newEnv();local ack=0;local a=newSession(e,983,"fresh",{onLife=function() ack+=1 end})
+ check(a:beginLife("main",1),"fresh intent can precede initial load")
+ check(a:load()=="active","missing slot acquires normally")
+ run(e,a,15)
+ check(ack==1 and a.lifeRequests.main.done,"empty-slot retirement is durably acknowledged")
+ check(e.backend.data.R_983_main.payload.save_life==a.lifeTokens.main,"acknowledged identity matches storage")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

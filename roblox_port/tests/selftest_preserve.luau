@@ -63,7 +63,8 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	assert(loaded, "SpiderClient did not load: " .. tostring(loadError))
 	assert(WorldMap.world() == "preserve", "the client did not make the preserve the active world")
 	local driver = ClientStubs.driver
-	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 232, `the client's world is the compact preserve ({#WorldMap.regions()} regions; 181 authored plus 51 infill)`)
+	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 233, `the client's world is the compact preserve ({#WorldMap.regions()} regions; 182 authored plus 51 infill)`)
+	assert(WorldMap.region("room_exit") ~= nil, "the cracked back-room window has its authored outdoor landing")
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil, "the hut's window is shut in a new save")
 	for _ = 1, 30 do frame(1 / 60); simClock += 1 / 60 end
 	local looks = driver.world.looks

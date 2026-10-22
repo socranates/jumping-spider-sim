@@ -12,5 +12,11 @@
   "published": false,
   "foreign_lock_continue_ux_complete": false,
   "linux_ci_status": "in_progress",
-  "current_full_windows_pending_reason": "Prior full Windows session 85596 is confirmed live; keep full Windows runs serial on this memory-constrained host."
+  "current_full_windows_pending_reason": "Prior full Windows session 85596 is confirmed live; keep full Windows runs serial on this memory-constrained host.",
+  "native_prepared": true,
+  "native_place": "C:/Users/natha/claude-xfer/Windowsill-observed-life-native-v1/Windowsill-observed-life-review.rbxlx",
+  "native_place_sha256": "7f127432ab6fcb470fb8dd68c8d7552b33c0693a7642fe404b681c7b9cc39282",
+  "native_expected_save_cases": 8,
+  "native_expected_save_checks": 45,
+  "native_expected_shadow_cases": 7
 }

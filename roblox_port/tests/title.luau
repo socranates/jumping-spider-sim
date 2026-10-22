@@ -545,6 +545,8 @@ check("Continue from the title card begins the life: the drift lets the camera g
 	frames(1)
 	feed("SpiderFeed", Enum.UserInputState.End, { KeyCode = Enum.KeyCode.E, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
 	frames(2)
+	local awaitRest=require("./studio/AwaitRest")
+	assert(ctx.life.checkpointResult and awaitRest(ctx.life.checkpointResult,function() frame(0) end).ok,"rest preparation completed")
 	assert(ctx.currentStore():loadBest().ok, "a rest kept")
 	ctx.session.started = false -- (as at the start of a visit with a saved rest)
 	ctx.openMenu()

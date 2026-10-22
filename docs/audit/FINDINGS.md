@@ -42,3 +42,7 @@ A11 (major accessibility, source-confirmed): `SpiderHud.minimalView` drops the s
 Already improved since the supplied review: v50 throttles distant cat poses; current v51 release files and README identify place 140; growth uses seven / ten fly equivalents in every mode; current native receipts exist. The audit does not repeat old v48 deficiencies as current facts.
 
 Reproduction: from `roblox_port`, run `python tests/run.py path/to/luau ../../docs/audit/probe.luau`. `save-probe.txt` contains exact outputs. No live save or Roblox API is touched.
+
+## A12 — startup readiness and false loading success (new source8e02b5e)
+
+Major, reproduced. `Client/WorldClient.luau` construction waited without deadlines for World/home, guessed a default after missing streamed identity and admitted missing home collision after warning. `First/SplashScreen.luau` removed its loading veil on timeout/error although the controller might never be ready. The current [A12 report](../startup-world-readiness/README.md) retains failing-on-predecessor pairs (world4/title6) and passing candidate counterparts (world33/title21), client/preserve1181, compile216, strict and runner5. Source changes are small and isolated; Splash.client has a comment-only correction. Current full/native gates remain separate and pending. Shared imports, real network timing, current physical-device controls/legibility and broader clipping remain open. The original report above retains its original source/statuses; this section supersedes only the named startup finding.

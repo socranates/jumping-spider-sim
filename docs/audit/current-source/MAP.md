@@ -1,9 +1,9 @@
 # Foundation map
-Current source `6026d6c45fbad072c2bec14a3b893fb8e7abccc2`, branch `codex/observed-life-retirement`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
+Current source `8e02b5ee5f443ab332cf7e70f5951a304cb89eea`, branch `codex/startup-world-readiness`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
 
 See `../CURRENT.md` for current verification gaps; `../DATA.md` remains the historical schema discussion. This is a lexical index, not a line-by-line review.
 
-Static index: 216 source files, 55,189 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
+Static index: 216 source files, 55,243 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
 ## Source inventory
 
 | Source | Lines | Side | Purpose from source | Required by | Direct tests | Flags |
@@ -40,11 +40,11 @@ Static index: 216 source files, 55,189 lines. Shared means available to either s
 | `roblox_port/src/Client/TitleCard.luau` | 261 | Client | The title card's camera and the intro of a new life (ROBLOX-109). The words are UI/TitleText's, the shots Movement/TitleShots'; this module draws them. | SpiderClient.client.luau | none | no direct test import |
 | `roblox_port/src/Client/TrainPass.luau` | 137 | Client | The trains beyond the preserve's north fence, drawn (ROBLOX-115): a silhouette of cars that runs along the railway's track when World/PreserveTrain's timetable | WorldClient.luau | none | no direct test import |
 | `roblox_port/src/Client/WaspBody.luau` | 226 | Client | The drawn mud dauber wasp (Data/WaspLook has every number): about 2.5 cm long, built from ellipsoids and rods as the fly is | SpiderClient.client.luau | wasp.luau |  |
-| `roblox_port/src/Client/WorldClient.luau` | 318 | Client | The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this | SpiderClient.client.luau | world_client.luau |  |
+| `roblox_port/src/Client/WorldClient.luau` | 338 | Client | The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this | SpiderClient.client.luau | world_client.luau |  |
 | `roblox_port/src/Client/WorldDetail.luau` | 35 | Client | The low-detail tier of the world, applied on one client: phones and tablets drop what the server built for the full tier | SpiderClient.client.luau | world.luau |  |
 | `roblox_port/src/Client/WorldShadows.luau` | 186 | Client | The walkable boxes' shadows, kept to the ones an eye at the spider could see (ROBLOX-121). | WorldClient.luau | shadows.luau |  |
 | `roblox_port/src/First/Splash.client.luau` | 10 | First | ReplicatedFirst's one script (ROBLOX-109): the game's own loading screen, First/SplashScreen. Whatever happens in it, it ends: SplashScreen.run is | entrypoint or no static consumer | none | no direct test import |
-| `roblox_port/src/First/SplashScreen.luau` | 209 | First | The splash (ROBLOX-109): the game's own loading screen, from ReplicatedFirst. Roblox's default loading screen is removed at once and in its place is | entrypoint or no static consumer | title.luau |  |
+| `roblox_port/src/First/SplashScreen.luau` | 243 | First | The startup veil/title drift (ROBLOX-109). Healthy TitleReady fades into the | entrypoint or no static consumer | title.luau |  |
 | `roblox_port/src/Server/DataStoreBackend.luau` | 52 | Server | Roblox DataStore adapter (read and update, neither raises). An optional storage codec handles only R_ rest keys; | Persistence.server.luau | rest_compression.luau, rest_storage.luau, state.luau |  |
 | `roblox_port/src/Server/Main.server.luau` | 72 | Server | Builds the world: the windowsill (scripts/habitat/windowsill.gd) as region 0 of the map (World/WorldBuild, ROBLOX-94: every region's physical boxes under one `World` | entrypoint or no static consumer | none | no direct test import |
 | `roblox_port/src/Server/Persistence.server.luau` | 91 | Server | Persistent saves, the server's side (ROBLOX-39). Wires the engine to SaveService: the DataStore, the two remotes, the players coming and | entrypoint or no static consumer | none | no direct test import |
@@ -421,17 +421,17 @@ Each line below is a call site, not an assertion that it runs each frame. Inspec
 | `roblox_port/src/Client/TrainPass.luau` | 51 | `local f = Instance.new("Folder")` |
 | `roblox_port/src/Client/TrainPass.luau` | 60 | `local s = Instance.new("Sound")` |
 | `roblox_port/src/Client/WaspBody.luau` | 83 | `local folder = Instance.new("Folder")` |
-| `roblox_port/src/Client/WorldClient.luau` | 78 | `while named == nil and os.clock() < deadline and t ~= nil do` |
-| `roblox_port/src/Client/WorldClient.luau` | 178 | `if remote == nil or not remote:IsA("RemoteEvent") then return false end` |
-| `roblox_port/src/Client/WorldClient.luau` | 179 | `(remote :: RemoteEvent):FireServer(pos)` |
+| `roblox_port/src/Client/WorldClient.luau` | 84 | `while not Worlds.known(named) and os.clock() < deadline and t ~= nil do` |
+| `roblox_port/src/Client/WorldClient.luau` | 198 | `if remote == nil or not remote:IsA("RemoteEvent") then return false end` |
+| `roblox_port/src/Client/WorldClient.luau` | 199 | `(remote :: RemoteEvent):FireServer(pos)` |
 | `roblox_port/src/Client/WorldShadows.luau` | 137 | `while i <= #entries do` |
-| `roblox_port/src/First/SplashScreen.luau` | 87 | `frame = function(): number return (game:GetService("RunService") :: any).RenderStepped:Wait() end,` |
-| `roblox_port/src/First/SplashScreen.luau` | 104 | `local l = Instance.new("TextLabel")` |
-| `roblox_port/src/First/SplashScreen.luau` | 117 | `local gui = Instance.new("ScreenGui")` |
-| `roblox_port/src/First/SplashScreen.luau` | 123 | `local veil = Instance.new("Frame")` |
-| `roblox_port/src/First/SplashScreen.luau` | 136 | `local dot = Instance.new("Frame")` |
-| `roblox_port/src/First/SplashScreen.luau` | 145 | `local round = Instance.new("UICorner")` |
-| `roblox_port/src/First/SplashScreen.luau` | 177 | `while s.phase ~= "done" do` |
+| `roblox_port/src/First/SplashScreen.luau` | 84 | `frame = function(): number return (game:GetService("RunService") :: any).RenderStepped:Wait() end,` |
+| `roblox_port/src/First/SplashScreen.luau` | 101 | `local l = Instance.new("TextLabel")` |
+| `roblox_port/src/First/SplashScreen.luau` | 114 | `local gui = Instance.new("ScreenGui")` |
+| `roblox_port/src/First/SplashScreen.luau` | 120 | `local veil = Instance.new("Frame")` |
+| `roblox_port/src/First/SplashScreen.luau` | 133 | `local dot = Instance.new("Frame")` |
+| `roblox_port/src/First/SplashScreen.luau` | 142 | `local round = Instance.new("UICorner")` |
+| `roblox_port/src/First/SplashScreen.luau` | 203 | `while s.phase ~= "done" do` |
 | `roblox_port/src/Server/DataStoreBackend.luau` | 16 | `local ok, value = pcall(function(): any return self.ds:GetAsync(key) end)` |
 | `roblox_port/src/Server/DataStoreBackend.luau` | 31 | `local result = self.ds:UpdateAsync(key, function(stored: any): any` |
 | `roblox_port/src/Server/Main.server.luau` | 67 | `local foci = Instance.new("Folder")` |

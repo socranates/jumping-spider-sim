@@ -1,0 +1,11 @@
+{
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "evidence_id": "58063ec00de84212",
+  "windows_full_session_id": 22326,
+  "linux_ci_run": 39792121861,
+  "targeted_passed": 1235,
+  "targeted_suites": 4,
+  "native_verified": false,
+  "prior_source_native_diagnostic": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2 only; not this source",
+  "published": false
+}

@@ -1,0 +1,17 @@
+C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:58044: title failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:58044
+FAIL title: the splash's fallbacks: no words (a dark field, no camera), no title card (gone at READY_WAIT_S), a lookup that raises, a fault in a frame, no Players
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55314: an unfinished client keeps a visible explanation
+FAIL title: a startup world failure is visible before the ordinary splash timeout
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55336: explicit failed world does not masquerade as a ready title
+FAIL title: timeout without Shared words retains a self-contained error then clears on late readiness
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55346: missing text modules cannot erase failure explanation
+FAIL title: external failure-screen destruction disconnects its player listener
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55356: failure screen remains owned by PlayerGui
+FAIL title: deferred destruction and a queued ready signal cannot retain or destroy the error screen twice
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55365: unready screen retained
+FAIL title: a failed readiness subscription cleans its owner connection and reports the fallback failure
+    C:/Users/natha/AppData/Local/Temp/tmp44zyx024/bundle.luau:55379: recovery error is not swallowed
+TITLE passed=15 failed=6

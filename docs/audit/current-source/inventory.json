@@ -1,6 +1,6 @@
 {
-  "source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
-  "branch": "codex/observed-life-retirement",
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "branch": "codex/startup-world-readiness",
   "baseline": {
     "published": true,
     "release": "v51",
@@ -847,10 +847,10 @@
       ]
     },
     {
-      "sha256": "c0b1b587985a055a7dc8078ae8fc24087a7e038a30753754f28992e21af93c8e",
+      "sha256": "f2fda201bc86a5e7d0826669a9996997be275155bfd99595efebc562eab051df",
       "path": "roblox_port/src/Client/WorldClient.luau",
       "name": "WorldClient",
-      "lines": 318,
+      "lines": 338,
       "purpose": "The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this",
       "side": "Client",
       "strict": true,
@@ -870,7 +870,7 @@
       "tests": [
         "world_client.luau"
       ],
-      "any_casts": 10,
+      "any_casts": 9,
       "required_by": [
         "roblox_port/src/Client/SpiderClient.client.luau"
       ]
@@ -914,7 +914,7 @@
       ]
     },
     {
-      "sha256": "2b5e0f51d96357c237cb7cb3e2530723512a2483daf8832d802ba257ec0ff46a",
+      "sha256": "d2e93bf198bb882d578fce5c93c6ac4473356ac569752bd95ee35e5e1dc8cd4b",
       "path": "roblox_port/src/First/Splash.client.luau",
       "name": "Splash.client",
       "lines": 10,
@@ -927,11 +927,11 @@
       "required_by": []
     },
     {
-      "sha256": "aabc0df9e6c059a4d67d3ff8b310bf09bdcc17bccca2a27b41fa35a58075e488",
+      "sha256": "635d21ed8638fb64fbcdf6b37b5561321a34a710b6921e7a9f68b641c7271c9b",
       "path": "roblox_port/src/First/SplashScreen.luau",
       "name": "SplashScreen",
-      "lines": 209,
-      "purpose": "The splash (ROBLOX-109): the game's own loading screen, from ReplicatedFirst. Roblox's default loading screen is removed at once and in its place is",
+      "lines": 243,
+      "purpose": "The startup veil/title drift (ROBLOX-109). Healthy TitleReady fades into the",
       "side": "First",
       "strict": true,
       "requires": [],

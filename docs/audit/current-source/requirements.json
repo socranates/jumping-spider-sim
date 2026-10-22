@@ -1,7 +1,7 @@
 {
-  "as_of_utc": "2026-10-22T13:28:08.250815+00:00",
-  "source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
-  "evidence_id": "95802440d548b8c2",
+  "as_of_utc": "2026-10-22T14:07:25.651224+00:00",
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "evidence_id": "58063ec00de84212",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -24,11 +24,11 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "implemented-with-limits",
-      "evidence_boundary": "Current1,010 targeted checks, compile216, strict and runner5 pass. Both Linux39783315341 and Windows55171 passed64 suites/443861 checks/zero failed on6026d6c: two complete passes, one per platform. This does not prove absence of every flake or native behavior.",
+      "status": "pending",
+      "evidence_boundary": "Startup candidate1,235 targeted checks, compile216, strict and runner5 pass. Windows22326 and Linux39792121861 are live pending gates on8e02b5e. Predecessor6026d6c passed64 suites/443861 each on both platforms; those are not current-source full results.",
       "references": [
-        "docs/observed-life-retirement/receipt.json",
-        "docs/observed-life-retirement/progress.json"
+        "docs/startup-world-readiness/receipt.json",
+        "docs/startup-world-readiness/progress.json"
       ]
     },
     {
@@ -79,7 +79,7 @@
     {
       "id": "life-retirement-A05",
       "status": "implemented-current-verification-pending",
-      "evidence_boundary": "Acknowledged life identity and stale-rest protection implemented; latest observed identity/time/checksum guards pass769 persistence checks and241 integration checks. Current full/native gates pending.",
+      "evidence_boundary": "Acknowledged life identity and observed revision/checksum guards verified in targeted tests and both full CLI gates on6026d6c. These source modules are unchanged by A12; the new whole candidate and actual native/online rejoin still need their own evidence.",
       "references": [
         "docs/life-retirement/receipt.json",
         "docs/observed-life-retirement/receipt.json"
@@ -157,7 +157,7 @@
     {
       "id": "shadow-binding-cleanup",
       "status": "implemented-current-native-pending",
-      "evidence_boundary": "Bounded visible/ignored owner cleanup passes349 targeted and preceding full Windows/Linux443816 each. Current combined source-guarded native diagnostic is prepared, not executed; no FPS/category-growth fix claim.",
+      "evidence_boundary": "Bounded visible/ignored owner cleanup passes349 targeted and preceding full gates443816 each. Combined diagnostic6026d6c was prepared, not run; it does not cover this candidate's startup/UI change. No FPS/category-growth fix claim.",
       "references": [
         "docs/shadow-stream-retention/receipt.json",
         "docs/observed-life-retirement/prepared-native-manifest.json"
@@ -192,7 +192,7 @@
     {
       "id": "code-review-and-startup",
       "status": "partial",
-      "evidence_boundary": "Boundary/source review is not exhaustive behavioral review of216 modules. Strict analysis passes, but root/home waits and initialization failure paths still need bounded failure handling; SpiderClient split remains a larger proposal.",
+      "evidence_boundary": "A12 now stops partial home startup and retains recovery UI in targeted tests. Some Shared imports still wait, and a yielding splash dependency lookup is not bounded by the frame-loop deadline. Native cold boot/failure timing remains unverified; exhaustive behavioral review and SpiderClient split remain open.",
       "references": [
         "docs/audit/CODE-REVIEW.md",
         "docs/audit/current-source/MAP.md"
@@ -230,8 +230,8 @@
       "status": "partial",
       "evidence_boundary": "One candidate ancestry, historical immutable receipts, source-bound generated builds and current handoff pushed. Current candidate package/release, live publication/rejoin and laptop synchronization are not complete. No branch deletion or main rewrite authorized here.",
       "references": [
-        "chet/observed-life-retirement.md",
-        "docs/observed-life-retirement/receipt.json",
+        "chet/startup-world-readiness.md",
+        "docs/startup-world-readiness/receipt.json",
         "docs/audit/current-source/branches.txt"
       ]
     },
@@ -241,6 +241,15 @@
       "evidence_boundary": "All thirteen approved over successive builds; luna shipped in v51, twelve remain planned. Expansion is deferred during this foundation round, not silently called implemented.",
       "references": [
         "docs/RARE_SIGHTINGS_PLAN.md"
+      ]
+    },
+    {
+      "id": "startup-A12",
+      "status": "implemented-current-verification-pending",
+      "evidence_boundary": "Missing World/home/collision and unknown streamed identity no longer admit a partial playable client. Healthy/legacy flat paths, late readiness, timeout/error visibility, deferred disposal and failed-subscription cleanup pass54 focused checks; client/preserve1181 more. Native timing and legibility remain open.",
+      "references": [
+        "docs/startup-world-readiness/README.md",
+        "docs/startup-world-readiness/receipt.json"
       ]
     }
   ]

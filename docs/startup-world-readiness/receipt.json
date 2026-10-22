@@ -1,0 +1,28 @@
+{
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "base_source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
+  "evidence_id": "58063ec00de84212",
+  "changed_production_modules": [
+    "roblox_port/src/Client/WorldClient.luau",
+    "roblox_port/src/First/Splash.client.luau",
+    "roblox_port/src/First/SplashScreen.luau"
+  ],
+  "paired_baseline_failures": 10,
+  "world_passed": 33,
+  "title_passed": 21,
+  "integration_passed": 1181,
+  "targeted_passed": 1235,
+  "targeted_suites": 4,
+  "compiled": 216,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "release_sha256": "8f5a265c5907af24df31d805986b42ac4ada500ceca2b37b3f61be397949c2bf",
+  "test_place_rejected": true,
+  "windows_full_complete": false,
+  "linux_ci_verified": false,
+  "native_verified": false,
+  "actual_network_streaming_verified": false,
+  "native_phone_ui_verified": false,
+  "published": false,
+  "publication_ready": false
+}

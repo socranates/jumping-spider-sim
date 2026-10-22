@@ -5,6 +5,7 @@ not a proof that a test executes a function or that a dynamic require resolves.
 from pathlib import Path
 import json
 import hashlib
+import argparse
 import re
 import subprocess
 
@@ -12,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PORT = ROOT / "roblox_port"
 OUT = Path(__file__).resolve().parent / "current-source"
 OUT.mkdir(exist_ok=True)
-SOURCE = json.loads((ROOT / "docs/observed-life-retirement/progress.json").read_text())["source"]
+parser=argparse.ArgumentParser();parser.add_argument("--source");args=parser.parse_args()
+SOURCE=args.source or subprocess.check_output(["git","rev-list","-1","HEAD","--","roblox_port/src"],cwd=ROOT,text=True).strip()
 BRANCH = subprocess.check_output(["git","branch","--show-current"],cwd=ROOT,text=True).strip()
 # Refuse an index labelled with a source whose actual production bytes differ.
 expected = {}

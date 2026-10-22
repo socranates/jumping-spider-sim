@@ -16109,6 +16109,7 @@ export type Config = {
 function SaveSession.new(cfg: Config): any
 	local sched = SaveScheduler.new()
 	sched:track("progress", SaveRules.PROGRESS_DEBOUNCE)
+	sched:track("release", 0) -- metadata-only cleanup after giving up an owned lease
 	local rkey: { [string]: string } = {}
 	for _, mode in SaveRules.MODES do
 		sched:track("rest_" .. mode, SaveRules.REST_MIN_INTERVAL)
@@ -16182,8 +16183,12 @@ function SaveSession.notify(self: any)
 	end
 end
 
--- Goes session-only. The progress in memory stays; nothing more is written until the lock is held again (when `retry` is true).
+-- Goes session-only. Gameplay records stay in memory until ownership is recovered
+-- (when `retry` is true); a queued metadata-only request may release our old lock.
 function SaveSession.demote(self: any, reason: string, retry: boolean)
+	-- No yielding store call here: demotion can run inside a message callback.
+	-- A later step/flush releases only a lock still owned by this exact session.
+	if self.lockHeld then self.sched:markDirty("release", self.now()) end
 	if self.state == "session" and self.reason == reason then return end
 	log(self, "session-only: " .. reason)
 	self.state, self.reason, self.lockHeld = "session", reason, false
@@ -16311,6 +16316,7 @@ function SaveSession.load(self: any): string
 	local verdict, info = attemptLock(self)
 	local first = self.state == "loading"
 	if verdict == "ok" then
+		self.sched:abandon("release") -- a deliberate successful load owns the lease again
 		adoptStored(self, info)
 		self.state, self.reason, self.lockHeld, self.canRetry = "active", nil, true, false
 		self.sched:beat(self.now())
@@ -16579,6 +16585,34 @@ local function writeRest(self: any, mode: string): boolean
 	return false
 end
 
+-- Giving up a conflicting life must not leave a freshly acquired progress lock
+-- blocking the next visit until expiry. This writes no progress/rest candidate:
+-- preserve the entire raw envelope and backup, changing only our own lock.
+local function releaseOwnedLock(self: any): boolean
+	local now = self.now()
+	local version = self.sched:begin("release", now)
+	self.counters.requests += 1
+	local released = false
+	local ok, _, err = self.backend:update(self.pkey, function(old: any): any
+		released = false -- UpdateAsync may invoke this callback more than once
+		if self.state ~= "session" then return nil end
+		local op = SaveEnvelope.open(self.pspec, old, false)
+		if op.status ~= "ok" and op.status ~= "migrated" then return nil end
+		if type(op.lock) ~= "table" or op.lock.session ~= self.id then return nil end
+		released = true
+		return SaveEnvelope.withLock(old, nil)
+	end)
+	if not ok then
+		local class = SaveStores.classify(err)
+		local wait = self.sched:failed("release", now, class)
+		log(self, `lease cleanup failed ({class}, retry in {wait} s): {tostring(err)}`)
+		return false
+	end
+	self.sched:succeeded("release", now, version)
+	if released then self.counters.writes += 1 end
+	return true
+end
+
 -- Refreshes the lock when no write has done it lately.
 local function heartbeat(self: any)
 	local now = self.now()
@@ -16611,7 +16645,9 @@ local function stepInner(self: any): boolean
 	local now = self.now()
 	local did = true
 	if self.state == "session" then
-		if self.canRetry and now >= self.retryAt and self.sched:budgetOk(now) then
+		if self.sched:isDirty("release") then
+			if self.sched:due("release", now) then releaseOwnedLock(self) else did = false end
+		elseif self.canRetry and now >= self.retryAt and self.sched:budgetOk(now) then
 			self.retryAt = now + SaveRules.RETRY_LOAD
 			local wasReason = self.reason
 			self:load()
@@ -16713,6 +16749,19 @@ function SaveSession.flush(self: any, deadline: number?)
 				end
 			end
 			if self.now() >= limit or sleep == nil then break end
+			sleep(math.min(SaveRules.FLUSH_BACKOFF * 2 ^ (attempt - 1), math.max(0, limit - self.now())))
+		end
+		self.busy = false
+	end
+	-- Demotion during the flush above also comes through here. No rest/progress
+	-- merge is allowed after demotion, even on departure; cleanup is metadata only.
+	if self.state == "session" and self.sched:isDirty("release") then
+		self.busy = true
+		local attempt = 0
+		while attempt < SaveRules.FLUSH_ATTEMPTS and self.now() < limit do
+			attempt += 1
+			if releaseOwnedLock(self) then break end
+			if sleep == nil or self.now() >= limit then break end
 			sleep(math.min(SaveRules.FLUSH_BACKOFF * 2 ^ (attempt - 1), math.max(0, limit - self.now())))
 		end
 		self.busy = false

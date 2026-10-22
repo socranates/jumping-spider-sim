@@ -1,0 +1,11 @@
+C:/Users/natha/AppData/Local/Temp/tmpjwzrioed/state.luau:45841: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpjwzrioed/state.luau:45841
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.6 s
+FAIL [session-only cleanup preserves progress, backup and unknown envelope metadata] no local progress merge or backup rewrite
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] ambiguous responses cannot rewrite progress/backup
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] ambiguous responses cannot rewrite progress/backup
+FAIL [departure cleanup preserves dirty candidates and respects its deadline] departure changes no saved candidate
+STATE passed=827 failed=4

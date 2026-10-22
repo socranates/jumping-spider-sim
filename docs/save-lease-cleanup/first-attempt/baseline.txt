@@ -1,0 +1,28 @@
+C:/Users/natha/AppData/Local/Temp/tmp2so666jk/state.luau:45792: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp2so666jk/state.luau:45792
+state: a rest is 17886 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.9 s
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] main: only owned lock metadata was released
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] main: next visit loads immediately without waiting120 seconds
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] main: next visit receives the preserved life
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] free: only owned lock metadata was released
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] free: next visit loads immediately without waiting120 seconds
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] free: next visit receives the preserved life
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] easy: only owned lock metadata was released
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] easy: next visit loads immediately without waiting120 seconds
+FAIL [rejected unseen retirement releases its acquired lease without changing any saved life] easy: next visit receives the preserved life
+FAIL [session-only cleanup preserves progress, backup and unknown envelope metadata] one queued cleanup request executes
+FAIL [session-only cleanup preserves progress, backup and unknown envelope metadata] only the lock removal writes
+FAIL [retried cleanup callback rechecks the latest owner] fixture reruns callback after a concurrent owner change
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] uncertain cleanup remains queued
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] retry converges on released ownership
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] lost committed success does not duplicate a write
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] uncertain cleanup remains queued
+FAIL [cleanup retries transient failure with backoff and resolves a lost success response] retry converges on released ownership
+FAIL [metadata cleanup follows request budget and cannot renew a lease while waiting] one budgeted request releases rather than reacquires
+FAIL [metadata cleanup follows request budget and cannot renew a lease while waiting] release is not a false recovery notification
+FAIL [departure cleanup preserves dirty candidates and respects its deadline] bounded departure made one cleanup attempt in this half-second window
+FAIL [departure cleanup preserves dirty candidates and respects its deadline] bounded departure made one cleanup attempt in this half-second window
+STATE passed=810 failed=21

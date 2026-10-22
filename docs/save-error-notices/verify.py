@@ -25,6 +25,8 @@ assert 'Ran 5 tests' in text('runner.txt') and re.search(r'^OK$',text('runner.tx
 rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',text('targeted.txt'),re.M)
 assert len(rows)==5 and sum(int(r[1]) for r in rows)==389 and all(int(r[2])==0 for r in rows)
 assert 'FAIL' not in text('targeted.txt')
+progress=read('progress.json')
+assert progress['source']==SOURCE and progress['targeted_sha256']==digest((HERE/'targeted.txt').read_bytes())
 baseline=read('baseline-process.json');candidate=read('candidate-process.json')
 assert baseline['source']=='3c8de801e5fab68598e1e5323e7f5e1c8151b0e6' and baseline['exit_code']!=0
 assert candidate['source']==SOURCE and candidate['exit_code']==0

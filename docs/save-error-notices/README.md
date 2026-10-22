@@ -12,6 +12,8 @@ Native Studio run `1792668342799` passed 16 assertions after a guard checked all
 
 The first targeted run exposed a fixture omission: plain Luau has no Roblox `warn`. Its raw failed run is preserved in `targeted-initial.txt`. The fixture now provides and counts the expected diagnostic explicitly; the final targeted run exits zero. This was not a reproduced game-engine defect.
 
+Retained textual command logs use LF line endings for cross-platform Git/hash verification; source/test bytes remain exact. Never normalize a live output file while its process is writing it. The full-run output is retained only after terminal exit.
+
 Full Windows execution is running in exec session **44707**, writing `windows-full.txt` and, only after exit, `windows-full-process.json`. Linux CI **39770144327** is separately running for the exact source above. These identifiers are historical start metadata; re-poll the same live handles/run before deciding status. An observer timeout does not justify restarting a suite. `fetch-ci.py` retains the actual completed Linux logs. `verify.py --require-full` must pass before considering these gates complete; earlier 443,469-check results do not cover this source. The new default is 64 suites / 443,522 expected checks.
 
 Native diagnostic location: `C:\Users\natha\claude-xfer\Windowsill-save-notice-native-v1\Windowsill-save-notice-review.rbxlx`, SHA-256 `cce913a438d2977b0431ab5b73031700b23af96480ec2ebd456b74fc8f97a1a4`. It must never be published. Play was stopped after DONE; the review place remains open in Studio. Before closing/saving, preserve original bytes, archive Studio's serialization if necessary, then restore and verify the original package. No online save was used.

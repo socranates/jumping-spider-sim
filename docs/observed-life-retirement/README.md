@@ -41,3 +41,7 @@ Once Studio has enough memory: open this exact local file, inspect its title, ru
 The predecessor's Windows session 85596 and Linux CI 39781688244 are now both terminal successes: 64 suites /443,833 passed /zero failed each. Their historical receipts have been brought onto this branch as documentation-only commits; production source and default tests did not change.
 
 The full Windows run on current source 6026d6c has now started in **exec session 55171**, after the predecessor terminated. It writes `windows-full.txt`; the process receipt appears only after exit. Expected actual totals are 64 suites /443,861 checks. Poll this exact handle, do not restart on a timeout, and leave source/default tests fixed while it bundles its remaining suites. Current-source Linux CI **39783315341** is also live. Preparation of the combined native diagnostic is verified, execution remains unverified. No publication.
+
+## Current-source Linux gate completed
+
+CI **39783315341** completed successfully at 2026-10-22T13:11:14Z for exact source **6026d6c45fbad072c2bec14a3b893fb8e7abccc2**: **64 suites /443,861 passed /zero failed**, checksum verification for all four tool inputs, compilation216, strict analysis and runner5. Actual metadata/logs are retained in `ci-final.json` and `ci-*.txt` and checked by `verify.py`. Windows session **55171** remains live; native execution and publication remain unverified. The broader current audit scope is indexed in `docs/audit/CURRENT.md`; original audit counts are historical.

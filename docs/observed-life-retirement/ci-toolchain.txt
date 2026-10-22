@@ -1,0 +1,26 @@
+2026-10-22T13:02:08.7251127Z ##[group]Run set -euo pipefail
+2026-10-22T13:02:08.7251477Z [36;1mset -euo pipefail[0m
+2026-10-22T13:02:08.7251921Z [36;1mmkdir -p "$HOME/luau" "$HOME/lsp" "$HOME/bin" "$RUNNER_TEMP/windowsill-toolchain"[0m
+2026-10-22T13:02:08.7252340Z [36;1mcd "$RUNNER_TEMP/windowsill-toolchain"[0m
+2026-10-22T13:02:08.7252884Z [36;1mcurl -sSfL -o luau.zip https://github.com/luau-lang/luau/releases/download/0.743/luau-ubuntu.zip[0m
+2026-10-22T13:02:08.7253342Z [36;1mcurl -sSfL -o lsp.zip https://github.com/JohnnyMorganz/luau-lsp/releases/download/1.70.1/luau-lsp-linux-x86_64.zip[0m
+2026-10-22T13:02:08.7253818Z [36;1mcurl -sSfL -o rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/rojo-7.7.1-linux-x86_64.zip[0m
+2026-10-22T13:02:08.7254390Z [36;1mcurl -sSfL -o globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/7a10f6d2dc6067934c66f9e3ad6cb4095594ac62/scripts/globalTypes.d.luau[0m
+2026-10-22T13:02:08.7254864Z [36;1m# Verify every download before extracting or executing any tool.[0m
+2026-10-22T13:02:08.7255152Z [36;1msha256sum --check --strict <<'CHECKSUMS'[0m
+2026-10-22T13:02:08.7255439Z [36;1m99d45afb4afaee00ba631c526c8e8c76c67b60f6f119953ce6409be6d6953663  luau.zip[0m
+2026-10-22T13:02:08.7255784Z [36;1m1a2ea1ae4f98f8946cefd970a4b54853e11ab4775e6932faa7f60cf920346567  lsp.zip[0m
+2026-10-22T13:02:08.7256130Z [36;1m00feb4fa0829a1dd72b49df2639da519a352bfe13cadcd83969e2ba2bb5693c4  rojo.zip[0m
+2026-10-22T13:02:08.7256491Z [36;1m71698e2454aacef1a144a498ffc1d7ea80654b9593025344672bc9106997bf6a  globalTypes.d.luau[0m
+2026-10-22T13:02:08.7256774Z [36;1mCHECKSUMS[0m
+2026-10-22T13:02:08.7256955Z [36;1munzip -oq luau.zip -d "$HOME/luau"[0m
+2026-10-22T13:02:08.7257184Z [36;1munzip -oq lsp.zip -d "$HOME/lsp"[0m
+2026-10-22T13:02:08.7257401Z [36;1munzip -oq rojo.zip -d "$HOME/bin"[0m
+2026-10-22T13:02:08.7257669Z [36;1minstall -m 0644 globalTypes.d.luau "$HOME/lsp/globalTypes.d.luau"[0m
+2026-10-22T13:02:08.7258002Z [36;1mchmod +x "$HOME/luau/luau" "$HOME/luau/luau-compile" "$HOME/lsp/luau-lsp" "$HOME/bin/rojo"[0m
+2026-10-22T13:02:08.7410118Z shell: /usr/bin/bash -e {0}
+2026-10-22T13:02:08.7410392Z ##[endgroup]
+2026-10-22T13:02:10.4574329Z luau.zip: OK
+2026-10-22T13:02:10.4601071Z lsp.zip: OK
+2026-10-22T13:02:10.4636323Z rojo.zip: OK
+2026-10-22T13:02:10.4641975Z globalTypes.d.luau: OK

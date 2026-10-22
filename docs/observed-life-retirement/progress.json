@@ -11,7 +11,7 @@
   "shadow_native_verified": false,
   "published": false,
   "foreign_lock_continue_ux_complete": false,
-  "linux_ci_status": "in_progress",
+  "linux_ci_status": "success",
   "current_full_windows_pending_reason": null,
   "native_prepared": true,
   "native_place": "C:/Users/natha/claude-xfer/Windowsill-observed-life-native-v1/Windowsill-observed-life-review.rbxlx",
@@ -23,5 +23,7 @@
   "prior_full_windows_complete": true,
   "prior_full_windows_passed": 443833,
   "prior_linux_ci_complete": true,
-  "prior_linux_ci_run": 39781688244
+  "prior_linux_ci_run": 39781688244,
+  "linux_ci_complete": true,
+  "linux_ci_passed": 443861
 }

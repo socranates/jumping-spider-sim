@@ -13,7 +13,7 @@
   "runner_regressions": 5,
   "windows_full_complete": false,
   "windows_full_passed": null,
-  "linux_ci_verified": false,
+  "linux_ci_verified": true,
   "native_preparation_verified": true,
   "native_verified": false,
   "native_save_checks": null,

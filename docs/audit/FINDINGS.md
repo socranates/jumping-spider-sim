@@ -1,5 +1,8 @@
 # Foundation findings
 
+> Current candidate status: [CURRENT.md](CURRENT.md). This report retains its original named-source evidence.
+
+
 Baseline: v51, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`, place **140**, evidence `d9ddc5e0ed43d301`.
 Candidate: `codex/foundation-audit`, source `5ee048a791da5fa4f5b99aac53d9769bcd358845`, evidence `c7af2726574c44cc`. Publication is not yet verified.
 

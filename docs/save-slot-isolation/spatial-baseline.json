@@ -1,0 +1,7 @@
+{
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "probe_sha256": "ad3f4dbd1996282674dc80040aed1a26b6b77eb2cb9920cfaa5161b9e7574147",
+  "output_sha256": "6cb7b38f31c69267a5a3db978faba659a051dda155741f31021d5ac5c2aef3a9",
+  "exit_code": 0,
+  "scope": "Synthetic standalone save-validation corruption probe; no live save changes or engine evidence"
+}

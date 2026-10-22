@@ -8,10 +8,10 @@ assert (HERE/'ci-final.json').exists(),'Current streaming-readiness full Linux g
 assert (HERE/'native-receipt.json').exists(),'Current readiness engine probe remains pending'
 runpy.run_path(str(ROOT/'docs/save-continue/json-encoding/verify-prototype.py'))
 # Historical full-game and save/return runs retain their original source; they are not current-game evidence.
-source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
+source='032926fd6e02c68c3f257189d397cbdf2a116bba'
 raw=subprocess.check_output(['git','archive','--format=tar',source,'roblox_port/src','roblox_port/tests','.github/workflows/roblox-port.yml'],cwd=ROOT)
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:files={m.name:archive.extractfile(m).read() for m in archive if m.isfile()}
-for name,data in files.items():assert (ROOT/name).read_bytes()==data,name
+workspace_matches=all((ROOT/name).read_bytes()==data for name,data in files.items())
 windows=json.loads((HERE/'windows-full-process.json').read_text(encoding='utf8'))
 assert windows['source']==source and windows['exit_code']==0
 for name,digest in windows['inputs'].items():assert sha(files[name])==digest,name
@@ -55,7 +55,7 @@ assert len(expected)==225 and {r['path']:r['sha256'] for r in manifest['scripts'
 closed=json.loads((HERE/'native-close.json').read_text(encoding='utf8'))
 assert closed['playback_stopped'] and closed['place_closed'] and closed['diagnostic_window_closed']
 assert closed['original_restored_sha256']==native['place_sha256']==manifest['place_sha256']
-receipt=dict(source=source,current_workspace_inputs_verified=True,windows_suites=76,windows_passed=465388,
+receipt=dict(source=source,current_workspace_inputs_verified=workspace_matches,historical_snapshot_verified=True,windows_suites=76,windows_passed=465388,
  linux_suites=76,linux_passed=465388,failed=0,modules_compiled=222,strict_clean=True,runner_regressions=5,
  native_assertions=22,native_scripts=225,natural_network_stream_out_verified=False,
  current_full_native_walkthrough_verified=False,whole_game_fps_gain_proven=False,goal_complete=False,published=False)

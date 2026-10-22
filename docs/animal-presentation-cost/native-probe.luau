@@ -11,6 +11,10 @@ local specs={
 return function(d)
  assert(Run:IsStudio() and game.PlaceId==0 and WS:GetAttribute("AnimalCostProbe")==true)
  local id=tostring(DateTime.now().UnixTimestampMillis);local undo={};local rows={};local active=false;local focusLosses=0
+ local frameCount,frameSeconds,frameWorst=0,0,0
+ local frameConnection=Run.RenderStepped:Connect(function(dt)
+  if active then frameCount+=1;frameSeconds+=dt;frameWorst=math.max(frameWorst,dt) end
+ end)
  local connection=UIS.WindowFocusReleased:Connect(function() focusLosses+=1 end)
  local function waitFor(fn,seconds)
   local untilAt=os.clock()+seconds
@@ -56,19 +60,22 @@ return function(d)
    assert(state(),"predator disabled")
    local viewport=WS.CurrentCamera.ViewportSize;local losses=focusLosses
    for _,row in rows do row.calls=0;row.cpu=0;row.worst=0;row.positiveHeap=0 end
+   frameCount,frameSeconds,frameWorst=0,0,0
    d.prof.start();active=true;local sampleAt=os.clock();wait(12);active=false;d.prof.stop()
    local _,frames,total,worst=d.prof.rows()
    assert(frames>=120 and WS.CurrentCamera.ViewportSize==viewport and focusLosses==losses,"focus/viewport/sample invalid")
+   assert(frameCount>=120 and math.abs(frameCount-frames)<=2,"frame observer missing or mismatched")
    assert(d.world.region.id==r.id and d.motor.mode=="attached" and (d.motor.pos-at).Magnitude<.5,"scene moved")
    assert(state(),"predator disabled after sample")
    print("[NATIVE_ANIMAL_COST_SCENE]",id,scene.id,frames,string.format("%.3f",os.clock()-sampleAt),string.format("%.3f",total),string.format("%.3f",worst),viewport.X,viewport.Y)
+   print("[NATIVE_ANIMAL_COST_FRAME]",id,scene.id,frameCount,string.format("%.3f",frameSeconds/frameCount*1000),string.format("%.3f",frameWorst*1000))
    for _,row in rows do
     print("[NATIVE_ANIMAL_COST_ROW]",id,scene.id,row.name,row.calls,string.format("%.6f",row.cpu*1000),string.format("%.6f",row.worst*1000),string.format("%.3f",row.positiveHeap))
    end
    print("[NATIVE_ANIMAL_COST_GROUP]",id,scene.id,d.prof.line())
   end
  end,debug.traceback)
- active=false;d.prof.stop();connection:Disconnect()
+ active=false;d.prof.stop();connection:Disconnect();frameConnection:Disconnect()
  for i=#undo,1,-1 do undo[i]() end
  if ok then print("[NATIVE_ANIMAL_COST_PASS]",id,2,#rows) else warn("[NATIVE_ANIMAL_COST_FAIL]",id,tostring(err)) end
 end

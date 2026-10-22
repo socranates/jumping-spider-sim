@@ -1,4 +1,6 @@
-"""Current readiness fix gate; earlier encoder evidence remains source-bound in its own folder."""
+"""Current spatial validator gate; prior readiness evidence remains source-bound."""
 import runpy
 from pathlib import Path
-runpy.run_path(str(Path(__file__).resolve().parents[1]/'prey-stream-readiness/verify.py'))
+target=Path(__file__).resolve().parents[1]/'spatial-save-validation/verify.py'
+assert target.exists(),'Current spatial save validator full/native verification remains pending'
+runpy.run_path(str(target))

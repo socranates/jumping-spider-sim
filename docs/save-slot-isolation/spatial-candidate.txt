@@ -1,0 +1,7 @@
+SPATIAL_CONTROL valid=1
+SPATIAL_CASE	nan	REFUSED	prey: fly_1 has no finite vector position
+SPATIAL_CASE	positive_inf	REFUSED	prey: fly_1 has no finite vector position
+SPATIAL_CASE	negative_inf	REFUSED	prey: fly_1 has no finite vector position
+SPATIAL_CASE	plain_xyz	REFUSED	prey: fly_1 has no finite vector position
+SPATIAL_CASE	empty_table	REFUSED	prey: fly_1 has no finite vector position
+SPATIAL_CONTROL valid=2

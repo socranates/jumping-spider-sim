@@ -1,0 +1,15 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "suites": 6,
+  "passed": 1783,
+  "failed": 0,
+  "exit_code": 0,
+  "output_path": "docs/save-slot-isolation/spatial-focused.txt",
+  "output_sha256": "f5d119c27a920654ace9a40a0d2968c26f866d54bc76776a342ed5a5b4cad334",
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_verified": false,
+  "full_gates_verified": false,
+  "published": false
+}

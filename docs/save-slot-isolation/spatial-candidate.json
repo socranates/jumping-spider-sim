@@ -1,0 +1,13 @@
+{
+  "source_sha256": "a6c54cfbc957b1579cd69693e791b93b96259745c23928caaff6b3c28200ca16",
+  "candidate_module_sha256": "589518c979a10f282b65e39f099e6f4ee465debbcb26d47d2aeb61232718f08b",
+  "helper_sha256": "30ebff43af59a7b1300506dd6222603f6a59963ddb78c5d79bf63e987b153f45",
+  "probe_sha256": "ad3f4dbd1996282674dc80040aed1a26b6b77eb2cb9920cfaa5161b9e7574147",
+  "output_sha256": "054cf07cc729d6146303aefda20b4e7d8a724104290e70e0b2a95abe4282af04",
+  "exit_code": 0,
+  "invalid_positions_refused": 5,
+  "valid_controls": 2,
+  "integrated": false,
+  "production_changed": false,
+  "scope": "Private Checkpoint fly-position validator; no generic graph-format or live-save changes"
+}

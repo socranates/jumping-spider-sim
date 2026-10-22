@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-22T23:20:14.975310+00:00",
-  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "as_of_utc": "2026-10-22T23:32:34.079835+00:00",
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -23,12 +23,11 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "linux-and-native-verified-windows-running",
-      "evidence_boundary": "Current032926f: independent5/0, garden256706/0, compile222/strict/runner5 pass. Linux39868843334 completed76/465388/0. Studio22 assertions/all225 fingerprints/zero CreatorErrors pass after correcting a no-prey fixture; first failed attempt retained. Current Windows7806 active. Prior e51 Windows/Linux76/465383/0 both terminal and historically verified.",
+      "status": "spatial-validation-focused-verified-full-native-pending",
+      "evidence_boundary": "Current59146e1 six suites1783/0, compile222/strict/runner5. Linux39872335932 running, current Windows not started, native20/all223 prepared only. Prior032926f Linux76/465388/0 and native22/all225 verified; its immutable Windows7806 still live, not proof of current source.",
       "references": [
-        "docs/prey-stream-readiness/README.md",
-        "docs/prey-stream-readiness/ci-final.json",
-        "docs/prey-stream-readiness/native-receipt.json"
+        "docs/spatial-save-validation/README.md",
+        "docs/spatial-save-validation/focused-receipt.json"
       ]
     },
     {
@@ -71,10 +70,12 @@
     },
     {
       "id": "legacy-world-restore",
-      "status": "open",
-      "evidence_boundary": "A historical test_garden ecology is safely protected but cannot restore as preserve. Explicit migration/archive policy and lossless fixtures are still required; never relabel/drop ecology or weaken validation.",
+      "status": "policy-chosen-implementation-pending",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented.",
       "references": [
-        "docs/save-slot-isolation/legacy-world-follow-up.md"
+        "docs/save-slot-isolation/migration-design.md",
+        "docs/save-slot-isolation/map-view-receipt.json",
+        "docs/save-slot-isolation/map-view-types-receipt.json"
       ]
     },
     {
@@ -294,7 +295,7 @@
   },
   "latest_readiness_milestone": {
     "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
-    "status": "cached-prey-linux-native-verified-windows-running",
+    "status": "historical-032-linux-native-verified-windows-running",
     "evidence": "docs/prey-stream-readiness/README.md",
     "goal_complete": false,
     "published": false
@@ -304,5 +305,12 @@
     "user_delegated": true,
     "implemented": false,
     "design": "docs/save-slot-isolation/migration-design.md"
+  },
+  "latest_spatial_validation_milestone": {
+    "source": "59146e1005c083330455379766ab8c9dd2de2705",
+    "status": "focused-verified-full-native-pending",
+    "evidence": "docs/spatial-save-validation/README.md",
+    "goal_complete": false,
+    "published": false
   }
 }

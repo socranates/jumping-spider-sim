@@ -1,0 +1,13 @@
+# Refuse invalid fly positions in a saved world
+
+Candidate changes only Checkpoint save validation and checkpoint regressions. Fly positions must be finite Vector3 values; the CLI emulation must have the actual Vector3 metatable. Plain tables, NaN and positive/negative infinity are refused before prepare/restore can commit. Generic ObjectRecord number tagging, valid save bytes, schemas, feeding and hunting rules remain unchanged. The same check handles home and garden prey.
+
+Current runtime/tests source59146e1005c083330455379766ab8c9dd2de2705, branch codex/save-continue. The independent baseline on032926f accepted all five malformed positions; the private candidate refuses all five with both healthy controls intact. See ../save-slot-isolation/spatial-baseline.json and spatial-candidate.json. Default checkpoint tests add24 checks for server refusal, private preparation, atomic restore failure, unchanged source bytes, healthy controls and garden prey. Six focused suites pass1783/0 (checkpoint594, state1013, save_restore24, save_work39, save_offers99, rest_storage14);222 modules compile, strict clean, runner5 pass. Full/native verification remains pending. Linux39872335932 is running on this source.
+
+This is a targeted corruption fix, not proof that every possible bad spatial field in every simulation class is validated. It does not implement historical-world migration. The read-only map-view prototype separately passes167 checks and strict compilation in a disposable source copy; it remains outside gameplay.
+
+The previous032926f full Windows process7806 continues from its immutable archive. Its Linux76/465388/0 and native22 are source-specific historical evidence once this candidate is committed. Do not restart7806 or call it proof of this validator. The older readiness verifier is now pinned to032926f and reports a distinct current-workspace-match flag.
+
+Next gates:222 compile/strict/runner5, native20 actual-client corruption checks with all223 fingerprints, then this source's independent full Linux and Windows suites (expected76/465412/0). Run native checks after heavy local CLI work finishes. Nothing published; broader optimization/recovery goal remains active.
+
+Prepared native archive C:/Users/natha/claude-xfer/Windowsill-spatial-save-59146e1/Windowsill-spatial-save-review.rbxlx, SHA2562c6ef2e08fe04c598a2aee88f39523c8525e4d4d1ca5eade865a205fc08e521a. Actual client checkpoint objects with corrupted private record copies; no persistent writes. PlaceId0 and production Persistence disabled, all223 sources guarded before Play. Prepared only, not run; never publish this diagnostic.

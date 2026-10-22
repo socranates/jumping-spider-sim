@@ -36,3 +36,7 @@ CLI focused receipts and full gate status remain separate from the native proof.
 Verification source c4bcc6a changes only the title-screen fixture: it awaits actual rest completion before asserting Continue/Resume. The original focused run is retained with its single title fixture failure. Its other22 suites passed; the corrected title suite independently passes21/0. The verifier binds all current inputs, permits only that test-file difference, and aggregates23 suites /25,187 passed /zero remaining failures. Runtime source remains133aa60 and exactly matches all223 native fingerprints; no native or compile rerun was needed for a test-only correction.
 
 Windows98692 and Linux39846269494 use the original title fixture and are superseded for current full-proof purposes. Preserve their terminal results. Current corrected Linux run 39846956444 is active. Corrected full Windows run waits for98692 to close, then uses full-corrected.py. Expected74/444637 remains unverified.
+
+## Historical milestone status
+
+This runtime milestone is superseded by [local saved-world returns](../local-return/README.md). The133aa60 full Windows/Linux runs ended74/444632/5; corrected-title c4 Linux ended74/444633/4. Garden and quiet-HUD fixtures still expected immediate storage; their completed fixes are in current4ee6aec. See windows-full-summary.json and the newer milestone failure receipts. These old full runs are not green current evidence. The obsolete c4 Windows follow-up was skipped; current75-suite Windows/Linux runs use4ee6aec.

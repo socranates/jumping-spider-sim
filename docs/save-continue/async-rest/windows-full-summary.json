@@ -1,0 +1,28 @@
+{
+  "source": "133aa60342d03b534f9dbbf5f6399244714b9fc7",
+  "status": "terminal_failure",
+  "exit_code": 1,
+  "suites": 74,
+  "passed": 444632,
+  "failed": 5,
+  "failed_suites": [
+    [
+      "WORLD_CLIENT",
+      "30",
+      "3"
+    ],
+    [
+      "TITLE",
+      "20",
+      "1"
+    ],
+    [
+      "QUIET",
+      "9",
+      "1"
+    ]
+  ],
+  "inputs_verified": true,
+  "log_sha256": "02750aeb4d6efcdc903c8e435febfcd91a1a5d181741e53aff55ba7666389598",
+  "current_pass_claimed": false
+}

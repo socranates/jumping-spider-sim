@@ -1,3 +1,9 @@
+# Current unpublished milestone: local returns across frames, 4ee6aec
+
+[Implementation and evidence](local-return/README.md). Local Continue/Free play, Backspace and end-screen Back prepare privately behind Cancel; world/store/revision fencing and exact backup/schema checks remain. Current27-suite focused matrix25,294/0,222 compile, strict clean/runner5; Studio22 assertions/all223 fingerprints/Persistence disabled. Large local choice3ms, return4.2s/maxupdate38ms in a bounded1.5M case. No hard budget/FPS claim. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Prior133aa60 full Windows/Linux failed5 timing fixtures, c4 Linux failed4; corrections and original failure receipts retained. Nothing published; release artifacts old; broader goal active.
+
+Earlier status below is historical.
+
 # Current milestone: local rests prepare across frames, c4bcc6a
 
 [Implementation and evidence](async-rest/README.md). Coherent capture remains synchronous; validation/store/network preparation now runs privately across frames with atomic publication, revision/generation/token fencing, previous-rest backups and no early kept/Saved claim. Local saving survives network failure, and delayed completion preserves newer gameplay notices. Studio15 assertions/all223 fingerprints/Persistence disabled passed; source222 compiles with clean strict analysis and runner5. Focused23-suite matrix passed25,187/0; full Windows98692 and Linux39846269494 are active. Prior8db full Windows/Linux each72/444582/0 is terminal historical evidence. Large native replacement18.5s/maxupdate52.9ms; capture139.5ms. No hard frame-budget/typical-FPS claim. Nothing published; goal active.

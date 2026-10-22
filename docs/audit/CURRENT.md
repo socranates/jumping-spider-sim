@@ -1,3 +1,9 @@
+# Current unpublished milestone: local returns across frames, 4ee6aec
+
+[Implementation and evidence](../save-continue/local-return/README.md). Local Continue/Free play, Backspace and end-screen Back prepare privately behind Cancel; world/store/revision fencing and exact backup/schema checks remain. Current27-suite focused matrix25,294/0,222 compile, strict clean/runner5; Studio22 assertions/all223 fingerprints/Persistence disabled. Large local choice3ms, return4.2s/maxupdate38ms in a bounded1.5M case. No hard budget/FPS claim. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Prior133aa60 full Windows/Linux failed5 timing fixtures, c4 Linux failed4; corrections and original failure receipts retained. Nothing published; release artifacts old; broader goal active.
+
+Earlier status below is historical.
+
 # Latest unpublished milestone: local rests across frames, c4bcc6a
 
 [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-rest/README.md). Actual Studio15 assertions/223 fingerprints/disabled production persistence passed;222 compile/strict/runner5. Focused23-suite matrix passed25,187/0; current full Windows98692/Linux39846269494 active. Coherent snapshots are captured synchronously, then local preparation runs privately while simulation continues. Previous rest/backup stay intact until atomic publication; obsolete work cannot save across lives, failures do not claim success, and delayed completion keeps newer notices. Large native replacement18.5s/maxupdate52.9ms, capture139.5ms; overall latency/local-return stalls still open. Prior8db full Windows/Linux72/444582/0 is historical. No publication/FPS claim; broader audit/goal active.

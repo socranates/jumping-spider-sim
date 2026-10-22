@@ -1,0 +1,50 @@
+LOCAL_RETURN passed=27 failed=0
+C:/Users/natha/AppData/Local/Temp/tmpleaxer7s.luau:60147: WORLD_CLIENT failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpleaxer7s.luau:60147
+world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+FAIL world_client: a return to a rest under the stone puts the bed's prey back where it was
+    C:/Users/natha/AppData/Local/Temp/tmpleaxer7s.luau:59995: bed_a_fly_4 is where it was, as it was
+world_client: at sill the client holds 1469 parts of looks
+world_client: at outer_sill the client holds 1469 parts of looks
+world_client: at bed_a the client holds 1483 parts of looks
+world_client: at eaves the client holds 1496 parts of looks
+world_client: at shrub_west_a the client holds 1494 parts of looks
+world_client: at shrub_west_j the client holds 1483 parts of looks
+world_client: at kitchen_counter the client holds 1469 parts of looks
+world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+WORLD_CLIENT passed=32 failed=1
+INSPECT passed=37 failed=0
+  quiet: 53 kinds, 25 needed, 24 on the first day only, 4 in the gentle modes only; 11 notice lines classified
+QUIET passed=10 failed=0
+LOCAL_REST passed=33 failed=0
+LOCAL_REST_CLIENT passed=17 failed=0
+LIFE passed=20922 failed=0
+CLIENT passed=27 failed=0
+CLIENT_MATING passed=29 failed=0
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+NOTEBOOK passed=1517 failed=0
+OUTDOOR_RESET passed=45 failed=0
+SAVE_OFFERS passed=99 failed=0
+SAVE_RESTORE passed=24 failed=0
+SAVE_WORK passed=39 failed=0
+checkpoint: 17948 characters, 87 tables
+CHECKPOINT passed=570 failed=0
+RARE passed=265 failed=0
+CONTINUATION_MENU passed=41 failed=0
+SAVE_CONTINUATION passed=125 failed=0
+SAVE_INTENT passed=57 failed=0
+SAVE_OBSERVATION passed=50 failed=0
+state: a rest is 17887 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 13.2 s
+STATE passed=1013 failed=0
+STATE_CLIENT passed=161 failed=0
+STATE_OFFLINE passed=8 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=14 failed=0
+REST_COMPRESSION passed=57 failed=0
+SAVE_NOTICE passed=53 failed=0
+TITLE passed=21 failed=0

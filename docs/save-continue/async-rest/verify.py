@@ -2,7 +2,7 @@ from pathlib import Path
 import hashlib,io,json,re,subprocess,tarfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sha=lambda b:hashlib.sha256(b).hexdigest()
-source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
+source='c4bcc6a09f4e133deaa69f87f630b3fe31677581' # Historical immutable evidence
 raw=subprocess.check_output(['git','archive','--format=tar',source,'roblox_port/src','roblox_port/tests'],cwd=ROOT)
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:files={m.name:archive.extractfile(m).read() for m in archive if m.isfile()}
 meta=json.loads((HERE/'target-process.json').read_text(encoding='utf8'))
@@ -10,14 +10,14 @@ assert meta['exit_code']==1 # Retained original title fixture failure; corrected
 originalTitle=subprocess.check_output(['git','show','133aa60342d03b534f9dbbf5f6399244714b9fc7:roblox_port/tests/title.luau'],cwd=ROOT)
 assert sha(originalTitle)==meta['inputs']['roblox_port/tests/title.luau']
 for name,digest in meta['inputs'].items():
- if name!='roblox_port/tests/title.luau': assert sha(files[name])==digest and sha((ROOT/name).read_bytes())==digest,name
+ if name!='roblox_port/tests/title.luau': assert sha(files[name])==digest,name
 rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',(HERE/'target.txt').read_text(encoding='utf8'),re.M)
 assert len(rows)==23 and sum(int(r[1]) for r in rows)==25186 and sum(int(r[2]) for r in rows)==1,rows
 assert [(r[0].strip(),int(r[2])) for r in rows if int(r[2])]!=[]
 assert [(r[0].strip(),int(r[2])) for r in rows if int(r[2])]==[('TITLE',1)]
 fixed=json.loads((HERE/'title-fix/target-process.json').read_text(encoding='utf8'))
 assert fixed['exit_code']==0 and fixed['suites']==['title.luau']
-for name,digest in fixed['inputs'].items(): assert sha(files[name])==digest and sha((ROOT/name).read_bytes())==digest,name
+for name,digest in fixed['inputs'].items(): assert sha(files[name])==digest,name
 fixedRows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',(HERE/'title-fix/target.txt').read_text(encoding='utf8'),re.M)
 assert fixedRows==[('TITLE','21','0')],fixedRows
 assert sum(int(r[1]) for r in rows if r[0].strip()!='TITLE')+21==25187
@@ -30,7 +30,7 @@ assert not re.search(r'TypeError|SyntaxError|Error:',(HERE/'release-check/strict
 assert 'Ran 5 tests' in (HERE/'release-check/runner.txt').read_text(encoding='utf8')
 native=json.loads((HERE/'native-receipt.json').read_text(encoding='utf8'))
 manifest=json.loads((HERE/'manifest.json').read_text(encoding='utf8'))
-runtimeSource=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src'],cwd=ROOT,text=True).strip()
+runtimeSource='133aa60342d03b534f9dbbf5f6399244714b9fc7'
 assert native['source']==manifest['source']==runtimeSource and native['assertions']==15 and native['creator_errors']==0
 assert native['persistence_disabled'] and not native['online_save_accessed']
 assert sha((HERE/'native-output.txt').read_bytes())==native['output_sha256']

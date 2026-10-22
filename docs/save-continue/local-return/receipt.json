@@ -1,0 +1,23 @@
+{
+  "source": "4ee6aecc06f4753a85e40fc98a1487dc5126d27d",
+  "runtime_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
+  "original_world_fixture_failure_retained": true,
+  "world_fixture_corrected_and_retested": true,
+  "modules_compiled": 222,
+  "targeted_suites": 27,
+  "targeted_passed": 25294,
+  "failed": 0,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "inputs_verified": true,
+  "continue_worker_enabled": true,
+  "all_save_stalls_resolved": false,
+  "native_current_worker_verified": true,
+  "owned_offer_worker_enabled": true,
+  "local_rest_worker_enabled": true,
+  "local_return_worker_enabled": true,
+  "native_assertions": 22,
+  "hard_frame_budget_proven": false,
+  "release_artifact_rebuilt": false,
+  "published": false
+}

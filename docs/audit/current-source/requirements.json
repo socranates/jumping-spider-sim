@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T20:10:41.693101+00:00",
+  "as_of_utc": "2026-10-22T20:41:58.386347+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -25,11 +25,11 @@
     {
       "id": "cli-and-runner",
       "status": "focused-verified-full-pending",
-      "evidence_boundary": "Current c4bcc6a focused matrix23/25187/0, runtime133aa60 compiles222/222, strict/runner5 clean, native15 assertions/all223 exact fingerprints. Original title fixture failure retained and independently corrected21/0; no runtime changes. Original full133aa60 Windows98692/Linux39846269494 are superseded by the fixture correction. Corrected Linux39846956444 active; corrected Windows queued after98692. Historical8db full Windows/Linux72/444582/0 each. Expected74/444637 is not a completed current result.",
+      "evidence_boundary": "Current4ee6aec focused matrix27/25294/0; runtime07234ca compiles222, strict/runner5 clean, native22 assertions/all223 fingerprints. Original world timing fixture failure retained and corrected33/0 at matching tick. Current full Windows87216/Linux39849815798 pending; expected75/444664 unverified. Old133aa60 full Windows/Linux74/444632/5 and c4 Linux74/444633/4 are terminal failures in corrected timing fixtures, not current success proof. Historical8db full both72/444582/0.",
       "references": [
-        "docs/save-continue/async-rest/README.md",
-        "docs/save-continue/async-offers/ci-final.json",
-        "docs/save-continue/async-offers/windows-full-process.json"
+        "docs/save-continue/local-return/receipt.json",
+        "docs/save-continue/local-return/README.md",
+        "docs/save-continue/async-rest/windows-full-summary.json"
       ]
     },
     {
@@ -101,10 +101,11 @@
     {
       "id": "save-phases-and-faults",
       "status": "partial",
-      "evidence_boundary": "Synthetic boundary/refusal, corruption, throttling, shutdown and two-session tests exist. Must distinguish designed refusal of unsafe midair/feeding checkpoints from an accepted restore; actual teleport/rejoin and every historical fixture remain open.",
+      "evidence_boundary": "Synthetic boundary/refusal, corruption, throttling, shutdown and two-session tests exist. Must distinguish designed refusal of unsafe midair/feeding checkpoints from an accepted restore; actual teleport/rejoin and every historical fixture remain open. Current local return preparation is private/cancellable, source/world fenced, single-decoded and available offline. Focused27 local-return checks and native22 cover atomic visibility, cancellation/end-screen state and stale source refusal. Actual online/rejoin remains open.",
       "references": [
         "docs/audit/TESTS.md",
-        "docs/observed-life-retirement/integration.txt"
+        "docs/observed-life-retirement/integration.txt",
+        "docs/save-continue/local-return/README.md"
       ]
     },
     {
@@ -149,11 +150,12 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Four desktop Studio trials/52 records/44 timed samples exist on earlier source; mixed results do not establish causal speedup. Current-source matched scene comparisons, client/server MicroProfiler, network/startup and phone/tablet emulator checks remain open. Current133aa60 native15: local rest preparation spans frames; large replacement18.5s total/maxupdate52.9ms, synchronous capture139.5ms. Hard frame bound/typical FPS unproven. Local Continue/Backspace/end-screen return still synchronous; overall preparation latency remains open.",
+      "evidence_boundary": "Four desktop Studio trials/52 records/44 timed samples exist on earlier source; mixed results do not establish causal speedup. Current-source matched scene comparisons, client/server MicroProfiler, network/startup and phone/tablet emulator checks remain open. Current133aa60 native15: local rest preparation spans frames; large replacement18.5s total/maxupdate52.9ms, synchronous capture139.5ms. Hard frame bound/typical FPS unproven. Local Continue/Backspace/end-screen return still synchronous; overall preparation latency remains open. Runtime07234ca native22 local returns: choice3ms/zero encoding,1.5M record returns4.2s across249 steps/max38ms. No concurrent CLI; Low System Resources; no typical FPS/hard frame ceiling. Coherent capture and total large local-save latency remain open.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
-        "docs/save-continue/async-rest/native-receipt.json"
+        "docs/save-continue/async-rest/native-receipt.json",
+        "docs/save-continue/local-return/native-receipt.json"
       ]
     },
     {
@@ -267,18 +269,16 @@
     }
   ],
   "latest_save_milestone": {
-    "source": "133aa60342d03b534f9dbbf5f6399244714b9fc7",
-    "native_run": "1792699532277",
-    "native_assertions": 15,
-    "windows_full_session": 98692,
-    "linux_run": 39846269494,
+    "runtime_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
+    "verification_source": "4ee6aecc06f4753a85e40fc98a1487dc5126d27d",
+    "focused_suites": 27,
+    "focused_passed": 25294,
+    "native_run": "1792701458910",
+    "native_assertions": 22,
+    "windows_full_session": 87216,
+    "linux_run": 39849815798,
     "full_gates": "in_progress",
-    "reference": "docs/save-continue/async-rest/README.md",
-    "published": false,
-    "verification_source": "c4bcc6a09f4e133deaa69f87f630b3fe31677581",
-    "focused_suites": 23,
-    "focused_passed": 25187,
-    "linux_corrected_run": 39846956444,
-    "windows_corrected_status": "waiting for original98692 to finish"
+    "reference": "docs/save-continue/local-return/README.md",
+    "published": false
   }
 }

@@ -1,0 +1,38 @@
+{
+  "source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
+  "run_id": "1792701458910",
+  "assertions": 22,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "online_save_accessed": false,
+  "place_sha256": "b2040377f5904ed6cd979625c565f9ca32986da70021b2402510d75f3b6eb8a0",
+  "probe_sha256": "b82f37ebd5e22e59ef46bb746c69de43e72a9d064bd8352903ff86f08f2020ae",
+  "output_sha256": "5cf884f310b22d04e41340d1f312662e1c88df83601b7bfe92f6987ccc12e0a6",
+  "log_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T202813Z_Studio_AFFB9_last.log",
+  "record_chars": 1501336,
+  "region_initialization_attempts": 233,
+  "resident_region_counts_measured": false,
+  "choice_ms": 3.073,
+  "choice_canonical_calls": 0,
+  "work": {
+    "local_continue": {
+      "steps": 249,
+      "max_step_ms": 37.684,
+      "max_gap_ms": 331.513,
+      "cpu_ms": 571.956,
+      "elapsed_ms": 4210.361
+    },
+    "end_screen_return": {
+      "steps": 253,
+      "max_step_ms": 37.884,
+      "max_gap_ms": 42.236,
+      "cpu_ms": 572.82,
+      "elapsed_ms": 4241.053
+    }
+  },
+  "low_system_resources_warning": true,
+  "concurrent_local_cli_runs": false,
+  "hard_frame_budget_proven": false,
+  "typical_fps_proven": false,
+  "physical_device_tested": false
+}

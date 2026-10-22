@@ -1,0 +1,4821 @@
+{
+  "complete": true,
+  "memory_gate_evidence": false,
+  "growth_screen": "rehearsal_only",
+  "failures": [],
+  "incomplete_records": [],
+  "records": {
+    "header": {
+      "source": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+      "engine": "0.744.0.7441077",
+      "harness_version": 1,
+      "regions": [
+        "sill",
+        "hut_desk",
+        "garden_b2",
+        "meadow_b2",
+        "pond_a2",
+        "hut_doorway",
+        "lamp_1"
+      ],
+      "tier": "full",
+      "began_utc_ms": 1792665660641,
+      "sample_seconds": 15,
+      "memory_tags": [
+        "Animation",
+        "BaseParts",
+        "GeometryCSG",
+        "GraphicsMeshParts",
+        "GraphicsParticles",
+        "GraphicsParts",
+        "GraphicsSlimModels",
+        "GraphicsSolidModels",
+        "GraphicsSpatialHash",
+        "GraphicsTerrain",
+        "GraphicsTexture",
+        "GraphicsTextureCharacter",
+        "Gui",
+        "HttpCache",
+        "Instances",
+        "Internal",
+        "LuaHeap",
+        "Navigation",
+        "PhysicsCollision",
+        "Script",
+        "Signals",
+        "Sounds",
+        "StreamingSounds",
+        "TerrainVoxels"
+      ],
+      "memory_tracking_enabled": true,
+      "fresh_attempts_before_trace": 4,
+      "scope": "One continuous life with explicit region placements; not a walking tour, online-save test, phone test or FPS comparison",
+      "forced_gc_calls": 0,
+      "fresh_successes_before_trace": 1,
+      "profile": "smoke",
+      "persistence_disabled": true,
+      "mode": "Free",
+      "recovery_calls_during_trace": 0,
+      "viewport": [
+        1105,
+        433
+      ],
+      "dwell_seconds": 3,
+      "fresh_calls_during_trace": 0,
+      "duration_seconds": 90
+    },
+    "sample_1": {
+      "visit": 1,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "sill"
+      ],
+      "elapsed": 0.03679709997959435,
+      "mode_name": "free",
+      "hour": 9.131333333333144,
+      "placements": 1,
+      "living_parts": 231,
+      "wanted": "sill",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 0.033601198345422745,
+        "count": 1,
+        "max_ms": 33.601198345422745
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 6,
+      "region": "sill",
+      "phase": "transition",
+      "actors": {
+        "fruit_fly": 1,
+        "fly_like_prototype": 3
+      },
+      "looks": {
+        "live_regions": 76,
+        "plans": 1,
+        "live_sets": 139,
+        "destroyed": 0,
+        "made": 1484,
+        "jobs": 0
+      },
+      "sim_seconds": 0.03333333333333499,
+      "directors_made": 0,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 856.159912109375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 0.899169921875,
+          "Internal": 1345.563720703125,
+          "GraphicsParts": 6.55670166015625,
+          "Sounds": 6.614349365234375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.11845397949219,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 17.546714782714844,
+          "Signals": 10.066299438476562,
+          "Gui": 34.39472198486328,
+          "GraphicsTexture": 30.217670440673828
+        },
+        "lua_gc_mib": 20.298828125,
+        "engine_mb": 589.59765625,
+        "instances": 58240
+      },
+      "utc_ms": 1792665660678,
+      "initialized_regions": 0,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ]
+    },
+    "arrival_1": {
+      "visit": 1,
+      "region": "sill",
+      "elapsed": 0.03790130000561476,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ],
+      "transition_seconds": 0.03172520000953227,
+      "placements": 1
+    },
+    "visit_1": {
+      "visit": 1,
+      "region": "sill",
+      "elapsed": 3.0383553999708965,
+      "dwell_seconds": 3.0004575999919325,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 860.758544921875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 0.901123046875,
+          "Internal": 1345.508056640625,
+          "GraphicsParts": 6.55963134765625,
+          "Sounds": 6.614349365234375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.11822509765625,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 17.546714782714844,
+          "Signals": 10.064651489257812,
+          "Gui": 34.39472198486328,
+          "GraphicsTexture": 30.780170440673828
+        },
+        "lua_gc_mib": 21.45703125,
+        "engine_mb": 615,
+        "instances": 58240
+      },
+      "state": {
+        "visit": 1,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "sill"
+        ],
+        "elapsed": 3.0382845999556594,
+        "mode_name": "free",
+        "hour": 9.171333333333086,
+        "placements": 1,
+        "living_parts": 231,
+        "wanted": "sill",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 2.998576401732862,
+          "count": 133,
+          "max_ms": 78.7326991558075
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 7,
+        "region": "sill",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 1,
+          "fly_like_prototype": 3
+        },
+        "looks": {
+          "live_regions": 76,
+          "plans": 1,
+          "live_sets": 139,
+          "destroyed": 0,
+          "made": 1484,
+          "jobs": 0
+        },
+        "sim_seconds": 3.033333333333484,
+        "directors_made": 0,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 860.758544921875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 0.901123046875,
+            "Internal": 1345.508056640625,
+            "GraphicsParts": 6.55963134765625,
+            "Sounds": 6.614349365234375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.112335205078125,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.11822509765625,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 17.546714782714844,
+            "Signals": 10.064651489257812,
+            "Gui": 34.39472198486328,
+            "GraphicsTexture": 30.780170440673828
+          },
+          "lua_gc_mib": 21.45703125,
+          "engine_mb": 615,
+          "instances": 58240
+        },
+        "utc_ms": 1792665663680,
+        "initialized_regions": 0,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -22,
+          0.3100000023841858,
+          6
+        ]
+      }
+    },
+    "arrival_2": {
+      "visit": 2,
+      "region": "hut_desk",
+      "elapsed": 3.129702100006398,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ],
+      "transition_seconds": 0.08967660000780597,
+      "placements": 2
+    },
+    "visit_2": {
+      "visit": 2,
+      "region": "hut_desk",
+      "elapsed": 6.5659333000076,
+      "dwell_seconds": 3.436235300032422,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 864.62548828125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 0.9632568359375,
+          "Internal": 1345.04931640625,
+          "GraphicsParts": 6.450736999511719,
+          "Sounds": 6.614349365234375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.15200805664062,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 17.76203155517578,
+          "Signals": 10.064971923828125,
+          "Gui": 34.363380432128906,
+          "GraphicsTexture": 35.28163528442383
+        },
+        "lua_gc_mib": 28.298828125,
+        "engine_mb": 899.484375,
+        "instances": 58090
+      },
+      "state": {
+        "visit": 2,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "hut_desk"
+        ],
+        "elapsed": 6.565843099961057,
+        "mode_name": "free",
+        "hour": 9.211333333333029,
+        "placements": 2,
+        "living_parts": 231,
+        "wanted": "hut_desk",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 6.531401923857629,
+          "count": 277,
+          "max_ms": 786.8397235870361
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 9,
+        "region": "hut_desk",
+        "phase": "dwell",
+        "actors": {
+          "moth": 1
+        },
+        "looks": {
+          "live_regions": 86,
+          "plans": 2,
+          "live_sets": 158,
+          "destroyed": 122,
+          "made": 1614,
+          "jobs": 0
+        },
+        "sim_seconds": 6.033333333333633,
+        "directors_made": 1,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 864.62548828125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 0.9632568359375,
+            "Internal": 1345.04931640625,
+            "GraphicsParts": 6.450736999511719,
+            "Sounds": 6.614349365234375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.112335205078125,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.15200805664062,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 17.76203155517578,
+            "Signals": 10.064971923828125,
+            "Gui": 34.363380432128906,
+            "GraphicsTexture": 35.28163528442383
+          },
+          "lua_gc_mib": 28.298828125,
+          "engine_mb": 899.484375,
+          "instances": 58090
+        },
+        "utc_ms": 1792665667207,
+        "initialized_regions": 1,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          80,
+          4.309999942779541,
+          45
+        ]
+      }
+    },
+    "arrival_3": {
+      "visit": 3,
+      "region": "garden_b2",
+      "elapsed": 6.670964899996761,
+      "pos": [
+        -60,
+        -84.29000091552734,
+        -170
+      ],
+      "transition_seconds": 0.10347790003288537,
+      "placements": 3
+    },
+    "visit_3": {
+      "visit": 3,
+      "region": "garden_b2",
+      "elapsed": 9.679996699967887,
+      "dwell_seconds": 3.0090391999692656,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 871.49169921875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.0174560546875,
+          "Internal": 1346.074951171875,
+          "GraphicsParts": 7.015167236328125,
+          "Sounds": 6.612762451171875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.26953887939453,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 19.12615203857422,
+          "Signals": 10.067733764648438,
+          "Gui": 34.363258361816406,
+          "GraphicsTexture": 43.52821731567383
+        },
+        "lua_gc_mib": 30.82421875,
+        "engine_mb": 798.64453125,
+        "instances": 58694
+      },
+      "state": {
+        "visit": 3,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 9.679932300001383,
+        "mode_name": "free",
+        "hour": 9.225046666666286,
+        "placements": 3,
+        "living_parts": 303,
+        "wanted": "garden_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 9.650560725480318,
+          "count": 438,
+          "max_ms": 786.8397235870361
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 11,
+        "region": "garden_b2",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 48,
+          "plans": 3,
+          "live_sets": 72,
+          "destroyed": 905,
+          "made": 2405,
+          "jobs": 0
+        },
+        "sim_seconds": 9.150000000000137,
+        "directors_made": 1,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 871.49169921875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.0174560546875,
+            "Internal": 1346.074951171875,
+            "GraphicsParts": 7.015167236328125,
+            "Sounds": 6.612762451171875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.112335205078125,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.26953887939453,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 19.12615203857422,
+            "Signals": 10.067733764648438,
+            "Gui": 34.363258361816406,
+            "GraphicsTexture": 43.52821731567383
+          },
+          "lua_gc_mib": 30.82421875,
+          "engine_mb": 798.64453125,
+          "instances": 58694
+        },
+        "utc_ms": 1792665670321,
+        "initialized_regions": 1,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -60,
+          -84.29000091552734,
+          -170
+        ]
+      }
+    },
+    "arrival_4": {
+      "visit": 4,
+      "region": "meadow_b2",
+      "elapsed": 10.004468699975405,
+      "pos": [
+        -160,
+        -84.29000091552734,
+        -928
+      ],
+      "transition_seconds": 0.32242079998832196,
+      "placements": 5
+    },
+    "visit_4": {
+      "visit": 4,
+      "region": "meadow_b2",
+      "elapsed": 13.013961899967398,
+      "dwell_seconds": 3.009496799961198,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 873.09423828125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.0140380859375,
+          "Internal": 1347.55322265625,
+          "GraphicsParts": 7.1302947998046875,
+          "Sounds": 6.963134765625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.4732894897461,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 20.680320739746094,
+          "Signals": 10.077301025390625,
+          "Gui": 34.363258361816406,
+          "GraphicsTexture": 43.58681106567383
+        },
+        "lua_gc_mib": 31.9443359375,
+        "engine_mb": 802.62109375,
+        "instances": 58525
+      },
+      "state": {
+        "visit": 4,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "meadow_b2"
+        ],
+        "elapsed": 13.013846299960278,
+        "mode_name": "free",
+        "hour": 9.23971333333287,
+        "placements": 5,
+        "living_parts": 231,
+        "wanted": "meadow_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 12.981857911683619,
+          "count": 622,
+          "max_ms": 786.8397235870361
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 13,
+        "region": "meadow_b2",
+        "phase": "dwell",
+        "actors": {
+          "cricket": 1
+        },
+        "looks": {
+          "live_regions": 33,
+          "plans": 4,
+          "live_sets": 44,
+          "destroyed": 1913,
+          "made": 3413,
+          "jobs": 0
+        },
+        "sim_seconds": 12.483333333333281,
+        "directors_made": 2,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 873.09423828125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.0140380859375,
+            "Internal": 1347.55322265625,
+            "GraphicsParts": 7.1302947998046875,
+            "Sounds": 6.963134765625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.112335205078125,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.4732894897461,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 20.680320739746094,
+            "Signals": 10.077301025390625,
+            "Gui": 34.363258361816406,
+            "GraphicsTexture": 43.58681106567383
+          },
+          "lua_gc_mib": 31.9443359375,
+          "engine_mb": 802.62109375,
+          "instances": 58525
+        },
+        "utc_ms": 1792665673656,
+        "initialized_regions": 2,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -160,
+          -84.29000091552734,
+          -928
+        ]
+      }
+    },
+    "arrival_5": {
+      "visit": 5,
+      "region": "pond_a2",
+      "elapsed": 13.3534780999762,
+      "pos": [
+        644.5999755859375,
+        -85.79000091552734,
+        -1047.8704833984375
+      ],
+      "transition_seconds": 0.33776909997686744,
+      "placements": 7
+    },
+    "sample_2": {
+      "visit": 5,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "pond_a2",
+        "pond_b2"
+      ],
+      "elapsed": 15.047416099987458,
+      "mode_name": "free",
+      "hour": 9.248659999999488,
+      "placements": 7,
+      "living_parts": 231,
+      "wanted": "pond_a2",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 15.01541930437088,
+        "count": 722,
+        "max_ms": 786.8397235870361
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 15,
+      "region": "pond_a2",
+      "phase": "dwell",
+      "actors": {
+        "damselfly": 1,
+        "mosquito": 1
+      },
+      "looks": {
+        "live_regions": 42,
+        "plans": 5,
+        "live_sets": 57,
+        "destroyed": 2921,
+        "made": 4421,
+        "jobs": 0
+      },
+      "sim_seconds": 14.516666666666499,
+      "directors_made": 4,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 876.160888671875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.2398681640625,
+          "Internal": 1348.718994140625,
+          "GraphicsParts": 8.066619873046875,
+          "Sounds": 6.96356201171875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.64746856689453,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 22.574295043945312,
+          "Signals": 10.107528686523438,
+          "Gui": 34.362831115722656,
+          "GraphicsTexture": 51.57509231567383
+        },
+        "lua_gc_mib": 35.48046875,
+        "engine_mb": 512.00390625,
+        "instances": 59358
+      },
+      "utc_ms": 1792665675689,
+      "initialized_regions": 4,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        644.5999755859375,
+        -85.79000091552734,
+        -1047.8704833984375
+      ]
+    },
+    "visit_5": {
+      "visit": 5,
+      "region": "pond_a2",
+      "elapsed": 16.36354069999652,
+      "dwell_seconds": 3.0101153000141494,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 876.160888671875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.2398681640625,
+          "Internal": 1348.7095947265625,
+          "GraphicsParts": 8.066619873046875,
+          "Sounds": 6.96356201171875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.112335205078125,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.64067840576172,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 22.565383911132812,
+          "Signals": 10.107528686523438,
+          "Gui": 34.362831115722656,
+          "GraphicsTexture": 51.57509231567383
+        },
+        "lua_gc_mib": 35.48046875,
+        "engine_mb": 512.00390625,
+        "instances": 59358
+      },
+      "state": {
+        "visit": 5,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "pond_a2",
+          "pond_b2"
+        ],
+        "elapsed": 16.363437799969688,
+        "mode_name": "free",
+        "hour": 9.254453333332789,
+        "placements": 7,
+        "living_parts": 231,
+        "wanted": "pond_a2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 1.317897598259151,
+          "count": 75,
+          "max_ms": 44.98950019478798
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 15,
+        "region": "pond_a2",
+        "phase": "dwell",
+        "actors": {
+          "damselfly": 1,
+          "mosquito": 1
+        },
+        "looks": {
+          "live_regions": 42,
+          "plans": 5,
+          "live_sets": 57,
+          "destroyed": 2921,
+          "made": 4421,
+          "jobs": 0
+        },
+        "sim_seconds": 15.83333333333309,
+        "directors_made": 4,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 882.046875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.2401123046875,
+            "Internal": 1348.7095947265625,
+            "GraphicsParts": 8.067047119140625,
+            "Sounds": 6.96356201171875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.112335205078125,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.64067840576172,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 22.565383911132812,
+            "Signals": 10.1075439453125,
+            "Gui": 34.362831115722656,
+            "GraphicsTexture": 51.57509231567383
+          },
+          "lua_gc_mib": 36.576171875,
+          "engine_mb": 525.640625,
+          "instances": 59358
+        },
+        "utc_ms": 1792665677005,
+        "initialized_regions": 4,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          644.5999755859375,
+          -85.79000091552734,
+          -1047.8704833984375
+        ]
+      }
+    },
+    "arrival_6": {
+      "visit": 6,
+      "region": "hut_doorway",
+      "elapsed": 16.41491589997895,
+      "pos": [
+        160.75,
+        -69.69000244140625,
+        215
+      ],
+      "transition_seconds": 0.049786899995524436,
+      "placements": 8
+    },
+    "visit_6": {
+      "visit": 6,
+      "region": "hut_doorway",
+      "elapsed": 19.430188999976963,
+      "dwell_seconds": 3.0152765000239015,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 877.189697265625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.09765625,
+          "Internal": 1349.3118896484375,
+          "GraphicsParts": 7.942665100097656,
+          "Sounds": 6.96356201171875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.113739013671875,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.81583404541016,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 23.645339965820312,
+          "Signals": 10.16595458984375,
+          "Gui": 34.362831115722656,
+          "GraphicsTexture": 55.01356887817383
+        },
+        "lua_gc_mib": 40.7568359375,
+        "engine_mb": 568.8046875,
+        "instances": 58822
+      },
+      "state": {
+        "visit": 6,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "room_floor_g"
+        ],
+        "elapsed": 19.430128299980424,
+        "mode_name": "free",
+        "hour": 9.295342222221619,
+        "placements": 8,
+        "living_parts": 339,
+        "wanted": "hut_doorway",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 4.383745396509767,
+          "count": 246,
+          "max_ms": 90.43999761343002
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 17,
+        "region": "hut_doorway",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 2
+        },
+        "looks": {
+          "live_regions": 74,
+          "plans": 6,
+          "live_sets": 135,
+          "destroyed": 4022,
+          "made": 5243,
+          "jobs": 0
+        },
+        "sim_seconds": 18.899999999999583,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 877.189697265625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.09765625,
+            "Internal": 1349.3118896484375,
+            "GraphicsParts": 7.942665100097656,
+            "Sounds": 6.96356201171875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.113739013671875,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.81583404541016,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 23.645339965820312,
+            "Signals": 10.16595458984375,
+            "Gui": 34.362831115722656,
+            "GraphicsTexture": 55.01356887817383
+          },
+          "lua_gc_mib": 40.7568359375,
+          "engine_mb": 568.8046875,
+          "instances": 58822
+        },
+        "utc_ms": 1792665680071,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          160.75,
+          -69.69000244140625,
+          215
+        ]
+      }
+    },
+    "arrival_7": {
+      "visit": 7,
+      "region": "lamp_1",
+      "elapsed": 19.480060099973343,
+      "pos": [
+        -188,
+        -68.29000091552734,
+        -768
+      ],
+      "transition_seconds": 0.04812870000023395,
+      "placements": 9
+    },
+    "visit_7": {
+      "visit": 7,
+      "region": "lamp_1",
+      "elapsed": 22.496342699974775,
+      "dwell_seconds": 3.016285899968352,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 884.24267578125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.291015625,
+          "Internal": 1349.23828125,
+          "GraphicsParts": 8.272895812988281,
+          "Sounds": 6.95709228515625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.113739013671875,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 103.94293212890625,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 24.968399047851562,
+          "Signals": 10.224380493164062,
+          "Gui": 34.362831115722656,
+          "GraphicsTexture": 58.13856887817383
+        },
+        "lua_gc_mib": 31.3056640625,
+        "engine_mb": 598.33984375,
+        "instances": 59209
+      },
+      "state": {
+        "visit": 7,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 22.496269800001755,
+        "mode_name": "free",
+        "hour": 9.308835555554877,
+        "placements": 9,
+        "living_parts": 231,
+        "wanted": "lamp_1",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 7.449623988009989,
+          "count": 422,
+          "max_ms": 90.43999761343002
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 19,
+        "region": "lamp_1",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 55,
+          "plans": 7,
+          "live_sets": 82,
+          "destroyed": 4803,
+          "made": 6301,
+          "jobs": 0
+        },
+        "sim_seconds": 21.966666666666075,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 884.24267578125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.291015625,
+            "Internal": 1349.23828125,
+            "GraphicsParts": 8.272895812988281,
+            "Sounds": 6.95709228515625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.113739013671875,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 103.94293212890625,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 24.968399047851562,
+            "Signals": 10.224380493164062,
+            "Gui": 34.362831115722656,
+            "GraphicsTexture": 58.13856887817383
+          },
+          "lua_gc_mib": 31.3056640625,
+          "engine_mb": 598.33984375,
+          "instances": 59209
+        },
+        "utc_ms": 1792665683137,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -188,
+          -68.29000091552734,
+          -768
+        ]
+      }
+    },
+    "arrival_8": {
+      "visit": 8,
+      "region": "sill",
+      "elapsed": 22.551948399981484,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ],
+      "transition_seconds": 0.05400790000567213,
+      "placements": 10
+    },
+    "visit_8": {
+      "visit": 8,
+      "region": "sill",
+      "elapsed": 25.56331820000196,
+      "dwell_seconds": 3.01137550000567,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 880.849365234375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3387451171875,
+          "Internal": 1349.7952880859375,
+          "GraphicsParts": 8.304817199707031,
+          "Sounds": 7.1922607421875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1096038818359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.1055908203125,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 26.244491577148438,
+          "Signals": 10.301177978515625,
+          "Gui": 34.361305236816406,
+          "GraphicsTexture": 58.13856887817383
+        },
+        "lua_gc_mib": 31.3798828125,
+        "engine_mb": 622.0625,
+        "instances": 59164
+      },
+      "state": {
+        "visit": 8,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "sill"
+        ],
+        "elapsed": 25.563236699963454,
+        "mode_name": "free",
+        "hour": 9.349724444443707,
+        "placements": 10,
+        "living_parts": 231,
+        "wanted": "sill",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 10.517132490873337,
+          "count": 597,
+          "max_ms": 90.43999761343002
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 21,
+        "region": "sill",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 1,
+          "fly_like_prototype": 3
+        },
+        "looks": {
+          "live_regions": 76,
+          "plans": 8,
+          "live_sets": 139,
+          "destroyed": 5826,
+          "made": 7310,
+          "jobs": 0
+        },
+        "sim_seconds": 25.03333333333257,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 880.849365234375,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3387451171875,
+            "Internal": 1349.7952880859375,
+            "GraphicsParts": 8.304817199707031,
+            "Sounds": 7.1922607421875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1096038818359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.1055908203125,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 26.244491577148438,
+            "Signals": 10.301177978515625,
+            "Gui": 34.361305236816406,
+            "GraphicsTexture": 58.13856887817383
+          },
+          "lua_gc_mib": 31.3798828125,
+          "engine_mb": 622.0625,
+          "instances": 59164
+        },
+        "utc_ms": 1792665686204,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -22,
+          0.3100000023841858,
+          6
+        ]
+      }
+    },
+    "arrival_9": {
+      "visit": 9,
+      "region": "hut_desk",
+      "elapsed": 25.606114799971692,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ],
+      "transition_seconds": 0.041076799971051514,
+      "placements": 11
+    },
+    "visit_9": {
+      "visit": 9,
+      "region": "hut_desk",
+      "elapsed": 28.612460399977863,
+      "dwell_seconds": 3.0063488999730907,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 877.761962890625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3291015625,
+          "Internal": 1349.90771484375,
+          "GraphicsParts": 8.102737426757812,
+          "Sounds": 7.1922607421875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1096038818359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.07551574707031,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 26.349716186523438,
+          "Signals": 10.277023315429688,
+          "Gui": 34.345680236816406,
+          "GraphicsTexture": 58.13856887817383
+        },
+        "lua_gc_mib": 37.2548828125,
+        "engine_mb": 646.78125,
+        "instances": 58999
+      },
+      "state": {
+        "visit": 9,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "hut_desk"
+        ],
+        "elapsed": 28.61233929998707,
+        "mode_name": "free",
+        "hour": 9.390391111110315,
+        "placements": 11,
+        "living_parts": 231,
+        "wanted": "hut_desk",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 13.567082086578012,
+          "count": 775,
+          "max_ms": 90.43999761343002
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 23,
+        "region": "hut_desk",
+        "phase": "dwell",
+        "actors": {
+          "moth": 1
+        },
+        "looks": {
+          "live_regions": 86,
+          "plans": 9,
+          "live_sets": 158,
+          "destroyed": 5948,
+          "made": 7440,
+          "jobs": 0
+        },
+        "sim_seconds": 28.083333333332398,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 877.761962890625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3291015625,
+            "Internal": 1349.90771484375,
+            "GraphicsParts": 8.102737426757812,
+            "Sounds": 7.1922607421875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1096038818359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.07551574707031,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 26.349716186523438,
+            "Signals": 10.277023315429688,
+            "Gui": 34.345680236816406,
+            "GraphicsTexture": 58.13856887817383
+          },
+          "lua_gc_mib": 37.2548828125,
+          "engine_mb": 646.78125,
+          "instances": 58999
+        },
+        "utc_ms": 1792665689254,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          80,
+          4.309999942779541,
+          45
+        ]
+      }
+    },
+    "arrival_10": {
+      "visit": 10,
+      "region": "garden_b2",
+      "elapsed": 28.65818379999837,
+      "pos": [
+        -60,
+        -84.29000091552734,
+        -170
+      ],
+      "transition_seconds": 0.044316900020930916,
+      "placements": 12
+    },
+    "sample_3": {
+      "visit": 10,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [],
+      "elapsed": 30.063584099989384,
+      "mode_name": "free",
+      "hour": 9.39677111111028,
+      "placements": 12,
+      "living_parts": 303,
+      "wanted": "garden_b2",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 15.016042481176555,
+        "count": 855,
+        "max_ms": 90.43999761343002
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 24,
+      "region": "garden_b2",
+      "phase": "dwell",
+      "actors": [],
+      "looks": {
+        "live_regions": 48,
+        "plans": 10,
+        "live_sets": 72,
+        "destroyed": 6731,
+        "made": 8231,
+        "jobs": 0
+      },
+      "sim_seconds": 29.533333333332315,
+      "directors_made": 5,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 877.761962890625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3291015625,
+          "Internal": 1349.90771484375,
+          "GraphicsParts": 8.102737426757812,
+          "Sounds": 7.1922607421875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1096038818359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.07551574707031,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 26.349716186523438,
+          "Signals": 10.277023315429688,
+          "Gui": 34.345680236816406,
+          "GraphicsTexture": 58.13856887817383
+        },
+        "lua_gc_mib": 40.958984375,
+        "engine_mb": 657.68359375,
+        "instances": 59450
+      },
+      "utc_ms": 1792665690704,
+      "initialized_regions": 5,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        -60,
+        -84.29000091552734,
+        -170
+      ]
+    },
+    "visit_10": {
+      "visit": 10,
+      "region": "garden_b2",
+      "elapsed": 31.663699699973222,
+      "dwell_seconds": 3.005518399993889,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 871.950439453125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3291015625,
+          "Internal": 1349.90771484375,
+          "GraphicsParts": 8.102737426757812,
+          "Sounds": 7.190673828125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1096038818359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.07551574707031,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 26.349716186523438,
+          "Signals": 10.277023315429688,
+          "Gui": 34.330055236816406,
+          "GraphicsTexture": 58.13856887817383
+        },
+        "lua_gc_mib": 37.7294921875,
+        "engine_mb": 657.68359375,
+        "instances": 59450
+      },
+      "state": {
+        "visit": 10,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 31.663606499962043,
+        "mode_name": "free",
+        "hour": 9.40381111111024,
+        "placements": 12,
+        "living_parts": 303,
+        "wanted": "garden_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 1.6062324065715075,
+          "count": 94,
+          "max_ms": 43.13009977340698
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 25,
+        "region": "garden_b2",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 48,
+          "plans": 10,
+          "live_sets": 72,
+          "destroyed": 6731,
+          "made": 8231,
+          "jobs": 0
+        },
+        "sim_seconds": 31.133333333332224,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 871.950439453125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3402099609375,
+            "Internal": 1350.455810546875,
+            "GraphicsParts": 8.519798278808594,
+            "Sounds": 7.190673828125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1096038818359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.18260192871094,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 27.552017211914062,
+            "Signals": 10.33343505859375,
+            "Gui": 34.330055236816406,
+            "GraphicsTexture": 58.13856887817383
+          },
+          "lua_gc_mib": 37.7294921875,
+          "engine_mb": 668.84375,
+          "instances": 59450
+        },
+        "utc_ms": 1792665692305,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -60,
+          -84.29000091552734,
+          -170
+        ]
+      }
+    },
+    "arrival_11": {
+      "visit": 11,
+      "region": "meadow_b2",
+      "elapsed": 31.71561799995834,
+      "pos": [
+        -160,
+        -84.29000091552734,
+        -928
+      ],
+      "transition_seconds": 0.05060859996592626,
+      "placements": 13
+    },
+    "visit_11": {
+      "visit": 11,
+      "region": "meadow_b2",
+      "elapsed": 34.71719930000836,
+      "dwell_seconds": 3.0015858000260778,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 868.2919921875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3394775390625,
+          "Internal": 1350.45263671875,
+          "GraphicsParts": 8.108589172363281,
+          "Sounds": 7.25970458984375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.32492065429688,
+          "GraphicsParticles": 15.381752014160156,
+          "BaseParts": 28.6468505859375,
+          "Signals": 10.381866455078125,
+          "Gui": 34.330055236816406,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 33.4521484375,
+        "engine_mb": 696.375,
+        "instances": 59015
+      },
+      "state": {
+        "visit": 11,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "meadow_b2"
+        ],
+        "elapsed": 34.717081399983726,
+        "mode_name": "free",
+        "hour": 9.417231111110166,
+        "placements": 13,
+        "living_parts": 294,
+        "wanted": "meadow_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 4.661047614179552,
+          "count": 267,
+          "max_ms": 67.17459857463837
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 27,
+        "region": "meadow_b2",
+        "phase": "dwell",
+        "actors": {
+          "cricket": 1
+        },
+        "looks": {
+          "live_regions": 33,
+          "plans": 11,
+          "live_sets": 44,
+          "destroyed": 7739,
+          "made": 9239,
+          "jobs": 0
+        },
+        "sim_seconds": 34.18333333333205,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 868.2919921875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3394775390625,
+            "Internal": 1350.45263671875,
+            "GraphicsParts": 8.108589172363281,
+            "Sounds": 7.25970458984375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.32492065429688,
+            "GraphicsParticles": 15.381752014160156,
+            "BaseParts": 28.6468505859375,
+            "Signals": 10.381866455078125,
+            "Gui": 34.330055236816406,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 33.4521484375,
+          "engine_mb": 696.375,
+          "instances": 59015
+        },
+        "utc_ms": 1792665695359,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -160,
+          -84.29000091552734,
+          -928
+        ]
+      }
+    },
+    "arrival_12": {
+      "visit": 12,
+      "region": "pond_a2",
+      "elapsed": 34.77069139998639,
+      "pos": [
+        644.5999755859375,
+        -85.79000091552734,
+        -1047.8704833984375
+      ],
+      "transition_seconds": 0.051428699982352555,
+      "placements": 14
+    },
+    "visit_12": {
+      "visit": 12,
+      "region": "pond_a2",
+      "elapsed": 37.780564299959224,
+      "dwell_seconds": 3.0098778999526985,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 875.68359375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3831787109375,
+          "Internal": 1362.74169921875,
+          "GraphicsParts": 8.446357727050781,
+          "Sounds": 7.25970458984375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.46015930175781,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 30.035507202148438,
+          "Signals": 10.459136962890625,
+          "Gui": 34.330055236816406,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 36.15625,
+        "engine_mb": 756.3671875,
+        "instances": 59394
+      },
+      "state": {
+        "visit": 12,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "pond_a2",
+          "pond_b2"
+        ],
+        "elapsed": 37.780455000000075,
+        "mode_name": "free",
+        "hour": 9.430724444443424,
+        "placements": 14,
+        "living_parts": 231,
+        "wanted": "pond_a2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 7.72733620647341,
+          "count": 435,
+          "max_ms": 67.32449680566788
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 29,
+        "region": "pond_a2",
+        "phase": "dwell",
+        "actors": {
+          "damselfly": 1,
+          "mosquito": 1
+        },
+        "looks": {
+          "live_regions": 42,
+          "plans": 12,
+          "live_sets": 57,
+          "destroyed": 8747,
+          "made": 10247,
+          "jobs": 0
+        },
+        "sim_seconds": 37.24999999999854,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 875.68359375,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3831787109375,
+            "Internal": 1362.74169921875,
+            "GraphicsParts": 8.446357727050781,
+            "Sounds": 7.25970458984375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.46015930175781,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 30.035507202148438,
+            "Signals": 10.459136962890625,
+            "Gui": 34.330055236816406,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 36.15625,
+          "engine_mb": 756.3671875,
+          "instances": 59394
+        },
+        "utc_ms": 1792665698421,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          644.5999755859375,
+          -85.79000091552734,
+          -1047.8704833984375
+        ]
+      }
+    },
+    "arrival_13": {
+      "visit": 13,
+      "region": "hut_doorway",
+      "elapsed": 37.84286370000336,
+      "pos": [
+        160.75,
+        -69.69000244140625,
+        215
+      ],
+      "transition_seconds": 0.06087520002620295,
+      "placements": 15
+    },
+    "visit_13": {
+      "visit": 13,
+      "region": "hut_doorway",
+      "elapsed": 40.84520759998122,
+      "dwell_seconds": 3.0023466999991797,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 863.392822265625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3157958984375,
+          "Internal": 1368.2843017578125,
+          "GraphicsParts": 8.152999877929688,
+          "Sounds": 7.25970458984375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.60203552246094,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 31.109603881835938,
+          "Signals": 10.478439331054688,
+          "Gui": 34.267234802246094,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 30.8828125,
+        "engine_mb": 811.87890625,
+        "instances": 58852
+      },
+      "state": {
+        "visit": 13,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "room_floor_g"
+        ],
+        "elapsed": 40.84513569995761,
+        "mode_name": "free",
+        "hour": 9.471613333332254,
+        "placements": 15,
+        "living_parts": 339,
+        "wanted": "hut_doorway",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 10.783476292155683,
+          "count": 603,
+          "max_ms": 87.53730356693268
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 31,
+        "region": "hut_doorway",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 2
+        },
+        "looks": {
+          "live_regions": 74,
+          "plans": 13,
+          "live_sets": 135,
+          "destroyed": 9848,
+          "made": 11069,
+          "jobs": 0
+        },
+        "sim_seconds": 40.316666666665036,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 863.392822265625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3157958984375,
+            "Internal": 1368.2843017578125,
+            "GraphicsParts": 8.152999877929688,
+            "Sounds": 7.25970458984375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.60203552246094,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 31.109603881835938,
+            "Signals": 10.478439331054688,
+            "Gui": 34.267234802246094,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 30.8828125,
+          "engine_mb": 811.87890625,
+          "instances": 58852
+        },
+        "utc_ms": 1792665701487,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          160.75,
+          -69.69000244140625,
+          215
+        ]
+      }
+    },
+    "arrival_14": {
+      "visit": 14,
+      "region": "lamp_1",
+      "elapsed": 40.886210799973924,
+      "pos": [
+        -188,
+        -68.29000091552734,
+        -768
+      ],
+      "transition_seconds": 0.03934099996695295,
+      "placements": 16
+    },
+    "visit_14": {
+      "visit": 14,
+      "region": "lamp_1",
+      "elapsed": 43.89062749996083,
+      "dwell_seconds": 3.004419799952302,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 867.5048828125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.357421875,
+          "Internal": 1377.1976318359375,
+          "GraphicsParts": 8.38507080078125,
+          "Sounds": 7.25811767578125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.68986511230469,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 32.390869140625,
+          "Signals": 10.540374755859375,
+          "Gui": 34.07628631591797,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 34.6162109375,
+        "engine_mb": 866.21484375,
+        "instances": 59209
+      },
+      "state": {
+        "visit": 14,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 43.890552299970295,
+        "mode_name": "free",
+        "hour": 9.48503333333218,
+        "placements": 16,
+        "living_parts": 231,
+        "wanted": "lamp_1",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 13.834753978066146,
+          "count": 751,
+          "max_ms": 91.95759892463684
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 33,
+        "region": "lamp_1",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 55,
+          "plans": 14,
+          "live_sets": 82,
+          "destroyed": 10629,
+          "made": 12127,
+          "jobs": 0
+        },
+        "sim_seconds": 43.36666666666486,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 867.5048828125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.357421875,
+            "Internal": 1377.1976318359375,
+            "GraphicsParts": 8.38507080078125,
+            "Sounds": 7.25811767578125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.68986511230469,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 32.390869140625,
+            "Signals": 10.540374755859375,
+            "Gui": 34.07628631591797,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 34.6162109375,
+          "engine_mb": 866.21484375,
+          "instances": 59209
+        },
+        "utc_ms": 1792665704532,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -188,
+          -68.29000091552734,
+          -768
+        ]
+      }
+    },
+    "arrival_15": {
+      "visit": 15,
+      "region": "sill",
+      "elapsed": 43.96190759999445,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ],
+      "transition_seconds": 0.06915590004064143,
+      "placements": 17
+    },
+    "sample_4": {
+      "visit": 15,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "sill"
+      ],
+      "elapsed": 45.069390399963595,
+      "mode_name": "free",
+      "hour": 9.500588888887712,
+      "placements": 17,
+      "living_parts": 231,
+      "wanted": "sill",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 15.01356837619096,
+        "count": 802,
+        "max_ms": 91.95759892463684
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 34,
+      "region": "sill",
+      "phase": "dwell",
+      "actors": {
+        "fruit_fly": 1,
+        "fly_like_prototype": 3
+      },
+      "looks": {
+        "live_regions": 76,
+        "plans": 15,
+        "live_sets": 139,
+        "destroyed": 11652,
+        "made": 13136,
+        "jobs": 0
+      },
+      "sim_seconds": 44.53333333333146,
+      "directors_made": 5,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 863.853759765625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3914794921875,
+          "Internal": 1377.9515380859375,
+          "GraphicsParts": 8.349037170410156,
+          "Sounds": 7.37957763671875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.84397888183594,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 33.805328369140625,
+          "Signals": 10.609420776367188,
+          "Gui": 34.063621520996094,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 37.466796875,
+        "engine_mb": 874.9609375,
+        "instances": 59164
+      },
+      "utc_ms": 1792665705711,
+      "initialized_regions": 5,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ]
+    },
+    "visit_15": {
+      "visit": 15,
+      "region": "sill",
+      "elapsed": 46.963171699957456,
+      "dwell_seconds": 3.001267799991183,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 859.5380859375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3612060546875,
+          "Internal": 1377.80322265625,
+          "GraphicsParts": 8.33251953125,
+          "Sounds": 7.37957763671875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.78053283691406,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 33.62260437011719,
+          "Signals": 10.594924926757812,
+          "Gui": 34.063621520996094,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 30.9716796875,
+        "engine_mb": 874.43359375,
+        "instances": 59164
+      },
+      "state": {
+        "visit": 15,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "sill"
+        ],
+        "elapsed": 46.96306259999983,
+        "mode_name": "free",
+        "hour": 9.52592222222101,
+        "placements": 17,
+        "living_parts": 231,
+        "wanted": "sill",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 1.8923903042450547,
+          "count": 97,
+          "max_ms": 57.721901684999466
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 35,
+        "region": "sill",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 1,
+          "fly_like_prototype": 3
+        },
+        "looks": {
+          "live_regions": 76,
+          "plans": 15,
+          "live_sets": 139,
+          "destroyed": 11652,
+          "made": 13136,
+          "jobs": 0
+        },
+        "sim_seconds": 46.433333333331355,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 859.5380859375,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3612060546875,
+            "Internal": 1377.80322265625,
+            "GraphicsParts": 8.33251953125,
+            "Sounds": 7.37957763671875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.78053283691406,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 33.62260437011719,
+            "Signals": 10.594924926757812,
+            "Gui": 34.063621520996094,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 30.9716796875,
+          "engine_mb": 874.43359375,
+          "instances": 59164
+        },
+        "utc_ms": 1792665707604,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -22,
+          0.3100000023841858,
+          6
+        ]
+      }
+    },
+    "arrival_16": {
+      "visit": 16,
+      "region": "hut_desk",
+      "elapsed": 47.00431009999011,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ],
+      "transition_seconds": 0.03957930003525689,
+      "placements": 18
+    },
+    "visit_16": {
+      "visit": 16,
+      "region": "hut_desk",
+      "elapsed": 50.01838480000151,
+      "dwell_seconds": 3.0140783000388183,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 856.157470703125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.35009765625,
+          "Internal": 1377.7608642578125,
+          "GraphicsParts": 8.143264770507812,
+          "Sounds": 7.37957763671875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.81300354003906,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 33.768951416015625,
+          "Signals": 10.602554321289062,
+          "Gui": 34.059715270996094,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 43.4208984375,
+        "engine_mb": 866.61328125,
+        "instances": 58999
+      },
+      "state": {
+        "visit": 16,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "hut_desk"
+        ],
+        "elapsed": 50.0183102999581,
+        "mode_name": "free",
+        "hour": 9.566588888887617,
+        "placements": 18,
+        "living_parts": 231,
+        "wanted": "hut_desk",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 4.947602496482432,
+          "count": 269,
+          "max_ms": 78.38659733533859
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 37,
+        "region": "hut_desk",
+        "phase": "dwell",
+        "actors": {
+          "moth": 1
+        },
+        "looks": {
+          "live_regions": 86,
+          "plans": 16,
+          "live_sets": 158,
+          "destroyed": 11774,
+          "made": 13266,
+          "jobs": 0
+        },
+        "sim_seconds": 49.48333333333118,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 856.157470703125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.35009765625,
+            "Internal": 1377.7608642578125,
+            "GraphicsParts": 8.143264770507812,
+            "Sounds": 7.37957763671875,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.81300354003906,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 33.768951416015625,
+            "Signals": 10.602554321289062,
+            "Gui": 34.059715270996094,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 43.4208984375,
+          "engine_mb": 866.61328125,
+          "instances": 58999
+        },
+        "utc_ms": 1792665710659,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          80,
+          4.309999942779541,
+          45
+        ]
+      }
+    },
+    "arrival_17": {
+      "visit": 17,
+      "region": "garden_b2",
+      "elapsed": 50.06807300000219,
+      "pos": [
+        -60,
+        -84.29000091552734,
+        -170
+      ],
+      "transition_seconds": 0.048539900046307594,
+      "placements": 19
+    },
+    "visit_17": {
+      "visit": 17,
+      "region": "garden_b2",
+      "elapsed": 53.08134420000715,
+      "dwell_seconds": 3.013274700031616,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 861.57861328125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3797607421875,
+          "Internal": 1378.001220703125,
+          "GraphicsParts": 8.528961181640625,
+          "Sounds": 7.35845947265625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1076812744140625,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 104.92808532714844,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 34.96820068359375,
+          "Signals": 10.614715576171875,
+          "Gui": 34.027549743652344,
+          "GraphicsTexture": 58.20106887817383
+        },
+        "lua_gc_mib": 33.1826171875,
+        "engine_mb": 879.21875,
+        "instances": 59450
+      },
+      "state": {
+        "visit": 17,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 53.08125059999293,
+        "mode_name": "free",
+        "hour": 9.580082222220875,
+        "placements": 19,
+        "living_parts": 303,
+        "wanted": "garden_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 8.01348150987178,
+          "count": 423,
+          "max_ms": 78.38659733533859
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 39,
+        "region": "garden_b2",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 48,
+          "plans": 17,
+          "live_sets": 72,
+          "destroyed": 12557,
+          "made": 14057,
+          "jobs": 0
+        },
+        "sim_seconds": 52.549999999997674,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 861.57861328125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3797607421875,
+            "Internal": 1378.001220703125,
+            "GraphicsParts": 8.528961181640625,
+            "Sounds": 7.35845947265625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1076812744140625,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 104.92808532714844,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 34.96820068359375,
+            "Signals": 10.614715576171875,
+            "Gui": 34.027549743652344,
+            "GraphicsTexture": 58.20106887817383
+          },
+          "lua_gc_mib": 33.1826171875,
+          "engine_mb": 879.21875,
+          "instances": 59450
+        },
+        "utc_ms": 1792665713723,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -60,
+          -84.29000091552734,
+          -170
+        ]
+      }
+    },
+    "arrival_18": {
+      "visit": 18,
+      "region": "meadow_b2",
+      "elapsed": 53.154367099981755,
+      "pos": [
+        -160,
+        -84.29000091552734,
+        -928
+      ],
+      "transition_seconds": 0.07180149998748675,
+      "placements": 20
+    },
+    "visit_18": {
+      "visit": 18,
+      "region": "meadow_b2",
+      "elapsed": 56.16397749999305,
+      "dwell_seconds": 3.0096140000387095,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 865.449951171875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4420166015625,
+          "Internal": 1378.03515625,
+          "GraphicsParts": 8.123191833496094,
+          "Sounds": 7.43658447265625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 105.04251098632812,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 36.24424743652344,
+          "Signals": 10.676361083984375,
+          "Gui": 33.943153381347656,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 38.4482421875,
+        "engine_mb": 890.0078125,
+        "instances": 59015
+      },
+      "state": {
+        "visit": 18,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "meadow_b2"
+        ],
+        "elapsed": 56.163894500001334,
+        "mode_name": "free",
+        "hour": 9.593648888887467,
+        "placements": 20,
+        "living_parts": 294,
+        "wanted": "meadow_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 11.094714709557593,
+          "count": 562,
+          "max_ms": 78.38659733533859
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 41,
+        "region": "meadow_b2",
+        "phase": "dwell",
+        "actors": {
+          "cricket": 1
+        },
+        "looks": {
+          "live_regions": 33,
+          "plans": 18,
+          "live_sets": 44,
+          "destroyed": 13565,
+          "made": 15065,
+          "jobs": 0
+        },
+        "sim_seconds": 55.63333333333084,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 865.449951171875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4420166015625,
+            "Internal": 1378.03515625,
+            "GraphicsParts": 8.123191833496094,
+            "Sounds": 7.43658447265625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 105.04251098632812,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 36.24424743652344,
+            "Signals": 10.676361083984375,
+            "Gui": 33.943153381347656,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 38.4482421875,
+          "engine_mb": 890.0078125,
+          "instances": 59015
+        },
+        "utc_ms": 1792665716806,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -160,
+          -84.29000091552734,
+          -928
+        ]
+      }
+    },
+    "arrival_19": {
+      "visit": 19,
+      "region": "pond_a2",
+      "elapsed": 56.222123399958946,
+      "pos": [
+        644.5999755859375,
+        -85.79000091552734,
+        -1047.8704833984375
+      ],
+      "transition_seconds": 0.056833399983588606,
+      "placements": 21
+    },
+    "visit_19": {
+      "visit": 19,
+      "region": "pond_a2",
+      "elapsed": 59.236880799988285,
+      "dwell_seconds": 3.0147613000008278,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 856.37841796875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4027099609375,
+          "Internal": 1378.0595703125,
+          "GraphicsParts": 8.444442749023438,
+          "Sounds": 7.43658447265625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 105.11572265625,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 37.42362976074219,
+          "Signals": 10.72576904296875,
+          "Gui": 33.89543914794922,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 42.4443359375,
+        "engine_mb": 896.00390625,
+        "instances": 59394
+      },
+      "state": {
+        "visit": 19,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "pond_a2",
+          "pond_b2"
+        ],
+        "elapsed": 59.23677529999986,
+        "mode_name": "free",
+        "hour": 9.607142222220725,
+        "placements": 21,
+        "living_parts": 231,
+        "wanted": "pond_a2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 14.166827513836324,
+          "count": 699,
+          "max_ms": 78.38659733533859
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 43,
+        "region": "pond_a2",
+        "phase": "dwell",
+        "actors": {
+          "damselfly": 1,
+          "mosquito": 1
+        },
+        "looks": {
+          "live_regions": 42,
+          "plans": 19,
+          "live_sets": 57,
+          "destroyed": 14573,
+          "made": 16073,
+          "jobs": 0
+        },
+        "sim_seconds": 58.69999999999733,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 856.37841796875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4027099609375,
+            "Internal": 1378.0595703125,
+            "GraphicsParts": 8.444442749023438,
+            "Sounds": 7.43658447265625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 105.11572265625,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 37.42362976074219,
+            "Signals": 10.72576904296875,
+            "Gui": 33.89543914794922,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 42.4443359375,
+          "engine_mb": 896.00390625,
+          "instances": 59394
+        },
+        "utc_ms": 1792665719878,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          644.5999755859375,
+          -85.79000091552734,
+          -1047.8704833984375
+        ]
+      }
+    },
+    "arrival_20": {
+      "visit": 20,
+      "region": "hut_doorway",
+      "elapsed": 59.30696319998242,
+      "pos": [
+        160.75,
+        -69.69000244140625,
+        215
+      ],
+      "transition_seconds": 0.06859869998879731,
+      "placements": 22
+    },
+    "sample_5": {
+      "visit": 20,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "room_floor_g"
+      ],
+      "elapsed": 60.08855310000945,
+      "mode_name": "free",
+      "hour": 9.618475555554042,
+      "placements": 22,
+      "living_parts": 339,
+      "wanted": "hut_doorway",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 15.013784906826913,
+        "count": 728,
+        "max_ms": 117.68510192632675
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 44,
+      "region": "hut_doorway",
+      "phase": "dwell",
+      "actors": {
+        "fruit_fly": 2
+      },
+      "looks": {
+        "live_regions": 74,
+        "plans": 20,
+        "live_sets": 135,
+        "destroyed": 15674,
+        "made": 16895,
+        "jobs": 0
+      },
+      "sim_seconds": 59.54999999999728,
+      "directors_made": 5,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 856.37841796875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4027099609375,
+          "Internal": 1378.0595703125,
+          "GraphicsParts": 8.444442749023438,
+          "Sounds": 7.43658447265625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 105.11572265625,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 37.42362976074219,
+          "Signals": 10.72576904296875,
+          "Gui": 33.89543914794922,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 31.1259765625,
+        "engine_mb": 897.66015625,
+        "instances": 58852
+      },
+      "utc_ms": 1792665720730,
+      "initialized_regions": 5,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        160.75,
+        -69.69000244140625,
+        215
+      ]
+    },
+    "visit_20": {
+      "visit": 20,
+      "region": "hut_doorway",
+      "elapsed": 62.31257199996617,
+      "dwell_seconds": 3.005612899956759,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 856.37841796875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.354248046875,
+          "Internal": 1377.9364013671875,
+          "GraphicsParts": 8.158432006835938,
+          "Sounds": 7.43658447265625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41265869140625,
+          "Navigation": 0,
+          "Instances": 105.11572265625,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 37.42362976074219,
+          "Signals": 10.72576904296875,
+          "Gui": 33.365882873535156,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 31.1259765625,
+        "engine_mb": 897.66015625,
+        "instances": 58852
+      },
+      "state": {
+        "visit": 20,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "room_floor_g"
+        ],
+        "elapsed": 62.31249879999086,
+        "mode_name": "free",
+        "hour": 9.647808888887333,
+        "placements": 22,
+        "living_parts": 339,
+        "wanted": "hut_doorway",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 2.2309361062943935,
+          "count": 104,
+          "max_ms": 272.34411239624023
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 45,
+        "region": "hut_doorway",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 2
+        },
+        "looks": {
+          "live_regions": 74,
+          "plans": 20,
+          "live_sets": 135,
+          "destroyed": 15674,
+          "made": 16895,
+          "jobs": 0
+        },
+        "sim_seconds": 61.74999999999716,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 857.021484375,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.354248046875,
+            "Internal": 1377.9364013671875,
+            "GraphicsParts": 8.158432006835938,
+            "Sounds": 7.43658447265625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41265869140625,
+            "Navigation": 0,
+            "Instances": 105.2388916015625,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 38.50376892089844,
+            "Signals": 10.759994506835938,
+            "Gui": 33.365882873535156,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 31.8603515625,
+          "engine_mb": 907.44140625,
+          "instances": 58852
+        },
+        "utc_ms": 1792665722954,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          160.75,
+          -69.69000244140625,
+          215
+        ]
+      }
+    },
+    "arrival_21": {
+      "visit": 21,
+      "region": "lamp_1",
+      "elapsed": 62.35732629999984,
+      "pos": [
+        -188,
+        -68.29000091552734,
+        -768
+      ],
+      "transition_seconds": 0.04332830000203103,
+      "placements": 23
+    },
+    "visit_21": {
+      "visit": 21,
+      "region": "lamp_1",
+      "elapsed": 65.36963520001154,
+      "dwell_seconds": 3.0123127000406384,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 851.84912109375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3759765625,
+          "Internal": 1378.0465087890625,
+          "GraphicsParts": 8.393272399902344,
+          "Sounds": 7.43585205078125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.32566833496094,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 39.76591491699219,
+          "Signals": 10.825149536132812,
+          "Gui": 32.645973205566406,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 36.5654296875,
+        "engine_mb": 925.55859375,
+        "instances": 59209
+      },
+      "state": {
+        "visit": 21,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 65.36957739997888,
+        "mode_name": "free",
+        "hour": 9.661228888887258,
+        "placements": 23,
+        "living_parts": 231,
+        "wanted": "lamp_1",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 5.285765604116023,
+          "count": 264,
+          "max_ms": 272.34411239624023
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 47,
+        "region": "lamp_1",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 55,
+          "plans": 21,
+          "live_sets": 82,
+          "destroyed": 16455,
+          "made": 17953,
+          "jobs": 0
+        },
+        "sim_seconds": 64.79999999999698,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 851.84912109375,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3759765625,
+            "Internal": 1378.0465087890625,
+            "GraphicsParts": 8.393272399902344,
+            "Sounds": 7.43585205078125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.32566833496094,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 39.76591491699219,
+            "Signals": 10.825149536132812,
+            "Gui": 32.645973205566406,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 36.5654296875,
+          "engine_mb": 925.55859375,
+          "instances": 59209
+        },
+        "utc_ms": 1792665726011,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -188,
+          -68.29000091552734,
+          -768
+        ]
+      }
+    },
+    "arrival_22": {
+      "visit": 22,
+      "region": "sill",
+      "elapsed": 65.43387609999627,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ],
+      "transition_seconds": 0.06279970001196489,
+      "placements": 24
+    },
+    "visit_22": {
+      "visit": 22,
+      "region": "sill",
+      "elapsed": 68.43583179998677,
+      "dwell_seconds": 3.001960500027053,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 851.35400390625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3543701171875,
+          "Internal": 1377.096923828125,
+          "GraphicsParts": 8.352035522460938,
+          "Sounds": 7.421142578125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.44550323486328,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 41.054443359375,
+          "Signals": 10.890045166015625,
+          "Gui": 32.62512969970703,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 34.7666015625,
+        "engine_mb": 902.1640625,
+        "instances": 59164
+      },
+      "state": {
+        "visit": 22,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "sill"
+        ],
+        "elapsed": 68.43572549999226,
+        "mode_name": "free",
+        "hour": 9.702117777776088,
+        "placements": 24,
+        "living_parts": 231,
+        "wanted": "sill",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 8.354082709178329,
+          "count": 419,
+          "max_ms": 272.34411239624023
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 49,
+        "region": "sill",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 1,
+          "fly_like_prototype": 3
+        },
+        "looks": {
+          "live_regions": 76,
+          "plans": 22,
+          "live_sets": 139,
+          "destroyed": 17478,
+          "made": 18962,
+          "jobs": 0
+        },
+        "sim_seconds": 67.86666666666348,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 851.35400390625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3543701171875,
+            "Internal": 1377.096923828125,
+            "GraphicsParts": 8.352035522460938,
+            "Sounds": 7.421142578125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.44550323486328,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 41.054443359375,
+            "Signals": 10.890045166015625,
+            "Gui": 32.62512969970703,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 34.7666015625,
+          "engine_mb": 902.1640625,
+          "instances": 59164
+        },
+        "utc_ms": 1792665729076,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -22,
+          0.3100000023841858,
+          6
+        ]
+      }
+    },
+    "arrival_23": {
+      "visit": 23,
+      "region": "hut_desk",
+      "elapsed": 68.47530579997692,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ],
+      "transition_seconds": 0.038273699989076704,
+      "placements": 25
+    },
+    "visit_23": {
+      "visit": 23,
+      "region": "hut_desk",
+      "elapsed": 71.47870569996303,
+      "dwell_seconds": 3.003402800008189,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 847.427978515625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.34814453125,
+          "Internal": 1376.455810546875,
+          "GraphicsParts": 8.165580749511719,
+          "Sounds": 7.4202880859375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.43509674072266,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 41.15318298339844,
+          "Signals": 10.89251708984375,
+          "Gui": 32.52092742919922,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 32.1298828125,
+        "engine_mb": 913.4375,
+        "instances": 58999
+      },
+      "state": {
+        "visit": 23,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "hut_desk"
+        ],
+        "elapsed": 71.47857340000337,
+        "mode_name": "free",
+        "hour": 9.742562222220474,
+        "placements": 25,
+        "living_parts": 231,
+        "wanted": "hut_desk",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 11.390744594857097,
+          "count": 590,
+          "max_ms": 272.34411239624023
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 51,
+        "region": "hut_desk",
+        "phase": "dwell",
+        "actors": {
+          "moth": 1
+        },
+        "looks": {
+          "live_regions": 86,
+          "plans": 23,
+          "live_sets": 158,
+          "destroyed": 17600,
+          "made": 19092,
+          "jobs": 0
+        },
+        "sim_seconds": 70.89999999999664,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 847.427978515625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.34814453125,
+            "Internal": 1376.455810546875,
+            "GraphicsParts": 8.165580749511719,
+            "Sounds": 7.4202880859375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.43509674072266,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 41.15318298339844,
+            "Signals": 10.89251708984375,
+            "Gui": 32.52092742919922,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 32.1298828125,
+          "engine_mb": 913.4375,
+          "instances": 58999
+        },
+        "utc_ms": 1792665732120,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          80,
+          4.309999942779541,
+          45
+        ]
+      }
+    },
+    "arrival_24": {
+      "visit": 24,
+      "region": "garden_b2",
+      "elapsed": 71.52581479999935,
+      "pos": [
+        -60,
+        -84.29000091552734,
+        -170
+      ],
+      "transition_seconds": 0.045348200015723705,
+      "placements": 26
+    },
+    "visit_24": {
+      "visit": 24,
+      "region": "garden_b2",
+      "elapsed": 74.52747859997908,
+      "dwell_seconds": 3.0016666000010446,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 855.411376953125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4490966796875,
+          "Internal": 1377.1396484375,
+          "GraphicsParts": 8.562675476074219,
+          "Sounds": 7.4195556640625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.56758880615234,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 42.360687255859375,
+          "Signals": 10.962554931640625,
+          "Gui": 32.52092742919922,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 39.3447265625,
+        "engine_mb": 920.98046875,
+        "instances": 59491
+      },
+      "state": {
+        "visit": 24,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 74.52741340000648,
+        "mode_name": "free",
+        "hour": 9.756055555553733,
+        "placements": 26,
+        "living_parts": 303,
+        "wanted": "garden_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 14.445191705599427,
+          "count": 749,
+          "max_ms": 272.34411239624023
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 53,
+        "region": "garden_b2",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 48,
+          "plans": 24,
+          "live_sets": 72,
+          "destroyed": 18383,
+          "made": 19883,
+          "jobs": 0
+        },
+        "sim_seconds": 73.96666666666313,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 855.411376953125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4490966796875,
+            "Internal": 1377.1396484375,
+            "GraphicsParts": 8.562675476074219,
+            "Sounds": 7.4195556640625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.56758880615234,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 42.360687255859375,
+            "Signals": 10.962554931640625,
+            "Gui": 32.52092742919922,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 39.3447265625,
+          "engine_mb": 920.98046875,
+          "instances": 59491
+        },
+        "utc_ms": 1792665735169,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -60,
+          -84.29000091552734,
+          -170
+        ]
+      }
+    },
+    "arrival_25": {
+      "visit": 25,
+      "region": "meadow_b2",
+      "elapsed": 74.58158140000887,
+      "pos": [
+        -160,
+        -84.29000091552734,
+        -928
+      ],
+      "transition_seconds": 0.05285170004935935,
+      "placements": 27
+    },
+    "sample_6": {
+      "visit": 25,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "meadow_b2"
+      ],
+      "elapsed": 75.09899199998472,
+      "mode_name": "free",
+      "hour": 9.758548888887052,
+      "placements": 27,
+      "living_parts": 294,
+      "wanted": "meadow_b2",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 15.014640804380178,
+        "count": 770,
+        "max_ms": 272.34411239624023
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 54,
+      "region": "meadow_b2",
+      "phase": "dwell",
+      "actors": {
+        "cricket": 1
+      },
+      "looks": {
+        "live_regions": 33,
+        "plans": 25,
+        "live_sets": 44,
+        "destroyed": 19391,
+        "made": 20891,
+        "jobs": 0
+      },
+      "sim_seconds": 74.53333333332976,
+      "directors_made": 5,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 854.081787109375,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3702392578125,
+          "Internal": 1376.160400390625,
+          "GraphicsParts": 7.783355712890625,
+          "Sounds": 7.418701171875,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.65560150146484,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 42.869110107421875,
+          "Signals": 10.992889404296875,
+          "Gui": 32.51702117919922,
+          "GraphicsTexture": 58.38838577270508
+        },
+        "lua_gc_mib": 43.54296875,
+        "engine_mb": 923.859375,
+        "instances": 59056
+      },
+      "utc_ms": 1792665735741,
+      "initialized_regions": 5,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        -160,
+        -84.29000091552734,
+        -928
+      ]
+    },
+    "visit_25": {
+      "visit": 25,
+      "region": "meadow_b2",
+      "elapsed": 77.58593629999086,
+      "dwell_seconds": 3.0043583000078797,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 847.737548828125,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.3594970703125,
+          "Internal": 1376.160400390625,
+          "GraphicsParts": 7.783355712890625,
+          "Sounds": 7.39825439453125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.65560150146484,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 42.869110107421875,
+          "Signals": 10.992889404296875,
+          "Gui": 32.51702117919922,
+          "GraphicsTexture": 58.38838577270508
+        },
+        "lua_gc_mib": 36.9892578125,
+        "engine_mb": 923.859375,
+        "instances": 59056
+      },
+      "state": {
+        "visit": 25,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "meadow_b2"
+        ],
+        "elapsed": 77.58580729999812,
+        "mode_name": "free",
+        "hour": 9.769475555553658,
+        "placements": 27,
+        "living_parts": 294,
+        "wanted": "meadow_b2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 2.484288400039077,
+          "count": 117,
+          "max_ms": 51.49580165743828
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 55,
+        "region": "meadow_b2",
+        "phase": "dwell",
+        "actors": {
+          "cricket": 1
+        },
+        "looks": {
+          "live_regions": 33,
+          "plans": 25,
+          "live_sets": 44,
+          "destroyed": 19391,
+          "made": 20891,
+          "jobs": 0
+        },
+        "sim_seconds": 77.01666666666296,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 847.737548828125,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.3594970703125,
+            "Internal": 1376.9111328125,
+            "GraphicsParts": 8.173377990722656,
+            "Sounds": 7.39825439453125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.71871185302734,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 43.50614929199219,
+            "Signals": 11.026718139648438,
+            "Gui": 32.51702117919922,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 36.9892578125,
+          "engine_mb": 930.62890625,
+          "instances": 59056
+        },
+        "utc_ms": 1792665738228,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -160,
+          -84.29000091552734,
+          -928
+        ]
+      }
+    },
+    "arrival_26": {
+      "visit": 26,
+      "region": "pond_a2",
+      "elapsed": 77.64723880001111,
+      "pos": [
+        644.5999755859375,
+        -85.79000091552734,
+        -1047.8704833984375
+      ],
+      "transition_seconds": 0.05919449997600168,
+      "placements": 28
+    },
+    "visit_26": {
+      "visit": 26,
+      "region": "pond_a2",
+      "elapsed": 80.66055149998283,
+      "dwell_seconds": 3.013316399999894,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 851.78369140625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4183349609375,
+          "Internal": 1377.6455078125,
+          "GraphicsParts": 8.502555847167969,
+          "Sounds": 7.39825439453125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.82129669189453,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 44.88153076171875,
+          "Signals": 11.100860595703125,
+          "Gui": 32.51702117919922,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 34.9560546875,
+        "engine_mb": 880.75390625,
+        "instances": 59435
+      },
+      "state": {
+        "visit": 26,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "pond_a2",
+          "pond_b2"
+        ],
+        "elapsed": 80.66045580001082,
+        "mode_name": "free",
+        "hour": 9.78304222222025,
+        "placements": 28,
+        "living_parts": 231,
+        "wanted": "pond_a2",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 5.56414529401809,
+          "count": 267,
+          "max_ms": 77.0685002207756
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 57,
+        "region": "pond_a2",
+        "phase": "dwell",
+        "actors": {
+          "damselfly": 1,
+          "mosquito": 1
+        },
+        "looks": {
+          "live_regions": 42,
+          "plans": 26,
+          "live_sets": 57,
+          "destroyed": 20399,
+          "made": 21899,
+          "jobs": 0
+        },
+        "sim_seconds": 80.09999999999611,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 851.78369140625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4183349609375,
+            "Internal": 1377.6455078125,
+            "GraphicsParts": 8.502555847167969,
+            "Sounds": 7.39825439453125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.82129669189453,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 44.88153076171875,
+            "Signals": 11.100860595703125,
+            "Gui": 32.51702117919922,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 34.9560546875,
+          "engine_mb": 880.75390625,
+          "instances": 59435
+        },
+        "utc_ms": 1792665741302,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          644.5999755859375,
+          -85.79000091552734,
+          -1047.8704833984375
+        ]
+      }
+    },
+    "arrival_27": {
+      "visit": 27,
+      "region": "hut_doorway",
+      "elapsed": 80.72149359999457,
+      "pos": [
+        160.75,
+        -69.69000244140625,
+        215
+      ],
+      "transition_seconds": 0.05946910002967343,
+      "placements": 29
+    },
+    "visit_27": {
+      "visit": 27,
+      "region": "hut_doorway",
+      "elapsed": 83.73994549998315,
+      "dwell_seconds": 3.0184549000114202,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 851.6025390625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4036865234375,
+          "Internal": 1377.66455078125,
+          "GraphicsParts": 8.227928161621094,
+          "Sounds": 7.39825439453125,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1086273193359375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 105.9991683959961,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 46.059539794921875,
+          "Signals": 11.16015625,
+          "Gui": 32.51667022705078,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 45.646484375,
+        "engine_mb": 740.17578125,
+        "instances": 58893
+      },
+      "state": {
+        "visit": 27,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "room_floor_g"
+        ],
+        "elapsed": 83.73985839996021,
+        "mode_name": "free",
+        "hour": 9.82393111110908,
+        "placements": 29,
+        "living_parts": 339,
+        "wanted": "hut_doorway",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 8.63864228874445,
+          "count": 410,
+          "max_ms": 77.0685002207756
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 59,
+        "region": "hut_doorway",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 2
+        },
+        "looks": {
+          "live_regions": 74,
+          "plans": 27,
+          "live_sets": 135,
+          "destroyed": 21500,
+          "made": 22721,
+          "jobs": 0
+        },
+        "sim_seconds": 83.1666666666626,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 851.6025390625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4036865234375,
+            "Internal": 1377.66455078125,
+            "GraphicsParts": 8.227928161621094,
+            "Sounds": 7.39825439453125,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1086273193359375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 105.9991683959961,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 46.059539794921875,
+            "Signals": 11.16015625,
+            "Gui": 32.51667022705078,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 45.646484375,
+          "engine_mb": 740.17578125,
+          "instances": 58893
+        },
+        "utc_ms": 1792665744381,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          160.75,
+          -69.69000244140625,
+          215
+        ]
+      }
+    },
+    "arrival_28": {
+      "visit": 28,
+      "region": "lamp_1",
+      "elapsed": 83.80995049997,
+      "pos": [
+        -188,
+        -68.29000091552734,
+        -768
+      ],
+      "transition_seconds": 0.06765819998690858,
+      "placements": 30
+    },
+    "visit_28": {
+      "visit": 28,
+      "region": "lamp_1",
+      "elapsed": 86.83551379997516,
+      "dwell_seconds": 3.0255689999903552,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 847.701171875,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4345703125,
+          "Internal": 1377.796142578125,
+          "GraphicsParts": 8.456756591796875,
+          "Sounds": 7.39703369140625,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1107177734375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 106.1003189086914,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 47.2281494140625,
+          "Signals": 11.217056274414062,
+          "Gui": 32.51667022705078,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 30.2900390625,
+        "engine_mb": 573.73046875,
+        "instances": 59250
+      },
+      "state": {
+        "visit": 28,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [],
+        "elapsed": 86.83540899999207,
+        "mode_name": "free",
+        "hour": 9.837571111109003,
+        "placements": 30,
+        "living_parts": 231,
+        "wanted": "lamp_1",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 11.734390975907445,
+          "count": 523,
+          "max_ms": 143.14989745616913
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 61,
+        "region": "lamp_1",
+        "phase": "dwell",
+        "actors": [],
+        "looks": {
+          "live_regions": 55,
+          "plans": 28,
+          "live_sets": 82,
+          "destroyed": 22281,
+          "made": 23779,
+          "jobs": 0
+        },
+        "sim_seconds": 86.26666666666243,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 847.701171875,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4345703125,
+            "Internal": 1377.796142578125,
+            "GraphicsParts": 8.456756591796875,
+            "Sounds": 7.39703369140625,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1107177734375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 106.1003189086914,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 47.2281494140625,
+            "Signals": 11.217056274414062,
+            "Gui": 32.51667022705078,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 30.2900390625,
+          "engine_mb": 573.73046875,
+          "instances": 59250
+        },
+        "utc_ms": 1792665747477,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -188,
+          -68.29000091552734,
+          -768
+        ]
+      }
+    },
+    "arrival_29": {
+      "visit": 29,
+      "region": "sill",
+      "elapsed": 86.89785810001194,
+      "pos": [
+        -22,
+        0.3100000023841858,
+        6
+      ],
+      "transition_seconds": 0.06088459998136386,
+      "placements": 31
+    },
+    "visit_29": {
+      "visit": 29,
+      "region": "sill",
+      "elapsed": 89.91651489998912,
+      "dwell_seconds": 3.018660400004592,
+      "memory_min": {
+        "tags_mb": {
+          "LuaHeap": 853.799072265625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4908447265625,
+          "Internal": 1378.3524169921875,
+          "GraphicsParts": 8.424468994140625,
+          "Sounds": 7.4114990234375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1107177734375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 106.26262664794922,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 48.64764404296875,
+          "Signals": 11.300506591796875,
+          "Gui": 32.51667022705078,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 35.36328125,
+        "engine_mb": 600.75390625,
+        "instances": 59205
+      },
+      "state": {
+        "visit": 29,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "sill"
+        ],
+        "elapsed": 89.91625730000669,
+        "mode_name": "free",
+        "hour": 9.878682222220055,
+        "placements": 31,
+        "living_parts": 231,
+        "wanted": "sill",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 14.813665271736681,
+          "count": 687,
+          "max_ms": 143.14989745616913
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 63,
+        "region": "sill",
+        "phase": "dwell",
+        "actors": {
+          "fruit_fly": 1,
+          "fly_like_prototype": 3
+        },
+        "looks": {
+          "live_regions": 76,
+          "plans": 29,
+          "live_sets": 139,
+          "destroyed": 23304,
+          "made": 24788,
+          "jobs": 0
+        },
+        "sim_seconds": 89.34999999999559,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 853.799072265625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4908447265625,
+            "Internal": 1378.3524169921875,
+            "GraphicsParts": 8.424468994140625,
+            "Sounds": 7.4114990234375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1107177734375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 106.26262664794922,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 48.64764404296875,
+            "Signals": 11.300506591796875,
+            "Gui": 32.51667022705078,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 35.36328125,
+          "engine_mb": 600.75390625,
+          "instances": 59205
+        },
+        "utc_ms": 1792665750557,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          -22,
+          0.3100000023841858,
+          6
+        ]
+      }
+    },
+    "arrival_30": {
+      "visit": 30,
+      "region": "hut_desk",
+      "elapsed": 89.96981340000639,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ],
+      "transition_seconds": 0.05139120004605502,
+      "placements": 32
+    },
+    "sample_7": {
+      "visit": 30,
+      "rules": "gentle",
+      "focus_losses": 0,
+      "active_regions": [
+        "hut_desk"
+      ],
+      "elapsed": 90.07557829999132,
+      "mode_name": "free",
+      "hour": 9.880682222220052,
+      "placements": 32,
+      "living_parts": 231,
+      "wanted": "hut_desk",
+      "day": 1,
+      "region_ready": true,
+      "mode": "attached",
+      "frames": {
+        "seconds": 14.970791072584689,
+        "count": 690,
+        "max_ms": 143.14989745616913
+      },
+      "predator_enabled": {
+        "bird": true,
+        "cat": true,
+        "wasp": true,
+        "crab": true,
+        "frog": true
+      },
+      "world_focus_reports": 64,
+      "region": "hut_desk",
+      "phase": "dwell",
+      "actors": {
+        "moth": 1
+      },
+      "looks": {
+        "live_regions": 86,
+        "plans": 30,
+        "live_sets": 158,
+        "destroyed": 23426,
+        "made": 24918,
+        "jobs": 0
+      },
+      "sim_seconds": 89.49999999999558,
+      "directors_made": 5,
+      "memory": {
+        "tags_mb": {
+          "LuaHeap": 853.799072265625,
+          "GraphicsTextureCharacter": 0,
+          "GraphicsSpatialHash": 1.4908447265625,
+          "Internal": 1378.3524169921875,
+          "GraphicsParts": 8.424468994140625,
+          "Sounds": 7.4114990234375,
+          "StreamingSounds": 0,
+          "GraphicsSlimModels": 0,
+          "GraphicsTerrain": 0,
+          "GraphicsMeshParts": 2.09613037109375,
+          "GraphicsSolidModels": 0,
+          "PhysicsCollision": 0.003265380859375,
+          "Animation": 0.01776123046875,
+          "HttpCache": 0.1107177734375,
+          "TerrainVoxels": 0,
+          "GeometryCSG": 0,
+          "Script": 276.41259765625,
+          "Navigation": 0,
+          "Instances": 106.26262664794922,
+          "GraphicsParticles": 15.381874084472656,
+          "BaseParts": 48.64764404296875,
+          "Signals": 11.300506591796875,
+          "Gui": 32.51667022705078,
+          "GraphicsTexture": 58.38856887817383
+        },
+        "lua_gc_mib": 34.720703125,
+        "engine_mb": 602.4921875,
+        "instances": 59040
+      },
+      "utc_ms": 1792665750717,
+      "initialized_regions": 5,
+      "viewport": [
+        1105,
+        433
+      ],
+      "meals": 0,
+      "stage": 0,
+      "pos": [
+        80,
+        4.309999942779541,
+        45
+      ]
+    },
+    "final": {
+      "forced_gc_calls": 0,
+      "sim_seconds": 89.49999999999558,
+      "focus_losses": 0,
+      "fresh_calls_during_trace": 0,
+      "elapsed": 90.07746870000847,
+      "frame_seconds": 90.0778481438756,
+      "frames": 4568,
+      "max_frame_ms": 786.8397235870361,
+      "state": {
+        "visit": 30,
+        "rules": "gentle",
+        "focus_losses": 0,
+        "active_regions": [
+          "hut_desk"
+        ],
+        "elapsed": 90.07768960000249,
+        "mode_name": "free",
+        "hour": 9.880682222220052,
+        "placements": 32,
+        "living_parts": 231,
+        "wanted": "hut_desk",
+        "day": 1,
+        "region_ready": true,
+        "mode": "attached",
+        "frames": {
+          "seconds": 0,
+          "count": 0,
+          "max_ms": 0
+        },
+        "predator_enabled": {
+          "bird": true,
+          "cat": true,
+          "wasp": true,
+          "crab": true,
+          "frog": true
+        },
+        "world_focus_reports": 64,
+        "region": "hut_desk",
+        "phase": "dwell",
+        "actors": {
+          "moth": 1
+        },
+        "looks": {
+          "live_regions": 86,
+          "plans": 30,
+          "live_sets": 158,
+          "destroyed": 23426,
+          "made": 24918,
+          "jobs": 0
+        },
+        "sim_seconds": 89.49999999999558,
+        "directors_made": 5,
+        "memory": {
+          "tags_mb": {
+            "LuaHeap": 853.799072265625,
+            "GraphicsTextureCharacter": 0,
+            "GraphicsSpatialHash": 1.4908447265625,
+            "Internal": 1378.3524169921875,
+            "GraphicsParts": 8.424468994140625,
+            "Sounds": 7.4114990234375,
+            "StreamingSounds": 0,
+            "GraphicsSlimModels": 0,
+            "GraphicsTerrain": 0,
+            "GraphicsMeshParts": 2.09613037109375,
+            "GraphicsSolidModels": 0,
+            "PhysicsCollision": 0.003265380859375,
+            "Animation": 0.01776123046875,
+            "HttpCache": 0.1107177734375,
+            "TerrainVoxels": 0,
+            "GeometryCSG": 0,
+            "Script": 276.41259765625,
+            "Navigation": 0,
+            "Instances": 106.26262664794922,
+            "GraphicsParticles": 15.381874084472656,
+            "BaseParts": 48.64764404296875,
+            "Signals": 11.300506591796875,
+            "Gui": 32.51667022705078,
+            "GraphicsTexture": 58.38856887817383
+          },
+          "lua_gc_mib": 34.7314453125,
+          "engine_mb": 602.55078125,
+          "instances": 59040
+        },
+        "utc_ms": 1792665750719,
+        "initialized_regions": 5,
+        "viewport": [
+          1105,
+          433
+        ],
+        "meals": 0,
+        "stage": 0,
+        "pos": [
+          80,
+          4.309999942779541,
+          45
+        ]
+      },
+      "placements": 32,
+      "utc_ms": 1792665750719,
+      "recovery_calls_during_trace": 0,
+      "viewport": [
+        1105,
+        433
+      ],
+      "visited": {
+        "garden_b2": true,
+        "hut_doorway": true,
+        "sill": true,
+        "meadow_b2": true,
+        "lamp_1": true,
+        "hut_desk": true,
+        "pond_a2": true
+      },
+      "samples": 7,
+      "visits": 29
+    }
+  },
+  "scope": "Desktop Studio, one Free life with explicit placements; not walking, phone, online-save or whole-game speedup evidence",
+  "run": "1792665646453",
+  "source": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+  "profile": "smoke",
+  "duration_seconds": 90.07746870000847,
+  "visits_by_region": {
+    "sill": 5,
+    "hut_desk": 4,
+    "garden_b2": 4,
+    "meadow_b2": 4,
+    "pond_a2": 4,
+    "hut_doorway": 4,
+    "lamp_1": 4
+  },
+  "samples": 7,
+  "source_guard_verified": true,
+  "events_sha256": "d37e40b1796eab19144ca10694dcf34a80f7d5abc1b0d03a8e74a8f75987ab4b",
+  "manifest_sha256": "362daff6a08f70fa80f029846a73299d1a76fe308217dbeefab0a2ab3debe922"
+}

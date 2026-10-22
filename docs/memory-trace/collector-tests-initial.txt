@@ -1,0 +1,14 @@
+.....F....
+======================================================================
+FAIL: test_modified_payload_fails_checksum (test_collect.CollectorTests.test_modified_payload_fails_checksum)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\natha\windowsill-publish\docs\memory-trace\test_collect.py", line 48, in test_modified_payload_fails_checksum
+    text=encode(SMOKE);self.assertRaises(ValueError,c.collect,text.replace('Desktop','Dfsktop',1),MANIFEST)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised by collect
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.161s
+
+FAILED (failures=1)

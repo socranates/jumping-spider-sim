@@ -1,0 +1,19 @@
+{
+  "run": "1792666028145",
+  "source": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+  "profile": "long",
+  "source_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T104521Z_Studio_337E4_last.log",
+  "window_id": 59246462,
+  "process_id": 4428,
+  "initial_focus_evidence": "Explicit sky activation, inspected Studio title, source guard and F5 in that window; subsequent focus loss monitored natively",
+  "other_active_studio_edit_windows": 0,
+  "unused_startup_process_id": 27184,
+  "heavy_cli_suites_finished_before_start": true,
+  "persistence_disabled": true,
+  "began_utc_ms": 1792666038399,
+  "expected_duration_seconds": 1800,
+  "observer_session_id": 52003,
+  "observer_directory": "C:\\Users\\natha\\claude-xfer\\Windowsill-memory-trace-v1b\\long-observer",
+  "status_at_recording": "running, not completed",
+  "manifest_sha256": "362daff6a08f70fa80f029846a73299d1a76fe308217dbeefab0a2ab3debe922"
+}

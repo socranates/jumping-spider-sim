@@ -1,0 +1,31 @@
+# Native memory trace
+
+Status: **90-second rehearsal verified; 30-minute run in progress.** Source `3c8de801e5fab68598e1e5323e7f5e1c8151b0e6` has passed 63 Windows suites / 443,469 checks, successful Linux CI, and native encounter-reset checks. The memory harness is a separate diagnostic; no production source changes here.
+
+## Protocol fixed before the long run
+
+One continuous Free/gentle life, full detail, no feeding fixture or adult upgrade. After the client and viewport settle, cycle through sill, hut desk, garden_b2, meadow_b2, pond_a2, hut doorway and lamp_1. The pond uses the first flat-stone anchor, tested against the actual map. Each long-run visit waits for ordinary streamed geometry, then dwells for 30 seconds. Placement retries are counted. This is lifecycle/streaming churn from explicit placements, **not a physical walking tour**. No fresh life, checkpoint recovery, forced GC, profiler toggling or clock changes occur during the trace. The life clock advances normally; the newborn/gentle workload is not a worst-case combat or mature-life test.
+
+Sample every 15 seconds, plus each visit end: total engine memory, gcinfo heap, every available DeveloperMemoryTag, live instances, active population, retained regional directors, look creation/destruction/live-set counts, local detail parts, simulation clock and rendered-frame activity. The client retains only bounded counters and one visit's minima; full samples live in the external log, not an ever-growing client array. Logging and diagnostic allocations still introduce overhead.
+
+The run rejects focus loss, viewport changes, disabled predators, menus/death/rest, clock resets, five seconds without simulation progress, missing geometry, or leaving a dwell fixture. All seven habitats must be visited. A valid full memory gate additionally requires 1,800 seconds, sufficient rendered/simulated activity, complete CRC-checked records, and at least six completed visits to each habitat. The rehearsal can never satisfy that gate.
+
+For each habitat, compare lower-envelope observations from visits 3/4 with its final two visits, avoiding the initial asset/cache loading cycles. Predeclared **triage** flags: engine growth > max(64 MB, 10%); Lua GC heap growth > max(16 MiB, 25%); instance growth > max(500, 5%). These are investigation thresholds, not universal budgets or proof of no leaks. Retained population expansion is reported separately. Inspect tag curves, GC sawtooth, live objects and workload before attributing growth to a leak. Category-level values are retained even when the summary screen is quiet.
+
+The official [Stats API](https://create.roblox.com/docs/reference/engine/classes/Stats) documents MemoryTrackingEnabled, GetMemoryUsageMbForTag, InstanceCount and total memory. The harness checks tracking availability before using category counters. Total memory comes from OS reporting and can exclude paged-out memory; tag sums are not an equality check against that total. LuaHeap includes core and custom scripts. [Roblox memory guidance](https://create.roblox.com/docs/studio/optimization/memory-usage) describes the category/snapshot tools. Native focus tracking uses [WindowFocusReleased](https://create.roblox.com/docs/reference/engine/classes/UserInputService).
+
+## Source and safety boundaries
+
+`build.py --source COMMIT --rojo ABS_EXE --out NEW_ABS_DIRECTORY` archives immutable Git source and verifies all 216 production modules. It injects only driver.luau, disables the production Persistence script, rejects duplicate instance paths, and creates exact guards for both profiles. Each native guard verifies all 217 script fingerprints, attributes and disabled persistence before Play. **Never publish these places.** They are rejected by the game's production release checks and are not the playable release XML.
+
+Final prepared directory: `C:\Users\natha\claude-xfer\Windowsill-memory-trace-v1b`. The long place SHA-256 is `a60ea467fb340ebea2a1165b2de0cb91f4911c85caff60cbee5e26bb8f1261c5`; the rehearsal SHA-256 is `9a6af0b64ae15c9b2c693ee9777f18c1a055dc385d5b24a05d7d6d900f9734da`. Earlier v1 files were preparation only and were never run. The final rehearsal was stopped, saved into an archive, and original package bytes restored before Studio closed. The long run starts in a fresh Studio process, with no heavy CLI suites running. A small unused startup-dialog process remains; origin metadata records this environmental limit.
+
+This is desktop Studio evidence, not physical-phone performance, online DataStore rejoin, standalone-client memory or a measured speedup. Persistence is disabled throughout. The earlier v6 matrix stays frozen and is not modified by this harness.
+
+## Rehearsal and collector
+
+Run `1792665646453` completed 90.077 seconds, 29 full visits across all seven habitats and seven interval samples, with all CRCs/source checks/activity/focus checks passing. `smoke-v1b-events.txt`, `smoke-v1b.json` and `manifest-v1b.json` retain the proof. Its memory_gate_evidence is explicitly false.
+
+`collect.py LOG --manifest MANIFEST --run-id ID --out NEW_JSON` reconstructs chunk lengths/checksums, source/configuration, ordered visits, memory tags, clock/activity and focus. Incomplete native runs exit nonzero. Ten collector tests cover real captured rehearsal data and deliberately corrupted/missing/mislabelled records, plus synthetic long/growth cases. Synthetic unit records are never native evidence. An initial mutation test changed a string absent from the fixture; that test setup failure is retained in collector-tests-initial.txt, and the corrected mutation now changes an actual payload byte.
+
+`watch.py` only observes the existing native log. It never starts, stops or restarts Studio. An observation timeout does not prove that the native run stopped. Poll the same observer/run, inspect authoritative state, and do not restart on a timeout. long-v1b-origin.json identifies the live run and observer; a metadata file alone is not liveness proof. No completed 30-minute result is claimed until the terminal records and collector gate pass.

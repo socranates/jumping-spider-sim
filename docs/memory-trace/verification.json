@@ -1,0 +1,16 @@
+{
+  "source": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+  "source_modules": 216,
+  "diagnostic_script_count": 217,
+  "smoke_verified": true,
+  "collector_tests": 10,
+  "rehearsal_duration": 90.07746870000847,
+  "long_complete": false,
+  "memory_gate_evidence": false,
+  "growth_screen": "pending",
+  "live_metadata_is_not_liveness_proof": true,
+  "performance_speedup_claim": false,
+  "phone_verified": false,
+  "published": false,
+  "publication_ready": false
+}

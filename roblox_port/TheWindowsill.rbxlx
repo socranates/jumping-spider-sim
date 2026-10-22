@@ -49185,7 +49185,14 @@ local function checks(): { Check }
 				seen = true
 				local folder = Workspace:FindFirstChild("PondAnimals")
 				local body = if folder ~= nil then folder:FindFirstChild("GreenFrog") else nil
-				need(body ~= nil and #body:GetChildren() >= 20, "the frog is not drawn")
+    local required={"Body","Head","Snout","EyeL","EyeR","ArmL","ArmR","ForearmL","ForearmR","ThighL","ThighR","ShankL","ShankR","FootL","FootR"}
+    if r.ctx.detail~="low" then
+     for _,name in {"Belly","Throat","PupilL","PupilR","TympanumL","TympanumR","RidgeL","RidgeR","MottleL","MottleR","HandL","HandR","BandL","BandR","ToesL","ToesR","Mottle"} do table.insert(required,name) end
+    end
+    for _,name in required do
+     local part=if body then body:FindFirstChild(name) else nil
+     need(part~=nil and part:IsA("BasePart") and part.Transparency<1 and part.Position.Y>-500,"frog missing drawn "..name.." at "..tostring(r.ctx.detail))
+    end
 			end)
 			frog.enabled = false
 			if not ok then error(err, 0) end

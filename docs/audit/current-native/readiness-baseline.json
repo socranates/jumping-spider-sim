@@ -1,0 +1,9 @@
+{
+  "source": "359618f4e73ed33db922081597bacb7536a9d15d",
+  "runtime_source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "passed": 0,
+  "failed": 3,
+  "exit": 1,
+  "scope": "CLI component proof: already-cached non-station creature gate permits missing/partial geometry; no actual stream-out engine behavior proven",
+  "probe_sha256": "968a04356322b2d4555f4bb616abba1fc5f6f6d422a85de5abcd257409ea8c83"
+}

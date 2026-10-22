@@ -1,0 +1,15 @@
+# Current-source native preserve walkthrough
+
+Source068a87891770dbdf291ec3cab0e67480d14c0251, unchanged222 production scripts. A full-detail Studio run on2026-10-22 completed274 passed/0 failed/0 skipped in594seconds. It visited all233 region spawns with complete-piece arrival, real raycast support, stable attachment and region ownership checks. Existing scripted walking, ceiling, station exit, mown path/boardwalk, creatures, camera fallback, local rest/restore, eating and starvation-handler checks also passed. Zero CreatorErrors between the source guard and terminal END marker. This is scripted native evidence, not exhaustive manual seam/clipping/device review, natural hatch-to-generation progression or online durability.
+
+Production Persistence was disabled; PlaceId0 preflight verified all222 source fingerprints before Play. No heavy CLI ran during the walkthrough. A pre-existing stopped rig window94504044 remained; no new resource warning was observed. Diagnostic window38470806 was stopped, saved, closed and exited; the Studio serialization was archived, and the original XML/hash restored. Never publish this test place.
+
+Archive: C:/Users/natha/claude-xfer/Windowsill-current-native-068a878-full/Windowsill-current-native-review.rbxlx. SHA2565f3b291e4489f8859aa3f38f5bba3368e5b0de6493c42692220743d6a0b28902. Build and collection scripts, prepared manifest/guard, bounded output, receipt and closure hashes are retained here. All274 PASS rows and the END count must agree; the presence of END alone is not success.
+
+The late sill sample averaged23.9ms; removing far-preserve folders gave24.4ms, and temporarily disabling shadows17.6ms. These are short sequential observations in one desktop Studio viewport after a long traversal, with varying heaps and scene residency. They suggest investigating shadow/render cost, not disabling the requested lighting or claiming a causal FPS gain. The full render-step profile and allocation observations are retained in full-receipt.json.
+
+## Separate streaming-cache regression
+
+After closing the timed run, readiness-repro.luau exercised the actual WorldClient component under the CLI shim. All three desired safety assertions fail on068a878: a previously-ready non-station creature gate admits a removed region model, a missing collision piece, and partial re-arrival. regionReady itself correctly reports false; creatureLive returns its stale whole flag first. The earlier native walkthrough did not force these stream-out cases, so its274 passes do not refute this finding. The existing station path uses deliberately Persistent geometry and has a separate cache contract.
+
+readiness-baseline.txt/json retain the failing proof. Fix and test the non-station gate, including complete re-arrival. Do not describe this component finding as proof of the cause of the user's observed falls. Low-tier native, actual streaming pressure/re-arrival, physical devices, natural full lifecycle, migration and release remain open. No production code or published place changed in this evidence stage.

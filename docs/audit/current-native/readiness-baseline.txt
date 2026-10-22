@@ -1,0 +1,8 @@
+FAIL STREAM_READINESS atomic folder leaves after first arrival: C:/Users/natha/AppData/Local/Temp/tmps6rge9db.luau:56420: resident still simulates on streamed-out geometry
+FAIL STREAM_READINESS one collision piece leaves after first arrival: C:/Users/natha/AppData/Local/Temp/tmps6rge9db.luau:56425: resident still simulates on partial geometry
+FAIL STREAM_READINESS partial rearrival refuses then resumes same creature gate: C:/Users/natha/AppData/Local/Temp/tmps6rge9db.luau:56430: partial replacement treated as ready
+STREAM_READINESS: 0 passed, 3 failed
+stream readiness regression
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmps6rge9db.luau:56435

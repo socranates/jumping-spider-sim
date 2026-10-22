@@ -93,8 +93,8 @@ for p in SOURCES:
             out.append(f"| `{rel(p)}` | {i} | `{line.strip().replace('|','/')[:300]}` |\n")
 if (OUT/'DATA.md').exists():
     out.append('\n' + (OUT/'DATA.md').read_text(encoding='utf-8'))
-(OUT/'MAP.md').write_text(''.join(out),encoding='utf-8')
-(OUT/'inventory.json').write_text(json.dumps(dict(source=SOURCE,branch=BRANCH,baseline=baseline,modules=records,cycles=sorted(cycles)),indent=2),encoding='utf-8')
+(OUT/'MAP.md').write_text(''.join(out),encoding='utf-8',newline='\n')
+(OUT/'inventory.json').write_text(json.dumps(dict(source=SOURCE,branch=BRANCH,baseline=baseline,modules=records,cycles=sorted(cycles)),indent=2)+"\n",encoding='utf-8',newline='\n')
 branches=subprocess.run(['git','branch','--all','--format=%(refname:short) %(objectname)'],cwd=ROOT,capture_output=True,text=True,check=True)
-(OUT/'branches.txt').write_text(branches.stdout,encoding='utf-8')
+(OUT/'branches.txt').write_text(branches.stdout,encoding='utf-8',newline='\n')
 print(f'Indexed {len(records)} files; {sum(r["lines"]>800 for r in records)} over 800 lines; {sum(not r["tests"] for r in records)} without direct test imports; {len(cycles)} lexical cycles.')

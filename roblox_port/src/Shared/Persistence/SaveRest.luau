@@ -14,7 +14,27 @@ local SaveEnvelope = require(script.Parent.SaveEnvelope)
 
 local SaveRest = {}
 
-SaveRest.SCHEMA = 1
+-- Schema 2 accepts a checksummed {save_retired=true,save_life=token} marker or a checkpoint with optional save_life.
+-- The identity is storage metadata, not simulation state. Schema 1 migrates without changing its checkpoint.
+-- Older readers must refuse schema 2, preserving the marker and its previous-checkpoint backup.
+SaveRest.SCHEMA = 2
+function SaveRest.validLife(token: any): boolean
+ return type(token)=="string" and #token>=1 and #token<=SaveRules.MAX_LIFE_TOKEN_CHARS and string.match(token,"^[%w_:%.%-]+$")~=nil
+end
+function SaveRest.isRetired(payload: any): boolean
+ return type(payload)=="table" and payload.save_retired==true
+end
+local function validateStored(mode: string,payload: any): ({string},any?)
+ if SaveRest.isRetired(payload) then
+  if not SaveRest.validLife(payload.save_life) then return {"invalid retired life identity"},nil end
+  for key in payload do if key~="save_retired" and key~="save_life" then return {"unknown retirement field"},nil end end
+  return {},payload
+ end
+ if type(payload)=="table" and (payload.save_retired~=nil or (payload.save_life~=nil and not SaveRest.validLife(payload.save_life))) then
+  return {"invalid life identity"},nil
+ end
+ return SaveRest.check(mode,payload),payload
+end
 
 -- Counts the values in `v` and refuses anything that is not a plain string, boolean, finite number or table without a metatable, a
 -- table met twice, or a structure deeper than `maxDepth` or larger than `maxNodes`. Cheap and bounded: a hostile payload is stopped
@@ -67,6 +87,7 @@ SaveRest.stubWorld = stubWorld
 function SaveRest.check(mode: any, record: any): { string }
 	if mode ~= "main" and mode ~= "free" and mode ~= "easy" then return { "unknown mode" } end
 	if type(record) ~= "table" then return { "the rest is not a table" } end
+ if record.save_retired~=nil or (record.save_life~=nil and not SaveRest.validLife(record.save_life)) then return {"reserved or invalid life identity"} end
 	local why = SaveRest.bounded(record, SaveRules.MAX_REST_NODES, SaveRules.MAX_DEPTH)
 	if why then return { why } end
 	local text, err = Json.canonical(record)
@@ -89,8 +110,8 @@ end
 function SaveRest.spec(mode: string): SaveEnvelope.Spec
 	return {
 		kind = "rest_" .. mode, current = SaveRest.SCHEMA,
-		migrations = {} :: { [number]: (any) -> any },
-		validate = function(payload: any): ({ string }, any?) return SaveRest.check(mode, payload), payload end,
+		migrations = { [1] = function(payload: any): any return payload end } :: { [number]: (any) -> any },
+  validate = function(payload: any): ({ string }, any?) return validateStored(mode,payload) end,
 	}
 end
 

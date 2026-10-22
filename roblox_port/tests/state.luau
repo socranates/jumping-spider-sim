@@ -16,6 +16,7 @@ local Json = require("../src/Shared/Persistence/Json")
 local SaveRules = require("../src/Shared/Data/SaveRules")
 local SaveStores = require("../src/Shared/Persistence/SaveStores")
 local MemoryBackend = require("../src/Shared/Persistence/MemoryBackend")
+local SaveClient = require("../src/Client/SaveClient")
 local SaveEnvelope = require("../src/Shared/Persistence/SaveEnvelope")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 local SettingsModel = require("../src/Shared/UI/SettingsModel")
@@ -1828,6 +1829,133 @@ case("audit: rejected rests reach the client and cannot erase the earlier stored
 	srv.service:onMessage(p, { kind = "rest", mode = "main", record = rest })
 	tickServer(e, srv, 15)
 	check(srv.service:statusOf(p) == "saved", "a later accepted rest can recover online saving")
+end)
+
+
+case("retirement records preserve old checkpoints and reject old readers",function()
+ local rec=realRest(120,"main")
+ local spec=SaveRest.SPECS.main
+ local marker={save_retired=true,save_life="session:main:1"}
+ local tombstone=SaveEnvelope.make(spec,marker,100,SaveEnvelope.make(spec,rec,90,nil))
+ check(SaveEnvelope.open(spec,tombstone).status=="ok","retirement is a valid schema-2 value")
+ local old={kind=spec.kind,current=1,migrations={},validate=spec.validate}
+ check(SaveEnvelope.open(old,tombstone).status=="newer","old reader refuses retirement before parsing it")
+ check(canon(SaveEnvelope.open(spec,tombstone.backup and {format=tombstone.format,kind=tombstone.kind,schema=tombstone.backup.schema,updatedAt=tombstone.backup.updatedAt,payload=tombstone.backup.payload,checksum=tombstone.backup.checksum}).payload)==canon(rec),"previous life retained as recoverable backup")
+ local bad=SaveEnvelope.make(spec,{save_retired=true,save_life="a",extra=true},100,nil)
+ check(SaveEnvelope.open(spec,bad).status=="invalid","unknown retirement fields refused")
+ local legacy=SaveEnvelope.make(old,rec,90,nil)
+ check(SaveEnvelope.open(spec,legacy).status=="migrated" and canon(SaveEnvelope.open(spec,legacy).payload)==canon(rec),"schema-1 checkpoint migrates without changing state")
+end)
+case("New Life retires durably before acknowledgement, binds later rests, and survives quit",function()
+ local e=newEnv();local acknowledgements={}
+ local a=newSession(e,901,"A",{onLife=function(mode,serial,token)
+  table.insert(acknowledgements,{mode,serial,token})
+  check(e.backend.data["R_901_main"].payload.save_life==token,"ack follows actual durable write")
+ end})
+ a:load();local old=realRest(120,"main");a:setRest("main",old);run(e,a,15)
+ local oldBytes=canon(e.backend.data["R_901_main"].payload)
+ check(a:beginLife("main",1),"New Life intent accepted")
+ check(#acknowledgements==0 and a:snapshot().rests.main==nil,"not acknowledged before write; old rest not offered")
+ check(not a:setRest("main",old) and not a:setRestForLife("main",old,"wrong"),"prior life cannot enqueue another rest")
+ a:flush()
+ check(#acknowledgements==1,"retirement acknowledged once committed")
+ local value=e.backend.data["R_901_main"]
+ check(value.payload.save_retired==true and canon(value.backup.payload)==oldBytes,"marker kept instead of deleting the prior rest")
+ e.t+=40;local b=newSession(e,901,"B");b:load()
+ check(b:snapshot().rests.main==nil,"quitting before the first new rest cannot revive old life")
+ local token=b:snapshot().lives.main
+ check(token==acknowledgements[1][3],"life identity persists across sessions")
+ check(not b:setRestForLife("main",old,"A:old") and not b:setRest("main",old),"late old records rejected after rejoin")
+ check(b:setRestForLife("main",old,token),"same-life resumed record can be kept")
+ b:flush()
+ check(e.backend.data["R_901_main"].payload.save_life==token and not e.backend.data["R_901_main"].payload.save_retired,"new rest replaces retirement marker with same identity")
+end)
+case("New Life retry after a lost write response is idempotent",function()
+ local e=newEnv();local ack={};local a=newSession(e,902,"A",{onLife=function(_,serial) table.insert(ack,serial) end})
+ a:load();a:setRest("main",realRest(120,"main"));run(e,a,15)
+ local update=e.backend.update;local lose=true
+ e.backend.update=function(self,key,fn)
+  local ok,value,err=update(self,key,fn)
+  if key=="R_902_main" and lose then lose=false;return false,nil,"lost response" end
+  return ok,value,err
+ end
+ a:beginLife("main",1);run(e,a,1)
+ check(#ack==0 and a.lifeRequests.main.done==false,"ambiguous response never acknowledges retirement")
+ local backup=canon(e.backend.data["R_902_main"].backup)
+ run(e,a,20)
+ check(#ack==1 and a.lifeRequests.main.done,"retry confirms durable marker")
+ check(canon(e.backend.data["R_902_main"].backup)==backup,"retry never replaces old-life backup with a duplicate marker")
+ check(a:beginLife("main",1) and #ack==2,"duplicate request resends acknowledgement")
+ check(not a:beginLife("main",0) and not a:beginLife("main",0/0) and not a:beginLife("unknown",2),"invalid intents refused")
+end)
+case("a newer New Life choice supersedes an in-flight older acknowledgement",function()
+ local e=newEnv();local ack={};local a=newSession(e,903,"A",{onLife=function(_,serial) table.insert(ack,serial) end})
+ a:load();a:setRest("main",realRest(120,"main"));run(e,a,15)
+ local update=e.backend.update;local replace=true
+ e.backend.update=function(self,key,fn)
+  local ok,value,err=update(self,key,fn)
+  if key=="R_903_main" and replace then replace=false;a:beginLife("main",2) end
+  return ok,value,err
+ end
+ a:beginLife("main",1);run(e,a,1)
+ check(#ack==0 and a.lifeRequests.main.serial==2,"late response does not acknowledge superseded life")
+ check(a:snapshot().rests.main==nil,"no transient prior rest exposed")
+ run(e,a,20)
+ check(#ack==1 and ack[1]==2,"only latest intent acknowledged")
+ check(not a:beginLife("main",1),"reordered old intent refused")
+end)
+case("retirement obeys foreign locks and preserves damaged records",function()
+ local e=newEnv();local a=newSession(e,904,"A");a:load();a:setRest("main",realRest(120,"main"));run(e,a,15)
+ local b=newSession(e,904,"B");b:load();b:beginLife("main",1);local before=canon(e.backend.data["R_904_main"])
+ run(e,b,20);check(canon(e.backend.data["R_904_main"])==before and not b.lifeRequests.main.done,"foreign lease cannot retire another session's life")
+ e.backend.data["R_904_main"].checksum="broken";before=canon(e.backend.data["R_904_main"])
+ a:beginLife("main",1);run(e,a,20)
+ check(canon(e.backend.data["R_904_main"])==before and a.state=="session" and not a.lifeRequests.main.done,"damaged record never replaced by a retirement marker")
+end)
+
+case("rest messages cannot forge retirement and foreign epochs cannot race equal timestamps",function()
+ local e=newEnv();local a=newSession(e,905,"A");a:load();local rec=realRest(120,"main")
+ local forged=Json.copy(rec);forged.save_retired=true;forged.save_life="A:forged"
+ check(not a:setRest("main",forged),"checkpoint-shaped client payload cannot create retirement marker")
+ a:beginLife("main",1);run(e,a,15)
+ local token=a.lifeTokens.main;local old=e.backend.data["R_905_main"]
+ local foreign=SaveEnvelope.make(SaveRest.SPECS.main,{save_retired=true,save_life="B:main:1"},old.updatedAt,old,{session="B"})
+ e.backend.data["R_905_main"]=foreign;local before=canon(foreign)
+ check(a:setRestForLife("main",rec,token),"old session can queue before discovering new owner")
+ run(e,a,20)
+ check(canon(e.backend.data["R_905_main"])==before and a.reason=="other_session","foreign life identity prevents overwrite even with equal timestamps")
+end)
+
+case("retiring one slot preserves the other two byte for byte",function()
+ local e=newEnv();local a=newSession(e,906,"A");a:load()
+ for _,mode in {"main","free","easy"} do check(a:setRest(mode,realRest(120,mode)),"seed "..mode) end
+ run(e,a,20)
+ local free,easy=canon(e.backend.data["R_906_free"]),canon(e.backend.data["R_906_easy"])
+ a:beginLife("main",1);run(e,a,20)
+ check(canon(e.backend.data["R_906_free"])==free and canon(e.backend.data["R_906_easy"])==easy,"other slots untouched")
+ check(a:snapshot().rests.main==nil and a:snapshot().rests.free~=nil and a:snapshot().rests.easy~=nil,"only retired Continue is hidden")
+end)
+case("real SaveClient and SaveService carry durable intent and same-life rest end to end",function()
+ local e=newEnv();local srv=newServer(e);local p=player(907);srv.service:addPlayer(p)
+ local deliver
+ local remotes={server={FireServer=function(_,msg) srv.service:onMessage(p,msg) end},client={OnClientEvent={Connect=function(_,fn) deliver=fn end}}}
+ local send=srv.service.cfg.send
+ srv.service.cfg.send=function(who,msg) send(who,msg);if who==p and deliver then deliver(msg) end end
+ local client=SaveClient.new({rules=SaveRules,now=e.now,findRemotes=function() return remotes end,
+  onLoaded=function() end,onRest=function() end,onStatus=function() end,build=SaveProgress.default})
+ client:update();check(client:connected(),"real hello/load exchange completed")
+ local rec=realRest(120,"main")
+ client:beginLife("main");client:sendRest("main",rec);client:update()
+ check(srv.last(p,"life")==nil and e.backend.data["R_907_main"]==nil,"no early acknowledgement or premature rest")
+ tickServer(e,srv,2)
+ local ack=srv.last(p,"life");check(ack and client.lifeRequests.main.done and e.backend.data["R_907_main"].payload.save_retired,"actual stored marker acknowledges client intent")
+ client:update();tickServer(e,srv,15)
+ check(e.backend.data["R_907_main"].payload.save_life==ack.token and not e.backend.data["R_907_main"].payload.save_retired,"queued rest crosses real service boundary only in new life")
+ local before=canon(e.backend.data["R_907_main"])
+ srv.service:onMessage(p,{kind="rest",mode="main",record=rec,life="wrong"});tickServer(e,srv,15)
+ check(canon(e.backend.data["R_907_main"])==before,"late foreign-life message never changes stored rest")
+ srv.service:removePlayer(p);e.t+=40
+ local rejoined=newSession(e,907,"rejoin");check(rejoined:load()=="active" and rejoined.lifeTokens.main==ack.token,"life identity survives full service leave/rejoin")
 end)
 
 print(`STATE passed={passed} failed={failed}`)

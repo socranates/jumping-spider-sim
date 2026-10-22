@@ -58,6 +58,7 @@ SRC = HERE.parent / "src" / "Shared"
 
 # Shared modules in dependency order: name -> path under src/Shared.
 MODULES = [
+    ("SaveClient", "../Client/SaveClient.luau"),
     ("RareLedger", "Life/RareLedger.luau"),
     ("RareSightings", "Data/RareSightings.luau"),
     ("Environment", "World/Environment.luau"),
@@ -265,7 +266,6 @@ CLIENT_MODULES = [
     ("PondBodies", "../Client/PondBodies.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
-    ("SaveClient", "../Client/SaveClient.luau"),
     ("FrameProfile", "../Client/FrameProfile.luau"),
     ("LookStream", "../Client/LookStream.luau"),
     ("TrainPass", "../Client/TrainPass.luau"),

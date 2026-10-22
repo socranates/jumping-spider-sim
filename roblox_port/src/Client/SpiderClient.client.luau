@@ -832,6 +832,10 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
+ if saveClient~=nil and not saveState.broken then
+  local sent,problem=pcall(function() saveClient:beginLife(slot) end)
+  if not sent then saveState.fail(problem) end
+ end
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
  if M.cat then M.cat:load(M.Cat.defaultRecord()) end -- (ROBLOX-118: a new life meets the cat anew)
@@ -1104,7 +1108,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="New" or choice=="Easy" then
   if session.started and confirming~=choice then
    confirming=choice
-   menu:showChoices("Begin a new life?",if choice=="Easy" then "This replaces the Easy life's last rest as soon as the new spider rests. The standard life's last rest is kept." else "This replaces the standard life's last rest as soon as the new spider rests. The Easy life's last rest is kept.","",
+   menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end

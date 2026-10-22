@@ -176,6 +176,12 @@ for _, p in Layout.PIECES do table.insert(pieces, { name = p.id, lo = p.lo, hi =
 BoxWorld.folder("Windowsill", pieces)
 workspace:SetAttribute("SaveWait", true)
 local R = fakeRemotes()
+-- The real-client transport fixture acknowledges intents; durability itself is exercised in state.luau.
+local remember=R.server.FireServer
+R.server.FireServer=function(self,msg)
+ remember(self,msg)
+ if msg.kind=="begin_life" then R.deliver({kind="life",mode=msg.mode,serial=msg.serial,token=`fixture:{msg.mode}:{msg.serial}`}) end
+end
 local remotesFolder = Instance.new("Folder")
 remotesFolder.Name = SaveRules.REMOTES_NAME
 local toServer = Instance.new("Folder")
@@ -208,6 +214,24 @@ local function realWait(seconds: number)
 	local t0 = os.clock()
 	while os.clock() - t0 < seconds do end
 end
+
+case("New Life waits for its durable acknowledgement and discards stale replies",function()
+ local c=newClient();c.remotes=fakeRemotes();c.client:update()
+ c.remotes.deliver({kind="loaded",status="saved",progress={},rests={},lives={main="prior"}})
+ c.client:sendRest("main",{old=true});c.client:beginLife("main");c.client:sendRest("main",{young=true});c.client:update()
+ local sent=c.remotes.fired;local intent=sent[#sent]
+ check(intent.kind=="begin_life" and intent.serial==1,"retirement sent first")
+ check(select(1,c.client:status())=="saving","unacknowledged retirement cannot claim Saved")
+ for _,m in sent do check(m.kind~="rest","no rest sent ahead of retirement") end
+ c.client:beginLife("main");c.client:sendRest("main",{newest=true});c.client:update()
+ c.remotes.deliver({kind="life",mode="main",serial=1,token="stale"});c.client:update()
+ check(not c.client.lifeRequests.main.done,"stale acknowledgement ignored")
+ c.remotes.deliver({kind="life",mode="main",serial=2,token="current"});c.client:update()
+ local rest=c.remotes.fired[#c.remotes.fired]
+ check(rest.kind=="rest" and rest.life=="current" and rest.record.newest==true and rest.record.old==nil,"only new-life rest sent with acknowledged identity")
+ c.remotes.deliver({kind="loaded",status="saved",progress={},rests={},lives={main="prior"}})
+ check(c.client.lifeTokens.main=="current","delayed load cannot downgrade life identity")
+end)
 
 -- a real rest from the same kind of world the client runs
 local Motor = require("../src/Shared/Movement/SpiderMotor")

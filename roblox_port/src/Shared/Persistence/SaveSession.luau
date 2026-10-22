@@ -33,7 +33,7 @@ SaveSession.__index = SaveSession
 export type Config = {
 	backend: any, userId: number | string, sessionId: string, now: () -> number,
 	sleep: ((number) -> ())?, log: ((string) -> ())?, progressSpec: SaveEnvelope.Spec?, -- (a test may hand in a later schema)
-	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?,
+	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?, onLife: ((string,number,string) -> ())?,
 }
 
 
@@ -52,7 +52,7 @@ function SaveSession.new(cfg: Config): any
 		sched = sched,
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
-		rests = {} :: { [string]: any },
+		rests = {} :: { [string]: any }, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any},
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
@@ -178,20 +178,29 @@ local function readRests(self: any)
 				self.restLoaded[mode] = true
 				if op.status == "ok" or op.status == "migrated" then
 					self.restBase[mode] = op.updatedAt
-					self.rests[mode] = op.payload
+					self.lifeTokens[mode] = op.payload.save_life
+     self.rests[mode] = if SaveRest.isRetired(op.payload) then nil else op.payload
 				elseif op.status == "missing" then
 					self.restBase[mode] = 0
+     self.lifeTokens[mode],self.rests[mode]=nil,nil
 				else
 					-- A readable backup is offered in memory only. Preserve the original unreadable record for recovery.
 					self.restBase[mode] = op.updatedAt or 0
 					local b = op.backup
-					if b and (b.status == "ok" or b.status == "migrated") then self.rests[mode] = b.payload end
+					if b and (b.status == "ok" or b.status == "migrated") and not SaveRest.isRetired(b.payload) then self.rests[mode] = b.payload end
 					log(self, `the {mode} rest is {op.status}: {op.reasons[1] or ""}`)
 					self:demote(if op.status == "newer" then "newer" else "corrupt", false)
 				end
-				-- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
+				local request=self.lifeRequests[mode]
+    local queued=self.restPending[mode]
+    if (request and request.done and request.token~=self.lifeTokens[mode])
+     or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode]) then
+     self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world
+    end
+    if request and not request.done then self.rests[mode]=nil end
+    -- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
 				local pending = self.restPendingTime[mode]
-				if pending ~= nil and (self.restBase[mode] or 0) > pending then
+				if pending ~= nil and not SaveRest.isRetired(self.restPending[mode]) and (self.restBase[mode] or 0) > pending then
 					self.restPending[mode], self.restPendingTime[mode] = nil, nil
 					self.sched.items["rest_" .. mode].dirty = false
 				end
@@ -263,9 +272,38 @@ function SaveSession.setProgress(self: any, payload: any): boolean
 	return true
 end
 
-function SaveSession.setRest(self: any, mode: string, record: any): boolean
+-- A session-local increasing intent makes retries idempotent and later New Life choices supersede earlier ones.
+-- The marker goes through the same guarded UpdateAsync and backup path as a rest; never DeleteAsync.
+function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
+ if self.closed or SaveRest.SPECS[mode]==nil or type(serial)~="number" or serial~=serial or serial<1 or serial>SaveRules.MAX_LIFE_SERIAL or serial~=math.floor(serial) then return false end
+ local prior=self.lifeRequests[mode]
+ if prior and serial<prior.serial then return false end
+ if prior and serial==prior.serial then
+  if prior.done and self.cfg.onLife then pcall(self.cfg.onLife,mode,serial,prior.token) end
+  return true
+ end
+ local token=`{self.id}:{mode}:{serial}`
+ if not SaveRest.validLife(token) then return false end
+ self.lifeRequests[mode]={serial=serial,token=token,done=false}
+ self.rests[mode],self.restRejected[mode]=nil,nil
+ self.restPending[mode]={save_retired=true,save_life=token}
+ self.restPendingTime[mode]=self.now()
+ self.sched:markDirty("rest_"..mode,self.now());self:notify()
+ return true
+end
+
+-- Legacy callers intentionally have no life credential; extra Lua return values are ignored here.
+function SaveSession.setRest(self: any,mode: string,record: any): boolean
+ return self:setRestForLife(mode,record,nil)
+end
+function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeToken: string?): boolean
 	if self.closed or SaveRest.SPECS[mode] == nil then return false end
-	local problems = SaveRest.check(mode, record)
+ local request=self.lifeRequests[mode]
+ if (request and not request.done) or lifeToken~=self.lifeTokens[mode] then
+  self.counters.rejected+=1
+  return false -- never let a late prior-life rest cross a retirement boundary
+ end
+ local problems = SaveRest.check(mode, record)
 	if #problems > 0 then
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
@@ -275,7 +313,10 @@ function SaveSession.setRest(self: any, mode: string, record: any): boolean
 	end
 	local now = self.now()
 	self.restRejected[mode] = nil
-	self.restPending[mode], self.restPendingTime[mode] = record, now
+	local stamped={}
+ for key,value in record do stamped[key]=value end
+ stamped.save_life=self.lifeTokens[mode]
+ self.restPending[mode], self.restPendingTime[mode] = stamped, now
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()
 	return true
@@ -348,18 +389,27 @@ local function writeRest(self: any, mode: string): boolean
 		self.sched.items[name].dirty = false
 		return true
 	end
-	local now = self.now()
-	local version = self.sched:begin(name, now)
+	if not SaveRest.isRetired(record) and record.save_life~=self.lifeTokens[mode] then
+  self.restPending[mode],self.restPendingTime[mode]=nil,nil
+  self.sched:abandon(name);self:demote("other_session",false)
+  return false
+ end
+ local now = self.now()
+ local version = self.sched:begin(name, now)
 	self.counters.requests += 1
 	local spec = SaveRest.SPECS[mode]
 	local outcome = ""
 	local newTime = now
+ local expectedLife=self.lifeTokens[mode]
 	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
 		outcome = ""
 		local op = SaveEnvelope.open(spec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
 		if op.status == "corrupt" or op.status == "invalid" then outcome = "corrupt"; return nil end
-		local base = self.restBase[mode]
+		if (op.status=="ok" or op.status=="migrated") and op.payload.save_life~=expectedLife and op.session~=self.id then
+   outcome="superseded";return nil -- life identities protect even simultaneous writes with equal timestamps
+  end
+  local base = self.restBase[mode]
 		if (op.status == "ok" or op.status == "migrated") and base ~= nil and (op.updatedAt or 0) > base and op.session ~= self.id then
 			outcome = "superseded"
 			return nil
@@ -389,8 +439,14 @@ local function writeRest(self: any, mode: string): boolean
 	end
 	if outcome == "ok" then
 		self.restBase[mode] = newTime
-		self.rests[mode] = record
-		if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode] = nil, nil end
+		self.lifeTokens[mode]=record.save_life
+  self.rests[mode] = if SaveRest.isRetired(record) then nil else record
+  local request=self.lifeRequests[mode]
+  if SaveRest.isRetired(record) and request and request.token==record.save_life then
+   request.done=true
+   if self.cfg.onLife then pcall(self.cfg.onLife,mode,request.serial,request.token) end
+  end
+  if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode] = nil, nil end
 		self.sched:succeeded(name, now, version)
 		self.counters.writes += 1
 		return true
@@ -502,8 +558,11 @@ end
 function SaveSession.snapshot(self: any): any
 	local status, reason = self:status()
 	local rests: { [string]: any } = {}
-	for _, mode in SaveRules.MODES do rests[mode] = self.rests[mode] end
-	return { status = status, reason = reason, progress = self.progress, rests = rests }
+	for _, mode in SaveRules.MODES do
+  local request=self.lifeRequests[mode]
+  if not request or request.done then rests[mode]=self.rests[mode] end
+ end
+ return { status = status, reason = reason, progress = self.progress, rests = rests, lives = Json.copy(self.lifeTokens) }
 end
 
 -- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.

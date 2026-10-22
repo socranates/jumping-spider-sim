@@ -8,6 +8,7 @@
 --   * waiting(): the start menu may wait while this is true: the remotes are being looked for (CLIENT_WAIT_REMOTES seconds) or the first reply
 --     is awaited (CLIENT_WAIT_REPLY seconds). It is never true for long.
 --   * status(): ("saved" | "saving" | "session", reason). Before any reply: nil. With no server: ("session", "offline").
+-- beginLife(mode): discard old queued rests, retry a serial intent, and hold new rests until durable acknowledgement.
 -- `cfg.rules` is Data/SaveRules; `cfg.findRemotes()` returns { server, client } (RemoteEvents) or nil; the callbacks hand the server's messages up.
 local SaveClient = {}
 SaveClient.__index = SaveClient
@@ -22,7 +23,8 @@ function SaveClient.new(cfg: Config): any
 	local now = cfg.now()
 	return setmetatable({
 		cfg = cfg, born = now, remotes = nil :: any, phase = "searching", helloAt = -1e9, helloTries = 0,
-		lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
+		lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any}, lifeSerial = 0,
+  lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
 		st = nil :: string?, why = nil :: string?, sent = { progress = 0, rest = 0, hello = 0 },
 	}, SaveClient)
 end
@@ -32,12 +34,20 @@ local function receive(self: any, msg: any)
 	if msg.kind == "loaded" then
 		self.phase = "ready"
 		self.st, self.why = msg.status, msg.reason
-		self.cfg.onLoaded(msg)
+		if type(msg.lives)=="table" then
+   for mode,token in msg.lives do if not self.lifeRequests[mode] and type(token)=="string" then self.lifeTokens[mode]=token end end
+  end
+  self.cfg.onLoaded(msg)
 		self.cfg.onStatus(msg.status, msg.reason)
 	elseif msg.kind == "status" then
 		self.st, self.why = msg.status, msg.reason
 		self.cfg.onStatus(msg.status, msg.reason)
-	elseif msg.kind == "rest" then
+	elseif msg.kind == "life" then
+  local request=self.lifeRequests[msg.mode]
+  if request and request.serial==msg.serial and type(msg.token)=="string" and #msg.token>0 and #msg.token<=self.cfg.rules.MAX_LIFE_TOKEN_CHARS then
+   request.done=true;self.lifeTokens[msg.mode]=msg.token
+  end
+ elseif msg.kind == "rest" then
 		if type(msg.mode) == "string" then self.cfg.onRest(msg.mode, msg.record) end
 	end
 end
@@ -57,6 +67,13 @@ function SaveClient.markDirty(self: any)
 	self.dirty = true
 end
 
+function SaveClient.beginLife(self: any,mode: string)
+ self.lifeSerial+=1
+ self.lifeRequests[mode]={serial=self.lifeSerial,done=false,last=-1e9}
+ self.pendingRest[mode]=nil -- an unsent rest belongs to the life being retired
+ self.lastRest[mode]=nil
+end
+
 function SaveClient.sendRest(self: any, mode: string, record: any)
 	self.pendingRest[mode] = record
 end
@@ -70,7 +87,10 @@ function SaveClient.waiting(self: any): boolean
 end
 
 function SaveClient.status(self: any): (string?, string?)
-	if self.st ~= nil then return self.st, self.why end
+	if self.st ~= nil then
+  if self.st=="saved" then for _,request in self.lifeRequests do if not request.done then return "saving",nil end end end
+  return self.st,self.why
+ end
 	if self.phase == "searching" and self.cfg.now() - self.born >= self.cfg.rules.CLIENT_WAIT_REMOTES then return "session", "offline" end
 	if self.phase == "hello" and not self:waiting() then return "session", "offline" end
 	return nil, nil
@@ -106,12 +126,22 @@ function SaveClient.update(self: any)
 			self.remotes.server:FireServer({ kind = "progress", progress = payload })
 		end
 	end
-	for mode, record in self.pendingRest do
+	if self.phase=="ready" then
+  for mode,request in self.lifeRequests do
+   if not request.done and t-request.last>=rules.CLIENT_LIFE_GAP then
+    request.last=t
+    self.remotes.server:FireServer({kind="begin_life",mode=mode,serial=request.serial})
+   end
+  end
+ end
+ for mode, record in self.pendingRest do
+  local request=self.lifeRequests[mode]
+  if request and not request.done then continue end
 		if t - (self.lastRest[mode] or -1e9) >= rules.CLIENT_PROGRESS_GAP * 2 then
 			self.pendingRest[mode] = nil
 			self.lastRest[mode] = t
 			self.sent.rest += 1
-			self.remotes.server:FireServer({ kind = "rest", mode = mode, record = record })
+			self.remotes.server:FireServer({ kind = "rest", mode = mode, record = record, life = self.lifeTokens[mode] })
 		end
 	end
 end

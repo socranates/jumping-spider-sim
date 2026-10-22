@@ -9,6 +9,9 @@
 -- not anti-cheat: it is a solo game with no economy, so a dishonest client can only change its own player's save.
 --
 -- Client to server (ToServer): { kind = "hello", v } | { kind = "progress", progress } | { kind = "rest", mode, record }
+-- New Life: {kind="begin_life",mode,serial}; rest messages carry the acknowledged `life` token.
+-- Server acknowledges {kind="life",mode,serial,token} only after the retirement marker is stored.
+-- Loaded replies include `lives` by slot; retired slots have no rest to offer.
 -- Server to client (ToClient): { kind = "loaded", v, status, reason, progress, rests = { main?, free?, easy? } }
 --                              | { kind = "status", status, reason } | { kind = "rest", mode, record }
 local SaveRules = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("SaveRules"))
@@ -54,7 +57,7 @@ end
 
 local function loadedMessage(session: any): { [string]: any }
 	local snap = session:snapshot()
-	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests }
+	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives }
 end
 
 -- A player arrived: start their session (the load runs in its own thread) and wait for their hello.
@@ -63,7 +66,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	self.counter += 1
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
-	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), helloBucket = bucket(3, 0.2, now) }
+	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
 	entry.session = SaveSession.new({
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
@@ -73,7 +76,10 @@ function SaveService.addPlayer(self: any, player: Player)
 		onLoaded = function(_snap: any)
 			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry.session)) end
 		end,
-		onRest = function(mode: string, record: any)
+		onLife = function(mode: string,serial: number,token: string)
+   if entry.hello and not entry.leaving then sendTo(self,player,{kind="life",mode=mode,serial=serial,token=token}) end
+  end,
+  onRest = function(mode: string, record: any)
 			if entry.hello and not entry.leaving then sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
 		end,
 	})
@@ -109,10 +115,13 @@ local function handle(self: any, entry: any, msg: any)
 	elseif kind == "progress" then
 		if not take(entry.progressBucket, now) then self.stats.limited += 1; return end
 		if not entry.session:setProgress(msg.progress) then self.stats.dropped += 1 end
-	elseif kind == "rest" then
+	elseif kind == "begin_life" then
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if type(msg.mode)~="string" or not entry.session:beginLife(msg.mode,msg.serial) then self.stats.dropped+=1 end
+ elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
 		local mode = msg.mode
-		if type(mode) ~= "string" or not entry.session:setRest(mode, msg.record) then self.stats.dropped += 1 end
+		if type(mode) ~= "string" or not entry.session:setRestForLife(mode, msg.record,msg.life) then self.stats.dropped += 1 end
 	else
 		self.stats.dropped += 1
 	end

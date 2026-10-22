@@ -1,0 +1,12 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "run": "1792712576643",
+  "assertions": 20,
+  "scripts": 223,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "place_sha256": "2c6ef2e08fe04c598a2aee88f39523c8525e4d4d1ca5eade865a205fc08e521a",
+  "output_sha256": "77d8fd8a86c8bcb8dfa0aa7b2badbf71eca928f300504d9c5c7ed335b47be274",
+  "scope": "Actual-client checkpoint objects; synthetic corrupted copies; no persistent writes, arbitrary-state resume or complete spatial-field audit",
+  "published": false
+}

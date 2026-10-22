@@ -1,0 +1,20 @@
+{
+  "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
+  "current_workspace_inputs_verified": false,
+  "historical_snapshot_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 465388,
+  "linux_suites": 76,
+  "linux_passed": 465388,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_assertions": 22,
+  "native_scripts": 225,
+  "natural_network_stream_out_verified": false,
+  "current_full_native_walkthrough_verified": false,
+  "whole_game_fps_gain_proven": false,
+  "goal_complete": false,
+  "published": false
+}

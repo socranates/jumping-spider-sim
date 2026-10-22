@@ -1,0 +1,27 @@
+[NATIVE_ANIMAL_COST_GUARD] 59146e1005c083330455379766ab8c9dd2de2705 223 persistence_disabled
+[NATIVE_ANIMAL_COST_BEGIN] 1792712719676
+[NATIVE_ANIMAL_COST_SCENE] 1792712719676 sill_noon 711 12.001 6.263 12.405 1105 433
+[NATIVE_ANIMAL_COST_FRAME] 1792712719676 sill_noon 711 16.885 31.871
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon Soundscape.update 711 27.135000 0.179000 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon Soundscape.updateWasp 711 11.368500 0.112600 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon Soundscape.updateMeal 711 1.532400 0.037300 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon WaspBody.draw 711 234.718801 0.938300 10994.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon CrabBody.draw 711 3.143300 0.011100 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon StationMouseBody.draw 711 61.636001 0.442800 1698.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon PondBodies.draw 711 130.655200 0.637000 17145.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon BirdBody.draw 711 1.010199 0.020400 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 sill_noon CatBody.draw 711 61.974501 0.496200 6346.000
+[NATIVE_ANIMAL_COST_GROUP] 1792712719676 sill_noon 711 frames, the render step 6.26 ms a frame (worst 12.4): spider rig 2.23/4.2, sound 0.80/2.3, camera 0.48/1.6, light 0.44/5.4, hud 0.37/0.8, fly bodies 0.35/1.2, prey 0.28/1.2, wasp 0.26/7.4, other rigs 0.24/1.9, senses 0.22/1.0, rival 0.13/0.6, motor 0.10/0.4, life 0.06/0.2, save 0.05/0.2, small 0.24 (mean/worst ms); a frame: spider parts placed 654, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 202 KB a frame (percepts 2, senses 2, prey 2, wasp 3, rival 2, life 1, camera 2, light 11, spider rig 74, other rigs 4, hud 4, fly bodies 41, sound 51)
+[NATIVE_ANIMAL_COST_SCENE] 1792712719676 garden_mate 575 12.003 6.619 17.784 1105 433
+[NATIVE_ANIMAL_COST_FRAME] 1792712719676 garden_mate 575 20.877 47.192
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate Soundscape.update 575 9.209201 0.183500 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate Soundscape.updateWasp 575 21.360901 0.230800 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate Soundscape.updateMeal 575 1.376899 0.021800 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate WaspBody.draw 575 211.603501 0.868500 8929.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate CrabBody.draw 575 3.185901 0.042000 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate StationMouseBody.draw 575 14.486000 0.150900 1352.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate PondBodies.draw 575 79.552200 0.423200 13903.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate BirdBody.draw 575 0.868401 0.003900 0.000
+[NATIVE_ANIMAL_COST_ROW] 1792712719676 garden_mate CatBody.draw 575 56.222601 0.701800 5786.000
+[NATIVE_ANIMAL_COST_GROUP] 1792712719676 garden_mate 575 frames, the render step 6.62 ms a frame (worst 17.8): spider rig 2.74/5.9, sound 0.74/1.7, camera 0.53/2.6, light 0.47/6.1, hud 0.44/1.4, wasp 0.37/8.4, other rigs 0.32/2.6, rival 0.20/0.8, motor 0.19/0.5, prey 0.13/0.5, life 0.08/0.4, senses 0.06/0.4, save 0.05/0.1, small 0.29 (mean/worst ms); a frame: spider parts placed 658, fly parts placed 0, bug parts placed 0, camera casts 4, camera overlaps 3, camera rays 0, framing searches 0; allocated 164 KB a frame (senses 1, prey 1, motor 1, wasp 6, rival 3, life 1, camera 2, light 11, spider rig 75, other rigs 5, hud 4, sound 52)
+[NATIVE_ANIMAL_COST_PASS] 1792712719676 2 9

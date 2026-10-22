@@ -1,0 +1,225 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "run": "1792712719676",
+  "scripts": 223,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "place_sha256": "4f7a67685d2d73798fbfe45f5f0fb9991d69eac06b93b686e9cd31cbe8e957fc",
+  "output_sha256": "cdb99f141f98c958343126dcfef9e1e0966ac00d2961a1e6839b7fd36b604c68",
+  "scenes": {
+    "sill_noon": {
+      "frames": 711,
+      "elapsed_seconds": 12.001,
+      "lua_callback_mean_ms": 6.263,
+      "lua_callback_worst_ms": 12.405,
+      "viewport": [
+        1105,
+        433
+      ],
+      "components": [
+        {
+          "name": "WaspBody.draw",
+          "calls": 711,
+          "total_cpu_ms": 234.718801,
+          "worst_call_ms": 0.9383,
+          "cpu_ms_per_frame": 0.3301248959212377,
+          "cpu_ms_per_call": 0.3301248959212377,
+          "positive_heap_growth_kb": 10994.0,
+          "positive_heap_growth_kb_per_frame": 15.462728551336147
+        },
+        {
+          "name": "PondBodies.draw",
+          "calls": 711,
+          "total_cpu_ms": 130.6552,
+          "worst_call_ms": 0.637,
+          "cpu_ms_per_frame": 0.18376258790436006,
+          "cpu_ms_per_call": 0.18376258790436006,
+          "positive_heap_growth_kb": 17145.0,
+          "positive_heap_growth_kb_per_frame": 24.11392405063291
+        },
+        {
+          "name": "CatBody.draw",
+          "calls": 711,
+          "total_cpu_ms": 61.974501,
+          "worst_call_ms": 0.4962,
+          "cpu_ms_per_frame": 0.08716526160337552,
+          "cpu_ms_per_call": 0.08716526160337552,
+          "positive_heap_growth_kb": 6346.0,
+          "positive_heap_growth_kb_per_frame": 8.925457102672292
+        },
+        {
+          "name": "StationMouseBody.draw",
+          "calls": 711,
+          "total_cpu_ms": 61.636001,
+          "worst_call_ms": 0.4428,
+          "cpu_ms_per_frame": 0.08668917158931083,
+          "cpu_ms_per_call": 0.08668917158931083,
+          "positive_heap_growth_kb": 1698.0,
+          "positive_heap_growth_kb_per_frame": 2.388185654008439
+        },
+        {
+          "name": "Soundscape.update",
+          "calls": 711,
+          "total_cpu_ms": 27.135,
+          "worst_call_ms": 0.179,
+          "cpu_ms_per_frame": 0.038164556962025316,
+          "cpu_ms_per_call": 0.038164556962025316,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "Soundscape.updateWasp",
+          "calls": 711,
+          "total_cpu_ms": 11.3685,
+          "worst_call_ms": 0.1126,
+          "cpu_ms_per_frame": 0.01598945147679325,
+          "cpu_ms_per_call": 0.01598945147679325,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "CrabBody.draw",
+          "calls": 711,
+          "total_cpu_ms": 3.1433,
+          "worst_call_ms": 0.0111,
+          "cpu_ms_per_frame": 0.004420956399437412,
+          "cpu_ms_per_call": 0.004420956399437412,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "Soundscape.updateMeal",
+          "calls": 711,
+          "total_cpu_ms": 1.5324,
+          "worst_call_ms": 0.0373,
+          "cpu_ms_per_frame": 0.0021552742616033757,
+          "cpu_ms_per_call": 0.0021552742616033757,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "BirdBody.draw",
+          "calls": 711,
+          "total_cpu_ms": 1.010199,
+          "worst_call_ms": 0.0204,
+          "cpu_ms_per_frame": 0.0014208143459915612,
+          "cpu_ms_per_call": 0.0014208143459915612,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        }
+      ],
+      "observed_render_frames": 711,
+      "observed_render_interval_mean_ms": 16.885,
+      "observed_render_interval_worst_ms": 31.871
+    },
+    "garden_mate": {
+      "frames": 575,
+      "elapsed_seconds": 12.003,
+      "lua_callback_mean_ms": 6.619,
+      "lua_callback_worst_ms": 17.784,
+      "viewport": [
+        1105,
+        433
+      ],
+      "components": [
+        {
+          "name": "WaspBody.draw",
+          "calls": 575,
+          "total_cpu_ms": 211.603501,
+          "worst_call_ms": 0.8685,
+          "cpu_ms_per_frame": 0.36800608869565216,
+          "cpu_ms_per_call": 0.36800608869565216,
+          "positive_heap_growth_kb": 8929.0,
+          "positive_heap_growth_kb_per_frame": 15.528695652173914
+        },
+        {
+          "name": "PondBodies.draw",
+          "calls": 575,
+          "total_cpu_ms": 79.5522,
+          "worst_call_ms": 0.4232,
+          "cpu_ms_per_frame": 0.13835165217391304,
+          "cpu_ms_per_call": 0.13835165217391304,
+          "positive_heap_growth_kb": 13903.0,
+          "positive_heap_growth_kb_per_frame": 24.179130434782607
+        },
+        {
+          "name": "CatBody.draw",
+          "calls": 575,
+          "total_cpu_ms": 56.222601,
+          "worst_call_ms": 0.7018,
+          "cpu_ms_per_frame": 0.09777843652173912,
+          "cpu_ms_per_call": 0.09777843652173912,
+          "positive_heap_growth_kb": 5786.0,
+          "positive_heap_growth_kb_per_frame": 10.062608695652173
+        },
+        {
+          "name": "Soundscape.updateWasp",
+          "calls": 575,
+          "total_cpu_ms": 21.360901,
+          "worst_call_ms": 0.2308,
+          "cpu_ms_per_frame": 0.03714939304347826,
+          "cpu_ms_per_call": 0.03714939304347826,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "StationMouseBody.draw",
+          "calls": 575,
+          "total_cpu_ms": 14.486,
+          "worst_call_ms": 0.1509,
+          "cpu_ms_per_frame": 0.02519304347826087,
+          "cpu_ms_per_call": 0.02519304347826087,
+          "positive_heap_growth_kb": 1352.0,
+          "positive_heap_growth_kb_per_frame": 2.351304347826087
+        },
+        {
+          "name": "Soundscape.update",
+          "calls": 575,
+          "total_cpu_ms": 9.209201,
+          "worst_call_ms": 0.1835,
+          "cpu_ms_per_frame": 0.016016001739130436,
+          "cpu_ms_per_call": 0.016016001739130436,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "CrabBody.draw",
+          "calls": 575,
+          "total_cpu_ms": 3.185901,
+          "worst_call_ms": 0.042,
+          "cpu_ms_per_frame": 0.005540697391304347,
+          "cpu_ms_per_call": 0.005540697391304347,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "Soundscape.updateMeal",
+          "calls": 575,
+          "total_cpu_ms": 1.376899,
+          "worst_call_ms": 0.0218,
+          "cpu_ms_per_frame": 0.0023946069565217395,
+          "cpu_ms_per_call": 0.0023946069565217395,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        },
+        {
+          "name": "BirdBody.draw",
+          "calls": 575,
+          "total_cpu_ms": 0.868401,
+          "worst_call_ms": 0.0039,
+          "cpu_ms_per_frame": 0.001510262608695652,
+          "cpu_ms_per_call": 0.001510262608695652,
+          "positive_heap_growth_kb": 0.0,
+          "positive_heap_growth_kb_per_frame": 0.0
+        }
+      ],
+      "observed_render_frames": 575,
+      "observed_render_interval_mean_ms": 20.877,
+      "observed_render_interval_worst_ms": 47.192
+    }
+  },
+  "scope": "Instrumented foreground full-detail desktop attribution; advancing Free life/all predators enabled; instrumentation adds overhead; no paired FPS gain, allocation-rate, leak or device proof",
+  "production_optimization_adopted": false,
+  "goal_complete": false,
+  "published": false
+}

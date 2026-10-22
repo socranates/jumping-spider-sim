@@ -1,0 +1,10 @@
+{
+  "playback_stopped": true,
+  "place_closed": true,
+  "diagnostic_window_closed": true,
+  "diagnostic_window_id": 101584660,
+  "prior_window_id": 94504044,
+  "prior_window_remained": true,
+  "saved_serialization_sha256": "31c91244f33063d182e894f3426d09f7d54692246dc890b8877e6f0915b089ae",
+  "original_restored_sha256": "4f7a67685d2d73798fbfe45f5f0fb9991d69eac06b93b686e9cd31cbe8e957fc"
+}

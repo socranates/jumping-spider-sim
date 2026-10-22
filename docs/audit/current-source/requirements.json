@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T23:32:34.079835+00:00",
+  "as_of_utc": "2026-10-22T23:52:22.721234+00:00",
   "source": "59146e1005c083330455379766ab8c9dd2de2705",
   "goal_complete": false,
   "published": false,
@@ -23,11 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "spatial-validation-focused-verified-full-native-pending",
-      "evidence_boundary": "Current59146e1 six suites1783/0, compile222/strict/runner5. Linux39872335932 running, current Windows not started, native20/all223 prepared only. Prior032926f Linux76/465388/0 and native22/all225 verified; its immutable Windows7806 still live, not proof of current source.",
+      "status": "spatial-validation-linux-native-verified-windows-running",
+      "evidence_boundary": "Current59146e1 six suites1783/0, compile222/strict/runner5. Linux39872335932 completed76/465412/0; native20/all223/zero CreatorErrors pass. Current immutable Windows58767 active. Prior032926f Windows7806 closed0, both platforms76/465388/0 and native22/all225 historically verified; not current591 Windows proof.",
       "references": [
         "docs/spatial-save-validation/README.md",
-        "docs/spatial-save-validation/focused-receipt.json"
+        "docs/spatial-save-validation/ci-final.json",
+        "docs/spatial-save-validation/native-receipt.json"
       ]
     },
     {
@@ -152,7 +153,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less encoder CPU; bounded game save/return32 passes with225 fingerprints, capture108/98ms still synchronous and replacement14.34s elapsed. Prior native full walkthrough sill sample23.9ms and shadow-off17.6ms are short sequential observations, not causal FPS gain. Broad sound category includes animal drawing; new attribution driver prepared only, not measured. Current032926f correctness gates pending; no general FPS, heap or hard-budget claim.",
+      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Linux76/465412/0 and native20 pass, Windows58767 running.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -163,16 +164,20 @@
         "docs/save-continue/save-cost/preserve/receipt.json",
         "docs/save-continue/save-cost/rig-prior-evidence.json",
         "docs/save-continue/json-encoding/native-receipt.json",
-        "docs/save-continue/json-encoding/prototype-verification.json"
+        "docs/save-continue/json-encoding/prototype-verification.json",
+        "docs/animal-presentation-cost/native-receipt.json",
+        "docs/animal-presentation-cost/verification.json",
+        "docs/spatial-save-validation/README.md"
       ]
     },
     {
       "id": "memory-attribution",
       "status": "investigate",
-      "evidence_boundary": "1800-second trace met investigation threshold. Isolated control reproduced allocation-category growth without game code; neither game leak nor engine bug nor leak absence is proven.",
+      "evidence_boundary": "1800-second trace met investigation threshold. Isolated control reproduced allocation-category growth without game code; neither game leak nor engine bug nor leak absence is proven. Current59146e1 short instrumented scenes observe about24KB positive heap growth per frame in PondBodies; this excludes collections and is neither allocation rate nor retained-leak proof. Investigate invariant geometry and owned buffer reuse with exact-output checks.",
       "references": [
         "docs/memory-trace/verification.json",
-        "docs/native-part-churn/receipt.json"
+        "docs/native-part-churn/receipt.json",
+        "docs/animal-presentation-cost/native-receipt.json"
       ]
     },
     {
@@ -250,11 +255,13 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Source068a878 is pushed on codex/save-continue with byte-compatible encoder and frozen-reference regression suite. Paired native evidence, compile/types/runner and focused checks pass; Linux full76/465380/0 is verified and Windows full is live, no release rebuilt/published. Broad audit/current native lifecycle/online/rejoin/devices, main integration and laptop synchronization remain open.",
+      "evidence_boundary": "Current59146e1 runtime/tests pushed on codex/save-continue. Six focused suites1783/0, Linux76/465412/0, compile222/strict/runner5 and native20/all223 pass. Current Windows58767 running. Two-scene current animal attribution and diagnostic closure verified. Source release XML/BuildInfo remain older, no publication/main integration/laptop synchronization; broader recovery/lifecycle/online/device audit remains open.",
       "references": [
         "chet/save-continue.md",
         "docs/save-continue/json-encoding/README.md",
-        "docs/save-continue/json-encoding/prototype-verification.json"
+        "docs/save-continue/json-encoding/prototype-verification.json",
+        "docs/spatial-save-validation/README.md",
+        "docs/animal-presentation-cost/README.md"
       ]
     },
     {
@@ -295,7 +302,7 @@
   },
   "latest_readiness_milestone": {
     "source": "032926fd6e02c68c3f257189d397cbdf2a116bba",
-    "status": "historical-032-linux-native-verified-windows-running",
+    "status": "historical-032-both-platforms-native-verified",
     "evidence": "docs/prey-stream-readiness/README.md",
     "goal_complete": false,
     "published": false
@@ -308,9 +315,18 @@
   },
   "latest_spatial_validation_milestone": {
     "source": "59146e1005c083330455379766ab8c9dd2de2705",
-    "status": "focused-verified-full-native-pending",
+    "status": "linux-native-verified-windows-running",
     "evidence": "docs/spatial-save-validation/README.md",
     "goal_complete": false,
+    "published": false
+  },
+  "latest_animal_attribution": {
+    "source": "59146e1005c083330455379766ab8c9dd2de2705",
+    "status": "two-scenes-measured-no-optimization-adopted",
+    "evidence": "docs/animal-presentation-cost/native-receipt.json",
+    "scenes": 2,
+    "scripts": 223,
+    "whole_game_fps_gain_proven": false,
     "published": false
   }
 }

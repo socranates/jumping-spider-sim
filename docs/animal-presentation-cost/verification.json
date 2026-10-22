@@ -1,0 +1,13 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "scripts": 223,
+  "scenes": 2,
+  "source_and_probe_hashes_verified": true,
+  "closure_verified": true,
+  "current_workspace_inputs_verified": true,
+  "whole_game_fps_gain_proven": false,
+  "engine_audio_cost_measured": false,
+  "leak_proven": false,
+  "optimization_adopted": false,
+  "published": false
+}

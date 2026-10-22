@@ -1,0 +1,82 @@
+{
+  "source_commit": "5e2964d27309c4db5220ed0705e76cb9506b7a02",
+  "evidence_id": "35bf178f68118c38",
+  "single_final_source_full_run": false,
+  "predecessor": {
+    "source": "1f81d7c",
+    "suites": 56,
+    "passed": 53,
+    "failed": [
+      "preserve.luau",
+      "selftest_preserve.luau",
+      "route_preparation.luau"
+    ],
+    "raw_summary": "cli-predecessor/summary.json"
+  },
+  "changed_port_files": [
+    "roblox_port/src/Shared/World/Hut.luau",
+    "roblox_port/tests/route_preparation_reference.luau",
+    "roblox_port/tests/selftest_preserve.luau"
+  ],
+  "scope": "The only runtime change after predecessor is the three low-only rug decorative records. Two test expectation fixtures updated for new authored station geometry. No incremental route algorithm change.",
+  "reruns": [
+    {
+      "suite": "preserve.luau",
+      "source": "5938aac",
+      "passed": 1154,
+      "failed": 0,
+      "exit_code": 0,
+      "raw": "final-preserve-rerun.txt"
+    },
+    {
+      "suite": "station_debug.luau",
+      "source": "5938aac",
+      "passed": 38,
+      "failed": 0,
+      "exit_code": 0,
+      "raw": "final-affected-client-rerun.txt"
+    },
+    {
+      "suite": "minimal_hud.luau",
+      "source": "5938aac",
+      "passed": 37,
+      "failed": 0,
+      "exit_code": 0,
+      "raw": "final-affected-client-rerun.txt"
+    },
+    {
+      "suite": "world_client.luau",
+      "source": "5938aac",
+      "passed": 30,
+      "failed": 0,
+      "exit_code": 0,
+      "raw": "final-affected-client-rerun.txt"
+    },
+    {
+      "suite": "route_preparation.luau",
+      "source": "5e2964d",
+      "passed": 11971,
+      "failed": 0,
+      "exit_code": 0,
+      "raw": "final-route-preparation-rerun.txt"
+    },
+    {
+      "suite": "selftest_preserve.luau",
+      "source": "5e2964d",
+      "exit_code": 0,
+      "state": "terminal",
+      "passed": 7,
+      "failed": 0,
+      "embedded_selftest": {
+        "passed": 271,
+        "failed": 0,
+        "skipped": 0
+      },
+      "raw": "final-selftest-preserve-rerun.txt"
+    }
+  ],
+  "gate_coverage_complete": true,
+  "completed_declared_gates": 56,
+  "inherited_passes": 50,
+  "rerun_gates": 6
+}

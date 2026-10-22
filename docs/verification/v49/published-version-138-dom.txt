@@ -1,0 +1,143 @@
+- button "menu":
+- navigation "breadcrumb":
+  - list:
+    - link "Creations":
+      - /url: /dashboard/creations
+    - listitem: /
+    - link "The Windowsill":
+      - /url: /dashboard/creations/experiences/10771103250/overview
+    - listitem: /
+    - link "Places":
+      - /url: /dashboard/creations/experiences/10771103250/places
+    - listitem: /
+    - listitem: "socranates's Place: 10152026_1"
+    - listitem: /
+    - listitem: Version History
+- button "Search"
+- button "Notifications"
+- button "socranates":
+  - img "socranates"
+- heading "Version History" [level=1]
+- paragraph: Choosing to restore a previous version will only save the version. In order to publish the previous version, open and publish it in Studio.
+- checkbox "Show published only" [checked] [active]
+- generic: Show published only
+- table:
+  - rowgroup:
+    - row "Version Last Updated (in local time) Published Version":
+      - columnheader "Version"
+      - columnheader "Last Updated (in local time)"
+      - columnheader "Published Version"
+      - columnheader
+  - rowgroup:
+    - row "138 October 21, 2026 at 7:14 PM":
+      - cell "138"
+      - cell "October 21, 2026 at 7:14 PM"
+      - cell:
+      - cell
+    - row "137 October 21, 2026 at 4:05 PM Restore":
+      - cell "137"
+      - cell "October 21, 2026 at 4:05 PM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "61 October 21, 2026 at 8:42 AM Restore":
+      - cell "61"
+      - cell "October 21, 2026 at 8:42 AM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "53 October 21, 2026 at 4:41 AM Restore":
+      - cell "53"
+      - cell "October 21, 2026 at 4:41 AM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "48 October 21, 2026 at 12:23 AM Restore":
+      - cell "48"
+      - cell "October 21, 2026 at 12:23 AM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "46 October 20, 2026 at 9:42 PM Restore":
+      - cell "46"
+      - cell "October 20, 2026 at 9:42 PM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "44 October 20, 2026 at 1:49 PM Restore":
+      - cell "44"
+      - cell "October 20, 2026 at 1:49 PM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "43 October 20, 2026 at 11:41 AM Restore":
+      - cell "43"
+      - cell "October 20, 2026 at 11:41 AM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "38 October 20, 2026 at 10:49 AM Restore":
+      - cell "38"
+      - cell "October 20, 2026 at 10:49 AM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+    - row "37 October 19, 2026 at 9:37 PM Restore":
+      - cell "37"
+      - cell "October 19, 2026 at 9:37 PM"
+      - cell:
+      - cell "Restore":
+        - button "Restore":
+          - text: Restore
+  - rowgroup:
+    - 'row "Rows per page: 10 1-10 Go to previous page Go to next page"':
+      - 'cell "Rows per page: 10 1-10 Go to previous page Go to next page"':
+        - paragraph: "Rows per page:"
+        - 'combobox "Rows per page: 10"': "10"
+        - textbox: "10"
+        - paragraph: 1-10
+        - button "Go to previous page" [disabled]:
+        - button "Go to next page":
+- generic: ©2026 Roblox Corporation. All rights reserved.
+- link "Terms":
+  - /url: https://www.roblox.com/info/terms
+- text: ·
+- link "Privacy":
+  - /url: https://www.roblox.com/info/privacy
+- text: ·
+- link "Accessibility":
+  - /url: https://www.roblox.com/info/accessibility
+- text: ·
+- link "Support":
+  - /url: https://www.roblox.com/info/help
+- text: ·
+- button "Your Privacy Choices":
+  - generic: Your Privacy Choices
+- link "X":
+  - /url: https://x.com/Roblox
+  - button "X":
+- link "Facebook":
+  - /url: https://www.facebook.com/Roblox/
+  - button "Facebook":
+- link "LinkedIn":
+  - /url: https://www.linkedin.com/company/roblox
+  - button "LinkedIn":
+- link "Instagram":
+  - /url: https://www.instagram.com/roblox/
+  - button "Instagram":
+- link "YouTube":
+  - /url: https://www.youtube.com/Roblox
+  - button "YouTube":
+- link "English":
+  - /url: https://roblox.com/my/account
+  - button "English":
+    - generic: English
+- alert: Creator Dashboard

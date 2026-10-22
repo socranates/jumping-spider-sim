@@ -1,5 +1,7 @@
 # Verification checkpoint — not published
 
+Final state: corrected host70225 terminal exit0,7/0 and embedded271/0/0; all56 gates covered by documented lineage. Published existing place version138 at2026-10-22T00:27:38Z, verified in Dashboard published-only view. Final source5e2964d, evidence35bf178f68118c38. See main handoff, RELEASE-v49-place138.md and external RELEASE-PACKAGE.json. Everything below is retained chronological checkpoint history.
+
 ## Current state after recovery and completed predecessor run
 
 Final source/test commit **5e2964d27309c4db5220ed0705e76cb9506b7a02**, evidence **35bf178f68118c38**. Runtime source is byte-identical to `5938aac`; later changes correct two test fixtures. Strict clean, compile and XML/source comparison **209/209**. Final archive/playable hashes are in `playable-source-comparison.json`.

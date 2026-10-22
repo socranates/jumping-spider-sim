@@ -1,0 +1,41 @@
+2026-10-22T00:27:23.459Z,13378.459961,5f64,6,Info [FLog::CreatorOutput] [CHET_V49_PUBLISH_READY] 5e2964d 35bf178f68118c38
+2026-10-22T00:27:31.188Z,13386.188477,5f64,6 [DFLog::NamedMutex] NamedMutex(0000026B073AF4A0, name:InstallerInfo.log)
+2026-10-22T00:27:31.189Z,13386.189453,5f64,6 [DFLog::NamedMutex] ~NamedMutex(0000026B073AF4A0, name:InstallerInfo.log)
+2026-10-22T00:27:36.828Z,13391.828125,25e0,6,Info [FLog::StudioKeyEvents] publish request routing through state machine (publishType=1)
+2026-10-22T00:27:36.860Z,13391.860352,95d0,6,Debug [FLog::PublishSessionStateController] Processing task results for PublishInitiated state
+2026-10-22T00:27:36.861Z,13391.861328,95d0,6,Debug [FLog::PublishSessionStateController] Go to PublishPreAssetsPublishing
+2026-10-22T00:27:36.869Z,13391.869141,7e00,6,Debug [FLog::PublishSessionStateController] Processing task results for PublishPreAssetsPublishing state
+2026-10-22T00:27:36.869Z,13391.869141,7e00,6,Debug [FLog::PublishSessionStateController] Go to PublishInProgress
+2026-10-22T00:27:36.992Z,13391.992188,5f64,6,Info [FLog::CreatorOutput] Sent message to server to publish.
+2026-10-22T00:27:38.458Z,13393.458984,25e0,6,Info [DFLog::StudioPerformanceMeasurementsSummary] StudioPerformanceMeasurements summary for StudioPublishPlace: 1630ms
+2026-10-22T00:27:38.458Z,13393.458984,5f64,6,Debug [FLog::PublishSessionStateController] Processing task results for PublishInProgress state
+2026-10-22T00:27:38.458Z,13393.458984,5f64,6,Debug [FLog::PublishSessionStateController] Go to PublishSuccessful
+2026-10-22T00:27:38.461Z,13393.461914,5f64,6,Info [FLog::StudioPublishStatusLabel] Publish succeeded for placeId 120119801868085; marking as published (refreshing menu label to "Publish latest version")
+2026-10-22T00:27:38.462Z,13393.462891,25e0,6,Info [FLog::CreatorOutput] 
+2026-10-22T00:27:38.462Z,13393.462891,25e0,6,Info [FLog::CreatorOutput] Quick Links:
+2026-10-22T00:27:38.462Z,13393.462891,25e0,6,Info [FLog::CreatorOutput] → Add publish notes to v138
+2026-10-22T00:27:38.463Z,13393.463867,25e0,6,Info [FLog::CreatorOutput] → Edit experience details & audience
+2026-10-22T00:27:38.463Z,13393.463867,25e0,6,Info [FLog::CreatorOutput] → View performance
+2026-10-22T00:27:38.464Z,13393.464844,25e0,6,Info [FLog::CreatorOutput] → View error reports
+2026-10-22T00:27:38.500Z,13393.500977,25e0,6,Info [FLog::CreatorOutput] Published new changes in "socranates's Place: 10152026_1" to Roblox.
+2026-10-22T00:27:38.502Z,13393.502930,25e0,6 [FLog::StudioTimingLog] ======== Studio Publish Place Times =======
+2026-10-22T00:27:38.502Z,13393.502930,25e0,6 [FLog::StudioTimingLog] PublishPlaceTime : 13393.5029 sec
+2026-10-22T00:27:39.817Z,13394.817383,431c,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 669 cur_l2ts 12941.222442904 elapsed_l2b 12940.01236422997
+2026-10-22T00:27:48.500Z,13403.500977,431c,6,Info [FLog::StudioPluginOTANew] Attempting to acquire download lock - ensuring only one Studio instance handles OTA downloads
+2026-10-22T00:27:48.502Z,13403.502930,431c,6,Error [FLog::InterprocessReadWriteLock] InterprocessReadWriteLock::lockImpl failed with Failed to acquire lock for RobloxStudioPluginOTADownloadLock with error The process cannot access the file because another process has locked a portion of the file.
+2026-10-22T00:27:48.502Z,13403.502930,431c,6,Info [FLog::StudioPluginOTANew] Failed to acquire download lock - another Studio instance is already handling OTA downloads
+2026-10-22T00:27:51.183Z,13406.183594,5f64,6 [DFLog::NamedMutex] NamedMutex(0000026B0526F4A0, name:InstallerInfo.log)
+2026-10-22T00:27:51.184Z,13406.184570,5f64,6 [DFLog::NamedMutex] ~NamedMutex(0000026B0526F4A0, name:InstallerInfo.log)
+2026-10-22T00:27:59.817Z,13414.817383,95d0,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 670 cur_l2ts 12961.222106670026 elapsed_l2b 12960.012027995996
+2026-10-22T00:28:11.183Z,13426.183594,5f64,6 [DFLog::NamedMutex] NamedMutex(0000026B07A6F4A0, name:InstallerInfo.log)
+2026-10-22T00:28:11.185Z,13426.185547,5f64,6 [DFLog::NamedMutex] ~NamedMutex(0000026B07A6F4A0, name:InstallerInfo.log)
+2026-10-22T00:28:19.817Z,13434.817383,8650,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 671 cur_l2ts 12981.222076113987 elapsed_l2b 12980.011997439957
+2026-10-22T00:28:28.957Z,13443.957031,431c,6,Warning [FLog::Output] settingsUrl: https://clientsettingscdn.roblox.com/v2/settings-compressed/application/PCStudioApp.zst
+2026-10-22T00:28:28.988Z,13443.988281,93f4,6,Warning [FLog::UpdateRequest] Didn't receive 'flagOnly' property for channel. Assuming it's false.
+2026-10-22T00:28:28.993Z,13443.993164,7d9c,6,Info [FLog::StudioGuac] GUAC request succeeded
+2026-10-22T00:28:29.033Z,13444.033203,5f64,6,Info [FLog::BackendConfigManager] updateConfig finished getting the config
+2026-10-22T00:28:29.042Z,13444.042969,7e00,6,Info [FLog::BackendConfigManager] SetCachedStartupConfig result for update true
+2026-10-22T00:28:29.082Z,13444.082031,7e00,6,Info [FLog::BackendConfigManager] Finished writing cache to SharedMemory and local file in 0 seconds
+2026-10-22T00:28:31.191Z,13446.191406,5f64,6 [DFLog::NamedMutex] NamedMutex(0000026B0233F4A0, name:InstallerInfo.log)
+2026-10-22T00:28:31.192Z,13446.192383,5f64,6 [DFLog::NamedMutex] ~NamedMutex(0000026B0233F4A0, name:InstallerInfo.log)
+2026-10-22T00:28:39.814Z,13454.814453,7e00,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 672 cur_l2ts 13001.219459874013 elapsed_l2b 13000.009381199983

@@ -1,0 +1,9 @@
+{
+  "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+  "runtime_sha256": "8e0dc5fe9765101fa80d74be0e552bfaedff047957da90d1ae249ce8517b7c3b",
+  "passed": 3,
+  "failed": 0,
+  "exit": 0,
+  "scope": "CLI component proof: current non-station gate refuses removed/partial geometry and resumes after complete rearrival; no actual network stream-out proven",
+  "probe_sha256": "968a04356322b2d4555f4bb616abba1fc5f6f6d422a85de5abcd257409ea8c83"
+}

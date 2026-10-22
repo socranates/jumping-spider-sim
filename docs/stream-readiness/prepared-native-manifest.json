@@ -1,0 +1,1347 @@
+{
+  "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+  "tier": "full",
+  "scripts": [
+    {
+      "path": "ReplicatedFirst.Splash",
+      "length": 596,
+      "adler32": 3240479982,
+      "sha256": "d2e93bf198bb882d578fce5c93c6ac4473356ac569752bd95ee35e5e1dc8cd4b"
+    },
+    {
+      "path": "ReplicatedFirst.SplashScreen",
+      "length": 11774,
+      "adler32": 1684235014,
+      "sha256": "635d21ed8638fb64fbcdf6b37b5561321a34a710b6921e7a9f68b641c7271c9b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.AntMimic",
+      "length": 4899,
+      "adler32": 1739146978,
+      "sha256": "d489dbb7e3dd71ad7beede937f11f40d0f4e202ca5e75e234d5118b8b0aee979"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Appearances",
+      "length": 66100,
+      "adler32": 1305127575,
+      "sha256": "b5b3b0558a65bf0ba9d5b7fdd82f56c5fdc53e21f06d476522c92b132c179d9a"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Catch",
+      "length": 4563,
+      "adler32": 360966077,
+      "sha256": "7529fd215d25512b86a5248f517c30fb1db94be106deb43cd34d0f0b22d910e7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Detail",
+      "length": 1282,
+      "adler32": 1712176071,
+      "sha256": "379018f2217e184a31a92dfb598be346db74ed6895a977d7f752c80a86b363be"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Eyes",
+      "length": 12720,
+      "adler32": 3707977693,
+      "sha256": "bbb919497f5818b9040d6f25959d91bd9584165b6699b2082f9afa50770f94e4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Flora",
+      "length": 15833,
+      "adler32": 235218951,
+      "sha256": "efbf508dd9b26e9d5a20c1f3de49f58b2b4ae46ee4993db3fd5493d4e246a761"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.FlyLook",
+      "length": 45777,
+      "adler32": 2706099346,
+      "sha256": "6d01910acec5b6fb23d3a4dc25faf949f324f8b04d2b12e328b17a067fb90154"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Graphics",
+      "length": 19623,
+      "adler32": 2855323685,
+      "sha256": "9e0389258bc72c2122e94272cf95d4695dbfbfec714bea0610e4f218f8be899b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.MatingRules",
+      "length": 7184,
+      "adler32": 698908997,
+      "sha256": "18cb89d1fb01cda7b13b09184730708543ce262dc61531c03ce256a4c94c15f7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Meshes",
+      "length": 2299,
+      "adler32": 895145478,
+      "sha256": "5205ad7d10f3df7b5dd98884491f8cee8e3212262081e35f24081f00e713934b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.NotebookPages",
+      "length": 58257,
+      "adler32": 3656924150,
+      "sha256": "b5f24379d18fd6e2b863ecb677557f13597972513111ab55ad2899a687d3f363"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Peacock",
+      "length": 5201,
+      "adler32": 3184999491,
+      "sha256": "414137eafb2036a0b31aed37ae7c102f2fd9ecde72d66ed5e1ea5d8b84ff2292"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.RareSightings",
+      "length": 514,
+      "adler32": 4196839398,
+      "sha256": "9c9ecae3407a6cd386b73d03033063275f5856b5a7cefebd74e64c4bab302b78"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.RivalRules",
+      "length": 4763,
+      "adler32": 1285962216,
+      "sha256": "d8e65efb2ae3390a127cc4ec748a7b37f5f97166ec4f8674f535ee6d6cc95349"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.SaveRules",
+      "length": 5097,
+      "adler32": 1887857782,
+      "sha256": "12900acd1094a534af630762090ba3def738a197c7c2a3a771f9607a611a5b68"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.SettingsSpec",
+      "length": 8416,
+      "adler32": 1024431409,
+      "sha256": "cc65643f67d93badc92daa7e40c9a0bdbdf91716ea5ab838f56ea82b82023b90"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Species",
+      "length": 26753,
+      "adler32": 1471954748,
+      "sha256": "d1d0aeab2c11c5396346ad5bc75a04bf3773000e672409347548996c9f5c10a8"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Surfaces",
+      "length": 2548,
+      "adler32": 697192054,
+      "sha256": "5a7acd8fb49ce6e3ef329d2764926d328676fc0252e2ab8712dc598328b2fb24"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Tarantula",
+      "length": 3708,
+      "adler32": 1423956400,
+      "sha256": "5c4cbf233df1eec332420e5b9fdc8dd3ed1f872a85eb25d66081e1049988e728"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Wasp",
+      "length": 8223,
+      "adler32": 1629769409,
+      "sha256": "6cbaac25aeb33c7e9b4582049d773934e05785352e0aacc18bf94fe97211ea6e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.WaspLook",
+      "length": 5360,
+      "adler32": 3745865453,
+      "sha256": "159de9a9640d65aa38448be324475a02620ca2893fb49d29f619615339c1a9aa"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Data.Wear",
+      "length": 4336,
+      "adler32": 2361565395,
+      "sha256": "b527af0abef34fdb526ec79a5ce570f97efcf8aa5434eba5594c800c5f222630"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Breakaway",
+      "length": 3112,
+      "adler32": 2496606939,
+      "sha256": "7b1e28362c4851153a5e59078b77da598ab13066b4fa7293102b8bf64934cc06"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.DayLight",
+      "length": 6871,
+      "adler32": 3761040591,
+      "sha256": "4d203cced3491a558962e7eff247b2a123ecdf5b6bceab4752b7ab1831c7ee79"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Dressing",
+      "length": 11073,
+      "adler32": 1599658633,
+      "sha256": "f1941469981ac14d14495f40544e0fd93a962f4256d31659eba3a66ba5f9678a"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Lit",
+      "length": 4810,
+      "adler32": 22767615,
+      "sha256": "8ec39b3976c2763f01932e7ba91fa63798755b3c69a293cb8e9d882f64e5d0a7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Materials",
+      "length": 1466,
+      "adler32": 1979185269,
+      "sha256": "7c91152f9edab0bf0884cb810424f5fa84b2fc03efcde90fd5251ee13470a566"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Patina",
+      "length": 6262,
+      "adler32": 2323954079,
+      "sha256": "fa539469ef058190b90170b24c5f3f2e64eb9aeed5fb999a6d67d4bbbb35ae86"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Plants",
+      "length": 27579,
+      "adler32": 289264621,
+      "sha256": "71c433c62a073b282e27f3972d91cc7f1c09a5b815e1a4a1a86ca6a954998a4f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Scenery",
+      "length": 29496,
+      "adler32": 3221575414,
+      "sha256": "7ff347f6c1af9bfcd21f2fc140cecb5379cb181efcf3e142a339baa8045bad7f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.Shapes",
+      "length": 7047,
+      "adler32": 1799554028,
+      "sha256": "4a10bb56b7aabfe4a524b9233661376428ef49b489421fb2efd4d8c97f5809c7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.SunPick",
+      "length": 3346,
+      "adler32": 1406365666,
+      "sha256": "ff1c46727a47a1999716007c4e612538694740f9d06c151c454386e000b70524"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.TestTarget",
+      "length": 1328,
+      "adler32": 1385482491,
+      "sha256": "518287f2411ca068df4b21ad8323f22b0c28a0c5c89a4ab2579a992760249df8"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Habitat.WindowsillLayout",
+      "length": 6495,
+      "adler32": 700339909,
+      "sha256": "2e2de156471e13853d2d3511af3186d74708dcce7becdad4c72c3b921f1dd831"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Learning.FieldNotebook",
+      "length": 7663,
+      "adler32": 3634763846,
+      "sha256": "263ef25afc6e4960d1fff78c4cec933f79dd830de64b38bf80cffa0d52caa6c1"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Learning.NotebookWatch",
+      "length": 10403,
+      "adler32": 1525196972,
+      "sha256": "88a81f8402a63d167ebc3065d6633149841aebdcc38ec6e5cf8bb5c8410e7679"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Ballooning",
+      "length": 8372,
+      "adler32": 1233491754,
+      "sha256": "a840cb3031c2c0188a4ecefaa710b31a98ffcf0687885d41e9737749a6a58311"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Growth",
+      "length": 6771,
+      "adler32": 4217257691,
+      "sha256": "8044619a893e29d795eb6a4c9c9c1c1c80daa6ddc9cf9015013cc054de894e84"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.LifeClock",
+      "length": 7624,
+      "adler32": 3202471471,
+      "sha256": "87c5d5518af1def9da1f0c911bdee53a2852547370732196baaf2867edf1586e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.LifeLoop",
+      "length": 13090,
+      "adler32": 4108103200,
+      "sha256": "e4d4c31e207a7dfa60bf757cba0f081172da4c385cf71a922ed5d70bac941e48"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.LifeSession",
+      "length": 2048,
+      "adler32": 3086267966,
+      "sha256": "f697141ffe5a21f4c6524967306759a41fe9677c81fcf58bf7732874e54f4fe7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Mating",
+      "length": 18174,
+      "adler32": 882939508,
+      "sha256": "a92bbd24f2a1328010387a5d3f27b276cd04dd4cfe435e3491e147527345b5b3"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.MatingScene",
+      "length": 9653,
+      "adler32": 1586724257,
+      "sha256": "1d75aea13afcd25ad39f9a6c7b4256c39cf220b241659827b315563ac761c96b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Nature",
+      "length": 9574,
+      "adler32": 2739165129,
+      "sha256": "6343684e766da7f95fe8984b6bd06c1f1044b69fe2bc6906a6efeaf9ca46ad8c"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.NeedsModel",
+      "length": 17894,
+      "adler32": 2185641658,
+      "sha256": "04a0c694dadc9e86c1d30d78d203debd2694bc9dc8c74798ad90759367e87add"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Nursery",
+      "length": 2770,
+      "adler32": 3928992305,
+      "sha256": "05ebef04c5f15f2df58b56c4ce32c575d9d34b4c7257f70499e24d667975cd36"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.RareDirector",
+      "length": 3566,
+      "adler32": 2027285952,
+      "sha256": "cbfb412e4b543f8987a8f4e08a4bbce6280bfe2a66ef229329ca0fae15275a0d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.RareLedger",
+      "length": 2915,
+      "adler32": 3737183104,
+      "sha256": "c5a3ee78ad05a8934db08021c08aa307b12cad72db70dedf857eb8c7dfb49b2e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Life.Water",
+      "length": 8295,
+      "adler32": 736597333,
+      "sha256": "7d23c05c703a351a2ab4f015a84e8aa81934fbe18fe59a44d7a6da3070485da8"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.CameraMath",
+      "length": 12417,
+      "adler32": 1988097614,
+      "sha256": "114cd1b40bc5fe816f7461414844c83893724c740ddcabed3ee91ddad6617f55"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.FocusState",
+      "length": 732,
+      "adler32": 1839071490,
+      "sha256": "ed54fd709f6a73a1e6e27c3fae9e69618bc390da2c6892a8d5a7d2657bc46a9e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.InputState",
+      "length": 3450,
+      "adler32": 100955075,
+      "sha256": "40359cf98ee7d135c15fef41ad1aa364d48e6380249c0ce923360efb85aa699e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.InspectView",
+      "length": 8232,
+      "adler32": 2544276687,
+      "sha256": "1a1c4509ec9c8fddfb82e45754b15c88a02b0eb36caa01772da58ac5c82c08c2"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.JumpInput",
+      "length": 5289,
+      "adler32": 1004393295,
+      "sha256": "59a1ac78bb8aa393954014eab6fc46cfd4009f711243eb33340794fc636c79bd"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.JumpMath",
+      "length": 4603,
+      "adler32": 2988356167,
+      "sha256": "c49605f33dcb3d3560ec428a56d9bfffb894654a3f0194dde1402448f18e77f8"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.LineFraming",
+      "length": 4513,
+      "adler32": 3721325342,
+      "sha256": "1f7fbe3c4648e3ffd724f8d05c73eef681df6571cfd998f8a7dce64b5f492de7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.LockOn",
+      "length": 9753,
+      "adler32": 3272461534,
+      "sha256": "100bde62a89a4d3e7b96b1d2237a1538b1465105fc5d2c49c6b6c6edcfecc575"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.SilkController",
+      "length": 18959,
+      "adler32": 615598198,
+      "sha256": "0d876582e4da523db3038d94a2b7a3769c8441a7a7728602c3c60c6468fcc37c"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.SpiderMotor",
+      "length": 34581,
+      "adler32": 637874076,
+      "sha256": "0da8a0068e3992fd0efcfd8dcfcc9c76781cc43ba3095ae69cf448cebbb8949d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.StickCarry",
+      "length": 2297,
+      "adler32": 1283524830,
+      "sha256": "7f6d9183e53c089929c7760a775e7487234bc731c0eb090a2b2a5d64d2263a46"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.SupportMath",
+      "length": 2534,
+      "adler32": 4093531017,
+      "sha256": "d9eb67e99feaa450dc6fad7f4922e6ef9a2bd3013bb364628ee206b901f8f131"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.TetherMath",
+      "length": 2635,
+      "adler32": 1894221491,
+      "sha256": "7678cac3aa20522fc7ce39bac21b361bf519a976b9543f56412c70e99d6b05a4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Movement.TitleShots",
+      "length": 10378,
+      "adler32": 3775720569,
+      "sha256": "481bdb453457c57d2c41e6dca7b033dbfbeeccd5319d334d7e4d6eac7f282fb2"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.Observation",
+      "length": 6341,
+      "adler32": 2913819601,
+      "sha256": "d69fc436e52a53921c11967ccb4334e0efb956b2f79538cdf146bd96182560c2"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.ObservationMemory",
+      "length": 16249,
+      "adler32": 2937809045,
+      "sha256": "5c68842b2e9a8fe6b1d9b42bdc38898c03732167e2f9ab888963416ba0bf4c29"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.PerceptionMath",
+      "length": 8423,
+      "adler32": 2779784327,
+      "sha256": "91e88bdf30ed9818c675b6cbfb5f35ce6d40cc26e5971269d9e32f0e48feef4f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.Sensor",
+      "length": 18908,
+      "adler32": 214822141,
+      "sha256": "0687a48526aa879bf9525f7822a7c7c6a53a361d518abe593f7f6d6feb5b7da6"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.SensorCore",
+      "length": 19990,
+      "adler32": 482314905,
+      "sha256": "5b28ada981c51d24e022ffa43a5934023bd33a5d586704a9b100d46386c4daaf"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Perception.Signal",
+      "length": 1011,
+      "adler32": 2103724923,
+      "sha256": "9158c302b5a68b307dadd7e42d7e74efa69e757ab5856cf1775b7f1fe951b4d1"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.Checkpoint",
+      "length": 42506,
+      "adler32": 518635706,
+      "sha256": "a6c54cfbc957b1579cd69693e791b93b96259745c23928caaff6b3c28200ca16"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.CheckpointStore",
+      "length": 12225,
+      "adler32": 1344420110,
+      "sha256": "226d9b2a4b1bafa3a58f1b9ecfdd907096f5fc371031ffae91f5d15cdba74110"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.CompactMigration",
+      "length": 5046,
+      "adler32": 14264216,
+      "sha256": "049b956b02e957e7f8cd33e5819166db933e213677cffcf2463ba19eb15c259c"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.Json",
+      "length": 5551,
+      "adler32": 1569191840,
+      "sha256": "9b6599b4c1476c5c5114bacb5106b2a869d799a78988d20688b572c6d0f31384"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.MemoryBackend",
+      "length": 4391,
+      "adler32": 3107696525,
+      "sha256": "4f27e644fdd2ba7a20a79e283f4ec27267d5c1d56685ab3f1f52f536aa15c1f5"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.ObjectRecord",
+      "length": 12351,
+      "adler32": 3778194071,
+      "sha256": "ec51bb6c05f4b9ca8a7e07931fbb0970b03a7f89849ca546ecfbd295db4c4330"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveEnvelope",
+      "length": 9182,
+      "adler32": 2880714676,
+      "sha256": "5d15ecee3f8e5d0a0203e26aa41ab850aad370f2bc241e2c3eecf6be4829cada"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveIntent",
+      "length": 3392,
+      "adler32": 3907172990,
+      "sha256": "c6001916ba2356736127ace646a995a848a73a6f8f96fa75d9f65c0e2fe07b02"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveObservation",
+      "length": 4841,
+      "adler32": 1187498991,
+      "sha256": "d383f22738da5c06e1f7a1bd62991035343692cd186a9020f62fc64a37b49bae"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveProgress",
+      "length": 10744,
+      "adler32": 1425564381,
+      "sha256": "60f089b363f0648fd1ef1464d7bbc797b1afeb490160c3b58d28134b2df0e86d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveRest",
+      "length": 6756,
+      "adler32": 2732001361,
+      "sha256": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveScheduler",
+      "length": 4859,
+      "adler32": 3975642115,
+      "sha256": "5d2c739936adc5f8fdc7e91c6105346db1c99c70b99aa6ec246c54d34dd144bb"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveSession",
+      "length": 44960,
+      "adler32": 3407049578,
+      "sha256": "b3a566210743c40e2ac146cd9e7adab4a0e76c85ce758cfc285379a3952e2886"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveStores",
+      "length": 2972,
+      "adler32": 1570038780,
+      "sha256": "07a1052dac47e5c9f6d4b916a0c5a6e65907f5d6406f5fa375f2788150550399"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Persistence.SaveWork",
+      "length": 3014,
+      "adler32": 1624453221,
+      "sha256": "268cedc7bc81730d3f650b36fe9016e485928d4d7b1a957332a16093819f746e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.Bird",
+      "length": 21270,
+      "adler32": 3416604920,
+      "sha256": "8fa4903dcf28f9bc8ff6f7687fb49a39d8f4198548857cf0d56c3c4fb5bdb7d7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.Cat",
+      "length": 28731,
+      "adler32": 3098902801,
+      "sha256": "84596af0c0f2babc8aada48bac6b0768caa4f91e0e4a1e7bcdd46236d0e491f5"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.CrabSpider",
+      "length": 7186,
+      "adler32": 1874798173,
+      "sha256": "b8c2bcd3c6aa213e467ed69bcac6ecefb2e1a841c48754e30aba5f8a9c25f6b1"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.Frog",
+      "length": 8116,
+      "adler32": 3327806602,
+      "sha256": "46e671e78918819ce4dadb0b58570faea60396125753f406aaa7d080f4a6c201"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.Mate",
+      "length": 18742,
+      "adler32": 2058698073,
+      "sha256": "e111195d36eded003ec17e148b218d11525ab3199f9649752dda058a279f4269"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.MateDrive",
+      "length": 4673,
+      "adler32": 600585636,
+      "sha256": "20c585eae2933e62bbb35ba87c99c7adbdff28bef3addc670f5049587224940c"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.RivalDisplay",
+      "length": 10511,
+      "adler32": 2513657217,
+      "sha256": "45af4852fafd066322cf73fab32ff533e83ff656d870a20fc365ed5498a113fb"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.RivalDrive",
+      "length": 22951,
+      "adler32": 1538564766,
+      "sha256": "d98991e98c3d93b46de7cf0e26c905e43d1828c3e5230e5f14428d1e1b6e00f9"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.RivalGrip",
+      "length": 3477,
+      "adler32": 255493887,
+      "sha256": "52f4e8a5833448cf1da0d2d35da078f81be89a0430a6eea65fcb554e61889230"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.RivalRoute",
+      "length": 34725,
+      "adler32": 856778608,
+      "sha256": "252e7e331236200e5f30fed45d4c44c8c8cfb9529a6a099c7eeb3207aa53e852"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.RivalSpider",
+      "length": 18184,
+      "adler32": 2357938015,
+      "sha256": "b37f67c321fc5e902f0a785c9806a3dde7822b5f8d4af9a0abbc6bf7d079c1c4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Predator.WaspDirector",
+      "length": 38964,
+      "adler32": 3336515833,
+      "sha256": "64bdb25cbe04214c2562ce00eade3197d681f380f9fcabb9ea422b0672a8ddb4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Ant",
+      "length": 6109,
+      "adler32": 675326506,
+      "sha256": "e734fae74cdd93e37ba9bc1dc531e36a36ee56b3257788741343b0d65cfb0123"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Feeding",
+      "length": 6055,
+      "adler32": 1666927766,
+      "sha256": "507594c6f4917b182e2ee05c6d144d18cbdd19cb1cc927d429a2cc9be15aecd7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Fly",
+      "length": 17131,
+      "adler32": 1502328940,
+      "sha256": "1304fb04925ad4118ff44a6c8b62c63cd0d254dfbf36615682b10ae4c1ef318e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.FlyFlight",
+      "length": 3416,
+      "adler32": 2119608887,
+      "sha256": "0f84cf2a6bf05a42134c1a87a5f49313f9ea4c8eef502cb497f63de51f4fe7a1"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.FlySenses",
+      "length": 3610,
+      "adler32": 490145974,
+      "sha256": "d0357fe9e8dc7a6fc3cd1caba9d6ce5ffc66978f126b8ed1ece10017244ba658"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Harvestman",
+      "length": 6696,
+      "adler32": 696747913,
+      "sha256": "3e4406be3359b06f4400f469053ef568fe7923e1caa79731927a8fdbf434073a"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Ladybird",
+      "length": 9709,
+      "adler32": 3160560615,
+      "sha256": "5eaca901716e5e816a2e7189968b278d31e27873405d835c8521d1a118c2e01d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Millipede",
+      "length": 9598,
+      "adler32": 2912814649,
+      "sha256": "c7cfa65e9bc82c5535337a96fb97e6248cf59cf8826883453ba2bf7b3bd3c96d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PerchGraph",
+      "length": 3025,
+      "adler32": 2763664658,
+      "sha256": "e01c45447f499c039d1f1fdfe26edf59be5396cb929659eb93148c6424f1e676"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PlantWalk",
+      "length": 3261,
+      "adler32": 156707665,
+      "sha256": "48ec5683db87032db05e7287fcaba2049838f57a558d516257584d83d908072e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyDirector",
+      "length": 13884,
+      "adler32": 658299134,
+      "sha256": "a0de1b49979a960bc93907d4c86a27121d81d0a0fba672183e0cd04ed06080ca"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyKinds",
+      "length": 18728,
+      "adler32": 3417754962,
+      "sha256": "cdb663fa41a3aa0a26bde7f747d910223de7f6c83a5bfbf02bdc47a1b1d30a88"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyMath",
+      "length": 4477,
+      "adler32": 3501987459,
+      "sha256": "0ebc0fad87697058ea660bf0e45c078c83d57318c29f527a34877e3b13e78d0d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyPopulation",
+      "length": 1245,
+      "adler32": 273397863,
+      "sha256": "a8685b10fcedf88b458810983eaed5931c13282fcca2f1a40839cba0489bcdbf"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyRandom",
+      "length": 1287,
+      "adler32": 758420489,
+      "sha256": "0b3623956e15206235da786a802561464e31266fd4ea01af0083ae37da8e200b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.PreyWorld",
+      "length": 20920,
+      "adler32": 3531897909,
+      "sha256": "16d2d55bc5430989da60883fb02bc8e4612fb54bc20d17b2e05ded3a1b7812f0"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Skater",
+      "length": 6168,
+      "adler32": 604495580,
+      "sha256": "8213a7cd6b603661c8a8a9073c6834cfb93143424389dc2ce115046a0b1f9210"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Snail",
+      "length": 9416,
+      "adler32": 2144455822,
+      "sha256": "ba7ce5f5a0abc0a232fcc1c7469593499530a2b80e0b8264f736229ae4653536"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.StationMouse",
+      "length": 1745,
+      "adler32": 531248123,
+      "sha256": "c226e67f5e060ba3345f3c7f5fc7c5ec3051dfba9d159635b1451994764d3ebb"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Prey.Woodlouse",
+      "length": 9035,
+      "adler32": 116950832,
+      "sha256": "6762ce554cc331e3dc2df0301405f8578106bc3a13babc592e01ce644af7f6ac"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.Anatomy",
+      "length": 9933,
+      "adler32": 614088936,
+      "sha256": "98cbdadd445e427863b57b584835ae3553abd33a41a35877b29b48a33b28e60e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.AntMimicPose",
+      "length": 5418,
+      "adler32": 466100452,
+      "sha256": "0bcf8d10725b7f38e0646a1617a1577121b586b027a0e605d43f696d5d2c6f28"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.CatPose",
+      "length": 19168,
+      "adler32": 2010322217,
+      "sha256": "afde056e0d6c2d9d2c15e4efc325893ca1432638b0d319c384296f6698b4d9fd"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.DogGait",
+      "length": 3926,
+      "adler32": 2646095645,
+      "sha256": "eb282888b436f3c260a66fa297b566a3b5350642f79a342741382059bace2595"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.Idle",
+      "length": 4016,
+      "adler32": 3221819922,
+      "sha256": "1da2c7cc046de1175ca2e0b6ba73274d4aa637dec64eee641c07df2e20e62705"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.Living",
+      "length": 15490,
+      "adler32": 2338626620,
+      "sha256": "218965167424ececf5c953860eb38412582c3208a0b90e02cd73a0d9a7e6e6f1"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.PeacockDance",
+      "length": 6993,
+      "adler32": 748221362,
+      "sha256": "8f79ee569bd0efe31c7b12476fa0fd08cb1b8f72c311881f292a1b896a594375"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.Setae",
+      "length": 23670,
+      "adler32": 2812842253,
+      "sha256": "638606450f52eaa87110ee2a1c1d61c3003f67e026c95c797f97ccec38917504"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.SpiderChoice",
+      "length": 6421,
+      "adler32": 1918150489,
+      "sha256": "68ffa8369927f98e5e063742401c71c971c63070b73d487c1cc002c59e4bb2c4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.SpiderRig",
+      "length": 88502,
+      "adler32": 1232311415,
+      "sha256": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.Rig.TarantulaPose",
+      "length": 6700,
+      "adler32": 3193813046,
+      "sha256": "0b8c8dc963aac985d827b9f75325bc45b30baaae1f3d6308c8513ce10f2f630f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.AntMimicText",
+      "length": 1617,
+      "adler32": 335820227,
+      "sha256": "553985d3f08813f557e1030cc9b64934e17e062ef92b09b8d2aa903f5170fcbe"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.BirdText",
+      "length": 1407,
+      "adler32": 36690985,
+      "sha256": "74340b8a0867d490c9f9069e39f389773bcd5cf4cd40f6dd23ac71467ca5d2ed"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.CatText",
+      "length": 1492,
+      "adler32": 1316222467,
+      "sha256": "5a516be7feb51dba274c2428ffaaceed98e85158bdcd1a80bb9b17d3e3b1c765"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.ContextPrompts",
+      "length": 1844,
+      "adler32": 824933637,
+      "sha256": "a41644859d0c0621933f788a4ccc371c0984ada817b8a06c8db827fcf199079d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.ControlText",
+      "length": 13322,
+      "adler32": 3784976139,
+      "sha256": "2b606e59a1c6825ab0fdcf3111829a82d989a72473a54d29561bce4a88c798f0"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.CrabText",
+      "length": 699,
+      "adler32": 1305472838,
+      "sha256": "9155a758ae66acecd4bd4379e785bbc03de41084b2756935a401caab991f9670"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.EyeOptics",
+      "length": 15843,
+      "adler32": 2142335976,
+      "sha256": "3575998a2217a89e55988d50ce4cffcc1f2dea5df8756e839e748477796235ca"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.FrogText",
+      "length": 660,
+      "adler32": 1846927608,
+      "sha256": "7f4a8ea96d1a2da0201aab6430025d2e2c698eda4ec3819910c3b4691d6739c9"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.Heard",
+      "length": 1070,
+      "adler32": 2804642320,
+      "sha256": "4deeee99a59feb57c14753db800c9934df81544ad44a38ce24ebf9c0e9ebb1ec"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.HudLayout",
+      "length": 8647,
+      "adler32": 2427696544,
+      "sha256": "2044c3d7c940889835df60632493b20dc81f2e5eb931e1ec8da21c456b6b230a"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.InspectText",
+      "length": 2402,
+      "adler32": 663564571,
+      "sha256": "54e255ec94550b283fdec66d15cac6f2c5281fef40d8186e499aec12904f9db8"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.LifeText",
+      "length": 14217,
+      "adler32": 1473211855,
+      "sha256": "3f9abccf13cfe0f71ec946325f3444ec1e876e087211072347d55033403f7f71"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.MateText",
+      "length": 11986,
+      "adler32": 2292052400,
+      "sha256": "56f3385443c21a3580acce72a303f702f1db06aab9d6b7639974dda99cbe42e4"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.NotebookText",
+      "length": 7692,
+      "adler32": 2877757824,
+      "sha256": "44623b4ecb52ff6609a67dc8ab32e55cd2f2fc9922b2e998bbf4e457441ff752"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.PeacockText",
+      "length": 5844,
+      "adler32": 1507649644,
+      "sha256": "b357fe3f7729fabf1e765817960d3c326b43393d80fe0c5f6502e856cf4c72e6"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.PerceptionShapes",
+      "length": 5291,
+      "adler32": 601730319,
+      "sha256": "10addc9fc73639ab74eb3bda20d75a7e203990842900213242ac80be7b9992b7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.PerceptionText",
+      "length": 461,
+      "adler32": 3950945301,
+      "sha256": "214c2c980b92efdf1f82dd43b3a7ed1c69d426037a65c4c29f48f16a9713c847"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.PerceptionView",
+      "length": 1969,
+      "adler32": 820937448,
+      "sha256": "632477980aaf1410602ed58de7ca7a5023f49c6cc7128352b43845fa28c091ae"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.PreyText",
+      "length": 2472,
+      "adler32": 1348943363,
+      "sha256": "fc3a7eff6833b9274f88fe84dc1588fede45c59f44a31f076f601977a728daca"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.QuietHud",
+      "length": 15618,
+      "adler32": 912207781,
+      "sha256": "93db1e9b65134d9b7db0c10ecd32dce7f473936a00acfc05e4002b940c5c11bc"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.RivalText",
+      "length": 2387,
+      "adler32": 828650792,
+      "sha256": "32cfa69cff63a6982b6b4f2fd42bf8111305ecf08c90cb4ce466821f27483518"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.SaveText",
+      "length": 5275,
+      "adler32": 1049823279,
+      "sha256": "560591336ee81ff4500b340ee8c65088e3b0758a1600f162e90e36ff5b276e64"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.SettingsModel",
+      "length": 11644,
+      "adler32": 2051141377,
+      "sha256": "3790a3575e37dcb7156c9e30e8daa9db1273fcf179472fba06eae7ed97de4cbf"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.SettingsNav",
+      "length": 3047,
+      "adler32": 1824779189,
+      "sha256": "9bd3a39f86efd5f5739366105cbc31b51c3c0ee44375add1bde689e88c06590d"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.SettingsText",
+      "length": 6827,
+      "adler32": 539160024,
+      "sha256": "90f5f8068c7b87ff8863ff5a864a35c39b597ccf44c091745b4cd28d7bc6421a"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.TarantulaText",
+      "length": 1763,
+      "adler32": 3505087579,
+      "sha256": "b355e94d9ba3abef5678979d564c7002fe06694f463b3732b9338b2b0a5be3e7"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.TitleText",
+      "length": 4007,
+      "adler32": 2794866054,
+      "sha256": "fc403bf3baca72e67e72240c3498bebed0be495f0cb652e64fb2217f600a5831"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.WaspText",
+      "length": 7025,
+      "adler32": 878459514,
+      "sha256": "e8bc2d3ba2d21f731eb9a2f5557c2257d71d5b12f204d96e96e34c601be34496"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.UI.WaterText",
+      "length": 799,
+      "adler32": 2924352060,
+      "sha256": "65797a619ed65fd3249bdcc899c814a10214ad965efe04b294d8f4b20e1bef3e"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.AntForage",
+      "length": 1778,
+      "adler32": 858419350,
+      "sha256": "f098f529fe11c7d95f84e2899ec311e7980e981f03279e1ee28353f122a343b5"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.DogGround",
+      "length": 1852,
+      "adler32": 951282743,
+      "sha256": "093d7ce881af9709eab17ac47b9a128741083ededc7eec2f3c31db41a8da9c3f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Environment",
+      "length": 7926,
+      "adler32": 2546960820,
+      "sha256": "33f67ac8a4f7fb8d5948ae70ddae39b9c10bd1a4bf7c2a61264e5b09ecbfed64"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Garden",
+      "length": 182601,
+      "adler32": 129976241,
+      "sha256": "c9308f5b4952fbfbc6948a4b3598a3ed152eadecf778204e6e930f04aa52541f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.GardenPocket",
+      "length": 4353,
+      "adler32": 427665401,
+      "sha256": "80d22923c1d3241d193ba385d1e7523f420dbdd82fb2d9ab70060ae09c8d35ad"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Hut",
+      "length": 181305,
+      "adler32": 1864948600,
+      "sha256": "4c453c704cd072da8505e5f942321789b44b2679c3526a4d563323fb4666c83b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.LivedInSites",
+      "length": 6661,
+      "adler32": 4158548360,
+      "sha256": "37149083c261716823c4cf49170a472bd0ecc87be8e8e6ea39aed77dbe7fe3f3"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.LookPlan",
+      "length": 14254,
+      "adler32": 453198522,
+      "sha256": "bc105269c00b11393c4accf576ed37a17efc4c8d34b8e30c4945b47fd766dcc9"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Meadow",
+      "length": 74919,
+      "adler32": 2708264933,
+      "sha256": "5159e1ab961dfeeee90ec9091deeb20e40853c8c01795dfee2eb457cf15ffbeb"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.NavigationPreparation",
+      "length": 2297,
+      "adler32": 386796362,
+      "sha256": "ab6c0aeec2351f063a7bb235675be95426d6f72dcbd9736786899cfe4c865174"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Pond",
+      "length": 71247,
+      "adler32": 1701016864,
+      "sha256": "3a0ab3b343c4f73292b420f3a9faebf03750698b2fabf3d68cc846d06ff00f4f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Preserve",
+      "length": 12259,
+      "adler32": 4185112678,
+      "sha256": "ee276cf45c5c27ac277c3e69f64b8b6f360d9297b7cf15289769939318d0007c"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.PreserveLook",
+      "length": 65587,
+      "adler32": 2819455688,
+      "sha256": "e24536af30e3568b404d3f8e44c1f0635aa8d008b8825f93e3896d4f84219a4b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.PreserveTrain",
+      "length": 5117,
+      "adler32": 3987110454,
+      "sha256": "7042e344b4f1d9d9b30a2ad9dd6689dd8d16053818d5c95fb3a0f2d06140d35b"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Region",
+      "length": 11484,
+      "adler32": 3237036796,
+      "sha256": "3854417660816d5922a261b3b3c93674ba334af0e83e3c7883903410792bba14"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.StationAir",
+      "length": 7452,
+      "adler32": 1823263693,
+      "sha256": "ac0ebc96a183fb7d8409d63ce490d9ceea1f0d6f37f89a7ae9818dc2759d7b05"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.StationTerritory",
+      "length": 1245,
+      "adler32": 3918315030,
+      "sha256": "57231a28000809a4d1eebe9397866e3fec313dd990fc3dc863ef3759551e7f4f"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Verge",
+      "length": 10721,
+      "adler32": 123004768,
+      "sha256": "68c68b768a1a879d341e5b76a3897c5587b98c54db43edfa8813af429b044e97"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.WorldBuild",
+      "length": 5013,
+      "adler32": 4172528567,
+      "sha256": "86ff266765dad8626d3ea3a44118a193b6b818bd2845bc7a21a938cb58367f41"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.WorldMap",
+      "length": 34013,
+      "adler32": 2126719130,
+      "sha256": "d0ea26ee6737d1ca0d9cfb04de6cf258fd7f5286dac3d61f9239db7d56581672"
+    },
+    {
+      "path": "ReplicatedStorage.Shared.World.Worlds",
+      "length": 2991,
+      "adler32": 2060510961,
+      "sha256": "fb3b78fc2819bece7bbce766b124021c33c553a9306a9abafb2dc0290f5571a3"
+    },
+    {
+      "path": "ServerScriptService.Server.DataStoreBackend",
+      "length": 2491,
+      "adler32": 3043778241,
+      "sha256": "9a0a140ed3837222deed02063f8df14c36d91e0151b5c41295a3816971356552"
+    },
+    {
+      "path": "ServerScriptService.Server.Main",
+      "length": 5128,
+      "adler32": 1856174922,
+      "sha256": "ac73f0d2988ba23b00cd8e0bb01a4668d75b48160595d1d7531a62f141ed4b9b"
+    },
+    {
+      "path": "ServerScriptService.Server.Persistence",
+      "length": 4320,
+      "adler32": 3470843289,
+      "sha256": "f62032b53eafad45d6e95f8ea87635354a07961d70e7277eb634e235b4fd3edd"
+    },
+    {
+      "path": "ServerScriptService.Server.RestCompression",
+      "length": 7021,
+      "adler32": 250986797,
+      "sha256": "10887f494c2afefa679cf2956f5f478d1390bd34e4169e20aa18b25d528cc413"
+    },
+    {
+      "path": "ServerScriptService.Server.SaveService",
+      "length": 13748,
+      "adler32": 280980686,
+      "sha256": "7bca22a20add702e5ef73743545a5bed7b2d0565e22730a4332e5315f7aa2eb0"
+    },
+    {
+      "path": "ServerScriptService.Server.WorldFocus",
+      "length": 6060,
+      "adler32": 2161977052,
+      "sha256": "aa0b9347a9fa859f36be3adf5193c1a38c8a5cb9239ea7d6ce307160cb357255"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.BirdBody",
+      "length": 12750,
+      "adler32": 3394874093,
+      "sha256": "e290e574c9064832dd822ab008e9dc247bbb44512b5a381c13b1ea6674b801c7"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.BugBodies",
+      "length": 40591,
+      "adler32": 2543180892,
+      "sha256": "889696d55ad001e610d3c8885402141faa3b9d48c5b478a63dc94fd7611dcf24"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CatBody",
+      "length": 5705,
+      "adler32": 668882172,
+      "sha256": "42239c8a504a920be01228cf3fb147ffedffdcb3c77ebbe794b71a502c2e950c"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CaughtPanel",
+      "length": 10867,
+      "adler32": 3320433887,
+      "sha256": "d93b8905305be924183919edde3e9dc0511109913109188c7c43a3c75b3dadf7"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CrabBody",
+      "length": 6335,
+      "adler32": 2664545019,
+      "sha256": "3e562e7ae8e1d38edd9662b6c5a5a8139a662c5a208c6b4fab92c204998fe383"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.FlyBodies",
+      "length": 37567,
+      "adler32": 1264177891,
+      "sha256": "3aa18fabc5a5b49912a9e0ef0887dcc110b8b29e5a7a201763abbba299dab977"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.FrameProfile",
+      "length": 5674,
+      "adler32": 705388028,
+      "sha256": "039adb3277928384ccb2a9add7b7f0d55f7ca5975013d9e04aceb08914ade9b0"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.HutLife",
+      "length": 12652,
+      "adler32": 3669820308,
+      "sha256": "4fa40d51d324bb8cdd0fb9ee94015f3699e62890ce23dab05750229da8985f23"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.LivingWorld",
+      "length": 26044,
+      "adler32": 2540679593,
+      "sha256": "270664ccf742dbbeeffe2944bfc8b583cae33b7754837d2a02ebbe708c65d7d5"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.LookStream",
+      "length": 12993,
+      "adler32": 227728295,
+      "sha256": "2effb1e7d6a302cfc35c5e574c3c372453c195b3b260e37107c537d15b7a5b93"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.MateStage",
+      "length": 17576,
+      "adler32": 1864503707,
+      "sha256": "d94bd815a627aea40d08f8395015ac636a25636bf4f33bbbd4268a0f219a2310"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.MealPresentation",
+      "length": 3710,
+      "adler32": 959056491,
+      "sha256": "79895cdbf10ac8018cd116ada76c23cb6ad63408e609da0b46e3fcf37082a9d6"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.NotebookArt",
+      "length": 1631,
+      "adler32": 2857439709,
+      "sha256": "8412c1a40ce6a48c5e4696fed703ae7465aef0b165f4809d4deacc37443e499c"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.NotebookPanel",
+      "length": 21273,
+      "adler32": 166114347,
+      "sha256": "93b2e0fb3dfca309a58ac9ec64db0dfe6f9b1a2aa9ad1172e3bbed5ccfd22b53"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.OldSkins",
+      "length": 1848,
+      "adler32": 2304471703,
+      "sha256": "1df75fdbd4d88c9023401f18c99f369fc7980791f583b4065c6b0eb160f9ded2"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PerceptionHud",
+      "length": 9166,
+      "adler32": 3896090417,
+      "sha256": "b0a77d9fee4d8a56d06751d8eb0bd7f254cb7d6928781ccb743b9d88f79ae773"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PerceptionStage",
+      "length": 1751,
+      "adler32": 684210096,
+      "sha256": "55311bc6c1ac554efef6c6e06b91825fd790923b7bf446677201c552210134ae"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PondBodies",
+      "length": 10161,
+      "adler32": 1593716354,
+      "sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.RareBody",
+      "length": 5044,
+      "adler32": 2245640159,
+      "sha256": "0582fe30cc0b30f6054832128bdbe8a61ade74c937d5e245917ba7359e216e69"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SaveClient",
+      "length": 13112,
+      "adler32": 2100553092,
+      "sha256": "5f3da74904f3ae57b4a39131c3385ddea2121d11a07c20404283f7666ef64bfc"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SaveContinuation",
+      "length": 18588,
+      "adler32": 3888431920,
+      "sha256": "a748bbff893946937836e67e0d2ea06d019bed79900e6e4612aea287f2f93043"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SaveRestore",
+      "length": 1866,
+      "adler32": 2180683769,
+      "sha256": "212f718139db58a4b7aab4d6bdb3ea94096e7b6583c6eeb3ef8338c2ac9c72e7"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SelfTest",
+      "length": 103960,
+      "adler32": 169942316,
+      "sha256": "cfb858a819dc67826e428cd4c70e55582fe03b8a67a14a2d607b20db85d40b9b"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SettingsPanel",
+      "length": 29480,
+      "adler32": 3267406127,
+      "sha256": "0a14c23718aba1f9e0dda835df7dd57aa6fd4609db75ba39f36bd3d284413b1b"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.Soundscape",
+      "length": 11994,
+      "adler32": 2752361967,
+      "sha256": "ac199914b97b81a722037aae56ad228807ecf0fefcdb1ff5a1aa241be42ad561"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderCamera",
+      "length": 38971,
+      "adler32": 1759265986,
+      "sha256": "353c77d2ff37f457a67c52224eb3f7617679c58ccbba07c2e93d98544422f484"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderClient",
+      "length": 168230,
+      "adler32": 1658900042,
+      "sha256": "da3757953423c311469916a49bdc6d15502d6b54e01203294c5ddec03e44c32f"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderEyes",
+      "length": 17288,
+      "adler32": 2772189621,
+      "sha256": "3dc323eda15ddf9b79c1991029209b96cb14f89b6ce20df278e4bdcebd047689"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderHud",
+      "length": 20921,
+      "adler32": 3289329355,
+      "sha256": "917e92dbd5b987a860124c1274ec6a19efaf1e5a3d778d1cebbd834a6d701642"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderInput",
+      "length": 14756,
+      "adler32": 3324379393,
+      "sha256": "2e2d2d3acea655fc495c4781c040980f901c5187cdefdb8a8128047b90d2ccee"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.StationMouseBody",
+      "length": 1668,
+      "adler32": 2901804335,
+      "sha256": "8098b4e62f9448efc904da1258f700320e436b99d013900615bfc32d37f54a49"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.TitleCard",
+      "length": 10951,
+      "adler32": 4222501964,
+      "sha256": "1d2610a86aceda23f08d8c97ddb319ccc6d70318e3b37872f92ca6a48d37922b"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.TrainPass",
+      "length": 5350,
+      "adler32": 3981100976,
+      "sha256": "470799097fe6c6fd28bc4996f0fbf4c2f6924c3268dd227feddb3cec07045f72"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WaspBody",
+      "length": 10657,
+      "adler32": 1148016164,
+      "sha256": "5838e07272bd80e0ca7062e458eb5f498f9d79f613ef81268b948502c40c9a8f"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldClient",
+      "length": 21483,
+      "adler32": 538093466,
+      "sha256": "8e0dc5fe9765101fa80d74be0e552bfaedff047957da90d1ae249ce8517b7c3b"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldDetail",
+      "length": 1553,
+      "adler32": 1640172053,
+      "sha256": "6b1fbb565552376295dd3a372b527e99d577aa9b0ce211de89edaa54b0910e80"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldShadows",
+      "length": 9423,
+      "adler32": 3015975520,
+      "sha256": "85846e9d3b65e422bb4a58ebddecd895ddc1328f70673d205f3bc21863584233"
+    },
+    {
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SilkPlayback",
+      "length": 2979,
+      "adler32": 1048250150,
+      "sha256": "54e386e01a87c33d859a022878e8d069401616fe72dba0949c998d56792eca68"
+    }
+  ],
+  "persistence_disabled": true,
+  "place_sha256": "7f44301746ffce7ea8d0293a7ebc11b92a667d18448eb55ccd5c1a6b1c6572ed",
+  "scope": "Actual current client creature readiness gate with locally removed/restored engine instances; no natural network stream-out, physical devices or FPS claim; never publish"
+}

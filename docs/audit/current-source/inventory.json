@@ -1,5 +1,5 @@
 {
-  "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "source": "e51c546",
   "branch": "codex/save-continue",
   "baseline": {
     "published": true,
@@ -898,10 +898,10 @@
       ]
     },
     {
-      "sha256": "f2fda201bc86a5e7d0826669a9996997be275155bfd99595efebc562eab051df",
+      "sha256": "8e0dc5fe9765101fa80d74be0e552bfaedff047957da90d1ae249ce8517b7c3b",
       "path": "roblox_port/src/Client/WorldClient.luau",
       "name": "WorldClient",
-      "lines": 338,
+      "lines": 340,
       "purpose": "The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this",
       "side": "Client",
       "strict": true,

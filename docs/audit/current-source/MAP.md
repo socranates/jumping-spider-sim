@@ -1,9 +1,9 @@
 # Foundation map
-Current source `068a87891770dbdf291ec3cab0e67480d14c0251`, branch `codex/save-continue`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
+Current source `e51c546`, branch `codex/save-continue`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
 
 See `../CURRENT.md` for current verification gaps; `../DATA.md` remains the historical schema discussion. This is a lexical index, not a line-by-line review.
 
-Static index: 222 source files, 56,775 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
+Static index: 222 source files, 56,777 lines. Shared means available to either side; consumers determine execution. Direct test names are lexical matches, not coverage percentages. Requires inferred from literal module names; dynamic cases need manual review.
 ## Source inventory
 
 | Source | Lines | Side | Purpose from source | Required by | Direct tests | Flags |
@@ -42,7 +42,7 @@ Static index: 222 source files, 56,775 lines. Shared means available to either s
 | `roblox_port/src/Client/TitleCard.luau` | 261 | Client | The title card's camera and the intro of a new life (ROBLOX-109). The words are UI/TitleText's, the shots Movement/TitleShots'; this module draws them. | SpiderClient.client.luau | none | no direct test import |
 | `roblox_port/src/Client/TrainPass.luau` | 137 | Client | The trains beyond the preserve's north fence, drawn (ROBLOX-115): a silhouette of cars that runs along the railway's track when World/PreserveTrain's timetable | WorldClient.luau | none | no direct test import |
 | `roblox_port/src/Client/WaspBody.luau` | 226 | Client | The drawn mud dauber wasp (Data/WaspLook has every number): about 2.5 cm long, built from ellipsoids and rods as the fly is | SpiderClient.client.luau | wasp.luau |  |
-| `roblox_port/src/Client/WorldClient.luau` | 338 | Client | The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this | SpiderClient.client.luau | world_client.luau |  |
+| `roblox_port/src/Client/WorldClient.luau` | 340 | Client | The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this | SpiderClient.client.luau | world_client.luau |  |
 | `roblox_port/src/Client/WorldDetail.luau` | 35 | Client | The low-detail tier of the world, applied on one client: phones and tablets drop what the server built for the full tier | SpiderClient.client.luau | world.luau |  |
 | `roblox_port/src/Client/WorldShadows.luau` | 186 | Client | The walkable boxes' shadows, kept to the ones an eye at the spider could see (ROBLOX-121). | WorldClient.luau | shadows.luau |  |
 | `roblox_port/src/First/Splash.client.luau` | 10 | First | ReplicatedFirst's one script (ROBLOX-109): the game's own loading screen, First/SplashScreen. Whatever happens in it, it ends: SplashScreen.run is | entrypoint or no static consumer | none | no direct test import |

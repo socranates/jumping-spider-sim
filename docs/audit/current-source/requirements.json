@@ -1,13 +1,13 @@
 {
-  "as_of_utc": "2026-10-22T22:07:41.443543+00:00",
-  "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+  "as_of_utc": "2026-10-22T22:48:36.680287+00:00",
+  "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
   "goal_complete": false,
   "published": false,
   "requirements": [
     {
       "id": "inventory",
       "status": "partial",
-      "evidence_boundary": "Current068a878 lexical index binds all222 source files/56775 lines to exact committed production bytes;13 files over800 lines,15 without direct top-level test import, no literal-require cycles. Consumers/imports/call sites are indexed. Exact loop frequency/ownership and dynamic requires still need manual review; not runtime coverage percentages.",
+      "evidence_boundary": "Currente51c546 lexical index binds all222 source files/56777 lines to exact committed production bytes;13 files over800 lines,15 without direct top-level test import, no literal-require cycles. Consumers/imports/call sites are indexed. Exact loop frequency/ownership and dynamic requires still need manual review; not runtime coverage percentages.",
       "references": [
         "docs/audit/current-source/MAP.md",
         "docs/audit/current-source/inventory.json"
@@ -23,22 +23,22 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "encoder-full-gates-verified",
-      "evidence_boundary": "Source068a878 Windows28618 and Linux39860574006 each completed76 suites/465380 checks/0 failures, compile222/strict/runner5; exact source/test/workflow/log hashes verified. Current-game native sequence1792707403197 passed32 save/return assertions/225 fingerprints, production Persistence disabled, zero CreatorErrors and closed/restored artifact verified. Paired native20738 assertions proves isolated encoder cost only. Broader lifecycle/device/online/performance/release requirements remain open.",
+      "status": "stream-readiness-focused-verified-full-running",
+      "evidence_boundary": "Currente51c546: world_client36/0, independent reproduction3/0 versus baseline0/3, compile222/strict/runner5 pass. Windows exec43263 and Linux39866927660 are running, not terminal; expected76/465383 is unverified. Native focused11 assertions/all223 fingerprints passes with production persistence disabled. Previous068a878 both full gates76/465380 and full native274/0/0 are prior-source evidence only.",
       "references": [
-        "docs/save-continue/json-encoding/README.md",
-        "docs/save-continue/json-encoding/verification.json",
-        "docs/save-continue/json-encoding/game-native-receipt.json",
-        "docs/save-continue/json-encoding/windows-full-process.json",
-        "docs/save-continue/json-encoding/ci-final.json"
+        "docs/stream-readiness/README.md",
+        "docs/stream-readiness/candidate.json",
+        "docs/stream-readiness/native-receipt.json",
+        "docs/audit/current-native/full-receipt.json"
       ]
     },
     {
       "id": "native-life-loop",
       "status": "partial",
-      "evidence_boundary": "Historical native preserve self-test274/0/0 exists. Current fast-clock Normal/Easy/Free lifecycle and all deaths have not been manually verified on this candidate.",
+      "evidence_boundary": "Preceding068a878 native full preserve walkthrough274/0/0 with233 region visits and zero CreatorErrors completed594seconds; includes existing scripted starvation-handler/eating/rest checks. Currente51c546 native11 focuses on readiness only. Natural hatch/7/10 moults/adult/mating/eggs/next generation and all mode/death boundaries remain unverified manually.",
       "references": [
-        "docs/audit/native-final.txt",
+        "docs/audit/current-native/full-receipt.json",
+        "docs/stream-readiness/native-receipt.json",
         "docs/audit/TESTS.md"
       ]
     },
@@ -132,11 +132,11 @@
     },
     {
       "id": "network-streaming",
-      "status": "open",
-      "evidence_boundary": "Real stream-out/rearrival, respawn/rest rapid transitions and surfaces under the spider still need native network-streaming review. Scripted Instance lifecycle tests are narrower.",
+      "status": "partial",
+      "evidence_boundary": "Currente51c546 non-station creature readiness no longer trusts stale first-arrival flags. CLI3/0 and actual-client native11 checks/all223 fingerprints prove refusal of locally removed/partial geometry and resumption after full restoration; gate1000 calls5.287ms in one fixture. No natural server-driven stream-out/rearrival or network-pressure proof yet.",
       "references": [
-        "docs/shadow-stream-retention/README.md",
-        "docs/observed-life-retirement/README.md"
+        "docs/stream-readiness/README.md",
+        "docs/stream-readiness/native-receipt.json"
       ]
     },
     {
@@ -286,10 +286,17 @@
   "historical_baseline_source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "historical_baseline_evidence_id": "b425324a7f0a8007",
   "inventory_evidence": {
-    "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+    "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
     "modules": 222,
-    "lines": 56775,
-    "inventory_sha256": "3446c43ec9454c6d1dea57d6fb21777e2d129a67c7119454f36ee465fc39ea63",
+    "lines": 56777,
+    "inventory_sha256": "f275fae6be04d338be9e04b5ad63a2477c71cb4ceeae5c22624036052487ef26",
     "scope": "Lexical source/dependency/test-import index, not runtime coverage or release proof"
+  },
+  "latest_readiness_milestone": {
+    "source": "e51c546bde74ee41d07c6c8f08f26a10dd193a14",
+    "status": "focused-native-verified-full-gates-running",
+    "evidence": "docs/stream-readiness/README.md",
+    "goal_complete": false,
+    "published": false
   }
 }

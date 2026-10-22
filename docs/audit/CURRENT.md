@@ -1,3 +1,13 @@
+# Current unpublished candidate: outdoor streaming readiness, e51c546
+
+[Current evidence](../stream-readiness/README.md). WorldClient's non-station creature gate now checks current geometry instead of trusting a first-arrival flag. Removed/partial regions stop their creatures; complete re-arrival resumes them. Persistent station behavior and ecology are unchanged. Independent reproduction: baseline0/3, candidate3/0; world_client36/0; compile222/strict/runner5 pass. Studio1792709181290 passed11 assertions/all223 fingerprints with production Persistence disabled and zero CreatorErrors. The diagnostic is closed and its original XML/hash restored.
+
+Full Windows exec43263 and Linux39866927660 are live on sourcee51c546bde74ee41d07c6c8f08f26a10dd193a14. Expected76 suites/465383 checks is not a terminal result yet. Root save-continue/verify.py requires both completed full gates plus the native receipt. Do not restart live jobs or stage their unfinished logs.
+
+The preceding source068a878 native full walkthrough passed274/0/0, including233 region visits, in594seconds. Those prior-source results remain in audit/current-native. The new11 checks deliberately remove/restore local engine instances; actual server-driven stream-out/re-arrival, low tier, physical devices, full natural lifecycle, older-world migration, online durability and render/shadow performance remain open. Native gate sample1000 calls/5.287ms is component cost, not FPS proof. Source release artifacts remain old; nothing published; broader goal active.
+
+Earlier status below is historical.
+
 # Current unpublished candidate: encoder adoption, 068a878
 
 Current source068a87891770dbdf291ec3cab0e67480d14c0251 is on codex/save-continue. [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/json-encoding/README.md). One-buffer canonical encoding retains exact bytes/errors/checksums; only runtime Json.luau changed. Focused21420/0, compile222/strict/runner5 pass, native paired algorithm20738 assertions/224 fingerprints pass. A same-record isolated native comparison averages40.27percent lower encoder CPU; no whole-game FPS, heap-gain or hard-frame claim.

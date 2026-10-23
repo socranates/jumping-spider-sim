@@ -6,7 +6,7 @@ local Templates=require("../src/Server/RecoveryTemplates")
 local Build=require("../src/Shared/World/WorldBuild")
 local Rules=require("../src/Shared/Data/SaveRules")
 local Client=require("../src/Client/SaveClient")
-local count=0
+local count=0;local readChecks=0
 local function check(ok,why) assert(ok,why);count+=1 end
 local b=Memory.new();local clock={now=200};local packets={};local owners={};local errors={};local holdAck=true
 local oldBytes={}
@@ -28,7 +28,10 @@ WorldMap.use("preserve");workspace:SetAttribute("World","preserve");workspace:Se
 Build.world(workspace)
 local catalog
 local ds={}
-function ds:GetAsync(key,opts) check(opts==nil or opts.UseCache==false,"application used cached storage reads");local ok,v,why=b:read(key);if not ok then error(why) end;return v end
+function ds:GetAsync(key,opts)
+ assert(opts==nil or opts.UseCache==false,"application used cached storage reads");readChecks+=1
+ local ok,v,why=b:read(key);if not ok then error(why) end;return v
+end
 function ds:UpdateAsync(key,fn) local ok,v,why=b:update(key,fn);if not ok then error(why) end;return v end
 local server=__replacementService.new({backend=Backend.new(ds,codec),now=function() return clock.now end,sleep=function(dt) clock.now+=dt end,
  spawn=function(fn,...) fn(...) end,jobId="application-wire",keyOf=function() return 46001 end,
@@ -171,6 +174,8 @@ server:removePlayer(player)
 local final=owners[#owners]
 check(final.session.closed and not final.session.flushing and not final.session.lockHeld and final.runtime.phase=="closed" and b.data.P_46001.lock==nil,"final ordinary application owner did not close/release its lease")
 catalog:close()
+check(readChecks>0,"application never exercised storage reads")
+print("RECOVERY_APPLICATION_GAME read_invariants="..readChecks.." every_read_checked=true")
 print("RECOVERY_APPLICATION_GAME passed="..count.." failed=0")
 end
 runApplicationGameChecks()

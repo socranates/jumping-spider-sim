@@ -1,0 +1,16 @@
+{
+  "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-engine-stream-695e772-full-default\\Windowsill-engine-stream-695e772-full-default.rbxlx",
+  "model_sha256": "b278d6a78b6262cdd79bf133083a34078339ef9e1907f92fb921ab82d3f1e4b8",
+  "manifest_sha256": "367d48e90398a384c0f1c574abf04f1ee73348bdfb482bf55d114ab71770eed8",
+  "guard_sha256": "6f9619cc94bc697b3bbb2fa4239db637087089136fb0d66cbcb2bf03e488687f",
+  "probe_sha256": "8492c5568ca644445169b179a79cc992df9f0ac18f12876090c9434d2dadcc85",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

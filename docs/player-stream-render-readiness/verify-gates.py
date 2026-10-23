@@ -29,6 +29,15 @@ ci=json.loads((H/'ci-final.json').read_text(encoding='utf8'))
 assert ci['head_sha']==SOURCE and ci['status']=='completed' and ci['conclusion']=='success'
 assert ci['suites']==76 and ci['passed']==468866 and ci['failed']==0 and ci['modules_compiled']==222 and ci['runner_regressions']==5
 for name,digest in ci['logs_sha256'].items():assert sha((H/name).read_bytes())==digest
+assert 'PLAYER_STREAM_RENDER_WAIT sub_tick_frames=12 waiting_stable=true clocks_frozen=true' in (H/'ci-suites.txt').read_text(encoding='utf8')
+native=json.loads((H/'native-full-receipt.json').read_text(encoding='utf8'))
+assert native['source']==SOURCE and native['test_passed'] and native['checks']==60 and native['guard_verified_scripts']==223
+assert native['creator_errors_during_fixture']==0 and native['original_model_unchanged'] and native['studio_closed']
+assert sha((H/'native-full-output.txt').read_bytes())==native['filtered_output_sha256']
+if Path(native['path']).exists():assert sha(Path(native['path']).read_bytes())==native['model_sha256']
+component=json.loads((H/'private-unchanged.json').read_text(encoding='utf8'))
+assert component['current_production_source']==SOURCE and component['executable_bundle_unchanged'] and component['all_explicit_inputs_unchanged']
+assert component['private_component_checks']==187257 and component['private_component_failures']==0 and component['current_overlay_candidates']==34
 assert subprocess.run(['git','diff','--quiet','HEAD','--','roblox_port/src','roblox_port/tests'],cwd=ROOT).returncode==0
 assert subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()==SOURCE
 assert 'ownerFactory' not in (ROOT/'roblox_port/src/Server/Persistence.server.luau').read_text(encoding='utf8')
@@ -37,5 +46,7 @@ result=dict(source=SOURCE,windows_suites=76,windows_passed=468866,windows_failed
  linux_run=ci['id'],linux_suites=76,linux_passed=468866,linux_failed=0,compile=222,strict_clean=True,runner_regressions=5,
  immutable_windows_snapshot_verified=True,owner_factory_default_not_installed_in_engine=True,client_recovery_default_not_configured=True,
  player_collision_hold_and_projected_tick_cli_verified=True,player_sub_tick_render_wait_verified=True,explicit_recovery_handshake_and_transport_verified=True,protected_selection_skips_two_legacy_copies=True,
+ native_actual_client_scripted_checks=60,native_actual_client_scripted_fixture_verified=True,native_real_network_pressure_verified=False,
+ unchanged_private_component_checks=187257,current_overlay_candidates=34,
  native_full_game_verified=False,real_service_rejoin_verified=False,goal_complete=False,published=False)
 (H/'full-verification.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(result,indent=2))

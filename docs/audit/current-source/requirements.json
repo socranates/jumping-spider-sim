@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T13:05:01.184662+00:00",
+  "as_of_utc": "2026-10-23T13:22:00.909744+00:00",
   "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
   "goal_complete": false,
   "published": false,
@@ -23,8 +23,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "current-native-passed-full-platform-gates-running",
-      "evidence_boundary": "Current695e772: 222 compiles, clean strict, runner5; focused client43/0 including twelve quarter-tick render holds. Current immutable Windows95994 and Linux39957397842 are live, expected76/468866/0; no final full pass yet. Previousbf94f9d Linux76/468866/0 is historical and native diagnostic exposed a waiting-flag flicker. Last both-platform full source257e1a4 passed76/468859/0. Current native scripted client fixture60/0 is bounded, not release qualification.",
+      "status": "both-platforms-verified-bounded-native-hold-passed",
+      "evidence_boundary": "Current695e772: Windows95994 terminal exit0 and Linux39957397842 terminal success; each76/468866/0, compile222, clean strict, runner5. Immutable inputs/log hashes and both platforms twelve-quarter-tick wait regression verified. Native actual-client full-detail scripted fixture60/0 with223 fingerprints passes; not a full natural-life, online service/rejoin or release proof.",
       "references": [
         "docs/recovery-verified-gates/verification.json",
         "docs/recovery-verified-gates/README.md",
@@ -40,7 +40,8 @@
         "docs/player-stream-render-readiness/README.md",
         "docs/player-stream-render-readiness/checks.json",
         "docs/player-stream-render-readiness/windows-full-start.json",
-        "docs/player-stream-render-readiness/ci-start.json"
+        "docs/player-stream-render-readiness/ci-start.json",
+        "docs/player-stream-render-readiness/full-verification.json"
       ]
     },
     {
@@ -315,7 +316,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current695e772 is pushed on codex/save-continue; compile222/strict/runner5 and bounded native60 pass. Immutable Windows95994/Linux39957397842 full gates are running; no current complete platform pass or candidate yet. Earlier257e1a4 both-platform full76/468859/0 and exact-source candidate remain historical. Private recovery component187257/0 is byte-identical, with current34-candidate overlay types; whole-game recovery menu/profiles/model adoption, real online/release remain open. Player collision hold and native render-cadence counterexample/fix are explicitly handed off. Original OneDrive and unrelated edits preserved.",
+      "evidence_boundary": "Current695e772 pushed on codex/save-continue; both full76/468866/0 platform gates, compile222/strict/runner5, bounded native60/0 and exact222-source no-diagnostic candidate verified. Private recovery component187257/0 remains byte-identical with current34-candidate overlay types. Engine-streaming experiment prepared separately; actual game recovery menu/profile/model adoption, replacement epochs and native/online/release remain open. Original OneDrive and unrelated edits preserved; nothing published.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md",
@@ -1496,7 +1497,7 @@
     "hunger_energy_loss_proven": false,
     "fix_scope": "Specific known-region collision hold; see latest_player_stream_fix, real network pressure remains open"
   },
-  "last_both_platform_full_source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+  "last_both_platform_full_source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
   "latest_player_stream_fix": {
     "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
     "focused_checks": 43,
@@ -1510,8 +1511,10 @@
     "whole_game_verified": false,
     "windows_exec_handle": 95994,
     "linux_run": 39957397842,
-    "full_gates": "running",
-    "published": false
+    "full_gates": "both-platforms-verified",
+    "published": false,
+    "windows_exit_code": 0,
+    "linux_conclusion": "success"
   },
   "latest_private_recovery_component_reuse": {
     "current_production_source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
@@ -1526,6 +1529,53 @@
     "whole_game_private_recovery_proof": false,
     "native_recovery_verified": false,
     "real_datastore_verified": false,
+    "published": false
+  },
+  "latest_player_stream_full_gates": {
+    "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+    "windows_suites": 76,
+    "windows_passed": 468866,
+    "windows_failed": 0,
+    "windows_output_sha256": "164d8fda4d3f4723da6d684d0428953032feba8a38f88d7636446f06b403e79e",
+    "linux_run": 39957397842,
+    "linux_suites": 76,
+    "linux_passed": 468866,
+    "linux_failed": 0,
+    "compile": 222,
+    "strict_clean": true,
+    "runner_regressions": 5,
+    "immutable_windows_snapshot_verified": true,
+    "owner_factory_default_not_installed_in_engine": true,
+    "client_recovery_default_not_configured": true,
+    "player_collision_hold_and_projected_tick_cli_verified": true,
+    "player_sub_tick_render_wait_verified": true,
+    "explicit_recovery_handshake_and_transport_verified": true,
+    "protected_selection_skips_two_legacy_copies": true,
+    "native_actual_client_scripted_checks": 60,
+    "native_actual_client_scripted_fixture_verified": true,
+    "native_real_network_pressure_verified": false,
+    "unchanged_private_component_checks": 187257,
+    "current_overlay_candidates": 34,
+    "native_full_game_verified": false,
+    "real_service_rejoin_verified": false,
+    "goal_complete": false,
+    "published": false
+  },
+  "latest_player_stream_production_candidate": {
+    "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-695e772\\TheWindowsill-production-candidate.rbxlx",
+    "place_sha256": "5fa12d465ace029007cd3585f7a545f1685a3266fef5e29c711e9001d1305ae1",
+    "scripts": 222,
+    "all_production_sources_exact": true,
+    "injected_diagnostics": false,
+    "persistence_disabled": false,
+    "verified_platform_suites": 76,
+    "verified_platform_checks": 468866,
+    "native_current_source_scripted_fixture_verified": true,
+    "native_scripted_fixture_checks": 60,
+    "native_production_candidate_verified": false,
+    "owner_factory_installed": false,
+    "full_release_audit_complete": false,
     "published": false
   }
 }

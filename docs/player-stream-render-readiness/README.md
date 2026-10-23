@@ -15,13 +15,15 @@ The current correction passes the same pending destination to the per-render rea
 - Current source: 34 private recovery candidates compile/type-check clean. The executable recovery component bundle and all its explicit inputs are byte-identical to the earlier 187,257/0 execution at `257e1a4`; `private-unchanged.json` proves component evidence reuse. This is not a new whole-game recovery run.
 - Actual Studio client, full detail: 60 passing checks, 223 checked script fingerprints (222 exact production scripts plus one private probe), saving disabled and unbound PlaceId 0. Covers scripted collision disappearance, partial return, complete return to the same objects, repeated disappearance, menus while waiting, projected airborne refusal and thirty stable follow-up frames. Also covers the prior HUD/controlled-animal presentation checks. See `native-full-receipt.json` and `native-full-output.txt`.
 
-## Full gates in progress
+## Full gates verified
 
-Windows unified exec handle **95994**, immutable source snapshot; `windows-full-start.json` is the input manifest. Expected 76 suites / 468,866 checks / zero failures. Poll the existing handle; do not start another run.
+Windows unified exec handle **95994** is terminal exit 0; Linux push run **39957397842** is terminal success. Each passed **76 suites / 468,866 checks / zero failures**. `full-verification.json` binds immutable Windows snapshot inputs, both output logs, compile/strict/runner evidence and the bounded native fixture. Both outputs include the new twelve-quarter-tick regression. Do not repeat these completed gates without a new source change or unresolved failure.
 
-Linux existing push run **39957397842**: <https://github.com/socranates/jumping-spider-sim/actions/runs/39957397842>. `fetch-ci.py` collects only this run and never dispatches a replacement.
+Linux run: <https://github.com/socranates/jumping-spider-sim/actions/runs/39957397842>.
 
-Once both gates are terminal successful, run `verify-gates.py`, then `build-production.py`. The latter creates a separate diagnostic-free exact-source candidate; it does not publish. Preserve historical evidence and the unrelated three save-cost outputs and production sourcemap.
+`verify-gates.py` passed and `build-production.py` created `C:/Users/natha/claude-xfer/Windowsill-production-695e772/TheWindowsill-production-candidate.rbxlx`: 222 exact production scripts, no injected diagnostic, SHA256 `5fa12d465ace029007cd3585f7a545f1685a3266fef5e29c711e9001d1305ae1`. It is not published or verified as a normal online production-client session. Preserve historical evidence and the unrelated three save-cost outputs and production sourcemap.
+
+An additional engine-streaming experiment is prepared separately (`engine-full-default-prepared.json`). It moves through the production WorldFocus remote from Atomic garden_b4 to distant deck_n4 and back, without reparenting collision. Default engine retention is recorded as not observed rather than falsely passing stream-out coverage. Its results are separate from the completed 60-check controlled fixture and do not affect the already-qualified source snapshot.
 
 ## Limits and next work
 

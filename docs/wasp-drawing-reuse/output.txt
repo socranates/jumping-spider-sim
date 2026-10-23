@@ -1,0 +1,3 @@
+WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+WASP passed=16884 failed=0
+WASP_REUSE passed=110742 failed=0

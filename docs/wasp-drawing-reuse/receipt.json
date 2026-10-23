@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "bundle_sha256": "05d22fb83c1e301d82d8293b97e6b1de49bc49c496dba67cceefed1fec330cbe",
+  "inputs": {
+    "candidate.luau": "ab10033f4d4a265851735a85588b3de75f0dae7f21ff13da5435f45a9808ea97",
+    "tests.luau": "b3c10533bd5a7ec9c9dfe2642cc5b9298f0e22e0856838284c32c504d9169f6b"
+  },
+  "production_changed": false,
+  "native_verified": false
+}

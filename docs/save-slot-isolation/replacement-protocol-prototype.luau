@@ -2,7 +2,7 @@
 -- Private optional transport capability; ordinary peers keep their protocol.
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Rules = require(Shared.Data.SaveRules)
-local Protocol = {VERSION = 1, RETRY = Rules.CLIENT_LIFE_GAP, TIMEOUT = 120}
+local Protocol = {VERSION = 1, RETRY = Rules.CLIENT_LIFE_GAP, TIMEOUT = 120, NEW_VERSION = 1, NEW_TIMEOUT = 960}
 function Protocol.token(value: any): boolean
  return type(value) == "string" and #value > 0 and #value <= Rules.MAX_LIFE_TOKEN_CHARS
 end

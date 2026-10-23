@@ -47,14 +47,16 @@ function Adapter.new(config: any): any
    error("replacement constructor scope ended", 0)
   end
   local debt = self.debts[key]
+  if config.newLifeFactory then owned:installNewLifeFactory(config.newLifeFactory) end
   if debt then owned:inheritReplacementDebt(debt); self.debts[key] = nil end
   return owned
  end
  cfg.send = function(player: any, message: any)
   local p = self.peers[player]
-  if not p or self.transitions[player] ~= nil then return end
+  if not p or self.transitions[player] ~= nil or p.newLife~=nil then return end
   if message.kind == "loaded" then
    message.replacement = if p.enabled then Protocol.VERSION else nil
+   message.newLife = if p.newEnabled then Protocol.NEW_VERSION else nil
    if p.previous then
     message.replaced = {epoch = p.previous.epoch, serial = p.previous.serial, id = p.previous.id}
    end
@@ -88,6 +90,13 @@ function Adapter.addPlayer(self: any, player: any)
  return installed
 end
 local function drop(self: any) self.base.stats.dropped += 1 end
+local function newReply(self:any,player:any,p:any)
+ local n=p.newLife;local entry=self.base.entries[player]
+ if not n or not entry or entry.owner~=n.owner or self.transitions[player] then return end
+ local state=if n.refused then "refused" else n.owner:newLifeStatus() or "refused"
+ entry.sequence+=1;n.last=self.now();n.state=state
+ self.send(player,{kind="new_life_state",v=Protocol.NEW_VERSION,epoch=n.epoch,sequence=entry.sequence,mode=n.mode,serial=n.serial,offerId=n.offerId,state=state})
+end
 local function scope(t: any, message: any): boolean
  return message.v == Protocol.VERSION and message.epoch == t.epoch and message.serial == t.serial and message.id == t.id
 end
@@ -157,12 +166,28 @@ function Adapter.onMessage(self: any, player: any, message: any)
   p.enabled = message.v == Rules.OFFER_PROTOCOL and message.recovery == Rules.RECOVERY_PROTOCOL and message.replacement == Protocol.VERSION
    and entry.owner ~= nil and type(entry.owner.prepareReplacement) == "function" and type(entry.owner.replacementClosed) == "function"
    and type(entry.owner.inheritReplacementDebt) == "function"
+  p.newEnabled=p.enabled and message.newLife==Protocol.NEW_VERSION and entry.owner.newLifeFactory~=nil
  end
  if message.kind == "session_replace_ready" and p.enabled and p.previous and scope(p.previous, message)
   and Protocol.known(message, {kind=true,v=true,epoch=true,serial=true,id=true}) then
   ordinaryHello(self, player); return -- retry a lost new-epoch loaded reply
  end
  if p.enabled and message.kind ~= "hello" and message.epoch ~= entry.session.id then drop(self); return end
+ if message.kind=="new_life_request" then
+  if not p.newEnabled or not Protocol.known(message,{kind=true,v=true,epoch=true,mode=true,serial=true,offerId=true,progress=true})
+   or message.v~=Protocol.NEW_VERSION or not Protocol.serial(message.serial) or not Protocol.token(message.offerId)
+   or not table.find(Rules.MODES,message.mode) or SaveRest.bounded(message.progress,Rules.MAX_PROGRESS_NODES,Rules.MAX_PROGRESS_DEPTH) then drop(self);return end
+  local n=p.newLife
+  if n then
+   if n.owner~=entry.owner or n.epoch~=message.epoch or n.mode~=message.mode or n.serial~=message.serial or n.offerId~=message.offerId then drop(self);return end
+   if self.now()-n.last>=Protocol.RETRY then newReply(self,player,p) end;return
+  end
+  n={owner=entry.owner,epoch=message.epoch,mode=message.mode,serial=message.serial,offerId=message.offerId,last=-math.huge};p.newLife=n
+  local good,accepted=pcall(entry.owner.prepareNewLife,entry.owner,message.mode,message.serial,message.offerId,message.progress)
+  if not good or not accepted then n.refused=true end
+  newReply(self,player,p);return
+ end
+ if p.newLife and message.kind~="session_replace_request" then drop(self);return end
  if message.kind ~= "session_replace_request" then self.base:onMessage(player, message); return end
  if not p.enabled or not Protocol.known(message, {kind=true,v=true,epoch=true,serial=true,progress=true})
   or message.v ~= Protocol.VERSION or not Protocol.serial(message.serial) or message.serial <= p.serial
@@ -175,6 +200,7 @@ function Adapter.onMessage(self: any, player: any, message: any)
   id=Json.checksum(entry.session.id .. ":" .. tostring(message.serial) .. ":" .. tostring(self.counter)),
   stage="preparing",started=now,last=-math.huge}
  self.transitions[player] = t -- ordinary output/intake closes before callbacks
+ p.newLife=nil -- no late New reply may revive work across replacement
  local okay,prepared=pcall(entry.owner.prepareReplacement,entry.owner,message.progress)
  if self.transitions[player]~=t or self.peers[player]~=p or self.closing or t.stage~="preparing" then return end
  t.stage=if okay and prepared==true then "offered" else "failed"
@@ -183,6 +209,12 @@ end
 function Adapter.step(self: any)
  if self.closing then return end
  self.base:step() -- an awaiting-ACK owner maintains only its held lease
+ for player,p in self.peers do
+  if p.newLife and not self.transitions[player] then
+   local state=if p.newLife.refused then "refused" else p.newLife.owner:newLifeStatus() or "refused"
+   if state~=p.newLife.state or self.now()-p.newLife.last>=Protocol.RETRY then newReply(self,player,p) end
+  end
+ end
  for player, t in self.transitions do
   if t.stage=="preparing" and self.now()-t.started<Protocol.TIMEOUT then continue end
   if t.stage ~= "closing" and self.now() - t.last >= Protocol.RETRY then

@@ -21,11 +21,12 @@ local function rawSend(self: any, message: any)
  self.rawRemotes.server:FireServer(message)
 end
 local function send(self: any, message: any)
- if self.transition ~= nil then return end
+ if self.transition ~= nil or self.newLife~=nil then return end
  local ticket = self.sendTickets[coroutine.running() or self.mainThread]
  if ticket ~= nil and ticket ~= self.transportGeneration then return end
  if message.kind == "hello" then
   message.replacement = Protocol.VERSION
+  message.newLife=if type(self.replacementOptions.onNewState)=="function" then Protocol.NEW_VERSION else nil
  elseif self.replacementEnabled then
   if not self.bound or not self.bound.epoch or message.epoch ~= nil and message.epoch ~= self.bound.epoch then return end
   message.epoch = self.bound.epoch
@@ -72,12 +73,30 @@ function Adapter.requestReplacement(self: any): boolean
  local t = {epoch=self.bound.epoch,serial=self.replacementSerial,progress=Json.copy(clean),
   stage="preparing",started=self.cfg.now(),last=-math.huge}
  self.transition = t -- all outbound ordinary traffic stops before callbacks
+ self.newLife=nil
  self.transportGeneration += 1
  closeOldClient(self) -- in-flight checkpoint/adoption fences fail immediately
  local ok, paused = pcall(self.replacementOptions.onPause, t.epoch, t.serial)
  if self.transition ~= t then return false end
  if not ok or paused ~= true then failed(self, "application did not confirm pause"); return false end
  t.stage = "requesting"; return true
+end
+function Adapter.prepareNewLife(self:any,mode:string,id:string):boolean
+ if not self.newLifeEnabled or self.transition or self.newLife or not self:recoveryReady() or self:offerPending(mode) then return false end
+ local info=self:offerInfo(mode)
+ if not info or not info.protected or info.id~=id then return false end
+ local payload=self.cfg.build()
+ if SaveRest.bounded(payload,self.cfg.rules.MAX_PROGRESS_NODES,self.cfg.rules.MAX_PROGRESS_DEPTH) then return false end
+ local _,clean=Progress.sanitize(payload);if not clean then return false end
+ if not Client.beginLife(self,mode,id) then return false end
+ local r=self.bound.requests[mode]
+ self.transportGeneration+=1;self.restPreparing,self.restUnsent,self.pendingRest,self.lifeRequests={},{},{},{}
+ self.newLife={mode=mode,offerId=id,epoch=self.bound.epoch,serial=r.serial,request=r,progress=Json.copy(clean),started=self.cfg.now(),last=-math.huge,state="pending",sequence=0}
+ return true
+end
+local function newCurrent(self:any,n:any):boolean
+ return self.newLife==n and self.bound.epoch==n.epoch and self.bound.requests[n.mode]==n.request
+  and self.bound.serial==n.serial and n.request.kind=="new" and n.request.offerId==n.offerId and n.request.credential==nil
 end
 local function control(self: any, message: any): boolean
  return Protocol.known(message, {kind=true,v=true,epoch=true,sequence=true,serial=true,id=true})
@@ -87,10 +106,24 @@ local function receive(self: any, message: any, owned: boolean?)
  if type(message) ~= "table" then return end
  local t = self.transition
  if not t then
+  local n=self.newLife
+  if n then
+   if message.kind=="new_life_state" and newCurrent(self,n)
+    and Protocol.known(message,{kind=true,v=true,epoch=true,mode=true,serial=true,offerId=true,sequence=true,state=true})
+    and message.v==Protocol.NEW_VERSION and message.epoch==n.epoch and message.mode==n.mode and message.serial==n.serial and message.offerId==n.offerId
+    and Protocol.serial(message.sequence) and message.sequence>math.max(n.sequence,self.bound.loadedSeq)
+    and (message.state=="pending" or message.state=="verified" or message.state=="refused") then
+    if n.state~="pending" and message.state~=n.state then return end
+    n.sequence,n.state=message.sequence,message.state
+    self.replacementOptions.onNewState(n.state,n.mode,n.serial,n.epoch)
+   end
+   return -- ordinary stale packets cannot redefine the selected New observation
+  end
   notify(self, message, owned)
   if message.kind == "loaded" and not self.replacementFrozen and self.bound and self.bound.epoch == message.epoch then
    self.replacementFrozen = true
    self.replacementEnabled = message.replacement == Protocol.VERSION and self:recoveryReady()
+   self.newLifeEnabled=self.replacementEnabled and message.newLife==Protocol.NEW_VERSION and type(self.replacementOptions.onNewState)=="function"
   end
   return
  end
@@ -106,6 +139,7 @@ local function receive(self: any, message: any, owned: boolean?)
   self.activeSlot, self.temporarySlots, self.protectedSlots, self.lifeTokens = nil, {}, {}, {}
   self.phase = "hello"; t.stage = "activating"
   notify(self, message, owned)
+  self.newLifeEnabled=message.newLife==Protocol.NEW_VERSION and type(self.replacementOptions.onNewState)=="function"
   if self.transition ~= t or self.bound.epoch ~= message.epoch then failed(self, "new handshake refused"); return end
   local ok, ready = pcall(self.replacementOptions.onReady, t.epoch, message.epoch, t.serial)
   if self.transition ~= t then return end
@@ -130,6 +164,18 @@ function Adapter.receiveOwned(self: any, message: any) receive(self, message, tr
 function Adapter.update(self: any)
  local t = self.transition
  if not t then
+  local n=self.newLife
+  if n then
+   local now=self.cfg.now()
+   if not newCurrent(self,n) or now<n.started or now-n.started>=Protocol.NEW_TIMEOUT then
+    if n.state~="refused" then n.state="refused";self.replacementOptions.onNewState("refused",n.mode,n.serial,n.epoch) end
+    return
+   end
+   if n.state=="pending" and now-n.last>=Protocol.RETRY then
+    n.last=now;rawSend(self,{kind="new_life_request",v=Protocol.NEW_VERSION,epoch=n.epoch,mode=n.mode,serial=n.serial,offerId=n.offerId,progress=n.progress})
+   end
+   return
+  end
   local thread = coroutine.running() or self.mainThread
   local previous = self.sendTickets[thread]
   self.sendTickets[thread] = self.transportGeneration
@@ -152,22 +198,23 @@ function Adapter.update(self: any)
  end
 end
 function Adapter.beginLife(self: any, mode: string, id: string?): any
- if self.transition then return false end; return Client.beginLife(self, mode, id)
+ if self.transition or self.newLife then return false end; return Client.beginLife(self, mode, id)
 end
 function Adapter.continueLife(self: any, mode: string, id: string): boolean
- return self.transition == nil and Client.continueLife(self, mode, id)
+ return self.transition == nil and self.newLife==nil and Client.continueLife(self, mode, id)
 end
 function Adapter.sendRest(self: any, mode: string, record: any): any
- if self.transition then return false end; return Client.sendRest(self, mode, record)
+ if self.transition or self.newLife then return false end; return Client.sendRest(self, mode, record)
 end
 function Adapter.prepareRest(self: any, mode: string, record: any, token: any): any
- if self.transition then return nil end; return Client.prepareRest(self, mode, record, token)
+ if self.transition or self.newLife then return nil end; return Client.prepareRest(self, mode, record, token)
 end
 function Adapter.sendRecoveryApplied(self: any, receipt: any): boolean
- return self.transition == nil and Client.sendRecoveryApplied(self, receipt)
+ return self.transition == nil and self.newLife==nil and Client.sendRecoveryApplied(self, receipt)
 end
 function Adapter.status(self: any): (string?, string?)
  if self.transition then return "session", "session_replacement" end
+ if self.newLife then return if self.newLife.state=="pending" then "saving" else "session","protected_new_life" end
  return Client.status(self)
 end
 return table.freeze(Adapter)

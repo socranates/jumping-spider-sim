@@ -21,6 +21,12 @@ end
 local function slot(mode: any): boolean
  return type(mode) == "string" and table.find(Rules.MODES, mode) ~= nil
 end
+local function validNewChoice(self:any,mode:any,serial:any,id:any):boolean
+ if not slot(mode) or type(serial)~="number" or serial~=serial or serial<1 or serial>Rules.MAX_LIFE_SERIAL or serial%1~=0
+  or type(id)~="string" or #id==0 or #id>Rules.MAX_LIFE_TOKEN_CHARS then return false end
+ local observed=self.session.observations.latest[mode]
+ return observed~=nil and observed.id==id and observed.protected==true
+end
 local function alive(self: any): boolean
  local rt, s = self.runtime, self.session
  return not self.closed and not s.closed and not rt.leaving and rt.session == s
@@ -82,6 +88,27 @@ end
 function Profile.enableRecovery(self: any)
  if not alive(self) or self.recoveryEnabled then return end
  self.recoveryEnabled = true; enqueueProtected(self)
+end
+function Profile.installNewLifeFactory(self:any,factory:any)
+ assert(self.session.state=="loading" and not self.newLifeFactory and type(factory)=="table" and type(factory.new)=="function","trusted pre-load New policy factory required")
+ self.newLifeFactory=factory
+end
+function Profile.prepareNewLife(self:any,mode:any,serial:any,id:any,progress:any):boolean
+ if not alive(self) or not self.newLifeFactory or not self.recoveryEnabled or self.runtime.accepted or self.replacementPending
+  or not validNewChoice(self,mode,serial,id) then return false end
+ local prior=self.newLifeRequest
+ if prior then return prior.mode==mode and prior.serial==serial and prior.id==id end
+ if not self:setProgress(progress) or not self:requestLife("new",mode,serial,id) then return false end
+ self.newLifeRequest={mode=mode,serial=serial,id=id,state="pending"}
+ return true
+end
+function Profile.newLifeStatus(self:any):any
+ local n=self.newLifeRequest
+ if not n then return nil end
+ local r=self.session.intents.requests[n.mode]
+ if not alive(self) or not r or r.kind~="new" or r.serial~=n.serial or r.offerId~=n.id or r.state~="readonly" or r.credential~=nil then return "refused" end
+ if self.newLifeJob then return if self.newLifeJob.state=="verified" then "verified" elseif self.newLifeJob.state=="pending" then "pending" else "refused" end
+ return n.state
 end
 function Profile.refreshOffer(self: any, mode: any): boolean
  if not alive(self) or not slot(mode) then return false end
@@ -150,6 +177,7 @@ function Profile.requestLife(self: any, kind: any, mode: any, serial: any, offer
   return false
  end
  local choice = {kind = kind, mode = mode, serial = serial, offerId = offerId}
+ self.backgroundOrdinaryMode=nil -- an explicit choice supersedes optional discovery
  self.choice, self.lastChoiceSerial = choice, serial -- before callbacks can reenter
  if not self.session:requestLife(kind, mode, serial, offerId) then return false end
  if self.choice ~= choice then return true end
@@ -177,6 +205,17 @@ function Profile.requestLife(self: any, kind: any, mode: any, serial: any, offer
  self.queue[mode] = if s.restProtected[mode] then true else nil
  return true
 end
+function Profile.setRestForIntent(self:any,mode:any,record:any,life:any,serial:any,credential:any,restSerial:any):boolean
+ local rt,s=self.runtime,self.session
+ -- Optional protected-slot reads must not discard checkpoints from an already
+ -- granted ordinary life. Queue them on that same Session; writes resume once
+ -- the bounded background read returns to the normal worker.
+ if alive(self) and not rt.accepted and not rt.intakeClosed and s.backend.held==nil
+  and s.intents:authorized(mode,serial,credential,life) then
+  return s:setRestForIntent(mode,record,life,serial,credential,restSerial)
+ end
+ return BaseOwner.setRestForIntent(self,mode,record,life,serial,credential,restSerial)
+end
 function Profile.applyRecovery(self: any, message: any): boolean
  local choice, job = self.choice, self.runtime.entryJob
  if self.switchRequired or not choice or not job or not job.offer
@@ -195,6 +234,14 @@ local function processChoice(self: any)
   -- retirement policy. A background Continue discovery must not replace an
   -- explicitly observed retired source or invalidate that New selection.
   self.queue = {} -- an explicit New selection takes priority over background offers
+  if self.newLifeRequest and rt.phase=="normal" then
+   -- A cached protected observation may have been read while an ordinary life
+   -- remained writable. Establish the same tracked read scope without replacing
+   -- that exact observation; Policy.begin re-reads and verifies its raw source.
+   local s=self.session
+   rt.route={backend=s.backend,provider=s.backend.source,load=s._loadSerial,id=s.id,pkey=s.pkey,user=tostring(s.cfg.userId),scheduler=s.sched,observations=s.observations,intents=s.intents,lastNow=s.now()}
+   rt.phase="offered"
+  end
   self.session.intents:readonly(request, "protected_new_life_requires_policy"); self.pendingSelection = nil; return
  end
  if self.readingChoice ~= choice or self.readJob ~= rt.discovery or not self.readJob or self.readJob.state == "pending" then return end
@@ -240,21 +287,54 @@ function Profile.step(self: any): boolean
   return stepSwitchHold(self)
  end
  if self.newLifePolicy then return self.newLifePolicy:step(self.newLifeJob) end
+ if rt.phase=="normal" and self.pendingSelection then
+  for _,mode in Rules.MODES do
+   if self.session.restPending[mode] or self.session.lifeRequests[mode] and not self.session.lifeRequests[mode].done then return BaseOwner.step(self) end
+  end
+ end
  processChoice(self)
+ local n=self.newLifeRequest
+ if n and n.state=="pending" and not self.pendingSelection and self.mode==n.mode and (rt.phase=="offered" or rt.phase=="offer_refused") then
+  local okay,policy,job,why=pcall(function():...any
+   local worker=self.newLifeFactory.new(rt);local work,problem=worker:begin(n.mode,n.serial,n.id)
+   return worker,work,problem
+  end)
+  if okay and job then self.newLifePolicy,self.newLifeJob=policy,job
+  else n.state,n.problem="refused",tostring(if okay then why else policy) end
+  return false
+ end
  if rt.accepted then return BaseOwner.step(self) end
  if canBind(self) then
   local pending = self.pendingSelection
   local mode = if pending and self.queue[pending.mode] then pending.mode else nil
   if not mode then for _, candidate in Rules.MODES do if self.queue[candidate] then mode = candidate; break end end end
+  if mode and not pending then
+   for _,slotMode in Rules.MODES do
+    if self.session.restPending[slotMode] or self.session.lifeRequests[slotMode] and not self.session.lifeRequests[slotMode].done then return BaseOwner.step(self) end
+   end
+  end
   if mode and self.negotiated and bind(self, mode) then
-   local job, why = rt:discover(mode)
+   -- The trusted New policy can observe a persisted retirement marker for New
+   -- only; Runtime.accept still refuses to Continue a retired discovery.
+   local job, why = rt:discover(mode,nil,self.newLifeFactory~=nil)
    if job then
+    if not pending then
+     for slotMode,r in self.session.intents.requests do if r.state=="writable" and not self.session.restProtected[slotMode] then self.backgroundOrdinaryMode=slotMode;break end end
+    end
     self.queue[mode] = nil; self.readJob = job
     self.readingChoice = if pending and pending.mode == mode then pending else nil
    else self.problem = why end
    return false
   end
  end
- return BaseOwner.step(self)
+ local asked=BaseOwner.step(self)
+ local background=self.backgroundOrdinaryMode
+ if background and not self.pendingSelection and not rt.accepted and (rt.phase=="offered" or rt.phase=="offer_refused") and bind(self,background) then
+  -- Keep the published observation. Runtime.dismiss would withdraw it, which
+  -- makes the menu rediscover the same slot indefinitely.
+  stopLease(rt);rt.phase,rt.route,rt.reader,rt.discovery,rt.problem="normal",nil,nil,nil,nil
+  self.readJob,self.readingChoice,self.backgroundOrdinaryMode=nil,nil,nil
+ end
+ return asked
 end
 return table.freeze(Profile)

@@ -868,10 +868,13 @@ local function closeScreens()
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
  if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
 end
-local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?): boolean
+local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?, archivePrevious:boolean?): boolean
  if saveState.application and saveState.application:busy() then return false end
+ if saveState.application and saveState.application:beforeWorldChoice() then return false end
  if not initialRecord or (easy and not session.finishedMain) then return false end
  if saveClient and saveClient:offerPending(if mode=="free" then "free" elseif easy then "easy" else "main") then return false end
+ if saveState.application and saveState.application:prepareNew(if mode=="free" then "free" elseif easy then "easy" else "main",displayedOfferId) then return false end
+ if archivePrevious then session:archive() end
  if saveState.restore then saveState.restore:cancel() end
  saveState.invalidateRest()
  spiderPick.finish(nil, true)
@@ -1167,6 +1170,8 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Controls" then closeScreens();helpVisible,helpUntil=true,math.huge;return end -- (the controls card, kept up until H puts it away: ROBLOX-92)
+ if saveState.application and (choice=="New" or choice=="Easy" or choice=="NewFree" or choice=="Free" or choice=="Continue" or choice=="ContinueEasy"
+  or choice=="RemoteMain" or choice=="RemoteEasy" or choice=="RemoteFree") and saveState.application:beforeWorldChoice() then confirming=nil;return end
  if choice=="Continue" or choice=="ContinueEasy" or choice=="RemoteMain" or choice=="RemoteEasy" or choice=="RemoteFree" then
   local mode=if choice=="ContinueEasy" or choice=="RemoteEasy" then "easy" elseif choice=="RemoteFree" then "free" else "main"
   if mode=="easy" and not session.finishedMain then return end
@@ -1206,19 +1211,19 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   elseif fresh("free",false,nil,saveState.menuOffers.free) then M.title:beginIntro(M.title.always(),needs.gentle) end
   return
  end
- if choice=="New" or choice=="Easy" then
-  local slot=if choice=="Easy" then "easy" else "main"
+ if choice=="New" or choice=="Easy" or choice=="NewFree" then
+  local slot=if choice=="Easy" then "easy" elseif choice=="NewFree" then "free" else "main"
   if choice=="Easy" and not session.finishedMain then return end
   local info=saveClient:offerInfo(slot)
   if (session.started or stores[slot]:hasKnownRest() or (info and info.playable)) and confirming~=choice then
    confirming=choice;saveState.confirmOffer=saveState.menuOffers[slot]
-   menu:showChoices("Begin a new life?",if saveState.application and saveState.application:choosing() and info and info.protected then "This new spider will not be saved. The protected last rest is kept." elseif choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
+   menu:showChoices("Begin a new life?",if saveClient.newLifeEnabled and info and info.protected then "Your previous saved spider will be kept. The world stays paused while the new life is prepared." elseif saveState.application and saveState.application:choosing() and info and info.protected then "This new spider will not be saved. The protected last rest is kept." elseif choice=="NewFree" then "This starts a new Free play spider. The standard and Easy lives are kept." elseif choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end
   local id=if confirming==choice then saveState.confirmOffer else saveState.menuOffers[slot]
-  confirming=nil;session:archive()
-  if fresh("main",choice=="Easy",nil,id) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
+  confirming=nil
+  if fresh(if slot=="free" then "free" else "main",choice=="Easy",nil,id,true) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
   return
  end
  confirming=nil;openMenu()
@@ -1249,7 +1254,7 @@ openMenu=function(renderOnly: boolean?)
   local text=M.TitleText.choice(id,started)
   if saveState.application and saveState.application:choosing() and (id=="New" or id=="Easy") then
    local info=saveClient:offerInfo(if id=="New" then "main" else "easy")
-   if info and info.protected then text..=" without saving" end
+   if info and info.protected and not saveClient.newLifeEnabled then text..=" without saving" end
   end
   table.insert(choices,{id=id,text=text})
  end
@@ -1272,6 +1277,7 @@ openMenu=function(renderOnly: boolean?)
  if session.finishedMain and not saveClient:offerPending("easy") then add("Easy") end
  local freeInfo=saveClient:offerInfo("free")
  if not saveClient:offerPending("free") then table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and (not stores.free:hasKnownRest() or saveState.application and saveState.application:choosing()) then "Continue Free play without saving" else M.TitleText.choice("Free",started)}) end
+ if not saveClient:offerPending("free") and (stores.free:hasKnownRest() or freeInfo and freeInfo.playable) then table.insert(choices,{id="NewFree",text="New Free play spider"..(if freeInfo and freeInfo.protected and not saveClient.newLifeEnabled then " without saving" else "")}) end
  table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
  if started or #book.opened>0 then table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE}) end
  menu:setLook(if started then "card" else "title")
@@ -1495,6 +1501,7 @@ function saveState.cancelLocalReturn(resume:boolean?)
  saveState.localReturnScreen(j.stamp,resume)
 end
 function saveState.beginLocalReturn(mode:string?,action:string):boolean
+ if saveState.application and saveState.application:beforeWorldChoice() then return false end
  if saveState.application and saveState.application:held() then return false end
  local slot=mode
  if not slot then for name,st in stores :: {[string]:any} do if st==checkpoints then slot=name end end end
@@ -1627,8 +1634,8 @@ function saveState.installRecovery(factories:any): (boolean,string?)
   visible=function() return menu:isShowing() end,
   show=function(phase:string,canExit:boolean)
    controls:clear();dropAll();setHudShown(false);menu:setLook("card")
-   menu:showChoices(if phase=="failed" then "The saved spider could not be opened" elseif phase=="replacing" then "Changing saved spiders" else "Opening the saved spider",
-    if phase=="failed" then "This spider stays paused." else "The world waits while the saved spider is checked.",
+   menu:showChoices(if phase=="failed" then "The saved spider could not be opened" elseif phase=="new" then "Keeping the saved spider" elseif phase=="replacing" then "Changing saved spiders" else "Opening the saved spider",
+    if phase=="failed" then "This spider stays paused." elseif phase=="new" then "The world waits while your previous spider is kept safely." else "The world waits while the saved spider is checked.",
     if canExit then "You can choose another spider." else "If this cannot finish, leave and rejoin to choose again.",
     if canExit then {{id="RecoveryExit",text="Choose another spider"}} else {},true)
    menu:setHint(M.TitleText.navHint(device));menu:setTextScale(if setting("LargeText")==true then 1.5 else 1)

@@ -74,4 +74,34 @@ do
  f.app.cfg.freshMenu=function() error("synthetic fresh-menu failure") end
  check(not f.app:ready("old","new",1) and f.app.phase=="failed" and f.app:held(),"fresh menu exception activated old world")
 end
+do
+ local f=fixture();f.client.newLifeEnabled=true
+ function f.client:offerInfo() return {id="shown",protected=true} end
+ function f.client:prepareNewLife(mode,id)
+  if id~="shown" then return false end
+  self.newLife={mode=mode,epoch=self.bound.epoch,serial=7};return true
+ end
+ function f.client:requestReplacement() self.transition={stage="requesting"};return f.app:pauseReplacement("old",1) end
+ check(f.app:prepareNew("main","shown") and f.app.phase=="new" and f.app:held(),"protected New did not pause before sending")
+ f.app:newState("verified","free",7,"old");f.app:newState("verified","main",8,"old");f.app:newState("verified","main",7,"stale")
+ check(f.app.phase=="new" and f.client.transition==nil and f.app:held(),"stale New completion escaped its scope")
+ f.app:newState("verified","main",7,"old")
+ check(f.app.phase=="replacing" and f.app:held(),"verified New released world before replacement")
+ f.client.bound.epoch="fresh"
+ check(f.app:ready("old","fresh",1) and not f.started and f.app:held(),"verified New silently started a new life")
+end
+do
+ local f=fixture();f.client.newLifeEnabled=true
+ function f.client:offerInfo() return {id="shown",protected=true} end
+ function f.client:prepareNewLife(mode) self.newLife={mode=mode,epoch="old",serial=1};return true end
+ f.app:prepareNew("main","shown");f.app:newState("refused","main",1,"old")
+ check(f.app.phase=="failed" and f.app:held() and f.visible,"refused New lost its held error screen")
+end
+do
+ local f=fixture();check(not f.app:prepareNew("main","shown") and not f.app:held(),"unsupported New capability changed ordinary startup")
+ f.app.phase="playing";f.app.recoveredPlaying=true
+ function f.client:requestReplacement() return f.app:pauseReplacement("old",1) end
+ check(f.app:beforeWorldChoice() and f.app.phase=="replacing" and f.app:held(),"recovered world choice did not replace its owner first")
+ check(not f.app:beforeWorldChoice(),"already held world choice requested replacement twice")
+end
 print("RECOVERY_APPLICATION passed="..n.." failed=0")

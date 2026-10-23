@@ -17,7 +17,7 @@ end
 function Application.held(self: any): boolean return self.cfg.held() end
 function Application.choosing(self: any): boolean return self.phase == "menu" end
 function Application.busy(self: any): boolean
- return self.phase == "entry" or self.phase == "replacing" or self.phase == "failed"
+ return self.phase == "entry" or self.phase == "new" or self.phase == "replacing" or self.phase == "failed"
 end
 function Application.canExit(self: any): boolean
  return self.client ~= nil and self.client.replacementEnabled == true and self.client.transition == nil and self.cfg.healthy()
@@ -49,12 +49,42 @@ function Application.select(self: any, mode: string, serial: number): boolean
  if not self.entry:select(mode,serial) then return false end
  self.phase,self.problem="entry",nil;self.cfg.pauseUI();self:render();return true
 end
+-- A playing recovered life owns an enforced server save route. Leaving that
+-- world always obtains a new epoch first; never reuse its menu's old offer IDs.
+function Application.beforeWorldChoice(self:any):boolean
+ if self.phase~="playing" or not self.recoveredPlaying then return false end
+ local okay,accepted=pcall(self.client.requestReplacement,self.client)
+ if not okay or accepted~=true then self:fail("saved spider could not be closed") end
+ return true
+end
+function Application.prepareNew(self:any,mode:string,id:string?):boolean
+ if not self.client.newLifeEnabled then return false end
+ local info=self.client:offerInfo(mode)
+ if not info or not info.protected then return false end
+ self.entry:cancel();self.cfg.invalidate();self.hold=self.cfg.pause()
+ self.phase,self.problem="new",nil;self.cfg.pauseUI();self:render()
+ local okay,accepted=pcall(self.client.prepareNewLife,self.client,mode,id)
+ if not okay or accepted~=true then self:fail("new spider preparation was refused");return true end
+ local n=self.client.newLife
+ self.newOperation={epoch=n.epoch,mode=n.mode,serial=n.serial}
+ return true
+end
+function Application.newState(self:any,state:string,mode:string,serial:number,epoch:string)
+ local n=self.newOperation
+ if self.phase~="new" or not n or n.epoch~=epoch or n.mode~=mode or n.serial~=serial or self.client.bound.epoch~=epoch or not self:held() then return end
+ if state=="refused" then self:fail("the previous saved spider could not be kept safely")
+ elseif state=="verified" then
+  local okay,accepted=pcall(self.client.requestReplacement,self.client)
+  if not okay or accepted~=true then self:fail("new spider preparation could not close the previous session") end
+ end
+end
 function Application.decision(self: any, decision: any)
  if self.phase=="entry" then self.entry:decision(decision);self:update() end
 end
 function Application.pauseReplacement(self: any, epoch: string, serial: number): boolean
  if not self.client or self.client.bound.epoch~=epoch or not self.cfg.healthy() then return false end
  self.entry:cancel();self.cfg.invalidate();self.hold=self.cfg.pause()
+ self.recoveredPlaying=false;self.newOperation=nil
  self.replacement={epoch=epoch,serial=serial,hold=self.hold}
  self.phase,self.problem="replacing",nil;self.cfg.pauseUI();self:render()
  return self.hold.held()
@@ -95,7 +125,7 @@ function Application.update(self: any)
   local job=self.entry.job
   if not job or job.phase=="held" then self:fail(job and job.problem or "entry work disappeared");return end
   if job.phase=="granted" then
-   self.phase="playing"
+   self.phase="playing";self.recoveredPlaying=true
    local resumed,problem=pcall(self.cfg.resumeUI)
    if not resumed then self:fail(problem) end
    return
@@ -119,6 +149,7 @@ function Application.configure(self: any, original: any): any
 end
 function Application.replacementOptions(self: any): any
  return {onPause=function(epoch: string,serial: number): boolean return self:pauseReplacement(epoch,serial) end,
-  onReady=function(oldEpoch: string,newEpoch: string,serial: number): boolean return self:ready(oldEpoch,newEpoch,serial) end}
+  onReady=function(oldEpoch: string,newEpoch: string,serial: number): boolean return self:ready(oldEpoch,newEpoch,serial) end,
+  onNewState=function(state:string,mode:string,serial:number,epoch:string) self:newState(state,mode,serial,epoch) end}
 end
 return table.freeze(Application)

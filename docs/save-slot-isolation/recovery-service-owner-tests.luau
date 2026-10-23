@@ -7,7 +7,7 @@ local Client=require("../src/Client/SaveClient")
 local Rules=require("../src/Shared/Data/SaveRules")
 local count=0
 local function check(ok,why) assert(ok,why);count+=1 end
-local function fixture(mode,reentrant)
+local function fixture(mode,reentrant,oldPeer)
  WorldMap.use("test_garden");local old=gardenWorld();old.motor:place(Vector3.new(11,-89.69,-50),Vector3.yAxis,Vector3.zAxis)
  old.life.mode=if mode=="free" then "free" else "main";old.life.rules=if mode=="main" then "standard" else "gentle";old.needs.gentle=mode~="main"
  local source=assert(Checkpoint.capture(old,123));source.save_life="service-original-"..mode
@@ -47,23 +47,22 @@ local function fixture(mode,reentrant)
    local rules=record.life_rules;if type(rules)~="table" or rules.mode~=(if slot=="free" then "free" else "main") or slot=="easy" and rules.rules~="gentle" then return false end
    return __lifePrototype.prepare(record,context,"A1_46001")~=nil
   end,
-  onRestore=function(slot,_record,serial)
+  onRestore=function() if oldPeer then return true end;error("negotiated recovery restored the legacy observation") end},
+  recovery=if not oldPeer then {onSelected=function(slot,serial)
    f.selected={request=client.bound.requests[slot],epoch=client.bound.epoch,mode=slot,serial=serial};return true
-  end}})
- f.client=client
- deliver=function(msg)
-  listener(msg)
-  if msg.kind~="recovery_entry" then return end
+  end,onEntry=function(offer,epoch,_sequence)
   f.entries+=1
-  local offer=msg.offer;local selection=f.selected
-  if not selection or msg.epoch~=client.bound.epoch or offer.epoch~=msg.epoch or client.bound.requests[mode]~=selection.request or offer.serial~=selection.serial then return end
+  local selection=f.selected
+  if not selection or epoch~=client.bound.epoch or offer.epoch~=epoch or client.bound.requests[mode]~=selection.request or offer.serial~=selection.serial then return end
   local receipt=f.cache[offer.id]
   if not receipt then
    local commit,why=__entryClientPrototype.prepare(offer,context,function() return client.bound.epoch==selection.epoch and client.bound.requests[mode]==selection.request and selection.request.state=="readonly" end)
    check(commit~=nil,"wire entry preparation failed: "..tostring(why));receipt=assert(commit());f.applied+=1;f.cache[offer.id]=receipt
   end
-  if f.hold then table.insert(f.acks,Json.copy(receipt)) else remote:FireServer(Json.copy(receipt)) end
- end
+  if f.hold then table.insert(f.acks,Json.copy(receipt)) else check(client:sendRecoveryApplied(receipt),"actual client refused current receipt") end
+ end} else nil})
+ f.client=client
+ deliver=function(msg) listener(msg) end
  service:addPlayer(player);f.session=service.entries[player].session
  function f.pump()
   local before=b.requests;client:update();service:step()
@@ -92,7 +91,7 @@ for _,mode in Rules.MODES do
  before=b.requests;local bad=Json.copy(f.acks[1]);bad.id="wrong-nonce";f.service:onMessage(f.player,bad)
  check(b.requests==before and f.session.intents.requests[mode].credential==nil,"wrong receipt reached storage or granted authority")
  f.clock.now+=5;f.hold=false
- if mode~="free" then f.service:onMessage(f.player,Json.copy(f.acks[1])) end -- Free ACK returns reentrantly from the next entry resend
+ if mode~="free" then check(f.client:sendRecoveryApplied(f.acks[1]),"actual client refused queued receipt") end -- Free ACK returns reentrantly from the next entry resend
  f.drive(function() local d=f.client:decision(mode);return d and d.state=="writable" end)
  local d=f.client:decision(mode);check(f.session.intents:authorized(mode,d.serial,d.credential,d.life) and f.owner.runtime.phase=="recovered","wire decision was not the actual server entry grant")
  check(f.applied==1 and f.world.life.recoveryHistory~=nil,"wire path did not apply exactly one current checkpoint: "..mode.." applied="..f.applied.." history="..tostring(f.world.life.recoveryHistory~=nil))
@@ -108,6 +107,19 @@ for _,mode in Rules.MODES do
  local current={};for k,v in b.data do if string.sub(k,1,3)=="A1_" or string.sub(k,1,3)=="M1_" then current[k]=v end end
  check(Json.canonical(current)==kept,"wire saves/departure changed original archive/proposal")
  check(#f.errors==0,"service caught a hidden owner error: "..tostring(f.errors[1]))
+end
+for _,mode in Rules.MODES do
+ local f=fixture(mode,false,true);f.drive(function() return f.client:connected() end)
+ check(not f.client:recoveryReady() and f.owner.negotiated and not f.owner.recoveryEnabled,"older offer client negotiated recovery")
+ for _=1,10 do f.pump() end
+ check(f.owner.runtime.phase=="normal" and f.owner.runtime.discovery==nil and f.entries==0,"old peer started private recovery discovery")
+ f.clock.now+=5;f.service:onMessage(f.player,{kind="hello",v=3,recovery=1})
+ f.service:onMessage(f.player,{kind="life_intent",intent="continue",mode=mode,serial=1,offerId="unobserved"})
+ check(not f.owner.recoveryEnabled and not f.owner.runtime.accepted,"later hello or intent upgraded an old peer")
+ for k in f.b.data do check(string.sub(k,1,3)~="A1_" and string.sub(k,1,3)~="M1_","unnegotiated peer wrote recovery archive/proposal") end
+ check(#f.errors==0,"old peer caught hidden owner error")
+ f.service:removePlayer(f.player)
+ check(f.session.closed and f.owner.runtime.phase=="closed","old peer departure did not close owner")
 end
 print("RECOVERY_SERVICE_OWNER passed="..count.." failed=0")
 end

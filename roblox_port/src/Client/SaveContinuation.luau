@@ -5,7 +5,7 @@ local Continuation={}
 Continuation.__index=Continuation
 export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean)->boolean,
  onLoaded:((any)->())?,onOffer:((string,any)->())?,onDecision:((any)->())?,
- onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?,offerWork:any?}
+ onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?,offerWork:any?,recoveryVersion:number?,onProtectedSelected:((string,number)->boolean?)?}
 local function integer(n:any,max:number):boolean
  return type(n)=="number" and n==n and n>=1 and n<=max and n==math.floor(n)
 end
@@ -218,6 +218,9 @@ local function receive(self:any,msg:any,owned:boolean?):boolean
   end
   if msg.v~=self.cfg.rules.OFFER_PROTOCOL then return false end
   self.epoch=msg.epoch
+  -- Freeze optional capability on the first accepted handshake. A later loaded
+  -- snapshot cannot upgrade an old peer, or downgrade work already in progress.
+  self.recoveryVersion=if self.cfg.recoveryVersion~=nil and msg.recovery==self.cfg.recoveryVersion then self.cfg.recoveryVersion else nil
  end
  if msg.epoch~=self.epoch then return false end
  if msg.kind=="loaded" then
@@ -250,14 +253,19 @@ function Continuation.choose(self:any,mode:string,kind:string,id:string?):boolea
  if id~=nil and (not offer or offer.id~=id) then return false end
  if kind=="continue" and (not offer or offer.id~=id or offer.record.save_retired==true) then return false end
  if kind=="new" and offer~=nil and id==nil then return false end
+ local deferred=kind=="continue" and offer and offer.protected and self.recoveryVersion~=nil and self.cfg.onProtectedSelected~=nil
  self.serial+=1
  local r={mode=mode,kind=kind,serial=self.serial,offerId=id,revision=0,state="readonly",reason=nil,credential=nil,life=nil,
-  last=-1e9,ticket=0,selected=if kind=="continue" and offer and id then self.cfg.copy(offer.record) else nil}
+  last=-1e9,ticket=0,selected=if kind=="continue" and offer and id and not deferred then self.cfg.copy(offer.record) else nil}
  self.requests[mode]=r;self.decisionSeq[mode]=0
  -- Commit the complete intent before callbacks; a callback can choose another
  -- life immediately. Restore only here, once per explicit user choice.
- if kind=="continue" and self.cfg.onRestore then
-  local ok,result=pcall(self.cfg.onRestore,mode,self.cfg.copy(r.selected),r.serial)
+ if kind=="continue" and (deferred or self.cfg.onRestore) then
+  -- Negotiated recovery needs the immutable offer identity, not two more copies
+  -- of a legacy graph that will never be restored. Current entry comes later.
+  local ok,result
+  if deferred then ok,result=pcall(self.cfg.onProtectedSelected,mode,r.serial)
+  else ok,result=pcall(self.cfg.onRestore,mode,self.cfg.copy(r.selected),r.serial) end
   if not ok or result==false then
    if self.requests[mode]==r then self.requests[mode]=nil end
    return false

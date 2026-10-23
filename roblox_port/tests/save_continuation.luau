@@ -217,5 +217,86 @@ do
  c:receive({kind="offer",epoch="one",sequence=6,mode="main",offer=clash})
  check(not c:offerInfo("main").protected,"conflicting protection cannot redefine the same immutable id")
 end
+do
+ local SaveClient=require("../src/Client/SaveClient")
+ local function peer(enabled)
+  local f={now=0,wire={},entries={},selected=0,restored=0,loaded=0};local deliver;local client
+  local remotes={client={OnClientEvent={Connect=function(_self,fn) deliver=fn end}},server={FireServer=function(_self,msg) table.insert(f.wire,msg) end}}
+  client=SaveClient.new({rules=Rules,now=function() return f.now end,findRemotes=function() return remotes end,
+   continuation={copy=Json.copy,validate=function(mode,r) return type(r)=="table" and r.mode==mode and type(r.value)=="number" end,
+    onRestore=function() f.restored+=1;return true end},
+   recovery=if enabled then {onSelected=function(mode,serial) f.selected+=1;return if f.whenSelected then f.whenSelected(client,mode,serial) else true end,onEntry=function(o,epoch,sequence) table.insert(f.entries,{offer=o,epoch=epoch,sequence=sequence}) end} else nil,
+   onLoaded=function() f.loaded+=1;f.readyInCallback=client:recoveryReady() end,onRest=function() error("legacy restore callback") end,onStatus=function() end,build=function() return {} end})
+  f.client=client;f.deliver=function(msg) deliver(msg) end
+  function f.load(cap,protected)
+   f.deliver({kind="loaded",v=3,epoch="cap",sequence=10,status="saved",recovery=cap,
+    offers={main={id="protected",protected=protected,record={mode="main",value=1}}}})
+  end
+  function f.entry(sequence)
+   return {kind="recovery_entry",epoch="cap",sequence=sequence,offer={v=1,id="entry",epoch="cap",mode="main",serial=client.bound.serial,revision=1,
+    identity={checksum="1234567890abcdef",updatedAt=123},checkpoint={}}}
+  end
+  function f.receipt()
+   local o=f.entries[#f.entries].offer
+   return {kind="recovery_applied",v=1,id=o.id,epoch=o.epoch,mode=o.mode,serial=o.serial,revision=o.revision,identity=Json.copy(o.identity)}
+  end
+  client:update();return f
+ end
+ for _,cap in {false,1,2,"1",{},0/0,math.huge} do
+  for _,enabled in {false,true} do
+   local f=peer(enabled);local c=f.client
+   check(f.wire[1].recovery==(if enabled then 1 else nil),"only clients with both recovery callbacks advertise support")
+   f.deliver(f.entry(1));check(#f.entries==0 and not c:recoveryReady(),"entry admitted before matching handshake")
+   f.load(if cap~=false then cap else nil,true)
+   local accepted=enabled and cap==1
+   check(c:recoveryReady()==accepted and f.readyInCallback==accepted,"capability not ready before loaded callback or wrongly enabled")
+   check(c:continueLife("main","protected"),"capability changed normal Continue admission")
+   check(f.selected==(if accepted then 1 else 0) and f.restored==(if accepted then 0 else 1),"protected recovery restored the preview or old peer lost existing behavior")
+   f.deliver(f.entry(11));check(#f.entries==(if accepted then 1 else 0),"entry callback ignored negotiated capability")
+   f.deliver({kind="loaded",v=3,epoch="cap",sequence=12,status="saved",recovery=if accepted then nil else 1})
+   check(c:recoveryReady()==accepted,"later loaded snapshot changed frozen capability")
+  end
+ end
+ local f=peer(true);local c=f.client
+ f.load(1,true);check(c:continueLife("main","protected"),"negotiated selection")
+ for _,change in {
+  function(m) m.sequence=10 end,function(m) m.sequence=0/0 end,function(m) m.epoch="other" end,
+  function(m) m.offer.serial+=1 end,function(m) m.offer.mode="free" end,function(m) m.offer.id=string.rep("x",161) end,
+  function(m) m.offer.revision=0 end,function(m) m.offer.identity.checksum="bad" end,function(m) m.offer.identity.updatedAt=math.huge end,
+ } do local m=f.entry(20);change(m);f.deliver(m);check(#f.entries==0,"invalid or stale entry reached application") end
+ local msg=f.entry(20);f.deliver(msg);f.deliver(msg)
+ check(#f.entries==1 and f.entries[1].epoch=="cap" and f.entries[1].sequence==20,"entry sequence watermark not committed before callback")
+ local receipt=f.receipt();local n=#f.wire
+ for _,field in {"id","epoch","mode","serial","revision"} do local bad=Json.copy(receipt);bad[field]="wrong";check(not c:sendRecoveryApplied(bad) and #f.wire==n,"wrong receipt was forwarded") end
+ local bad=Json.copy(receipt);bad.identity.updatedAt+=1;check(not c:sendRecoveryApplied(bad),"different identity receipt admitted")
+ receipt.extra={unbounded="must not be forwarded"};check(c:sendRecoveryApplied(receipt),"current bounded receipt refused")
+ local sent=f.wire[#f.wire];check(sent.extra==nil and sent.identity~=receipt.identity and sent.identity.checksum==receipt.identity.checksum,"wire receipt retained arbitrary fields or application identity")
+ local repeatEntry=f.entry(21);f.deliver(repeatEntry);check(#f.entries==2,"new delivery of same entry must permit an idempotent ACK retry")
+ local changed=f.entry(22);changed.offer.identity.updatedAt+=1;f.deliver(changed);check(#f.entries==2,"immutable entry id was redefined")
+ check(c:abortContinue("main",c.bound.serial,"cap"),"cancel current recovery selection")
+ n=#f.wire;check(not c:sendRecoveryApplied(receipt) and #f.wire==n,"cancelled selection sent a receipt")
+ f.deliver(f.entry(23));check(#f.entries==2,"cancelled selection adopted a late entry")
+ local normal=peer(true);normal.load(1,false);check(normal.client:continueLife("main","protected") and normal.restored==1 and normal.selected==0,"ordinary compatible checkpoint was deferred as recovery")
+ local switched=peer(true);switched.load(1,true);switched.client:continueLife("main","protected");switched.deliver(switched.entry(20));local oldReceipt=switched.receipt()
+ check(switched.client:beginLife("free"),"later mode selection did not begin")
+ switched.deliver(switched.entry(21));check(#switched.entries==1 and not switched.client:sendRecoveryApplied(oldReceipt),"another mode's new life retained old recovery authority")
+ local reentrant=peer(true);reentrant.load(1,true)
+ reentrant.whenSelected=function(client) client:beginLife("free");return true end
+ check(not reentrant.client:continueLife("main","protected") and reentrant.client.activeSlot=="free","outer selection overwrote reentrant new life")
+ reentrant.deliver(reentrant.entry(20));check(#reentrant.entries==0,"reentrant new life accepted superseded entry")
+ local cancelled=peer(true);cancelled.load(1,true)
+ cancelled.whenSelected=function(client,mode,serial) client:abortContinue(mode,serial,"cap");return true end
+ check(not cancelled.client:continueLife("main","protected"),"synchronously cancelled callback reported active recovery")
+ local old=peer(true);old.deliver({kind="loaded",v=2,status="saved",rests={main={mode="main",value=1}},progress={}})
+ old.deliver(old.entry(20));check(old.client.legacyTemporary and not old.client:recoveryReady() and #old.entries==0,"old server negotiated new recovery")
+ local invalid=pcall(function() SaveClient.new({rules=Rules,now=function() return 0 end,recovery={onEntry=function() end}}) end)
+ check(not invalid,"incomplete recovery callbacks may not advertise support")
+ local copies,selected=0,0
+ local bounded=setup({copy=function(value) copies+=1;return Json.copy(value) end,recoveryVersion=1,onProtectedSelected=function() selected+=1;return true end,
+  onRestore=function() error("protected preview was copied for restore") end})
+ bounded:receive({kind="loaded",v=3,recovery=1,epoch="one",sequence=1,status="saved",offers={main={id="legacy",protected=true,record={mode="main",value=1}}}})
+ local before=copies;check(bounded:choose("main","continue","legacy") and selected==1,"protected metadata-only choice was not deferred")
+ check(copies==before and bounded.requests.main.selected==nil,"protected choice copied or retained an unused legacy graph")
+end
 print(`SAVE_CONTINUATION passed={passed} failed={failed}`)
 assert(failed==0,"continuation failures")

@@ -17,11 +17,13 @@ SaveClient.__index = SaveClient
 export type Config = {
 	rules: any, now: () -> number, findRemotes: () -> any?,
  continuation: any?, -- explicit opt-in; supplies bounded validation/copy and offer/decision/restore callbacks
+ recovery: {onSelected:(string,number)->boolean?,onEntry:(any,string,number)->()}?, -- both callbacks must implement deferred restore/current entry adoption
 	onLoaded: (any) -> (), onRest: (string, any) -> (), onStatus: (string, string?) -> (),
 	build: () -> any, -- the progress to send now (called only when something changed and the gap allows)
 }
 
 function SaveClient.new(cfg: Config): any
+	assert(cfg.recovery==nil or (cfg.continuation~=nil and type(cfg.recovery.onSelected)=="function" and type(cfg.recovery.onEntry)=="function"),"recovery requires deferred selection and entry callbacks with continuation")
 	local now = cfg.now()
 	local self:any = setmetatable({
 		cfg = cfg, born = now, remotes = nil :: any, phase = "searching", helloAt = -1e9, helloTries = 0,
@@ -34,9 +36,58 @@ function SaveClient.new(cfg: Config): any
   self.temporarySlots={}
   self.bound=SaveContinuation.new({rules=cfg.rules,copy=opt.copy,validate=opt.validate,
    onLoaded=function(msg:any) self.phase="ready";cfg.onLoaded(msg) end,
-   offerWork=opt.offerWork,onOffer=opt.onOffer,onDecision=opt.onDecision,onRestore=opt.onRestore,onStatus=cfg.onStatus})
+   offerWork=opt.offerWork,onOffer=opt.onOffer,onDecision=opt.onDecision,onStatus=cfg.onStatus,
+   recoveryVersion=if cfg.recovery then cfg.rules.RECOVERY_PROTOCOL else nil,
+   onProtectedSelected=if cfg.recovery then function(mode:string,serial:number):boolean?
+    self.recoveryChoice={mode=mode,request=self.bound.requests[mode],epoch=self.bound.epoch};self.recoveryOffer=nil
+    return cfg.recovery.onSelected(mode,serial)
+   end else nil,
+   onRestore=function(mode:string,record:any,serial:number):boolean?
+    self.recoveryChoice=nil;self.recoveryOffer=nil
+    return if opt.onRestore then opt.onRestore(mode,record,serial) else nil
+   end})
  end
  return self
+end
+
+function SaveClient.recoveryReady(self:any):boolean
+ return self.cfg.recovery~=nil and self.bound~=nil and not self.legacyTemporary
+  and self.bound.epoch~=nil and self.bound.recoveryVersion==self.cfg.rules.RECOVERY_PROTOCOL
+end
+local function recoveryCurrent(self:any):any
+ local c=self.recoveryChoice
+ if not self:recoveryReady() or not c or self.activeSlot~=c.mode or c.epoch~=self.bound.epoch or self.bound.requests[c.mode]~=c.request
+  or c.request.kind~="continue" or c.request.state~="readonly" then return nil end
+ return c
+end
+local function positive(self:any,n:any):boolean
+ return type(n)=="number" and n==n and n>=1 and n<=self.cfg.rules.MAX_LIFE_SERIAL and n%1==0
+end
+local function recoveryEntry(self:any,msg:any)
+ local c=recoveryCurrent(self);local o=msg.offer
+ if not c or msg.epoch~=c.epoch or not positive(self,msg.sequence) or msg.sequence<=math.max(self.recoverySequence or 0,self.bound.loadedSeq)
+  or type(o)~="table" or o.v~=self.cfg.rules.RECOVERY_PROTOCOL or o.epoch~=c.epoch or o.mode~=c.mode or o.serial~=c.request.serial
+  or type(o.id)~="string" or #o.id==0 or #o.id>self.cfg.rules.MAX_LIFE_TOKEN_CHARS or not positive(self,o.revision)
+  or type(o.identity)~="table" or type(o.identity.checksum)~="string" or #o.identity.checksum~=16
+  or type(o.identity.updatedAt)~="number" or o.identity.updatedAt~=o.identity.updatedAt or math.abs(o.identity.updatedAt)==math.huge then return end
+ local previous=self.recoveryOffer
+ if previous and previous.id==o.id and (previous.revision~=o.revision or previous.identity.checksum~=o.identity.checksum or previous.identity.updatedAt~=o.identity.updatedAt) then return end
+ self.recoverySequence=msg.sequence
+ self.recoveryOffer={id=o.id,epoch=c.epoch,mode=c.mode,serial=o.serial,revision=o.revision,identity={checksum=o.identity.checksum,updatedAt=o.identity.updatedAt}}
+ -- The handler must validate/prepare the bounded checkpoint and rebind the real
+ -- game before issuing a receipt. Engine deliveries own their decoded tables.
+ self.cfg.recovery.onEntry(o,c.epoch,msg.sequence)
+end
+function SaveClient.sendRecoveryApplied(self:any,receipt:any):boolean
+ local c=recoveryCurrent(self);local o=self.recoveryOffer
+ if not c or not o or not self.remotes or type(receipt)~="table" or receipt.kind~="recovery_applied" or receipt.v~=self.cfg.rules.RECOVERY_PROTOCOL
+  or receipt.id~=o.id or receipt.epoch~=o.epoch or receipt.mode~=o.mode or receipt.serial~=o.serial or receipt.revision~=o.revision
+  or type(receipt.identity)~="table" or receipt.identity.checksum~=o.identity.checksum or receipt.identity.updatedAt~=o.identity.updatedAt then return false end
+ -- Construct only the bounded receipt shape; do not forward arbitrary fields or
+ -- retain an application-owned table across a reentrant remote delivery.
+ self.remotes.server:FireServer({kind="recovery_applied",v=self.cfg.rules.RECOVERY_PROTOCOL,id=o.id,epoch=o.epoch,mode=o.mode,serial=o.serial,revision=o.revision,
+  identity={checksum=o.identity.checksum,updatedAt=o.identity.updatedAt}})
+ return true
 end
 
 local function applyProtected(self: any,value: any)
@@ -69,6 +120,7 @@ local function receive(self: any, msg: any, owned: boolean?)
    self.cfg.onLoaded({progress=msg.progress,rests=rests})
    self.cfg.onStatus("session","offline")
   elseif not self.legacyTemporary then
+   if msg.kind=="recovery_entry" then recoveryEntry(self,msg);return end
    if owned then self.bound:receiveOwned(msg) else self.bound:receive(msg) end
   end
   return
@@ -120,6 +172,7 @@ function SaveClient.beginLife(self: any,mode: string,offerId: string?)
   if self.legacyTemporary then return false end
   self.bound:abandon(mode)
   local accepted=self.bound:choose(mode,"new",offerId)
+  if accepted then self.recoveryChoice=nil;self.recoveryOffer=nil end
   self.temporarySlots[mode]=not accepted or nil
   return accepted
  end
@@ -159,7 +212,12 @@ end
 
 function SaveClient.continueLife(self:any,mode:string,id:string):boolean
  if not self.bound or self.legacyTemporary then return false end
+ local serial=self.bound.serial+1
  local accepted=self.bound:choose(mode,"continue",id)
+ -- Selection callbacks may synchronously cancel or choose another life. Do not
+ -- restore the outer choice's active slot over that newer decision.
+ local request=self.bound.requests[mode]
+ if accepted and (self.bound.serial~=serial or not request or request.serial~=serial) then return false end
  if accepted then self.activeSlot=mode;self.temporarySlots[mode]=nil;self.restPreparing[mode]=nil;self.restUnsent[mode]=nil elseif self.bound.requests[mode]==nil then self.temporarySlots[mode]=true end
  return accepted
 end
@@ -241,7 +299,8 @@ function SaveClient.update(self: any)
 		self.helloAt = t
 		self.helloTries += 1
 		self.sent.hello += 1
-		self.remotes.server:FireServer({ kind = "hello", v = if self.bound then rules.OFFER_PROTOCOL else rules.PROTOCOL })
+		self.remotes.server:FireServer({ kind = "hello", v = if self.bound then rules.OFFER_PROTOCOL else rules.PROTOCOL,
+   recovery=if self.cfg.recovery then rules.RECOVERY_PROTOCOL else nil })
 	end
 	if self.dirty and (not self.bound or self.bound.epoch~=nil or self.legacyTemporary) and t - self.lastProgress >= rules.CLIENT_PROGRESS_GAP then
 		self.dirty = false

@@ -14,17 +14,22 @@ local function alive(self:any):boolean
 end
 function Owner.load(self:any):...any
  self.busy=true;local result=table.pack(pcall(self.runtime.load,self.runtime));self.busy=false
- if self.negotiated and self.session.restProtected[self.mode] then self.pendingDiscovery=true end
+ if self.recoveryEnabled and self.session.restProtected[self.mode] then self.pendingDiscovery=true end
  if not result[1] then error(result[2],0) end;return table.unpack(result,2,result.n)
 end
 function Owner.enableOffers(self:any)
  if not alive(self) or self.negotiated then return end
  self.negotiated=true;self.session:enableOffers()
+end
+function Owner.enableRecovery(self:any)
+ if not alive(self) or self.recoveryEnabled then return end
+ self.recoveryEnabled=true
  if self.session.restProtected[self.mode] then self.pendingDiscovery=true end
 end
 function Owner.refreshOffer(self:any,mode:any):boolean
  if not alive(self) or type(mode)~="string" or not table.find(Rules.MODES,mode) then return false end
  local rt=self.runtime
+ if not self.recoveryEnabled then return rt.phase=="normal" and self.session:refreshOffer(mode) end
  if mode==self.mode and self.session.restProtected[mode] then
   if rt.accepted then return false end
   if rt.phase=="normal" or rt.phase=="offered" or rt.phase=="offer_refused" then self.pendingDiscovery=true end
@@ -35,6 +40,7 @@ end
 function Owner.requestLife(self:any,kind:any,mode:any,serial:any,offerId:any):boolean
  if not alive(self) or type(mode)~="string" or not table.find(Rules.MODES,mode) then return false end
  local rt=self.runtime;local s=self.session;local r=s.intents.requests[mode]
+ if not self.recoveryEnabled then return rt.phase=="normal" and s:requestLife(kind,mode,serial,offerId) end
  if rt.phase=="normal" and not self.pendingDiscovery and not s.restProtected[mode] then return s:requestLife(kind,mode,serial,offerId) end
  if r and r.kind==kind and r.serial==serial and r.offerId==offerId then s.intents:notify(r);return true end
  if self.busy or rt.busy or s.busy then
@@ -76,7 +82,7 @@ function Owner.setRestForIntent(self:any,mode:any,record:any,life:any,serial:any
  return self.runtime.phase=="normal" and not self.pendingDiscovery and self.session:setRestForIntent(mode,record,life,serial,credential,restSerial)
 end
 function Owner.applyRecovery(self:any,message:any):boolean
- return alive(self) and self.runtime:entryApplied(message)
+ return alive(self) and self.recoveryEnabled==true and self.runtime:entryApplied(message)
 end
 function Owner.demote(self:any,why:string,retry:boolean)
  local rt=self.runtime
@@ -86,7 +92,7 @@ function Owner.demote(self:any,why:string,retry:boolean)
 end
 local function step(self:any):boolean
  local rt=self.runtime;local s=self.session
- if self.pendingDiscovery and self.negotiated and s.state=="active" and not rt.accepted then
+ if self.pendingDiscovery and self.negotiated and self.recoveryEnabled and s.state=="active" and not rt.accepted then
   if rt.phase=="offered" then rt:dismiss() end
   if rt.phase=="normal" or rt.phase=="offer_refused" then
    local j=rt:discover(self.mode);if j then self.pendingDiscovery=nil end

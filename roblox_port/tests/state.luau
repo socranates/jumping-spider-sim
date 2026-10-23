@@ -2990,13 +2990,14 @@ case("optional service owner is the only work and intake route",function()
     result[name]=function(_self,...) calls[name]=(calls[name] or 0)+1;return session[name](session,...) end
    end
    result.applyRecovery=function(_self,msg) calls.applyRecovery=(calls.applyRecovery or 0)+1;return msg.id=="exact" end
+   result.enableRecovery=function() calls.enableRecovery=(calls.enableRecovery or 0)+1 end
    check(session.counters.requests==0,"owner constructor performed storage work");owned=result;return result
   end})
  local player={UserId=9950,Name="owner-test"};service:addPlayer(player)
  check(calls.load==1 and service.entries[player].session==owned.session,"service bypassed owned load or session")
  emitOwner({kind="recovery_entry",offer={id="pre-hello"}});check(#sent==0,"owned sender spoke before negotiation")
  service:onMessage(player,{kind="recovery_applied",id="exact"});check(calls.applyRecovery==nil,"receipt reached owner before hello")
- service:onMessage(player,{kind="hello",v=SaveRules.OFFER_PROTOCOL});check(calls.enableOffers==1,"hello bypassed owner negotiation")
+ service:onMessage(player,{kind="hello",v=SaveRules.OFFER_PROTOCOL,recovery=SaveRules.RECOVERY_PROTOCOL});check(calls.enableOffers==1 and calls.enableRecovery==1,"hello bypassed owner negotiation")
  local n=#sent;emitOwner({kind="recovery_entry",offer={id="exact"}})
  check(#sent==n+1 and sent[#sent].epoch==owned.session.id and type(sent[#sent].sequence)=="number","owned sender bypassed transport stamps")
  emitOwner({kind="decision",decision={state="writable"}});check(#sent==n+1,"owned sender accepted an unsupported packet kind")
@@ -3018,6 +3019,43 @@ case("optional service owner is the only work and intake route",function()
  local after=#sent;emitOwner({kind="recovery_entry",offer={id="late"}});check(#sent==after,"departed owner sent a late entry offer")
  local other={UserId=9951,Name="owner-shutdown"};service:addPlayer(other);service:shutdown()
  check(calls.flush==2 and owned.session.closed,"shutdown bypassed owned flush")
+end)
+
+case("recovery capability is explicit frozen and requires a complete owner",function()
+ for _,support in {"complete","noEnable","noApply"} do
+  for _,advertised in {false,1,2,"1",true,{},0/0,math.huge} do
+   local now=100;local b=MemoryBackend.new();local sent={};local emit;local enabled,applied=0,0
+   local service=SaveService.new({backend=b,now=function() return now end,sleep=function(dt) now+=dt end,spawn=function(f,...) f(...) end,
+    send=function(_player,msg) table.insert(sent,msg) end,
+    ownerFactory=function(cfg,sender)
+     emit=sender;local s=SaveSession.new(cfg);local o={session=s}
+     for _,name in {"load","step","flush","setProgress","beginLife","requestLife","refreshOffer","setRestForIntent","setRestForLife","enableOffers","demote"} do o[name]=function(_self,...) return s[name](s,...) end end
+     if support~="noEnable" then o.enableRecovery=function() enabled+=1 end end
+     if support~="noApply" then o.applyRecovery=function() applied+=1;return true end end
+     return o
+    end})
+   local player={UserId=9960,Name="capability"};service:addPlayer(player);local requests=b.requests
+   emit({kind="recovery_entry"});check(#sent==0,"entry emitted before hello")
+   service:onMessage(player,{kind="hello",v=SaveRules.OFFER_PROTOCOL,recovery=if advertised~=false then advertised else nil})
+   local accepted=support=="complete" and advertised==SaveRules.RECOVERY_PROTOCOL
+   check(enabled==(if accepted then 1 else 0),"capability enabled without both compatible peer and owner")
+   check(sent[#sent].kind=="loaded" and sent[#sent].recovery==(if accepted then SaveRules.RECOVERY_PROTOCOL else nil),"loaded did not echo the actual agreement")
+   check(b.requests==requests,"capability negotiation accessed storage")
+   local n=#sent;emit({kind="recovery_entry"});check(#sent==n+(if accepted then 1 else 0),"unnegotiated owner entry passed sealed sender")
+   service:onMessage(player,{kind="recovery_applied",v=1});check(applied==(if accepted then 1 else 0),"unnegotiated receipt reached owner")
+   now+=5;service:onMessage(player,{kind="hello",v=SaveRules.OFFER_PROTOCOL,recovery=if accepted then nil else 1})
+   check(sent[#sent].recovery==(if accepted then 1 else nil) and enabled==(if accepted then 1 else 0),"duplicate hello changed capability or repeated activation")
+   check(b.requests==requests,"duplicate handshake accessed storage")
+   service:removePlayer(player);requests=b.requests;service:onMessage(player,{kind="recovery_applied",v=1});check(b.requests==requests,"departed capability accessed storage")
+  end
+ end
+ -- A normal session has no recovery handler, even for an advertising client.
+ local now=100;local b=MemoryBackend.new();local sent={}
+ local service=SaveService.new({backend=b,now=function() return now end,sleep=function(dt) now+=dt end,spawn=function(f,...) f(...) end,send=function(_p,msg) table.insert(sent,msg) end})
+ local p={UserId=9961,Name="normal-only"};service:addPlayer(p);local requests=b.requests
+ service:onMessage(p,{kind="hello",v=3,recovery=1});check(sent[#sent].recovery==nil,"normal server advertised unimplemented recovery")
+ service:onMessage(p,{kind="recovery_applied",v=1});check(b.requests==requests and service.entries[p].recovery==nil,"normal session accepted recovery receipt")
+ service:removePlayer(p)
 end)
 
 print(`STATE passed={passed} failed={failed}`)

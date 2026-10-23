@@ -70,7 +70,7 @@ local function loadedMessage(entry: any): { [string]: any }
 	local snap = session:snapshot()
 	if entry.protocol==SaveRules.OFFER_PROTOCOL then
 		local offers={};for _,mode in SaveRules.MODES do offers[mode]=session:offer(mode) end
-		return {kind="loaded",v=SaveRules.OFFER_PROTOCOL,status=snap.status,reason=snap.reason,progress=snap.progress,protected=snap.protected,offers=offers,decisions=session.intents:snapshot()}
+		return {kind="loaded",v=SaveRules.OFFER_PROTOCOL,recovery=entry.recovery,status=snap.status,reason=snap.reason,progress=snap.progress,protected=snap.protected,offers=offers,decisions=session.intents:snapshot()}
 	end
 	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives, protected = snap.protected }
 end
@@ -115,7 +115,7 @@ function SaveService.addPlayer(self: any, player: Player)
  }
  if self.cfg.ownerFactory then
   local owned=self.cfg.ownerFactory(sessionConfig,function(msg:any)
-   if self.entries[player]~=entry or entry.leaving or not entry.loaded or not entry.hello or entry.protocol~=SaveRules.OFFER_PROTOCOL then return end
+   if self.entries[player]~=entry or entry.leaving or not entry.loaded or not entry.hello or entry.protocol~=SaveRules.OFFER_PROTOCOL or entry.recovery~=SaveRules.RECOVERY_PROTOCOL then return end
    if type(msg)~="table" or msg.kind~="recovery_entry" then return end
    sendTo(self,player,msg)
   end)
@@ -166,9 +166,14 @@ local function handle(self: any, entry: any, msg: any)
 			return
 		end
 		local wasUnsupported=entry.unsupported;entry.unsupported=false;entry.protocol=protocol
+		if not entry.hello then
+   entry.recovery=if protocol==SaveRules.OFFER_PROTOCOL and msg.recovery==SaveRules.RECOVERY_PROTOCOL
+    and entry.owner and type(entry.owner.enableRecovery)=="function" and type(entry.owner.applyRecovery)=="function" then SaveRules.RECOVERY_PROTOCOL else nil
+  end
 		if protocol==SaveRules.OFFER_PROTOCOL then owner(entry):enableOffers() end
 		if entry.session.state=="session" and (entry.session.reason=="offline" or (wasUnsupported and (entry.session.reason=="other_session" or entry.session.reason=="load_failed"))) then entry.session.canRetry=true;entry.session.retryAt=now end
-		entry.hello = true
+		local firstHello=not entry.hello;entry.hello = true
+  if firstHello and entry.recovery then entry.owner:enableRecovery() end
 		if entry.loaded then sendTo(self, entry.player, loadedMessage(entry)) end
 	elseif not entry.hello then
 		self.stats.dropped+=1 -- no candidates/permissions before compatible negotiation
@@ -190,7 +195,7 @@ local function handle(self: any, entry: any, msg: any)
   local accepted=if kind=="life_intent" then owner(entry):requestLife(msg.intent,msg.mode,msg.serial,msg.offerId) else owner(entry):refreshOffer(msg.mode)
   if not accepted then self.stats.dropped+=1 end
  elseif kind=="recovery_applied" then
-  if entry.protocol~=SaveRules.OFFER_PROTOCOL or not entry.owner or type(entry.owner.applyRecovery)~="function" then self.stats.dropped+=1;return end
+  if entry.protocol~=SaveRules.OFFER_PROTOCOL or entry.recovery~=SaveRules.RECOVERY_PROTOCOL or not entry.owner or type(entry.owner.applyRecovery)~="function" then self.stats.dropped+=1;return end
   if not take(entry.recoveryBucket,now) then self.stats.limited+=1;return end
   if not entry.owner:applyRecovery(msg) then self.stats.dropped+=1 end
  elseif kind == "rest" then

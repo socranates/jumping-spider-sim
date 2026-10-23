@@ -1,3 +1,17 @@
+# Latest checkpoint - private session replacement verified, 2026-10-23
+
+Production source is still `8c9b71896736d85d43e02fec1521bcd567cdb33f`, with unchanged completed Windows/Linux full gates (each 76/468880/0), compile 222, strict clean and native scripted fixture 82/0. The unchanged diagnostic-free candidate remains `C:\Users\natha\claude-xfer\Windowsill-production-8c9b718\TheWindowsill-production-candidate.rbxlx`. Do not repeat those completed unchanged gates. Nothing is published.
+
+Four new private replacement adapters wrap the actual SaveService/SaveClient/SaveContinuation and preceding all-slot owner. Capability freezes on first compatible hello. Request/offer/ACK closes the old owner, commit/ready opens a fresh epoch, and a nonce-bound new loaded reply requires a confirmed fresh-menu callback. Old intents/receipts/checkpoints/offer work and suspended client update emissions are fenced. Final P progress is preserved; confirmed R/A1/M1 remain unchanged. The account key is retained. Ordinary rolling request debt survives replacement; a new epoch cannot reopen a startup budget lane. Lost packets are idempotent. Failed saves, deadlines, refused application callbacks and failed/cancelled constructors stay read-only. The actual service departure counter drains removal/shutdown during a yielded close.
+
+`replacement-full-1` passes all 29 named groups / 204254 checks / 0 failures: preceding 201587 plus 2667 replacement assertions. `replacement-types-6` compiles all 40 candidates and the complete overlay is strict-clean. `verify-replacement.py` reconstructs the bundle and binds all source, committed production, outputs and type inputs. Three exact mode traces and consecutive replacements are covered. Focused-8 is the current focused pass; intermediate failures and corrections are retained in `docs/save-slot-isolation/SESSION-REPLACEMENT.md`. All owned jobs are terminal.
+
+These are memory-backed, synthetic-clock adapter tests. The pause/menu callbacks are scripted, not actual native game callbacks. Ordinary engine recovery/replacement remains uninstalled. Real DataStore/rejoin, measured payload/loading costs, native whole recovery/replacement and general gameplay/input/audio/sustained performance are still open. No release or whole-game claim. Original OneDrive/frozen Godot, three unrelated save-cost outputs and untracked sourcemap are untouched.
+
+Next: implement/qualify trusted pristine server template/context construction (one authored source with bounded owned mode profiles), review initial-visit factory cancellation, then connect actual game recovery/pause/menu and safe error/exit callbacks through the adapters. Preserve the existing controls, camera and local checkpoints. Before engine activation, prove payload/network budgets and native recovery/replacement; then isolated real test-store save/rejoin and broader native game/performance gates. The full optimization and stability goal remains active.
+
+---
+
 # Latest checkpoint - private all-slot recovery owner verified, 2026-10-23
 
 Production source remains `8c9b71896736d85d43e02fec1521bcd567cdb33f`. Its completed Windows and Linux full runs each pass 76 suites / 468880 checks / 0 failures; native scripted fixture 82/0; compile 222 and strict clean. The diagnostic-free candidate remains `C:\Users\natha\claude-xfer\Windowsill-production-8c9b718\TheWindowsill-production-candidate.rbxlx`. It is not published. Do not repeat these unchanged production gates.

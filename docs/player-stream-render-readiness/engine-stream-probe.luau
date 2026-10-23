@@ -7,6 +7,9 @@ local Http=game:GetService("HttpService")
 local Map=require(game.ReplicatedStorage.Shared.World.WorldMap)
 local Region=require(game.ReplicatedStorage.Shared.World.Region)
 local Station=require(game.ReplicatedStorage.Shared.World.StationTerritory)
+-- Serialized fixture settings are checked from XML; radii are not Lua-readable
+-- in this Studio build. Do not mistake an unavailable property for zero.
+local TARGET_RADIUS=160
 local function frames(n) for _=1,n do Run.Heartbeat:Wait() end end
 local function waitFor(fn,seconds)
  local deadline=os.clock()+seconds
@@ -45,7 +48,7 @@ return function(d)
   d.openMenu(true);check(d.menu:isShowing(),"menu did not pause fixture travel")
   local near=assert(Map.region("garden_b4"));local far=assert(Map.region("deck_n4"))
   check(not Station.contains(near.id) and not Station.contains(far.id),"fixture uses Persistent station collision")
-  check((near.spawn.pos-far.spawn.pos).Magnitude>WS.StreamingTargetRadius*3,"fixture destinations too close")
+  check((near.spawn.pos-far.spawn.pos).Magnitude>TARGET_RADIUS*3,"fixture destinations too close")
   local _,nearFolder=arrive(near)
   local life,motor=d.life,d.motor
   local nearAt=near.spawn.pos+Vector3.yAxis*.31
@@ -57,7 +60,7 @@ return function(d)
   observedOut=waitFor(function()
    return nearFolder.Parent==nil and not d.world:regionReady(near.id)
   end,45)
-  note("away",{region=near.id,away=far.id,seconds=os.clock()-removalAt,engineRemoved=observedOut,nearReady=d.world:regionReady(near.id),streamOutBehavior=WS.StreamOutBehavior.Name})
+  note("away",{region=near.id,away=far.id,seconds=os.clock()-removalAt,engineRemoved=observedOut,nearReady=d.world:regionReady(near.id),streamOutBehavior="see immutable fixture manifest"})
   -- Retention is a valid engine choice under Default/low-memory behavior. It is
   -- recorded as not observed, never as proof of stream-out/rearrival.
   if not observedOut then

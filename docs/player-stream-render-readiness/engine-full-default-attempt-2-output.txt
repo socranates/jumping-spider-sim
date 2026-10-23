@@ -1,0 +1,7 @@
+2026-10-23T13:27:04.977Z,288.977753,5744,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_GUARD] 695e772d9d1ece490dd32132c655ac60c226c7b8 223 persistence_disabled
+2026-10-23T13:27:19.315Z,303.315338,5f04,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_BEGIN] 1792762040042
+2026-10-23T13:27:27.859Z,311.859650,4fbc,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_OBSERVATION] {"seconds":2.079030699998839,"phase":"arrival","region":"garden_b4","collisionReady":true,"pieces":9,"run":"1792762040042","serverFocusObserved":true}
+2026-10-23T13:27:28.029Z,312.029907,40e0,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_OBSERVATION] {"seconds":0.07383710000067367,"phase":"arrival","region":"deck_n4","collisionReady":true,"pieces":25,"run":"1792762040042","serverFocusObserved":true}
+2026-10-23T13:28:13.035Z,357.035492,3ffc,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_OBSERVATION] {"nearReady":true,"away":"deck_n4","streamOutBehavior":"see immutable fixture manifest","region":"garden_b4","phase":"away","seconds":45.004918499998897,"run":"1792762040042","engineRemoved":false}
+2026-10-23T13:28:13.036Z,357.036499,3ffc,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_OBSERVATION] {"phase":"scope","streamOutVerified":false,"run":"1792762040042","reason":"engine retained the near model within the bounded observation window"}
+2026-10-23T13:28:13.036Z,357.036499,3ffc,6,Info [FLog::CreatorOutput] [ENGINE_STREAM_PASS] 1792762040042 {"renderFrames":0,"heldFrames":0,"engineStreamOutObserved":false,"checks":11}

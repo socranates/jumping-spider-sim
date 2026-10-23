@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T13:22:00.909744+00:00",
+  "as_of_utc": "2026-10-23T13:38:01.978571+00:00",
   "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
   "goal_complete": false,
   "published": false,
@@ -185,8 +185,8 @@
     },
     {
       "id": "network-streaming",
-      "status": "player-hold-scripted-native-verified-real-network-open",
-      "evidence_boundary": "Source695e772 retains player pose, velocity, simulation objects and life/needs/prey clocks when authored collision disappears; partial return refuses, whole return resumes, repeated removal and menus while waiting are tested. Native60/0 checks223 exact fingerprints in an unbound persistence-disabled full-detail model, including projected airborne refusal and thirty stable subsequent frames. Earlierbf94 diagnostic proved no motion but a false cleared loading flag between ticks; per-render destination check fixes that. CLI43/0 includes twelve quarter-tick renders. This deliberately removes local collision folders; natural server/network streaming pressure, low-detail natural traversal, the complete swept path and device/performance proof remain open. Earlier creature/prey evidence is retained separately.",
+      "status": "controlled-engine-stream-out-verified-default-pressure-and-low-open",
+      "evidence_boundary": "Current695e772: bounded scripted native60/0 plus actual engine/production WorldFocus native25/0 under a separate Opportunistic-policy full-detail/Free-play fixture. Engine removed Atomic garden_b4 while at deck_n4, the player retained position/velocity/mode and life/needs/prey clocks through4 Heartbeat observations, then complete collision resumed the same life/motor. Default-policy11/0 retained the model throughout45seconds; no default-pressure stream-out proof. Each fixture223 script fingerprints,0 CreatorErrors; original models/editor copies preserved, Studio closed. No collision parenting in either engine probe. Low detail, Normal energy, natural network/memory pressure, complete swept paths and physical devices remain open. Production streaming policy is unchanged.",
       "references": [
         "docs/prey-stream-readiness/README.md",
         "docs/prey-stream-readiness/focused-receipt.json",
@@ -195,7 +195,9 @@
         "docs/player-stream-readiness/run-probe.py",
         "docs/player-stream-readiness/native-attempt-2-receipt.json",
         "docs/player-stream-render-readiness/native-full-receipt.json",
-        "docs/player-stream-render-readiness/native-full-output.txt"
+        "docs/player-stream-render-readiness/native-full-output.txt",
+        "docs/player-stream-render-readiness/ENGINE-RESULTS.md",
+        "docs/player-stream-render-readiness/engine-verification.json"
       ]
     },
     {
@@ -210,7 +212,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected.",
+      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected. Current695e772 controlled full-detail/Free-play garden sample after engine return:120 RenderStepped intervals at1105x433, mean16.676ms/p9518.193ms/max18.991ms. Short foreground diagnostic scene, not a paired gain or whole-game/device/long-session claim.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -227,7 +229,8 @@
         "docs/spatial-save-validation/README.md",
         "docs/pond-drawing-reuse/README.md",
         "docs/animal-presentation-cost/pond-v2-batch-receipt.json",
-        "docs/animal-presentation-cost/adoption.json"
+        "docs/animal-presentation-cost/adoption.json",
+        "docs/player-stream-render-readiness/engine-full-opportunistic-receipt.json"
       ]
     },
     {
@@ -316,7 +319,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current695e772 pushed on codex/save-continue; both full76/468866/0 platform gates, compile222/strict/runner5, bounded native60/0 and exact222-source no-diagnostic candidate verified. Private recovery component187257/0 remains byte-identical with current34-candidate overlay types. Engine-streaming experiment prepared separately; actual game recovery menu/profile/model adoption, replacement epochs and native/online/release remain open. Original OneDrive and unrelated edits preserved; nothing published.",
+      "evidence_boundary": "Current695e772 pushed on codex/save-continue; both full76/468866/0 platform gates, compile222/strict/runner5, bounded native60/0 and exact222-source no-diagnostic candidate verified. Private recovery component187257/0 remains byte-identical with current34-candidate overlay types. Engine streaming now observed under diagnostic Opportunistic policy (25/0); Default11/0 retained collision for45seconds; actual game recovery menu/profile/model adoption, replacement epochs and native/online/release remain open. Original OneDrive and unrelated edits preserved; nothing published.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md",
@@ -1514,7 +1517,13 @@
     "full_gates": "both-platforms-verified",
     "published": false,
     "windows_exit_code": 0,
-    "linux_conclusion": "success"
+    "linux_conclusion": "success",
+    "controlled_engine_stream_out_verified": true,
+    "engine_policy": "Opportunistic diagnostic only",
+    "engine_checks": 25,
+    "engine_held_heartbeat_observations": 4,
+    "default_policy_stream_out_observed": false,
+    "low_detail_native_verified": false
   },
   "latest_private_recovery_component_reuse": {
     "current_production_source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
@@ -1577,5 +1586,41 @@
     "owner_factory_installed": false,
     "full_release_audit_complete": false,
     "published": false
+  },
+  "latest_engine_streaming": {
+    "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+    "default_checks": 11,
+    "default_observation_seconds": 45,
+    "default_stream_out_observed": false,
+    "opportunistic_checks": 25,
+    "opportunistic_engine_remove_and_rearrival_verified": true,
+    "player_hold_frames": 4,
+    "same_life_and_motor_resumed": true,
+    "position_velocity_mode_and_life_needs_prey_clocks_retained": true,
+    "collision_folder_mutations": false,
+    "production_streaming_policy_changed": false,
+    "script_fingerprints_each": 223,
+    "creator_errors_during_each_fixture": 0,
+    "full_detail": true,
+    "mode": "Free play",
+    "native_low_detail_verified": false,
+    "render_sample": {
+      "maxMs": 18.991099670529366,
+      "region": "garden_b4",
+      "phase": "render_sample",
+      "comparisonGainClaim": false,
+      "frames": 120,
+      "p95Ms": 18.192699179053307,
+      "viewport": "1105, 433",
+      "run": "1792762293163",
+      "detail": "full",
+      "meanMs": 16.676110859649878
+    },
+    "whole_game_fps_gain_claim": false,
+    "real_network_pressure_under_default_verified": false,
+    "real_datastore_verified": false,
+    "recovery_native_verified": false,
+    "published": false,
+    "goal_complete": false
   }
 }

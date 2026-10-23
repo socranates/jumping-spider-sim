@@ -1,0 +1,92 @@
+{
+  "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-engine-stream-695e772-full-opportunistic\\Windowsill-engine-stream-695e772-full-opportunistic.rbxlx",
+  "model_sha256": "8f8aca3b874ffe02ceaf4f0c03dcf6e696bf48b45be8d4bd8c509e52e6c01ccb",
+  "manifest_sha256": "60d89c0716e728698f8dadf41e8a5ce7d0f8302ca15eccf0d6fab1a741a622ef",
+  "guard_sha256": "74ae0bf02593b798c898231d51484a21fa8a07bc32b95b441e6deaac4515e6f1",
+  "probe_sha256": "cf709722ad4176adb46e89cda7a85071d5e74dc1d356e6336f387f8b8780b405",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": true,
+  "native_verified": true,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false,
+  "experiment_passed": true,
+  "terminal": true,
+  "stopped": true,
+  "run": "1792762293163",
+  "summary": {
+    "renderFrames": 120,
+    "heldFrames": 4,
+    "engineStreamOutObserved": true,
+    "checks": 25
+  },
+  "observations": [
+    {
+      "seconds": 2.0818221000008634,
+      "phase": "arrival",
+      "region": "garden_b4",
+      "collisionReady": true,
+      "pieces": 9,
+      "run": "1792762293163",
+      "serverFocusObserved": true
+    },
+    {
+      "seconds": 0.07595020000007935,
+      "phase": "arrival",
+      "region": "deck_n4",
+      "collisionReady": true,
+      "pieces": 25,
+      "run": "1792762293163",
+      "serverFocusObserved": true
+    },
+    {
+      "nearReady": false,
+      "away": "deck_n4",
+      "streamOutBehavior": "see immutable fixture manifest",
+      "region": "garden_b4",
+      "phase": "away",
+      "seconds": 0.037445099998876685,
+      "run": "1792762293163",
+      "engineRemoved": true
+    },
+    {
+      "run": "1792762293163",
+      "seconds": 0.21520259999670088,
+      "phase": "return",
+      "region": "garden_b4",
+      "collisionReady": true,
+      "streamOutVerified": true,
+      "resumedSameObjects": true,
+      "heldFrames": 4
+    },
+    {
+      "maxMs": 18.991099670529366,
+      "region": "garden_b4",
+      "phase": "render_sample",
+      "comparisonGainClaim": false,
+      "frames": 120,
+      "p95Ms": 18.192699179053307,
+      "viewport": "1105, 433",
+      "run": "1792762293163",
+      "detail": "full",
+      "meanMs": 16.676110859649878
+    }
+  ],
+  "engine_stream_out_observed": true,
+  "engine_remove_and_rearrival_verified": true,
+  "player_hold_during_engine_gap_observed": true,
+  "stream_out_behavior": "Opportunistic",
+  "detail": "full",
+  "collision_mutations_in_probe": false,
+  "studio_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261023T132216Z_Studio_ED04A_last.log",
+  "filtered_output_sha256": "804a31bfb7a1144f53b2d51b813ed1277e10d0e6756f2e39b0c9927c26c7d8a8",
+  "scope": "Unbound, saving disabled, actual production client/WorldFocus and real engine streaming. Explicit diagnostic stream-out policy, no collision-folder mutations. Bounded local Studio observation; not production network pressure, device performance, recovery or online datastore proof; never publish.",
+  "original_model_unchanged": true,
+  "editor_copy_path": "C:\\Users\\natha\\claude-xfer\\Windowsill-engine-stream-695e772-full-opportunistic\\Windowsill-engine-opportunistic-editor-copy.rbxl",
+  "editor_copy_sha256": "cbee3eb85bb88b56cf6c5593e20cbcced035cbe3c61e2a96d0aeb7c1a6ba85fc",
+  "creator_errors_during_fixture": 0,
+  "editor_place_closed": true
+}

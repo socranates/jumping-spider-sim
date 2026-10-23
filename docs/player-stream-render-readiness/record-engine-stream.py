@@ -13,6 +13,11 @@ lines=[s for s in lines if re.search(r'\[FLog::Creator(?:Output|Warning|Error)\]
 assert any('[PLAYER_STREAM_NATIVE_GUARD] '+r['source']+' 223 persistence_disabled' in s for s in lines)
 begins=[s for s in lines if '[ENGINE_STREAM_BEGIN]' in s];assert begins
 run=begins[-1].split('[ENGINE_STREAM_BEGIN] ',1)[1].strip()
+# A Studio process can host several review places. Keep only the current run's
+# nearest preceding fingerprint guard and markers in this run's output file.
+beginIndex=max(i for i,s in enumerate(lines) if '[ENGINE_STREAM_BEGIN] '+run in s)
+guardIndex=max(i for i,s in enumerate(lines[:beginIndex]) if '[PLAYER_STREAM_NATIVE_GUARD]' in s)
+lines=lines[guardIndex:]
 ends=[s for s in lines if '[ENGINE_STREAM_PASS] '+run in s or '[ENGINE_STREAM_FAIL] '+run in s];assert len(ends)==1
 passed='[ENGINE_STREAM_PASS]' in ends[0]
 observations=[]

@@ -1,0 +1,17 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "assertions": 49,
+  "cooperative_suspensions": 7,
+  "current_runtime_bundle_verified": true,
+  "strict_clean": true,
+  "recorded_test_garden_inspection": true,
+  "same_id_fresh_capture_tested": true,
+  "growth_counts_only_new_food": true,
+  "extra_ledger_copy_counterexample_reproduced": true,
+  "production_connected": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "complete_projection": false,
+  "destination_commit_authorized": false,
+  "published": false
+}

@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmpkqu6jrqw.luau:45034: cooperative preparation changed portable data or never yielded
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpkqu6jrqw.luau:45034 function mealCheck
+C:/Users/natha/AppData/Local/Temp/tmpkqu6jrqw.luau:45107

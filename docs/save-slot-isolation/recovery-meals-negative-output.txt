@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmpgxmhbyw2.luau:45050: portable validation unnecessarily copied reserve books
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpgxmhbyw2.luau:45050 function mealCheck
+C:/Users/natha/AppData/Local/Temp/tmpgxmhbyw2.luau:45147

@@ -1,0 +1,16 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 1,
+  "inputs": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "before-validation-recovery-meals-prototype.luau": "2a4129c6d2cf29e8c554510b22ad3cc830d77081e6e62922f945000fbff5f0fb",
+    "recovery-meals-tests.luau": "69ccbc33d086b1ac21f92c251879b92e254050b9d97b9d0993c6a2ea3f180f8b"
+  },
+  "bundle_sha256": "0bd8a84c1f7927958d583973a0b30ab66aa2c61696ed29d7725d795a06a3ee32",
+  "output_sha256": "55838a1b12f7ee0c04493ab36a75b66c6c49022408c7cd7d7cc229ad0acdd1ce",
+  "production_connected": false,
+  "real_datastore_verified": false,
+  "native_verified": false,
+  "complete_projection": false
+}

@@ -1,0 +1,5 @@
+SESSION_BOUNDARY late-lock state=active now=221 stored_beat=100 scheduler_beat=221 baseline_ack=true
+C:/Users/natha/AppData/Local/Temp/windowsill-session-boundary-6dttspy1/run.luau:45181: initial load reported active with an already expired stored lease
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-session-boundary-6dttspy1/run.luau:45181

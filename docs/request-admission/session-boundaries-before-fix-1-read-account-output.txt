@@ -1,0 +1,5 @@
+SESSION_BOUNDARY read-account provider=2 session=1 history=1
+C:/Users/natha/AppData/Local/Temp/windowsill-session-boundary-l0x14cpy/run.luau:45186: in-flight initial rest read is absent from request accounting
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-session-boundary-l0x14cpy/run.luau:45186

@@ -1,0 +1,27 @@
+# Typed terminal-held maintenance
+
+This private `idle.luau` replacement and the one-line `runtime-held.luau` route extend [the lifecycle cohort](LIFECYCLE-WORKERS.md). Optional admission now reaches maintenance after an accepted recovery is cancelled or refused. Initial/ordinary Session and service-wide account/epoch admission remain incomplete; normal startup is unchanged.
+
+The worker retains its exact terminal recovery job, held baseline/permit, backend/account/load/scheduler identity, fresh uncached initial probe and lock-only renewal. The same typed operation remains queued across denied polls. Its transform and expected acknowledgement survive waiting and reset for every callback replay. Denial consumes no provider attempt, failure, backoff or phase. Actual starts atomically charge job/session counters and the shared gate, while pruning bounded rolling scheduler history. The old aggregate budget is consulted only on the legacy no-lane path.
+
+An ambiguous committed renewal waits its existing backoff, probes fresh and retains only its bounded uncertainty window. Invalid/expired/foreign ownership sets `leaseLost`, cleans queued work and keeps the enforcing hold. Cancellation may revoke a typed in-flight renewal; committed bytes and request debt remain, and a new epoch waits for provider drain. Busy/coroutine permit state releases when that actual provider finishes.
+
+An explicit selected retry cancels even queued maintenance and runs the real typed recovery pipeline with the same account lane. Existing complete A1/M1 bytes remain exact. Rebound recovery still requires entry and grants no gameplay. Closed departure stops held maintenance before using its sealed progress-only authority; it preserves latest local choices and requires exact release readback. Runtime passes `recovery.lifecycleAdmission` into its held/failure helper, so this path no longer silently falls back to the preceding limiter when that optional lane is present.
+
+## Evidence
+
+The full `held-qualified-1` result passes **282370 fixed checks /119 named groups /0**:272651 preceding,9512 held-worker checks and207 actual Runtime checks. The46-target/45-source full overlay compiles and is strict-clean in `held-types-development-1`. `verify-held.py` reconstructs current source/bundles/mounts/outputs, checks every preceding summary and committed production, and binds the separate counterexamples. `held-verification.json` records committed identity and explicitly open gates.
+
+Eight new named cases cover all four cancelled/refused and pre/post-rest phases,480-second menu waits without payload/backup/archive/local/baseline changes, zero read/write capacity, stable renewal callback replay, ambiguous renewal/probe backoff, expired/foreign/replaced identities, cancellation after an actually suspended committed renewal, typed explicit retry retaining A1/M1, held departure preserving a local choice and the actual Runtime cancel-to-held-to-closed route. Provider/job/session start totals, busy flags and held permits are checked throughout.
+
+`held-before-admission-negative-1` restores only the preceding held implementation while Runtime/tests supply the new lane. That older worker ignores the extra constructor argument and starts a provider despite zero typed capacity. It fails the intended assertion; the new implementation passes. This demonstrates the need to replace the worker as well as pass a lane. It is not evidence that normal startup already uses typed admission.
+
+All these are memory-backed CLI/synthetic-clock proofs at explicit quiescent boundaries after legacy load/discovery or accepted recovery. The full cohort includes the previously declared private WorldMap/Checkpoint replacements. No native, online, FPS, phone or loading-speed gain follows. Production source/tests remain bd67582b5d53473f067244fc1e2e1f94adde173b; no main merge, normal activation or publication.
+
+## Ordinary loading is still open
+
+The new [Session boundary audit](SESSION-BOUNDARIES.md) and actual production/factory-baseline probes reproduce two **unfixed** issues: an initial callback delayed121 seconds acknowledges an already expired stored lock while scheduling a newer local beat, and a suspended initial rest read is missing from request counters/history until it returns. Their correctness assertions intentionally fail; these failures are not included as passing checks in the held cohort. The known issues and source hashes remain visible in the verification result.
+
+Next convert all eight ordinary Session request entry sites, correcting callback/ACK time and charging before physical dispatch. Preserve every schema/backup/source/life/revision/credential/transform fence, exact stored acknowledgement, latest local choice and per-key debounce/backoff. Expose capacity wait separately from provider failure; do not block all actors or resume a native provider manually. Then bind Runtime/Profile/Replacement/Service constructors to one persistent physical-account gate through initial load, failed/cancelled factories, removal/shutdown and replacements. Retire competing startup wrappers, import complete unknown debt once and carry debt across epochs. Complete typed replacement rather than removing its guard or falling back to untyped Session I/O.
+
+Qualify the actual service and a bounded cooperative driver, then repeat real-clock native attribution, isolated test-store leave/rejoin and remaining gameplay/input/audio/device/sustained-performance/release gates. The overall optimization/stability goal remains active.

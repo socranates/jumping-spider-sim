@@ -1,0 +1,26 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-recovery-native-cost-bd67582-attempt1\\Windowsill-native-new-application.rbxlx",
+  "place_sha256": "08e5dd34e8a24b174cbdd5eff2b28c11ffcc1d4d4b4ea87447864f0697bba33b",
+  "manifest_sha256": "bb88d8f2611bc1c61ce972502e77a440cc1dc2d7412ec4d212101e144760d3a1",
+  "guard_sha256": "b292d3589574e11a975e6b7c6df8e625bcb975af184f58cc3389c78771c2fb8f",
+  "scripts": 265,
+  "production_untouched": 222,
+  "private_candidates": 41,
+  "production_overrides": [
+    "WorldMap",
+    "Checkpoint"
+  ],
+  "diagnostics": {
+    "docs/recovery-native-cost/native-client.luau": "5323108536bd2a09e1baf009965d98ecd27e002a753afcd0d33c3d0cacf48a25",
+    "docs/recovery-native-cost/native-server.server.luau": "96eec837fdd537913fd0b19a9c1e33f33eb697f6d132120d164d5e418d10f7c9"
+  },
+  "production_persistence_disabled": true,
+  "memory_store": true,
+  "engine_codec": true,
+  "clock_scale": 10,
+  "executed": false,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

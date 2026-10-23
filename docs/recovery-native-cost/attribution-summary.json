@@ -1,0 +1,77 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "run": "1792783457829",
+  "place_sha256": "9245baf717d28c606b86822e44fcd5519168cbdf88c1bab054a927884c197cdb",
+  "terminal": "passed",
+  "client_checks": 70,
+  "client_summary": {
+    "clock_scale": 10,
+    "engine_codec": true,
+    "memory_store": true,
+    "online": false,
+    "options": 213,
+    "real_remote_events": true,
+    "server_checks": 10
+  },
+  "send_to_callback_summary": {
+    "count": 349,
+    "min_seconds": 0.013147115707397461,
+    "median_seconds": 0.03471708297729492,
+    "max_seconds": 0.04676508903503418,
+    "negative_samples": 0
+  },
+  "real_elapsed_spans": {
+    "main_choice_to_adoption": 37.159924030303955,
+    "main_release_ack_to_playing": 2.382140874862671,
+    "main_checkpoint_preparation": 0.16690802574157715,
+    "main_checkpoint_to_stored": 1.0702009201049805,
+    "free_checkpoint_preparation": 0.18441200256347656,
+    "free_checkpoint_to_stored": 1.018671989440918,
+    "easy_checkpoint_preparation": 0.18415594100952148,
+    "easy_checkpoint_to_stored": 5.451843023300171
+  },
+  "online": false,
+  "published": false,
+  "server_dominant_states": [
+    {
+      "budget_full_calls": 1705,
+      "calls": 1753,
+      "elapsed_seconds": 29.215119699998468,
+      "key": "new_retirement:nil:nil:rest",
+      "max_seconds": 0.0033478999976068735,
+      "request_starts": 48,
+      "seconds": 0.3185760999331251
+    },
+    {
+      "budget_full_calls": 1366,
+      "calls": 1457,
+      "elapsed_seconds": 24.284662399993977,
+      "key": "recovering:commit:nil:prepare",
+      "max_seconds": 0.018490499998733867,
+      "request_starts": 42,
+      "seconds": 0.43677170012233546
+    },
+    {
+      "budget_full_calls": 1111,
+      "calls": 1142,
+      "elapsed_seconds": 19.029374199999438,
+      "key": "recovering:archive:nil:prepare",
+      "max_seconds": 0.005062800002633594,
+      "request_starts": 30,
+      "seconds": 0.1667171999142738
+    },
+    {
+      "budget_full_calls": 984,
+      "calls": 1009,
+      "elapsed_seconds": 17.580463799989957,
+      "key": "discovering:nil:nil:rest",
+      "max_seconds": 0.0003857000046991743,
+      "request_starts": 26,
+      "seconds": 0.10125449992483482
+    }
+  ],
+  "baseline_run": "1792783020948",
+  "baseline_main_choice_to_adoption": 41.81191897392273,
+  "request_admission_remains_open": true,
+  "controlled_speedup_claim": false
+}

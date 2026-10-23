@@ -1,0 +1,20 @@
+{
+  "original_models_unchanged": true,
+  "artifacts": [
+    {
+      "attempt": 1,
+      "place_sha256": "08e5dd34e8a24b174cbdd5eff2b28c11ffcc1d4d4b4ea87447864f0697bba33b",
+      "editor_copy": "C:\\Users\\natha\\claude-xfer\\Windowsill-recovery-native-cost-bd67582-attempt1\\after-run-editor-copy.rbxl",
+      "editor_copy_sha256": "96a466ef8ec4960622d483cfdda6d363eec5afbbbb9f07db10fbc1d37b393894",
+      "stopped": true
+    },
+    {
+      "attempt": 2,
+      "place_sha256": "9245baf717d28c606b86822e44fcd5519168cbdf88c1bab054a927884c197cdb",
+      "editor_copy": "C:\\Users\\natha\\claude-xfer\\Windowsill-recovery-native-cost-bd67582-attempt2\\after-run-editor-copy.rbxl",
+      "editor_copy_sha256": "eac8472079e80f555e301af96b410006e29e8bfe43dc16e0e2dea719e9fb16f3",
+      "stopped": true
+    }
+  ],
+  "published": false
+}

@@ -1,0 +1,31 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "run": "1792783020948",
+  "client_checks": 70,
+  "server_checks": 10,
+  "largest_representative_canonical_bytes": 40108,
+  "main_entry_selected_seconds": 41.66133117675781,
+  "main_client_entry_preparing_seconds": 0.1474149227142334,
+  "client_observer_copy_seconds": 0.005645199998980388,
+  "server_observer_copy_seconds": 0.00392329998430796,
+  "delivery": {
+    "count": 372,
+    "min_seconds": 0.011337041854858398,
+    "median_seconds": 0.034815430641174316,
+    "max_seconds": 0.1885690689086914,
+    "negative_samples": 0
+  },
+  "spans": {
+    "main_choice_to_adoption": 41.81191897392273,
+    "main_release_ack_to_playing": 1.3323090076446533,
+    "main_checkpoint_preparation": 0.16576099395751953,
+    "main_checkpoint_to_stored": 4.350156784057617,
+    "free_checkpoint_preparation": 0.2171781063079834,
+    "free_checkpoint_to_stored": 2.7857820987701416,
+    "easy_checkpoint_preparation": 0.18413186073303223,
+    "easy_checkpoint_to_stored": 3.5680840015411377
+  },
+  "timing_clock_scale": 10,
+  "online": false,
+  "server_cause_not_yet_attributed": true
+}

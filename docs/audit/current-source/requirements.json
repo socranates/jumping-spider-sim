@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T19:11:01.593459+00:00",
+  "as_of_utc": "2026-10-23T19:29:27.391827+00:00",
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
   "goal_complete": false,
   "published": false,
@@ -274,7 +274,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected. Current695e772 controlled full-detail/Free-play garden sample after engine return:120 RenderStepped intervals at1105x433, mean16.676ms/p9518.193ms/max18.991ms. Short foreground diagnostic scene, not a paired gain or whole-game/device/long-session claim. Separate695e772 low/Normal controlled garden120frames mean16.807/p9518.176/max45.174ms at1105x433; no paired gain, phone or whole-game claim.",
+      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected. Current695e772 controlled full-detail/Free-play garden sample after engine return:120 RenderStepped intervals at1105x433, mean16.676ms/p9518.193ms/max18.991ms. Short foreground diagnostic scene, not a paired gain or whole-game/device/long-session claim. Separate695e772 low/Normal controlled garden120frames mean16.807/p9518.176/max45.174ms at1105x433; no paired gain, phone or whole-game claim. Current bd67582 native attribution: two 70-client/10-server runs, real Remotes/memory/engine codec/10x protocol. Largest baseline canonical sample40108 bytes; Main choice-to-adoption41.812s then37.160s. Client entry preparation0.147s in baseline; second server archive/commit states observe full application budget1111/1142 and1366/1457 calls. Request admission is the next target, not an established payload bottleneck. Frame cadence changed alongside extra instrumentation; no causal speedup, online timing or representative FPS claim. Initialization/Easy whole-frame gaps remain unexplained.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -293,7 +293,9 @@
         "docs/animal-presentation-cost/pond-v2-batch-receipt.json",
         "docs/animal-presentation-cost/adoption.json",
         "docs/player-stream-render-readiness/engine-full-opportunistic-receipt.json",
-        "docs/player-stream-render-readiness/normal-stream-verification.json"
+        "docs/player-stream-render-readiness/normal-stream-verification.json",
+        "docs/recovery-native-cost/RESULTS.md",
+        "docs/recovery-native-cost/attribution-summary.json"
       ]
     },
     {
@@ -1970,5 +1972,82 @@
       "real_remote_events": true,
       "server_checks": 10
     }
+  },
+  "latest_recovery_native_cost": {
+    "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+    "run": "1792783457829",
+    "place_sha256": "9245baf717d28c606b86822e44fcd5519168cbdf88c1bab054a927884c197cdb",
+    "terminal": "passed",
+    "client_checks": 70,
+    "client_summary": {
+      "clock_scale": 10,
+      "engine_codec": true,
+      "memory_store": true,
+      "online": false,
+      "options": 213,
+      "real_remote_events": true,
+      "server_checks": 10
+    },
+    "send_to_callback_summary": {
+      "count": 349,
+      "min_seconds": 0.013147115707397461,
+      "median_seconds": 0.03471708297729492,
+      "max_seconds": 0.04676508903503418,
+      "negative_samples": 0
+    },
+    "real_elapsed_spans": {
+      "main_choice_to_adoption": 37.159924030303955,
+      "main_release_ack_to_playing": 2.382140874862671,
+      "main_checkpoint_preparation": 0.16690802574157715,
+      "main_checkpoint_to_stored": 1.0702009201049805,
+      "free_checkpoint_preparation": 0.18441200256347656,
+      "free_checkpoint_to_stored": 1.018671989440918,
+      "easy_checkpoint_preparation": 0.18415594100952148,
+      "easy_checkpoint_to_stored": 5.451843023300171
+    },
+    "online": false,
+    "published": false,
+    "server_dominant_states": [
+      {
+        "budget_full_calls": 1705,
+        "calls": 1753,
+        "elapsed_seconds": 29.215119699998468,
+        "key": "new_retirement:nil:nil:rest",
+        "max_seconds": 0.0033478999976068735,
+        "request_starts": 48,
+        "seconds": 0.3185760999331251
+      },
+      {
+        "budget_full_calls": 1366,
+        "calls": 1457,
+        "elapsed_seconds": 24.284662399993977,
+        "key": "recovering:commit:nil:prepare",
+        "max_seconds": 0.018490499998733867,
+        "request_starts": 42,
+        "seconds": 0.43677170012233546
+      },
+      {
+        "budget_full_calls": 1111,
+        "calls": 1142,
+        "elapsed_seconds": 19.029374199999438,
+        "key": "recovering:archive:nil:prepare",
+        "max_seconds": 0.005062800002633594,
+        "request_starts": 30,
+        "seconds": 0.1667171999142738
+      },
+      {
+        "budget_full_calls": 984,
+        "calls": 1009,
+        "elapsed_seconds": 17.580463799989957,
+        "key": "discovering:nil:nil:rest",
+        "max_seconds": 0.0003857000046991743,
+        "request_starts": 26,
+        "seconds": 0.10125449992483482
+      }
+    ],
+    "baseline_run": "1792783020948",
+    "baseline_main_choice_to_adoption": 41.81191897392273,
+    "request_admission_remains_open": true,
+    "controlled_speedup_claim": false
   }
 }

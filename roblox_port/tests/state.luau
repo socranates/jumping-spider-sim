@@ -3000,7 +3000,10 @@ case("optional service owner is the only work and intake route",function()
  local n=#sent;emitOwner({kind="recovery_entry",offer={id="exact"}})
  check(#sent==n+1 and sent[#sent].epoch==owned.session.id and type(sent[#sent].sequence)=="number","owned sender bypassed transport stamps")
  emitOwner({kind="decision",decision={state="writable"}});check(#sent==n+1,"owned sender accepted an unsupported packet kind")
- now+=5;service:onMessage(player,{kind="recovery_applied",id="exact"});check(calls.applyRecovery==1,"matching receipt did not reach owner")
+ service.entries[player].lifeBucket.tokens=0
+ service:onMessage(player,{kind="recovery_applied",id="exact"});check(calls.applyRecovery==1,"intent retries starved matching recovery receipt")
+ check(service.entries[player].lifeBucket.tokens==0,"recovery receipt consumed intent capacity")
+ now+=5
  service:onMessage(player,{kind="progress",progress=SaveProgress.default()});check(calls.setProgress==1,"progress bypassed owner")
  now+=5;service:onMessage(player,{kind="life_intent",intent="new",mode="main",serial=1});check(calls.requestLife==1,"intent bypassed owner")
  for _=1,12 do now+=1;service:step() end

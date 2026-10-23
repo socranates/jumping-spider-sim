@@ -81,7 +81,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	self.counter += 1
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
-	local entry: any = { player = player, hello = false, loaded = false, leaving = false, sequence=0, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
+	local entry: any = { player = player, hello = false, loaded = false, leaving = false, sequence=0, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), recoveryBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
 	local sessionConfig = {
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
@@ -191,7 +191,7 @@ local function handle(self: any, entry: any, msg: any)
   if not accepted then self.stats.dropped+=1 end
  elseif kind=="recovery_applied" then
   if entry.protocol~=SaveRules.OFFER_PROTOCOL or not entry.owner or type(entry.owner.applyRecovery)~="function" then self.stats.dropped+=1;return end
-  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if not take(entry.recoveryBucket,now) then self.stats.limited+=1;return end
   if not entry.owner:applyRecovery(msg) then self.stats.dropped+=1 end
  elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end

@@ -243,6 +243,26 @@ do
  check(f.adapter.job.phase=="held" and f.adoptions==0 and d.currentStore()==store and f.adapter.job.hold.held(),"selection timeout resumed or adopted")
  f.close()
 end
+-- A gentle Main life from before Easy had a key keeps Main authority. The real
+-- game's transport view and its active local store must agree after adoption.
+do
+ local f=fixture("main",{mainGentle=true});f.choose()
+ local easyStore=d.stores.easy;local easyBytes=assert(Json.canonical(easyStore.store.data))
+ f.drive(function() return f.adapter.job.phase=="applied" end)
+ local j=f.adapter.job;local archive=archived(f.b)
+ check(d.session.rules=="gentle" and d.needs.gentle and f.client.activeSlot=="main" and d.currentStore()==d.stores.main,"legacy Main/gentle adopted a different physical slot or rules")
+ f.holdAck=false;f.drive(function() return j.phase=="granted" end)
+ local decision=f.client:decision("main")
+ check(decision.state=="writable" and f.owner.session.intents:authorized("main",decision.serial,decision.credential,decision.life),"legacy gentle Main did not receive Main authority")
+ local result=d.life.save()
+ f.drive(function() return not result.pending end)
+ check(result.ok and d.currentStore()==d.stores.main,"actual legacy Main rest was not kept locally in Main")
+ f.drive(function() local r=f.client.bound.requests.main;return r.candidate and r.candidate.stored end)
+ check(f.owner.session.intents.requests.main.storedSerial==1 and f.b.data.R_46001_easy==nil,"actual legacy Main rest was not acknowledged from its owning key")
+ check(d.stores.easy==easyStore and Json.canonical(easyStore.store.data)==easyBytes,"actual legacy Main entry/rest changed the Easy store")
+ f.close();check(archived(f.b)==archive,"legacy Main continuation changed immutable original archive/proposal")
+ print("RECOVERY_ACTUAL_GAME legacy_main_gentle=true same_physical_slot=true actual_rest_stored=true easy_unchanged=true")
+end
 -- Deadline callback race: delivery happens before the next adapter update.
 do
  local f=fixture("main",{delayGrant=true});f.choose();f.drive(function() return f.adapter.job.phase=="applied" end)

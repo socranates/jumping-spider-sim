@@ -1,0 +1,16 @@
+{
+  "source": "8c9b71896736d85d43e02fec1521bcd567cdb33f",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-slot-8c9b718-full\\Windowsill-restored-slot-review.rbxlx",
+  "model_sha256": "e124383f2d81004d67a0f9edf254ce76b0d77aa8a9e9901f166a72cf20897207",
+  "manifest_sha256": "15f8c48070abca82a82e1e4d9662174c08d8dfde557ea90306fa6a277224cbcc",
+  "guard_sha256": "ab29d027cd2b353d7a516c88f48323eba34564f1e88f5dee61ed621f8cbf50cc",
+  "probe_sha256": "b37189c6aae34d95da88cde8cc132b15234ad7b2674a0e82bf01665bd93004b4",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

@@ -1,0 +1,3 @@
+2026-10-23T02:07:59.555Z,121.555298,9908,6,Info [FLog::CreatorOutput] [NATIVE_SESSION_BUDGET_GUARD] f4053597d03b99a61cb97e2eef1ec64ed174f22a 224 production_scripts_disabled
+2026-10-23T02:08:11.617Z,133.617630,9908,6,Info [FLog::CreatorOutput] [NATIVE_SESSION_BUDGET_BEGIN] 1792721291445
+2026-10-23T02:08:11.621Z,133.621643,9908,6,Warning [FLog::CreatorWarning] Warning: [NATIVE_SESSION_BUDGET_FAIL] 1792721291445 ServerScriptService.Server.SessionBudgetProbe:22: attempt to index nil with 'MODES'

@@ -1,0 +1,18 @@
+{
+  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "run": "1792721471045",
+  "assertions": 126,
+  "scripts": 224,
+  "creator_errors": 0,
+  "production_scripts_disabled": true,
+  "place_sha256": "12ea81ede23c26d2b4c59332b90462058ed2f1ed643d273285dbf9a8cf6f3f1d",
+  "candidates": {
+    "fresh-read-backend-candidate.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "session-budget-yield-candidate.luau": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1"
+  },
+  "output_sha256": "5cc73fe5645fb704c57208f7f8fdfd13304a8658d2a3ea46444c521f68bd8ca9",
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "progress_import_implemented": false,
+  "scope": "Paced recovery, retained observations and actual coroutine suspension across close/demote/superseding load; MemoryBackend; no real DataStore or full-game transport; never publish"
+}

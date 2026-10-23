@@ -2,17 +2,18 @@ from pathlib import Path
 import argparse,hashlib,importlib.util,json,subprocess,tempfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 spec=importlib.util.spec_from_file_location('runner',ROOT/'roblox_port/tests/run.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
-p=argparse.ArgumentParser();p.add_argument('--candidate',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--candidate',action='store_true');p.add_argument('--yielding',action='store_true');p.add_argument('--yield-fixed',action='store_true');p.add_argument('--controls',action='store_true');a=p.parse_args()
+assert not (a.yielding or a.yield_fixed) or a.candidate
 session=ROOT/'roblox_port/src/Shared/Persistence/SaveSession.luau'
 if a.candidate:
- original=session;session=HERE/'session-budget-candidate.luau';base=r.chunk
+ original=session;session=HERE/('session-budget-yield-candidate.luau' if a.yield_fixed else 'session-budget-candidate.luau');base=r.chunk
  r.chunk=lambda path:base(session if path.resolve()==original.resolve() else path)
 fixture=(ROOT/'roblox_port/tests/state.luau').read_text(encoding='utf8');prefix=fixture[:fixture.index('-- ---------------------------------------------------------------------------------------------- sizes, measured')]
-test=(HERE/('session-budget-candidate-tests.luau' if a.candidate else 'session-budget-probe.luau')).read_text(encoding='utf8')
+test=(HERE/('session-budget-yield-tests.luau' if (a.yielding or a.yield_fixed) and not a.controls else 'session-budget-candidate-tests.luau' if a.candidate else 'session-budget-probe.luau')).read_text(encoding='utf8')
 text=r.bundle('state.luau');suffix=r.requires(fixture)+'\n';assert text.endswith(suffix)
 text=text[:-len(suffix)]+r.requires(prefix+test)+'\n'
 cli=Path(r'C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools/luau/luau.exe')
-stem='session-budget-'+('candidate' if a.candidate else 'baseline')
+stem='session-budget-'+('yield-controls' if a.controls else 'yield-fixed' if a.yield_fixed else 'yield-baseline' if a.yielding else 'candidate' if a.candidate else 'baseline')
 assert not (HERE/(stem+'-output.txt')).exists(),'Retain earlier evidence'
 with tempfile.NamedTemporaryFile('w',suffix='.luau',encoding='utf8',delete=False) as f:f.write(text);path=Path(f.name)
 try:result=subprocess.run([str(cli),str(path)],capture_output=True,text=True)

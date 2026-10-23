@@ -1,0 +1,15 @@
+{
+  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "run": "1792721291445",
+  "status": "failed-fixture-setup",
+  "reason": "Diagnostic omitted SaveRules import; candidate source and acceptance unchanged",
+  "assertions_completed": 0,
+  "place_sha256": "50cb0544ba1d73e381883fb9996a83b639c148f46db46b56463bab5a2b0189fa",
+  "candidates": {
+    "fresh-read-backend-candidate.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "session-budget-yield-candidate.luau": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1"
+  },
+  "output_sha256": "d7ecaf7c137aa7cb65a3835d05d99b316fce6be34a389646deca7d34143720ba",
+  "production_changed": false,
+  "published": false
+}

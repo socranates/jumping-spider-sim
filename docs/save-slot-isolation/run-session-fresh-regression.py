@@ -2,8 +2,8 @@ from pathlib import Path
 import argparse,hashlib,importlib.util,json,subprocess,tempfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 spec=importlib.util.spec_from_file_location('runner',ROOT/'roblox_port/tests/run.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
-p=argparse.ArgumentParser();p.add_argument('--budget',action='store_true');a=p.parse_args()
-stem='session-budget' if a.budget else 'session-fresh'
+p=argparse.ArgumentParser();p.add_argument('--budget',action='store_true');p.add_argument('--budget-yield',action='store_true');a=p.parse_args()
+stem='session-budget-yield' if a.budget_yield else 'session-budget' if a.budget else 'session-fresh'
 original=ROOT/'roblox_port/src/Shared/Persistence/SaveSession.luau';candidate=HERE/(stem+'-candidate.luau');base=r.chunk
 r.chunk=lambda path:base(candidate if path.resolve()==original.resolve() else path)
 cli=Path(r'C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools/luau/luau.exe')

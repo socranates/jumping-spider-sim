@@ -1,0 +1,7 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "prior_candidate_sha256": "d217138209e3ea18838dcf0889d148c58dfcdb056a6792a6a0bfcb9e23bcc8ad",
+  "candidate_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+  "production_changed": false,
+  "scope": "Paced recovery with closed/demoted/superseding-load fences across yielding backend operations"
+}

@@ -1,3 +1,11 @@
+# Freshness cohort completed
+
+Source f4053597d03b99a61cb97e2eef1ec64ed174f22a is verified on both platforms:76 suites,468225 checks,0 failures. Windows95443 exited0 after1473.57 seconds; Linux39886240490 completed successfully with222 module compilations, clean strict analysis and5 runner regressions. verify.py binds the exact committed/runtime workspace inputs and raw logs. This closes that cohort; do not restart its terminal process.
+
+The native111-check evidence concerns the exact adopted adapter/session against a fake cached datastore with production scripts disabled. It is not a live DataStore, full transport, whole-game performance or migration claim. Nothing published. The private paced/yield-fenced recovery candidate has separate126-check native evidence and will require a new cohort when adopted.
+
+Original planning/status below is historical.
+
 # Save freshness adoption gates
 
 Source f4053597d03b99a61cb97e2eef1ec64ed174f22a, branch codex/save-continue. Exact native-tested SaveSession and DataStoreBackend modules adopted, with 111 adapter/session regression assertions added to the existing state suite. Expected full count: 76 suites / 468225 assertions. Expected numbers are not completed gates.

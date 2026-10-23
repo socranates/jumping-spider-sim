@@ -1,3 +1,23 @@
+# Current: freshness cohort fully verified; recovery candidate ready for adoption
+
+Production f405359: Windows95443 and Linux39886240490 both terminal76 suites/468225 checks/0 failures, all222 modules compiled, strict clean and runner5. The root verifier confirms exact current runtime/test/workflow bytes. All full jobs in this cohort are terminal. Nothing published.
+
+Private recovery candidate20f59026 passes82 pacing/retention,44 actual coroutine-yield,1624 checks in seven existing save suites, compile/strict and126 native/224 fingerprints/zero errors. Both native fixtures closed/restored, failed missing-import fixture retained. It is ready for exact-source adoption but is not yet production; subsequent adoption requires new full gates. See docs/save-slot-isolation/SESSION-BUDGET-YIELD.md.
+
+Neither cohort proves real DataStore durability/full game transport or completes progress-into-Preserve/complete archive integration. Natural lifecycle/streaming/device/memory/performance and release work remain open. Goal active.
+
+Earlier status below is historical.
+
+# Current: recovery candidate verified in Studio; Linux freshness gates passed
+
+Production remains f405359. Linux39886240490 completed76 suites/468225 checks/0 failures, compile222, strict and runner5 clean. Windows95443 remains a live immutable full run; its expected result is not yet terminal. The current root verifier and prepared adoption script refuse the missing gate. Do not restart that process.
+
+The newer private recovery candidate20f59026 passes82 pacing/retention checks,44 genuine coroutine-yield checks,1624 checks across seven unchanged save suites, compile/full strict, and126 native assertions with224 source fingerprints/zero CreatorErrors. It prevents late application/callbacks after close, demotion or a superseding load while retaining prompt progress notification and verified rest delivery. A missing-import native fixture failure was retained and corrected without changing candidate bytes or acceptance criteria. Both diagnostic places were stopped/saved/closed, the owned window exited and original package hashes restored. Prior Studio window untouched.
+
+See docs/save-slot-isolation/SESSION-BUDGET-YIELD.md. The candidate is not adopted; no actual DataStore/full game transport, migration completion or release claim. Adoption is prepared for after the current cohort closes and will need its own full gates. Progress-into-Preserve/archive, natural lifecycle/streaming/device/memory/performance and release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current save audit: budget candidate verified privately
 
 Production remains f405359; Windows95443 and Linux39886240490 full gates are running, not completed. The previous goal turn made progress by adopting the exact native-tested freshness fix and adding111 regular regression checks. This turn reproduced a separate periodic-recovery admission defect: three/four calls in one step can exceed the session's configured10/minute cap.

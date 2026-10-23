@@ -1,0 +1,16 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "candidate_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+  "focused_assertions": 82,
+  "yielding_assertions": 44,
+  "regression_suites": 7,
+  "regression_assertions": 1624,
+  "native_assertions": 126,
+  "native_scripts": 224,
+  "creator_errors": 0,
+  "strict_clean": true,
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "full_game_transport_verified": false,
+  "published": false
+}

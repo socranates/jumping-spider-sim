@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T02:00:39.172201+00:00",
+  "as_of_utc": "2026-10-23T02:15:39.604329+00:00",
   "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
   "goal_complete": false,
   "published": false,
@@ -23,13 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "current-full-gates-running",
-      "evidence_boundary": "Current f405359 Windows95443 and Linux39886240490 are live, with expected76/468225/0 not yet terminal. Earlier405e9df both platforms76/468114/0 is historical. Adopted freshness STATE1124/0 focused and isolated native111/224 fingerprints/zero errors pass. Current root verifier correctly refuses absent terminal gates.",
+      "status": "both-platforms-verified",
+      "evidence_boundary": "f405359 immutable Windows95443 and Linux39886240490 both terminal76/468225/0, compile222, strict and runner5 clean. Current root verifier confirms all runtime/test/workflow input bytes. Native freshness component111/224 fingerprints/zero errors binds exact adopted modules, not full-game or real DataStore coverage.",
       "references": [
+        "docs/session-freshness-gates/verification.json",
         "docs/session-freshness-gates/README.md",
-        "docs/session-freshness-gates/windows-full-start.json",
-        "docs/session-freshness-gates/ci-start.json",
-        "docs/checkpoint-return-oracle/verification.json"
+        "docs/save-slot-isolation/SESSION-CACHE.md"
       ]
     },
     {
@@ -288,8 +287,8 @@
     },
     {
       "id": "data-store-freshness",
-      "status": "adopted-focused-native-verified-full-gates-running",
-      "evidence_boundary": "f405359 adopts uncached initial/preview/intent rest observations, preserving final UpdateAsync fences. Baseline30 reproduces stale grants without data loss; candidate27, matrix150, adapter111, seven regressions1513, compile/strict clean and isolated Studio111/224 fingerprints/zero errors pass. Adopted STATE1124/0 focused run. Full Windows/Linux pending; no actual DataStore durability or full-game session claim.",
+      "status": "adopted-both-platforms-and-isolated-native-verified",
+      "evidence_boundary": "f405359 uncached rest load/preview/intent reads are adopted. Baseline stale-grant counterexample retained; focused and native111 checks bind exact modules. Both full platforms76/468225/0 with222 compile/strict and runner5 pass. Final UpdateAsync fences remain. No actual service durability or full-game transport claim.",
       "references": [
         "docs/save-slot-isolation/SESSION-CACHE.md",
         "docs/save-slot-isolation/session-cache-verification.json",
@@ -299,12 +298,13 @@
     },
     {
       "id": "save-request-budget",
-      "status": "private-candidate-cli-verified-native-integration-pending",
-      "evidence_boundary": "f405359 periodic recovery starts3 or4 requests in one step, exceeding cap10 with9 prior requests. Retained baseline12 checks reproduces it. Private corrected candidate82 focused/1624 across7 unchanged save suites and compile/strict pass. First candidate delayed merged progress and failed an existing state assertion; failure/source retained. Corrected candidate sends progress promptly, retains prior rests internally and delivers verified replacements. Not adopted; native yielding/transport and new full gates still required.",
+      "status": "private-cli-native-verified-adoption-pending",
+      "evidence_boundary": "Private20f59026 candidate supersedes pacing-only d217. It passes82 pacing/retention,44 actual coroutine-yield checks,1624 across7 unchanged save suites, compile/strict and126 native/224 fingerprints/zero errors. Late read callback after close was reproduced against d217; new load/demotion serials and post-yield fences reject closure/lost authority/superseding loads. Failed native missing-import fixture retained, corrected without candidate/criteria changes. Diagnostics closed/restored. Not adopted; actual service/rejoin/full transport and later full gates remain required.",
       "references": [
-        "docs/save-slot-isolation/SESSION-BUDGET.md",
-        "docs/save-slot-isolation/session-budget-verification.json",
-        "docs/save-slot-isolation/session-budget-baseline-receipt.json"
+        "docs/save-slot-isolation/SESSION-BUDGET-YIELD.md",
+        "docs/save-slot-isolation/session-budget-yield-verification.json",
+        "docs/save-slot-isolation/session-budget-native-receipt.json",
+        "docs/save-slot-isolation/session-budget-yield-baseline-receipt.json"
       ]
     }
   ],
@@ -396,9 +396,9 @@
   },
   "latest_session_freshness_milestone": {
     "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
-    "status": "adopted-focused-native-verified-full-gates-running",
+    "status": "both-platforms-verified",
     "windows_handle": 95443,
-    "evidence": "docs/session-freshness-gates/README.md",
+    "evidence": "docs/session-freshness-gates/verification.json",
     "published": false,
     "real_datastore_verified": false,
     "progress_import_implemented": false
@@ -414,6 +414,22 @@
     "production_changed": false,
     "native_verified": false,
     "real_datastore_verified": false,
+    "published": false
+  },
+  "latest_request_budget_yield_candidate": {
+    "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+    "candidate_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+    "focused_assertions": 82,
+    "yielding_assertions": 44,
+    "regression_suites": 7,
+    "regression_assertions": 1624,
+    "native_assertions": 126,
+    "native_scripts": 224,
+    "creator_errors": 0,
+    "strict_clean": true,
+    "production_changed": false,
+    "real_datastore_verified": false,
+    "full_game_transport_verified": false,
     "published": false
   }
 }

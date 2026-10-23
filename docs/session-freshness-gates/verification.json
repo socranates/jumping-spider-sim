@@ -1,0 +1,19 @@
+{
+  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "current_workspace_inputs_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 468225,
+  "linux_suites": 76,
+  "linux_passed": 468225,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_session_assertions": 111,
+  "native_session_scope": "Real adapter/session; fake cached datastore; actual engine options; all production scripts disabled; exact adopted module bytes",
+  "real_datastore_verified": false,
+  "progress_import_implemented": false,
+  "whole_game_fps_gain_proven": false,
+  "goal_complete": false,
+  "published": false
+}

@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmp8qu9xjt9.luau:44817: cancelled or superseded recovery emitted a late callback: read/close
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp8qu9xjt9.luau:44817 function verifyYield
+C:/Users/natha/AppData/Local/Temp/tmp8qu9xjt9.luau:44845

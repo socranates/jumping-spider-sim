@@ -1,0 +1,56 @@
+{
+  "candidate_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+  "suites": [
+    {
+      "suite": "save_observation.luau",
+      "bundle_sha256": "c94218091160e3cc48cb01801be12db99adefbc5665c2520615b49d994729c11",
+      "test_sha256": "3f5dc5a9763f6847f4d3fe1c1b6593a60d36970a9a084c8fed35cd9b93158d55",
+      "exit_code": 0,
+      "output_sha256": "bd9cc22695b0c295b2eb25d344f67ebfbf3edd4de5e8591f3b7a89403461095a"
+    },
+    {
+      "suite": "save_intent.luau",
+      "bundle_sha256": "4fadfba49b879bd537e0d7e0838086987b2ab1894a666209a93b6a8afe86590b",
+      "test_sha256": "6de5e6e5b51909a5e001b49b330f7a5ee5850856f470ec30084b28a928d39bfa",
+      "exit_code": 0,
+      "output_sha256": "289e9d56ecb2e71f768bd4cb8f95ba4e8d27a14e98200c1fe1343dd7e252da6a"
+    },
+    {
+      "suite": "save_offers.luau",
+      "bundle_sha256": "a0aecf64ca577829334fe642b418bd7ae9a8954c462f63241e12e60b95200c8d",
+      "test_sha256": "b53d66d6bf8ad0f46a0ca9621f943e79bf546e9dd68992f127adbfeeedba4e8a",
+      "exit_code": 0,
+      "output_sha256": "b1dfe81b94454b0f9e0bbe996737789476e326f297d65c063e0a314e9c7b3398"
+    },
+    {
+      "suite": "state.luau",
+      "bundle_sha256": "7a4f7c17097b4f1e34c21f2d1b6abbd0017a5a2927d144070eb89c6ca2c67052",
+      "test_sha256": "1d12cd9f7ada725cd677ef30b933b85f287f29e42263c44995c43a1f17d54fbc",
+      "exit_code": 0,
+      "output_sha256": "175c83e7e9fdaa1d5a62c69ed6529874cf895394150b47758409db9794e664bd"
+    },
+    {
+      "suite": "state_client.luau",
+      "bundle_sha256": "f37ee0f6b5757c1cef6e13621c2908fdaefec40e7e08566237c715f0395b32e9",
+      "test_sha256": "d0203b0fb114a91ef20f4f7802cb77c1939c9fb01fde45c4b6290ee940616694",
+      "exit_code": 0,
+      "output_sha256": "48330100fd5042b5b169c8696ce44708354cd8cf6513db01aaae781fd59a851a"
+    },
+    {
+      "suite": "state_offline.luau",
+      "bundle_sha256": "e416881dc862b170362451f9c7df9c21239b26bb20eb9b70dce8e665bd03477a",
+      "test_sha256": "7a36f277fbc1510b4cc969bd7bd7d644a77d3258d05824d2578fe692ef88efdf",
+      "exit_code": 0,
+      "output_sha256": "a35035ce1a6dd1816f42877ea83de3e6d588bcc767170a2d466e8e131cdcffb6"
+    },
+    {
+      "suite": "save_continuation.luau",
+      "bundle_sha256": "5c4a55699aaafed047884dfc04d73d290512d15a4256598a10670e86da8f1011",
+      "test_sha256": "5bba9460fdb382ca9799fc900dceea2f0a6e881cb9dd08943f7a4057d0e7c683",
+      "exit_code": 0,
+      "output_sha256": "5068c85a83e41b1b95e894c80cad013f1ad8b98d9f14ab06226b835263fef81e"
+    }
+  ],
+  "production_changed": false,
+  "real_datastore_verified": false
+}

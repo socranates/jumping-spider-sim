@@ -7,10 +7,12 @@ local Work=require(Shared.Persistence.SaveWork)
 local Json=require(Shared.Persistence.Json)
 local Rules=require(Shared.Data.SaveRules)
 local Archive=require(script.Parent.RecoveryArchivePrototype)
+local SaveRest=require(Shared.Persistence.SaveRest)
 local Store={};Store.__index=Store
 Store.FORMAT="the-windowsill recovery publication"
 local function plain(value:any):boolean return type(value)=="table" and getmetatable(value)==nil end
 local function same(expected:any,value:any):boolean
+ local pulse=Work.pulse();if pulse then pulse() end
  if type(expected)~=type(value) then return false end
  if type(expected)~="table" then
   return expected==value and (type(expected)~="number" or expected~=0 or 1/expected==1/value)
@@ -61,6 +63,30 @@ local function sequence(self:any,plan:any):(any?,string?,number?)
  end
  if total>self.bounds.total then return nil,"archive publication exceeds aggregate storage limit",nil end
  return out,nil,total
+end
+-- Pure complete-publication proof, shared by discovery and read-only reuse.
+function Store.checkPublished(owner:string,parts:any):(any?,string?)
+ if not knownOwner(owner) or not plain(parts) then return nil,"stored archive parts unavailable" end
+ local total=0
+ for _,slot in {"progress","main","free","easy","index"} do
+  local part=parts[slot]
+  if SaveRest.bounded(part,Archive.MAX_NODES+128,Archive.MAX_DEPTH+4) then return nil,"archive artifact exceeds structural bound" end
+  local text=Json.canonical(part)
+  if not text or #text>Rules.MAX_VALUE_CHARS then return nil,"invalid/oversize archive artifact" end
+  total+=#text;if total>Archive.MAX_TOTAL_CHARS then return nil,"archive publication exceeds aggregate budget" end
+ end
+ local head=parts.progress
+ if not plain(head) or not plain(head.index) or not plain(head.progress) then return nil,"archive anchor unavailable" end
+ local sources={progress={loaded=true,value=head.progress.raw}}
+ for _,slot in {"main","free","easy"} do
+  if not plain(parts[slot]) then return nil,"archive part missing" end
+  sources[slot]={loaded=true,value=parts[slot].raw}
+ end
+ local plan,why=Archive.prepare(owner,head.index.observation,sources);if not plan then return nil,why end
+ if not same(anchor(plan),head) then return nil,"archive anchor differs" end
+ for _,slot in {"main","free","easy"} do if not same(parts[slot],plan.entries[slot]) then return nil,"archive entry differs" end end
+ if not same(manifest(plan),parts.index) then return nil,"complete archive index differs" end
+ return plan,nil
 end
 local function live(job:any):boolean
  if job.state=="cancelled" then return false end

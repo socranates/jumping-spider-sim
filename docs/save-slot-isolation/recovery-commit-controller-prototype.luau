@@ -30,7 +30,7 @@ end
 local function release(j:any)
  if j.work then j.work:cancel() end
  if j.child and j.component then j.component:cancel(j.child) end
- j.work,j.child,j.component,j.plan,j.anchor,j.restPlan,j.progressPlan=nil,nil,nil,nil,nil,nil,nil
+ j.work,j.child,j.component,j.plan,j.anchor,j.restPlan,j.progressPlan,j.archiveParts=nil,nil,nil,nil,nil,nil,nil,nil
 end
 local function stop(j:any,state:string,why:string)
  j.state,j.problem=state,why;Fence.cancel(j.ticket);release(j)
@@ -54,9 +54,13 @@ function Controller.begin(self:any,mode:string,serial:number,offerId:string,arch
   failures=0,beatFailures=0,requests=0,expectedArchive=archivePlan.index.checksum,acked=false}
  self.current=j
  j.guard=function() return self.current==j and j.state=="pending" and not s.flushing and Fence.valid(ticket) end
- j.component=ArchiveStore.new(s.backend,ticket.owner)
- j.child,why=j.component:beginRecovery(nil,j.guard)
- if not j.child then stop(j,"refused",why or "archive readback preparation refused");return nil,j.problem end
+ if self.options.readOnlyArchive==true then
+  j.phase="archiveRead";j.archiveParts={};j.archiveSlot="progress"
+ else
+  j.component=ArchiveStore.new(s.backend,ticket.owner)
+  j.child,why=j.component:beginRecovery(nil,j.guard)
+  if not j.child then stop(j,"refused",why or "archive readback preparation refused");return nil,j.problem end
+ end
  return j,nil
 end
 function Controller.cancel(self:any,j:any):boolean
@@ -118,7 +122,9 @@ local function stepInner(self:any,j:any):boolean
   if j.work.state=="pending" then return false end
   local result=j.work:take();j.work=nil
   if not result or not result[1] then stop(j,"refused",if result then tostring(result[2]) else "recovery preparation failed");return false end
-  if j.phase=="inspect" then
+  if j.phase=="archiveProof" then
+   j.plan=result[1];j.archiveParts=nil;j.phase="probe";j.failures=0;j.nextAt=now
+  elseif j.phase=="inspect" then
    j.anchor=result[1];j.component=ProposalStore.new(s.backend,self.codec,self.context)
    local why;j.child,why=j.component:begin(j.anchor,j.guard)
    if not j.child then stop(j,"refused",why or "proposal preparation refused");return false end
@@ -128,6 +134,24 @@ local function stepInner(self:any,j:any):boolean
    j.component=RestWriter.new(self.rawBackend);j.child=assert(j.component:begin(j.restPlan,j.guard));j.phase="rest"
   end
   return false
+ end
+ if j.phase=="archiveRead" then
+  if not reserve(self,j) then return false end
+  local slot=j.archiveSlot
+  local called,ok,value,why=pcall(s.backend.readRawFresh,s.backend,"A1_"..j.ticket.owner.."_"..slot)
+  if not j.guard() then stop(j,"cancelled","session/selected Continue changed");return true end
+  if not called or ok~=true then j.failures+=1;j.nextAt=now+Scheduler.backoff(j.failures,Stores.classify(tostring(if called then why else ok)));return true end
+  j.archiveParts[slot]=value;j.failures=0;j.nextAt=now
+  if slot=="index" then
+   local parts=j.archiveParts
+   worker(self,j,function():(any?,string?)
+    local plan,problem=ArchiveStore.checkPublished(j.ticket.owner,parts)
+    if not plan then return nil,problem end
+    if plan.index.checksum~=j.expectedArchive then return nil,"durable archive differs from completed plan" end
+    return plan,nil
+   end,"archiveProof")
+  else local following={progress="main",main="free",free="easy",easy="index"};j.archiveSlot=following[slot] end
+  return true
  end
  if j.phase=="probe" then
   if not reserve(self,j) then return false end

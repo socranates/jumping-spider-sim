@@ -60,10 +60,10 @@ local function launch(self:any,j:any,phase:string,archive:any?):boolean
  local left=self.maxRequests-j.requests;local seconds=self.timeout-(s.now()-j.started)
  if left<1 or seconds<1 then stop(j,"refused","total recovery bound reached");return false end
  if phase=="archive" then
-  j.component=ArchiveController.new(s,{restCodec=self.codec,maxRequests=math.min(96,left),timeout=seconds,work=self.options.work})
+  j.component=ArchiveController.new(s,{reuseCompleteOriginal=self.options.reuseCompleteOriginal==true,restCodec=self.codec,maxRequests=math.min(96,left),timeout=seconds,work=self.options.work})
   j.child=select(1,j.component:begin(j.ticket.mode,j.ticket.serial,j.ticket.offerId,"owner-"..Json.checksum(s.id..j.ticket.mode..tostring(j.ticket.serial)..j.ticket.offerId)))
  else
-  j.component=Commit.new(s,self.codec,self.raw,self.template,self.context,{maxRequests=math.min(64,left),timeout=seconds,work=self.options.work})
+  j.component=Commit.new(s,self.codec,self.raw,self.template,self.context,{readOnlyArchive=self.options.reuseCompleteOriginal==true,maxRequests=math.min(64,left),timeout=seconds,work=self.options.work})
   j.child=select(1,j.component:begin(j.ticket.mode,j.ticket.serial,j.ticket.offerId,archive))
  end
  if not j.child then stop(j,"refused","recovery stage admission refused");return false end

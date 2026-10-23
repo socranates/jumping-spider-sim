@@ -47,7 +47,7 @@ local function clear(j:any)
  if j.collector and j.collection then j.collector:cancel(j.collection);j.collector.current=nil end
  if j.repository and j.publication then j.repository:cancel(j.publication) end
  if j.work then j.work:cancel() end
- j.collection,j.publication,j.work,j.sourcePlan=nil,nil,nil,nil
+ j.collection,j.publication,j.work,j.sourcePlan,j.originalParts,j.reusePlan=nil,nil,nil,nil,nil,nil
 end
 local function stop(j:any,state:string,why:string)
  j.state,j.problem=state,why;j.plan=nil;Fence.cancel(j.ticket);clear(j)
@@ -66,6 +66,7 @@ function Controller.begin(self:any,mode:string,serial:number,offerId:string,stam
  j.collector=Collector.new(s.backend,ticket.owner,ticket.sessionId,self.options.bounds,self.options.work)
  j.repository=Repository.new(s.backend,ticket.owner,self.options.publicationBounds)
  j.collection=j.collector:begin(stamp,j.guard);self.current=j
+ if self.options.reuseCompleteOriginal==true then j.phase="originalProbe" end
  return j,nil
 end
 local function reserve(self:any,j:any,now:number,heartbeat:boolean?):boolean
@@ -126,6 +127,53 @@ local function stepInner(self:any,j:any):boolean
   -- A full request bucket may delay renewal. CPU-only collection/comparison
   -- can still progress under the unexpired guard; no network work is admitted.
  end
+ if j.phase=="originalPrepare" or j.phase=="originalSelectWork" then
+  local selecting=j.phase=="originalSelectWork"
+  j.work:step();if not j.guard() then stop(j,"cancelled","session/Continue changed");return false end
+  if j.work.state=="pending" then return false end
+  local result=j.work:take();j.work=nil
+  if selecting then
+   if not result or result[1]~=true then stop(j,"refused","selected current source differs from immutable original");return false end
+   j.plan=j.reusePlan;j.reusedOriginal=true;j.state,j.problem="ready",nil;clear(j);Fence.cancel(j.ticket);return false
+  end
+  if not result or not result[1] then
+   -- Only incomplete publication may return to the original strict all-source
+   -- repair path. An invalid completed publication is never republished here.
+   if j.originalParts.index==nil then j.originalParts=nil;j.phase="collect";return false end
+   stop(j,"refused",if result then tostring(result[2]) else "complete original proof failed");return false
+  end
+  j.reusePlan=result[1];j.originalParts=nil;j.phase="originalSelectRead";return false
+ end
+ if j.phase=="originalProbe" or j.phase=="originalRead" or j.phase=="originalSelectRead" then
+  if not reserve(self,j,now) then return false end
+  local slot=if j.phase=="originalProbe" then "progress" elseif j.phase=="originalRead" then j.originalSlot else nil
+  local key=if slot then "A1_"..j.ticket.owner.."_"..slot else s.rkey[j.ticket.mode]
+  local called,ok,value,why=pcall(s.backend.readRawFresh,s.backend,key)
+  if not j.guard() then stop(j,"cancelled","session/Continue changed");return true end
+  if not called or ok~=true then delay(j,now,if called then why else ok);return true end
+  j.failures,j.problem,j.nextAt=0,nil,now
+  if j.phase=="originalSelectRead" then
+   local plan=j.reusePlan
+   j.work=Work.new(function() return same(value,plan.entries[j.ticket.mode].raw) and selectedSource(self,j,plan) end,self.options.work)
+   j.phase="originalSelectWork";return true
+  end
+  if j.phase=="originalProbe" then
+   if value==nil then j.originalAbsent=true;j.phase="collect";return true end
+   j.originalParts={progress=value};j.originalSlot="main";j.phase="originalRead";return true
+  end
+  j.originalParts[slot]=value
+  local following={main="free",free="easy",easy="index"}
+  if slot=="index" then
+   local parts=j.originalParts
+   j.work=Work.new(function() return Repository.checkPublished(j.ticket.owner,parts) end,self.options.work);j.phase="originalPrepare"
+  else j.originalSlot=following[slot] end
+  return true
+ end
+ if j.phase=="publishOriginal" then
+  local publication,why=j.repository:begin(j.sourcePlan,j.guard)
+  if not publication then stop(j,"refused",why or "archive preparation refused");return false end
+  j.publication=publication;j.phase="archive";return false
+ end
  if j.phase=="compare" or j.phase=="select" then
   local selecting=j.phase=="select"
   j.work:step()
@@ -133,7 +181,7 @@ local function stepInner(self:any,j:any):boolean
   if j.work.state=="pending" then return false end
   local result=j.work:take();j.work=nil
   if not result or not result[1] then stop(j,"refused",if selecting then "selected source changed" else "existing archive belongs to a different source observation");return false end
-  j.phase=if selecting then "probe" else "archive";return false
+  j.phase=if selecting then (if j.originalAbsent then "publishOriginal" else "probe") else "archive";return false
  end
  if j.phase=="collect" then
   local c=j.collection
@@ -142,7 +190,7 @@ local function stepInner(self:any,j:any):boolean
     j.sourcePlan=c.plan;j.work=Work.new(function() return selectedSource(self,j,c.plan) end,self.options.work);j.phase="select";return false
    end
    if not selectedSource(self,j,c.plan) then stop(j,"refused","selected source changed");return false end
-   j.sourcePlan=c.plan;j.phase="probe";return false
+   j.sourcePlan=c.plan;j.phase=if j.originalAbsent then "publishOriginal" else "probe";return false
   end
   if c.state=="retry" then
    if now<j.nextAt then return false end

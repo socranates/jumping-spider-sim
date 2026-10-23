@@ -35,27 +35,7 @@ end
 -- expected publication shapes, including the final index, are verified; no
 -- repair/write is attempted from an offer-discovery path.
 local function storedArchive(user:string,parts:any):(any?,string?)
- if type(parts)~="table" or getmetatable(parts)~=nil then return nil,"stored archive parts unavailable" end
- local total=0
- for _,slot in {"progress","main","free","easy","index"} do
-  local part=parts[slot]
-  if SaveRest.bounded(part,Archive.MAX_NODES+128,Archive.MAX_DEPTH+4) then return nil,"archive artifact exceeds structural bound" end
-  local text=Json.canonical(part)
-  if not text or #text>Rules.MAX_VALUE_CHARS then return nil,"invalid/oversize archive artifact" end
-  total+=#text;if total>Archive.MAX_TOTAL_CHARS then return nil,"archive publication exceeds aggregate budget" end
- end
- local head=parts.progress
- if type(head)~="table" or type(head.index)~="table" or type(head.progress)~="table" then return nil,"archive anchor unavailable" end
- local sources={progress={loaded=true,value=head.progress.raw}}
- for _,slot in {"main","free","easy"} do
-  if type(parts[slot])~="table" then return nil,"archive part missing" end
-  sources[slot]={loaded=true,value=parts[slot].raw}
- end
- local plan,why=Archive.prepare(user,head.index.observation,sources);if not plan then return nil,why end
- if not same(head,{format=ArchiveStore.FORMAT,version=1,owner=user,index=plan.index,progress=plan.entries.progress}) then return nil,"archive anchor differs" end
- for _,slot in {"main","free","easy"} do if not same(parts[slot],plan.entries[slot]) then return nil,"archive entry differs" end end
- if not same(parts.index,{format=ArchiveStore.FORMAT,version=1,owner=user,complete=true,index=plan.index}) then return nil,"complete archive index differs" end
- return plan,nil
+ return ArchiveStore.checkPublished(user,parts)
 end
 function Reader.prepare(user:string,slot:string,raw:any,anchor:any,parts:any,codec:any,context:any,requestedKind:string?,currentFormat:any?,retiredNewLife:boolean?):(any?,string?)
  if not owner(user) or not table.find(Rules.MODES,slot) or requestedKind~=nil and requestedKind~="primary" and requestedKind~="backup" then return nil,"invalid recovery offer scope" end

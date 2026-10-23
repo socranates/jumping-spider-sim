@@ -16,7 +16,7 @@ local function token(v:any):boolean return type(v)=="string" and #v>0 and #v<=Ru
 local function integer(v:any):boolean return type(v)=="number" and v==v and v%1==0 and v>=1 and v<=Rules.MAX_LIFE_SERIAL end
 -- Stable ownership of offer is required until preparation returns, as with the
 -- existing Checkpoint.prepare API. A private owned record is retained thereafter.
-function Client.prepare(offer:any,world:any,stillCurrent:any):(any?,string?)
+function Client.prepare(offer:any,world:any,stillCurrent:any,prepareAdoption:((any,any)->(any?,string?))?):(any?,string?)
  if type(stillCurrent)~="function" or not stillCurrent() or not known(offer,{v=true,id=true,epoch=true,mode=true,serial=true,revision=true,entryKind=true,life=true,identity=true,checkpoint=true})
   or offer.v~=1 or not token(offer.id) or not token(offer.epoch) or not table.find(Rules.MODES,offer.mode) or not integer(offer.serial) or not integer(offer.revision)
   or not known(offer.identity,{checksum=true,updatedAt=true}) or type(offer.identity.checksum)~="string" or #offer.identity.checksum~=16
@@ -31,14 +31,24 @@ function Client.prepare(offer:any,world:any,stillCurrent:any):(any?,string?)
  local life=decoded.roots.life;local stage=if life.mating then life.mating.stage else "none"
  local kind=if stage=="hatched" then "hatching" elseif life.mate and life.mate.scene or stage=="courted" then "mating" else "rest"
  if life.lifeOver~=false or kind~=offer.entryKind then return nil,"ended/different entry scene refused" end
- local commit,issues=Checkpoint.prepare(record,world);if not commit then return nil,table.concat(issues,";") end
+ -- The actual game supplies its full store/rules/camera adoption. Keep all
+ -- bounded record/slot/scene validation above, but do not decode a second
+ -- detached world commit which that path would never use.
+ local commit,problem
+ if prepareAdoption then
+  commit,problem=prepareAdoption(record,{mode=offer.mode,entryKind=kind})
+ else
+  local issues;commit,issues=Checkpoint.prepare(record,world)
+  problem=if issues then table.concat(issues,";") else nil
+ end
+ if type(commit)~="function" then return nil,problem or "entry adoption could not be prepared" end
  if not stillCurrent() then return nil,"selection changed during entry preparation" end
  local receipt={kind="recovery_applied",v=1,id=offer.id,epoch=offer.epoch,mode=offer.mode,serial=offer.serial,revision=offer.revision,identity=Json.copy(offer.identity)}
  local used=false
  return function():(any?,string?)
   if used or Work.pulse() or not stillCurrent() then return nil,"prepared entry no longer current" end
   used=true
-  local okay,bad=commit();if not okay then return nil,table.concat(bad,";") end
+  local okay,bad=commit();if not okay then return nil,if type(bad)=="table" then table.concat(bad,";") else tostring(bad or "entry adoption refused") end
   if not stillCurrent() then return nil,"selection changed during entry application" end
   return Json.copy(receipt),nil
  end,nil

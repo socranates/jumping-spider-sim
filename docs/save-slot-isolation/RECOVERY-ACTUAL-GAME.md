@@ -1,0 +1,31 @@
+# Actual-game recovery adoption - verified private milestone
+
+Production source `a97b0b54bfa7a49d8cec072cc4c0ebc1fd7ea8ff` is unchanged. Its Windows/Linux76 suites/468872/0 and scripted Studio70/0 remain qualified under `../recovery-client-pause/`. No new production source or published build changed.
+
+`docs/save-slot-isolation/recovery-game-entry-prototype.luau` connects recovery preparation to the real SpiderClient `restore.cfg.prepare` closure. The shared private entry validator now accepts an optional actual-adoption callback after its unchanged bounded record/slot/scene checks. It does not create an unused detached checkpoint commit when that callback exists. The actual adapter holds through preparation/adoption, accepts the one intended generation+1, caches an applied receipt before sending and releases only for the matching processed authoritative server grant. Cancellation/failure/timeout retain a hold. Safe user-facing exit and owner/profile/replacement coordination are still required before activation.
+
+## Terminal proof
+
+- `actual-game-attempt-2-*`:949 new actual-game assertions plus187257 preceding private checks = **188206 passing /0 failures**. Unified exec47748 is terminal exit0. Full=false is not confused with focused runs: final receipt focused=false, baseline=false, deadline_only=false. All26 summary groups are verified.
+- `actual-game-types-5-*`:all35 overlay candidates compile/type-check clean against unchanged production. The earlier type4 narrowing diagnostic was corrected with an explicit string widening after a reentrant call; full attempt2 binds final bytes.
+- `verify-recovery-game-entry.py` passed, reconstructing the actual executable, current raw inputs, committed production/test bytes, output hashes, all9 mode/scene markers, type hashes, the negative deadline proof and the separate legacy-profile probe. Result: `recovery-game-entry-verification.json`.
+- All3 modes cover rest/courted/hatched through actual game adoption/store/rules/controls/camera paths. The real pair renderer and hatching card take over after grant. Repeated entry delivery applies once; hidden menus keep life/needs/energy frozen. Free's real grant is delivered reentrantly during receipt send, then its send result deliberately raises: the completed grant is preserved. Original A1/M1 records stay unchanged through adoption/grant/departure.
+- Cancellation after a cooperative yield, invalid scene, refused preparation, reentrant newer choice, delayed real grant after a newer choice, extra generation change and timeout retain a hold/refuse obsolete receipt.
+- The prior private draft admitted a late grant callback before its next timeout update. `actual-game-deadline-negative-1-*` reproduces the expected assertion failure against the preserved before-deadline module and exact historical test snapshot. Current entry/event/grant guards enforce the deadline, and the full regression passes. This defect was never installed in production.
+
+The game and adapter see the same real SaveClient state through a test-only forwarding proxy used to switch isolated visits. It forwards activeSlot writes made by the real restore function; it is not proof of a production session replacement mechanism. Actual checkpointWorld is observed from production capture, not reconstructed. Server templates are freshly authored stand-ins; the actual production storage/compression adapters run over the memory facade. The recorded-map/checkpoint inspection overlays remain private; their ordinary current-world bodies are retained. This is CLI/game-code proof, not native remotes, physical controls, natural progression, live storage or normal-menu installation.
+
+## Real profile edge case confirmed; next fix
+
+`actual-game-profile-alias-1-*` is a separate **53-check expected integration counterexample**. Historical Easy saves may validly live under Main with `life_rules={mode=main,rules=gentle}` (SaveRest explicitly supports this). The real restore recomputes activeSlot as Easy while the selected Continue/request and local store remain Main. The new adapter correctly refuses to acknowledge and retains its pause. This case is **not supported yet**, and safe refusal is not completion.
+
+Fix the underlying ordinary-client slot ownership before further activation. Preserve the selected physical slot while retaining the recorded gentle rules; do not force Normal rules, ignore the adapter's slot fence, migrate over an existing Easy save or add a second server session. The code already derives rest-save slots from the active `checkpoints` object in `stores` (`life.save`, near line385). Use that ownership rather than deriving a new key from difficulty.
+
+Concrete small production change to review next:
+
+1. Let `returnToCheckpoint` receive the selected slot and use it for SaveClient.activeSlot. Both `saveState.localRestore.cfg.prepare` and `saveState.restore.cfg.prepare` already have immutable `stamp.mode`; pass it to the real restore. Keep raw/fresh-life behavior appropriate to their own selection.
+2. Resolve the end-screen offer from the active store's slot, matching life.save, rather than recomputing Easy from historical gentle rules. No new global alias field or save schema should be needed.
+3. Add an actual-client regression for a valid gentle record stored under Main: Continue keeps Main authority, next rest updates Main, Easy remains byte-identical, end offer matches Main; explicit new Easy/Normal lives still select their normal slots. Exercise actual SaveClient/Service through this private adapter too. Tell the user before menu-related production edits.
+4. Preserve this source-bound counterexample; update the positive profile fixture after the fix, qualify the changed production source with targeted/native and one immutable Windows/Linux full cohort, then continue trusted multi-profile owner selection and safe service/client replacement epochs.
+
+Normal engine menu callbacks, recovery owner activation, failure exit, selected server profiles, explicit replacement epochs, entry payload/network budgets, native full recovery, real DataStore/rejoin and release remain open. Nothing published or merged to main; goal active. All CLI/type/probe handles are terminal; Studio closed. Preserve original OneDrive/frozen Godot, three unrelated save-cost outputs and untracked production sourcemap.

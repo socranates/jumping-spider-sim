@@ -1,0 +1,57 @@
+{
+  "candidates": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
+    "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
+    "recovery-proposal-store-prototype.luau": "1ef86ba87bf474032165e2ddb9993d3f27a1b28b38c3d0b234cffe250204ff47",
+    "recovery-raw-backend-prototype.luau": "04e2f48bbfb2e36b21b89ca08af11a07814406ffadcc6a9406c29477ba75d173",
+    "recovery-rest-writer-prototype.luau": "64634b6ec76f88cab531e2240e95117a2d18a462b6e5a3bf56bcd5f5ebce3fda",
+    "recovery-progress-writer-prototype.luau": "ee5f76c75981f292b00a12388afb681b10e8511c863fc6db49f5f05eca7275fc",
+    "recovery-archive-store-prototype.luau": "4157c0a7f5130f921cc06c612ed3d90ea96739bc0d96f38fa73140e238c2e4a2",
+    "recovery-session-fence-prototype.luau": "25d7793a9c90d6c72fb22d897ab8d70ca87d8da6b86877f5dfa2502c23554ea9",
+    "recovery-commit-controller-prototype.luau": "49e21715fb25dc4b8ba475b4fdae778e4ea0cabe3d5a0b8cd80b0560ea82e413",
+    "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
+    "recovery-controller-prototype.luau": "cf73ca1f6b12d2c567dbf3f42377b9d07a2f59a51eecfc05cdfd0be660ac61fb",
+    "recovery-offer-reader-prototype.luau": "146828dfdf1c6eb1df4bbbff5331ff05da2f635333bee86496f67043bd995d9d",
+    "recovery-progress-baseline-prototype.luau": "e6c4d70d3ad8e891ee1a78af666817237c4ae2993b119004cecdfb85ca036b2c",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-pipeline-prototype.luau": "626d6d5fbb23fbd56b4ed2172478d297746da8896aa9827dead46a16b22cbe18",
+    "recovery-progress-reconcile-prototype.luau": "868ea5a5ccde9cff47553c096ae5bc8345dbb8a8694897e276aebc35417ee1da",
+    "recovery-departure-prototype.luau": "7512bcc0535cb233834265df0e5f7c6f54920380f1a5ddb05d4e08e2827031fa",
+    "recovery-idle-prototype.luau": "ae5276200e201866a259b40968b461bc5bde5a885dc429ad1c295d9b8aae319e",
+    "recovery-read-lease-prototype.luau": "0985effc77ac711e7af58809819819d72ba0c19e889ef7a5da477c4defb7062c",
+    "recovery-runtime-prototype.luau": "11d372f93d62a70446da32ede3ebcf6e0ea6f3f9999063525438967735cd95d2",
+    "recovery-rest-format-prototype.luau": "cb86377f1ccd4323275057a848eb23874aca51f0133f2513a9c280eb29767628",
+    "recovery-current-writer-prototype.luau": "23977eb6962d240645c64b6b4e596838c2c3640ad8b975c37730bc042214ce8e",
+    "recovery-entry-prototype.luau": "b149b2fd3e8d887e51f9f0946169c30df25ce92bd1867ae2b56dd5f1971337ec",
+    "recovery-entry-client-prototype.luau": "09c43b50c3238a86085a291600d97f416863c5e6f3b0de026742816305314c53",
+    "recovery-routine-progress-prototype.luau": "a62e25d83ce084fab3c90933433d23b2166883c53ed6b71cb7eb1a59e0d29790",
+    "recovery-save-loop-prototype.luau": "e2631cb92727feb4c44638c219be1fe1880cdf74eab9efa7b11dc9c02a7dcae5",
+    "recovery-startup-budget-prototype.luau": "6d9a0ba8437e5e1d7d992b23e5eb1393a95c8942f43d3d388082065f6100e331",
+    "recovery-service-owner-prototype.luau": "e6df1c2ae87f4b8ccac0a9ea4f6491f6365f173708ee2e4ac3c4f1f0b5e701a0",
+    "recovery-game-entry-prototype.luau": "d74fe12193504a4422593d4a57dd6fc3dc1205084800ee8ff0aa67ed9e954249"
+  },
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "a24876faa51c213d49d05e04f9fabb77fb57036521296e4c653ad00dc5664570"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 1,
+      "output_sha256": "c9d1c6527b45189fb6ca8d5dc703ceda27947323aa6828325bea67653a64a9ce"
+    }
+  ],
+  "production_connected": false
+}

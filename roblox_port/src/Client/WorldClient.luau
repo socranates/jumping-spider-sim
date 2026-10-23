@@ -19,8 +19,8 @@
 -- ROBLOX-95 (W2): the window is open and three regions lie outside it (the outer sill, the brick wall, the bed 90 studs below), the bed farther from the sill's spawn than the
 -- radius. So the focus follows the spider: `update` reports the spider's place to the server through the WorldFocus remote (Server/WorldFocus) whenever it has moved more than
 -- REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed, and the server moves the player's focus part there. And the client knows whether a region it is
--- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a spider in a region that is not whole is warned about once per region in Output, since
--- a missing box is a fall. (ROBLOX-108: the looks of the regions outside are this client's own, Client/LookStream, made near the spider by `streamLooks` and `update`;
+-- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a player in an incomplete known region waits with its simulation held, with a once-per-region
+-- diagnostic in Output. (ROBLOX-108: the looks of the regions outside are this client's own, Client/LookStream, made near the spider by `streamLooks` and `update`;
 -- nothing waits for them.) The player's motor is out of the
 -- world only where no region holds it (`inBounds`); the rival's and the mate's are bound to the sill and keep its bounds (`homeMin`, `homeMax`).
 -- ROBLOX-96 (W3): the garden has life. `prey` is the world's prey (Prey/PreyWorld: a director per region, run where the spider is and gated by `regionReady`) and
@@ -134,6 +134,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		remote = nil :: Instance?, reported = nil :: Vector3?, reportedAt = -math.huge, reports = 0,
 		-- the readiness guard: regions found whole, and regions already warned about
 		whole = {} :: { [string]: boolean }, warned = {} :: { [string]: boolean },
+  streaming=streaming,playerLoading=false,
 		-- ROBLOX-96: the world's prey and the drawn bugs (set by the client), and the last retreat the spider was in or beside
 		prey = nil :: any, bugs = nil :: any, lastRetreat = if #home.retreats > 0 then home.retreats[1].id else nil,
 		world = if m.world ~= nil then m.world() else Worlds.DEFAULT, train = nil :: any, -- (ROBLOX-115: the world it is, and the preserve's train once the looks are made)
@@ -186,6 +187,25 @@ function WorldClient.regionReady(self: any, id: string): boolean
 		if folder:FindFirstChild(piece.id) == nil then return false end
 	end
 	return true
+end
+
+-- Player physics is held on missing authored collision, not on optional looks.
+-- A previous whole flag is not authority after stream-out. Points outside all
+-- authored regions retain the normal jump/fall/silk rules; flat legacy fixtures
+-- intentionally provide only their own sill rather than the server's world.
+local function playerRegionReady(self:any,pos:Vector3):boolean
+ if self.root==self.sill and not self.streaming then return true end
+ local region=self.map.at(pos)
+ if region==nil or region.kind=="patch" or region.kind=="backdrop" then return true end
+ local folder=self:folderOf(region)
+ if self.root.Parent==nil or folder==nil or (folder~=self.root and not folder:IsDescendantOf(self.root)) then return false end
+ return self:regionReady(region.id)
+end
+function WorldClient.playerCanAdvance(self:any,pos:Vector3,nextPosition:Vector3?):boolean
+ local ready=playerRegionReady(self,pos)
+ if ready and nextPosition and (nextPosition-pos).Magnitude>1e-6 then ready=playerRegionReady(self,nextPosition) end
+ self.playerLoading=not ready
+ return ready
 end
 
 -- Sends the server where the spider is (the WorldFocus remote), when it has moved more than REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed. True
@@ -294,6 +314,7 @@ end
 -- the region it is in has arrived whole (warned about once if not).
 function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?)
 	self.region = self.map.at(pos) or self.region
+ self:playerCanAdvance(pos)
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
 	local clock = now or os.clock()
@@ -320,7 +341,7 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 			self.whole[id] = true
 		elseif not self.warned[id] then
 			self.warned[id] = true
-			tell(`[Windowsill] world: the spider is in {id}, which has not arrived whole; it may fall through where a box should be`)
+			tell(`[Windowsill] world: the spider is in {id}, which has not arrived whole; player physics waits for collision to return`)
 		end
 	end
 end

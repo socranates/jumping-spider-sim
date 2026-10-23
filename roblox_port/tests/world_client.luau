@@ -273,7 +273,7 @@ check("a region is ready when its folder holds every one of its boxes; a place w
 	workspace:ClearAllChildren()
 end)
 
-check("a spider in a region that has not arrived whole is warned about once for that region, in Output, and the game goes on", function()
+check("world updates stay nonblocking and warn once for incomplete collision", function()
 	workspace:ClearAllChildren()
 	local world = serverWorld()
 	local c = WorldClient.new(workspace, player())
@@ -1053,6 +1053,50 @@ check("the looks outside the window are this client's own and follow the spider 
 	end
 end)
 
+check("actual player holds pose and clocks through collision disappearance and partial return",function()
+ local d=assert(ClientStubs.driver);local folder,parent,part;local oldStreaming=workspace.StreamingEnabled
+ local ok,problem=xpcall(function()
+  assert(d.fresh("free",false,nil));d.place(Vector3.new(11,-89.69,-50));frames(5)
+  local bed=assert(WorldMap.region("bed_a"));folder=assert(d.world:folderOf(bed));parent=folder.Parent
+  local at,vel,mode=d.motor.pos,d.motor.vel,d.motor.mode
+  local elapsed,needsTime,preyTime=d.life.elapsed,d.needs.elapsedS,d.world.prey.clock
+  local life,motor=d.life,d.motor
+  assert(mode=="attached" and d.world:regionReady(bed.id) and d.world.whole.bed_a,"fixture needs a previously complete floor")
+  workspace.StreamingEnabled=true;folder.Parent=nil
+  frame(.25);frames(30)
+  assert(d.world.playerLoading and d.motor.pos==at and d.motor.vel==vel and d.motor.mode==mode,"missing collision changed the player's physics")
+  assert(d.life.elapsed==elapsed and d.needs.elapsedS==needsTime and d.world.prey.clock==preyTime,"life/needs/prey advanced while collision was absent")
+  part=assert(folder:FindFirstChild(Region.pieces(bed)[1].id));part.Parent=nil;folder.Parent=parent
+  frames(10)
+  assert(d.world.playerLoading and d.motor.pos==at and d.life.elapsed==elapsed,"partial collision arrival released the player")
+  part.Parent=folder;frames(2)
+  assert(not d.world.playerLoading and d.motor.mode=="attached" and d.life.elapsed>elapsed,"complete collision did not resume the same player")
+  assert(d.life==life and d.motor==motor,"resume replaced the simulation objects")
+  local again=d.motor.pos;elapsed=d.life.elapsed;folder.Parent=nil;frames(3)
+  assert(d.world.playerLoading and d.motor.pos==again and d.life.elapsed==elapsed,"cached first arrival hid a second stream-out")
+  print("PLAYER_STREAM_HOLD disappeared_pose_retained=true clocks_frozen=true partial_refused=true resumed_same_objects=true second_stream_out_held=true")
+ end,debug.traceback)
+ if part and folder then part.Parent=folder end;if folder then folder.Parent=parent end
+ workspace.StreamingEnabled=oldStreaming;frames(1)
+ assert(ok,problem)
+end)
+check("fixed tick refuses a prospective airborne step into absent authored collision",function()
+ local d=assert(ClientStubs.driver);local folder,parent
+ local ok,problem=xpcall(function()
+  assert(d.fresh("free",false,nil));frames(2)
+  local bed=assert(WorldMap.region("bed_a"));folder=assert(d.world:folderOf(bed));parent=folder.Parent;folder.Parent=nil
+  local at=d.motor.pos;d.motor.mode="air";d.motor.vel=(bed.spawn.pos-at)/(1/60)
+  local vel=d.motor.vel;local elapsed,needsTime=d.life.elapsed,d.needs.elapsedS
+  frame(.25)
+  assert(d.world.playerLoading and d.motor.pos==at and d.motor.vel==vel and d.motor.mode=="air","fixed tick entered missing collision or discarded airborne state")
+  assert(d.life.elapsed==elapsed and d.needs.elapsedS==needsTime,"fixed tick advanced clocks before its readiness gate")
+  print("PLAYER_STREAM_NEXT_TICK refused=true velocity_retained=true clocks_frozen=true")
+ end,debug.traceback)
+ if folder then folder.Parent=parent end
+ assert(d.fresh("free",false,nil));frames(1)
+ assert(ok,problem)
+end)
+
 -- First-arrival readiness must not survive missing collision. Engine streaming has separate native evidence.
 local function readyBed()
  workspace:ClearAllChildren();WorldMap.use("test_garden")
@@ -1082,6 +1126,39 @@ check("stream-out: partial rearrival refuses then resumes same creature gate",fu
  part.Parent=folder
  assert(client:creatureLive("bed_a"),"complete geometry did not resume")
  workspace:ClearAllChildren()
+end)
+check("player readiness rereads current collision and permits a complete rearrival",function()
+ local client,folder,root=readyBed();local at=assert(WorldMap.region("bed_a")).spawn.pos
+ assert(client:playerCanAdvance(at) and not client.playerLoading)
+ folder.Parent=nil;assert(not client:playerCanAdvance(at) and client.playerLoading)
+ local part=folder:GetChildren()[1];part.Parent=nil;folder.Parent=root
+ assert(not client:playerCanAdvance(at),"partial player region was admitted")
+ part.Parent=folder;assert(client:playerCanAdvance(at) and not client.playerLoading)
+ workspace:ClearAllChildren()
+end)
+check("player readiness gates the known destination but leaves ordinary void falls alone",function()
+ local client,folder=readyBed();local at=assert(WorldMap.region("house_wall")).spawn.pos;local target=assert(WorldMap.region("bed_a")).spawn.pos
+ assert(client:playerCanAdvance(at,target));folder.Parent=nil
+ assert(not client:playerCanAdvance(at,target) and client.playerLoading,"missing airborne destination was admitted")
+ assert(client:playerCanAdvance(Vector3.new(1e6,1e6,1e6)) and not client.playerLoading,"ordinary off-map fall was frozen")
+ workspace:ClearAllChildren()
+end)
+check("cached home pointer cannot admit collision detached from its actual world",function()
+ local client=readyBed();local home=assert(WorldMap.region("sill"));local parent=client.sill.Parent
+ client.sill.Parent=nil;assert(not client:playerCanAdvance(home.spawn.pos),"detached home collision was admitted")
+ client.sill.Parent=parent;assert(client:playerCanAdvance(home.spawn.pos))
+ workspace:ClearAllChildren()
+end)
+check("player collision readiness does not wait for optional decor",function()
+ local client=readyBed();client.decor=nil
+ assert(client:playerCanAdvance(assert(WorldMap.region("bed_a")).spawn.pos),"optional looks blocked physics")
+ workspace:ClearAllChildren()
+end)
+check("flat legacy worlds retain their original jump and fall scope",function()
+ workspace:ClearAllChildren();local old=workspace.StreamingEnabled;workspace.StreamingEnabled=false
+ local flat=flatWorld();local client=WorldClient.new(workspace,Instance.new("Player"),WorldMap)
+ assert(client.root==flat and client:playerCanAdvance(assert(WorldMap.region("bed_a")).spawn.pos) and not client.playerLoading)
+ workspace.StreamingEnabled=old;workspace:ClearAllChildren()
 end)
 
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)

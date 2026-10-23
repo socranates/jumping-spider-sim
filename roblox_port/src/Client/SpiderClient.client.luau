@@ -332,6 +332,7 @@ local saveState: any = { touched = {} :: { [string]: boolean }, applying = false
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
 	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing() or mateLegs.phase == "ride" -- (ROBLOX-120: the ride on the wind has the game)
+		or M.World.playerLoading==true
 		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
@@ -2067,6 +2068,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		M.Prof.lap("frame")
 		while accumulator >= DT do
+   -- Recheck each fixed tick: a slow frame can contain several movements, and
+   -- an airborne step must not enter a known region whose collision is absent.
+   -- No motor/AI/needs/life state advances while waiting; velocity is retained.
+   if not M.World:playerCanAdvance(motor.pos,motor.pos+motor.vel*DT) then accumulator=0;break end
 			accumulator -= DT
 			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies; ROBLOX-105: the woodlice and the ambient bugs are not shown to the senses)
             life.rival=life.rival or RivalSpider.new()

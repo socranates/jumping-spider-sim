@@ -12,6 +12,15 @@ raw=subprocess.check_output(['git','archive','--format=tar',SOURCE,'roblox_port/
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
  inputs={m.name:hashlib.sha256(archive.extractfile(m).read()).hexdigest() for m in archive if m.isfile()}
 assert inputs==win['inputs']
+runner=json.loads((H/'runner.json').read_text(encoding='utf8'))
+runner_text=(H/'runner.txt').read_text(encoding='utf8')
+assert runner['source']==SOURCE and runner['exit_code']==0
+assert hashlib.sha256((H/'runner.txt').read_bytes()).hexdigest()==runner['output_sha256']
+assert 'Ran 5 tests' in runner_text and re.search(r'\bOK\s*$',runner_text)
+for name,digest in runner['inputs'].items():
+ data=(ROOT/name).read_bytes();assert hashlib.sha256(data).hexdigest()==digest
+ committed=subprocess.check_output(['git','show',SOURCE+':'+name],cwd=ROOT)
+ assert data.replace(b'\r\n',b'\n')==committed.replace(b'\r\n',b'\n')
 text=(W/'windows-full.txt').read_text(encoding='utf8')
 rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',text,re.M)
 assert len(rows)==76 and sum(int(r[1]) for r in rows)==468487 and all(int(r[2])==0 for r in rows)

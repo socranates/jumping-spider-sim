@@ -1,0 +1,28 @@
+{
+  "observation": {
+    "game_id": 0,
+    "write_budget": 580,
+    "pass": true,
+    "read_budget": 580,
+    "production_connected": false,
+    "place_id": 0,
+    "elapsed_seconds": 0.00026389999948150944,
+    "engine_version": "0.744.0.7441077",
+    "real_datastore_verified": false,
+    "kind": "startup-budget-observer",
+    "assertions": 6,
+    "prototype_sha256": "6d9a0ba8437e5e1d7d992b23e5eb1393a95c8942f43d3d388082065f6100e331"
+  },
+  "log_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261023T095840Z_Studio_8D9ED_last.log",
+  "log_line": 2344,
+  "filtered_output_sha256": "cf59dfc49593234570e2e0592f22f98f7872805a5cd566ea0e8045438085adcd",
+  "build_receipt_sha256": "7e2c6d1f0154722fe5555a3976759ad20eb23255ca44eab00dc95d7e62ecc9ba",
+  "original_model_sha256": "50b96fb7b16d14a9e25101f1558d24b4ac509b5377e6c61ae92a81fff09fefa6",
+  "editor_copy_path": "C:\\Users\\natha\\claude-xfer\\Windowsill-startup-observer-da6dae13c6b6\\WindowsillStartupBudgetObserver-editor-copy.rbxl",
+  "editor_copy_sha256": "6abc16b83e389ca97013c150efeff047cd1105ce15d17518b52916511d7551c1",
+  "studio_stopped_and_closed": true,
+  "native_observer_verified": true,
+  "full_recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

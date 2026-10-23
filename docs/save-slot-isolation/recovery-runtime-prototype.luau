@@ -38,11 +38,13 @@ function Runtime.new(config:any,recovery:any):any
  cfg.backend:bindSession(s)
  local self:any=setmetatable({session=s,config=cfg,recovery=recovery,phase="normal",busy=false,leaving=false,accepted=false},Runtime)
  self.pipeline=Pipeline.new(s,recovery.codec,recovery.rawBackend,recovery.template,recovery.context,recovery.pipeline)
+ if recovery.startupBudget then recovery.startupBudget:attach(self) end
  return self
 end
 function Runtime.load(self:any):...any
  if not available(self) or self.phase~="normal" then return self.session.state,false end
- self.busy=true;local result=table.pack(pcall(self.session.load,self.session));self.busy=false
+ self.busy,self.loading=true,true;local result=table.pack(pcall(self.session.load,self.session));self.busy,self.loading=false,false
+ if self.startup and (not result[1] or self.session.state~="active") then self.startup:close("initial load refused") end
  if not result[1] then error(result[2],0) end
  return table.unpack(result,2,result.n)
 end
@@ -60,6 +62,7 @@ local function hold(self:any):(any?,string?)
  return held,why
 end
 local function lost(self:any,why:string)
+ if self.startup then self.startup:close("recovery ownership lost") end
  if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
  self.phase,self.problem="lost",why;self.pipeline.leaseLost=true
@@ -113,6 +116,7 @@ function Runtime.accept(self:any,mode:string,serial:number,offerId:string):(any?
   if not startReadLease(self) then return nil,self.problem end
   return self.continuedSelection,nil
  end
+ if self.startup then self.startup:close("legacy migration uses ordinary budget") end
  local j,why=self.pipeline:begin(mode,serial,offerId,d);if not j then return nil,why end
  stopLease(self);self.accepted=true;self.phase,self.problem="recovering",nil;self.job=j
  return j,nil
@@ -147,6 +151,7 @@ function Runtime.dismiss(self:any):boolean
   local latest=self.session.observations.latest[self.discovery.mode]
   if latest and latest.id==self.discovery.offer.id then self.session.observations:withdraw(self.discovery.mode) end
  end
+ if self.startup then self.startup:close("discovery dismissed") end
  stopLease(self);self.phase,self.discovery,self.reader="normal",nil,nil;return true
 end
 local function enterHeld(self:any)
@@ -197,6 +202,7 @@ local function stepInner(self:any):boolean
   if self.leaving or s.closed then return asked end
   if self.entryJob.state=="verified" then
    self.phase,self.result="recovered",self.entryJob.result
+   if self.startup then self.startup:close("playable entry verified",true) end
    if self.recovery.saveFactory then stopLease(self);self.saveLoop=self.recovery.saveFactory.new(self) end
    -- A decision callback may yield. Install the completed route first so late
    -- completion cannot reopen a session closed by departure during notification.
@@ -234,6 +240,7 @@ function Runtime.depart(self:any,deadline:number?):(any?,string?)
  local now=self.session.now();local untilAt=deadline or now+Rules.FLUSH_DEADLINE
  if not finite(now) or not finite(untilAt) then return nil,"finite departure deadline required" end
  if self.route and self.phase~="normal" and (now<self.route.lastNow or not routeMatches(self)) then self.scopeInvalid=true end
+ if self.startup then self.startup:close("session departing") end
  self.leaving=true;self.flushDeadline=untilAt
  if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end

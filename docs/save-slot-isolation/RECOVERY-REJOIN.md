@@ -35,3 +35,8 @@ Historical variants are retained. Attempt1's fixture expected cold migration to 
 ## Remaining work
 
 Qualify startup latency and actual server/client transport/compression, then complete explicit retirement/new-life handling, later-slot reuse of original A1, original archive/proposal lifetime, and safe replacement of a lost session while preserving local edits. Wire all production service/protocol/client selection, paused-world, error, load/tick/leave/shutdown paths. Actual DataStore interruption/takeover/rejoin, native performance/phone/long-session checks and broad production release gates remain required before main integration/publication/laptop synchronization. Production sources/tests remain unchanged at `441eaca`; nothing was published and the overall optimization/reliability goal remains active.
+
+
+## Subsequent startup admission milestone
+
+Runtime now optionally installs the bounded startup owner described in `RECOVERY-STARTUP-BUDGET.md`. The current 128847-check cohort includes all rejoin assertions; use `verify-recovery-startup-budget.py` for current hashes. Rejoin receipts above remain historical evidence for their original bytes.

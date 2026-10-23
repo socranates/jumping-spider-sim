@@ -1,0 +1,18 @@
+{
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-startup-observer-da6dae13c6b6\\WindowsillStartupBudgetObserver.rbxlx",
+  "model_sha256": "50b96fb7b16d14a9e25101f1558d24b4ac509b5377e6c61ae92a81fff09fefa6",
+  "prototype_raw_sha256": "6d9a0ba8437e5e1d7d992b23e5eb1393a95c8942f43d3d388082065f6100e331",
+  "prototype_normalized_sha256": "6d9a0ba8437e5e1d7d992b23e5eb1393a95c8942f43d3d388082065f6100e331",
+  "sources": {
+    "SaveRules": "12900acd1094a534af630762090ba3def738a197c7c2a3a771f9607a611a5b68",
+    "SaveWork": "268cedc7bc81730d3f650b36fe9016e485928d4d7b1a957332a16093819f746e",
+    "StartupBudgetObserverModule": "6d9a0ba8437e5e1d7d992b23e5eb1393a95c8942f43d3d388082065f6100e331",
+    "StartupBudgetObserver": "a2eb1166fc826327d9e6004e903dbded4fd9b1c384fa2d1246d7dfdc1acd2a6d"
+  },
+  "scripts": 4,
+  "project_bound_to_experience": false,
+  "production_connected": false,
+  "data_store_record_access": false,
+  "native_observer_verified": false,
+  "published": false
+}

@@ -63,6 +63,7 @@ end
 function Destination.prepare(capsule:any,template:any,context:any,slot:string):(any?,string?)
  if Map.world()~="preserve" then return nil,"destination must be the Preserve" end
  local imported,problem=Life.decode(capsule);if not imported then return nil,problem end
+ if imported.life.lifeOver then return nil,"ended life requires explicit ending recovery" end
  if imported.origin.seed~=Map.SEED then return nil,"source simulation seed requires explicit support" end
  if type(template)~="table" or type(template.world_map)~="table" or template.world_map.world~="preserve"
   or template.world_map.revision~=Map.revision() or template.world_map.seed~=Map.SEED then return nil,"fresh current Preserve template required" end

@@ -103,6 +103,12 @@ local broken=Json.copy(template)
 for _,object in broken.world.objects do if object.c=="PreyDirector" then for _,entry in object.e do if entry[1]=="captures" then entry[2]=1;break end end;break end end
 destinationCheck(__destinationPrototype.prepare(portable,broken,fresh,"main")==nil,"played population accepted as fresh template")
 destinationCheck(__destinationPrototype.prepare(portable,template,fresh,"free")==nil,"mismatched destination slot accepted")
+do
+ local ended=Json.copy(source)
+ for _,object in ended.world.objects do if object.c=="LifeLoop" then for _,e in object.e do if e[1]=="lifeOver" then e[2]=true;break end end;break end end
+ local capsule=assert(__lifePrototype.prepare(ended,fresh,"A1_46001"))
+ destinationCheck(__destinationPrototype.prepare(capsule,template,fresh,"main")==nil,"ended life was accepted as an ordinary rest")
+end
 for _,stage in {"courted","hatched"} do
  WorldMap.use("test_garden");local w=gardenWorld();w.motor:place(Vector3.new(11,-89.69,-50),Vector3.yAxis,Vector3.zAxis)
  w.life.growth.stage=3;w.life.mating=Mating.new();w.life.mating.stage=stage;w.life.mate=Mate.new()

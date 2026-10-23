@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "unknown_fields": "refuse",
+  "fields": {
+    "notebook": "union all unique pages or refuse overflow; maximum eye time",
+    "finished_main": "monotonic true",
+    "appearance": "latest timestamp, incoming wins ties; retain older if absent",
+    "settings": "per-key latest timestamp, refuse drops/clamps/unknown choices",
+    "settings_version": "explicit supported migration",
+    "intro_seen": "monotonic true; absent means false",
+    "hut_window": "monotonic true; absent means false",
+    "rare": "bounded lossless union/high-water marks plus selected-life binding/visit evidence"
+  }
+}

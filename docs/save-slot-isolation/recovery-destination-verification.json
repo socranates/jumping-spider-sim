@@ -1,6 +1,6 @@
 {
   "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
-  "destination_assertions": 71,
+  "destination_assertions": 72,
   "life_regression_assertions": 360,
   "meal_regression_assertions": 49,
   "current_runtime_bundle_verified": true,
@@ -14,6 +14,8 @@
   "memory_envelope_roundtrip_verified": true,
   "ordinary_cross_world_continue_still_refused": true,
   "scene_and_hatching_entry_explicit": true,
+  "ended_life_refused": true,
+  "ended_life_counterexample_reproduced": true,
   "production_connected": false,
   "native_verified": false,
   "real_datastore_verified": false,

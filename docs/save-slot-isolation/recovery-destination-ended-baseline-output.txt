@@ -1,0 +1,7 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+C:/Users/natha/AppData/Local/Temp/tmpsyekeanl.luau:46253: ended life was accepted as an ordinary rest
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpsyekeanl.luau:46253 function destinationCheck
+C:/Users/natha/AppData/Local/Temp/tmpsyekeanl.luau:46352

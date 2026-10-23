@@ -4,13 +4,13 @@
     "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
     "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
     "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
-    "recovery-destination-prototype.luau": "d4162973efe72c4e28015c1b949eff860e649134dea67dd0fd2a250d139eb937"
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a"
   },
   "steps": [
     {
       "name": "compile",
       "exit_code": 0,
-      "output_sha256": "74e15199125b2c294280e1da9f5c30f881f140e0dc435e8b752f0c82dae330ee"
+      "output_sha256": "e7f9974a6fbc0d1cc2710d65da1c22a55aedf3c3d9d122be151d3e4c498e0f01"
     },
     {
       "name": "sourcemap",

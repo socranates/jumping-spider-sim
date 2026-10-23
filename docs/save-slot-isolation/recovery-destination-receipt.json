@@ -10,11 +10,11 @@
     "recovery-life-tests.luau": "385b3dd40072f3c2fa4e760e5a8b58cd65ba729766dbcb9af673031e630adda5",
     "Checkpoint.luau": "4f91289a5a8240e6d30ff794ef0fb53ac3f8cd449e52d8e575db9a19710f8866",
     "SaveRest.luau": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d",
-    "recovery-destination-prototype.luau": "d4162973efe72c4e28015c1b949eff860e649134dea67dd0fd2a250d139eb937",
-    "recovery-destination-tests.luau": "9ad1f1896701160cc4631122fd2536fd18fbb57d0e49abc8fa7002b6aa3ec519"
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
+    "recovery-destination-tests.luau": "40c93d45fb107b501904d4a9f5071252e3a5d6a47150f75e8fad38e90d54f102"
   },
-  "bundle_sha256": "3b400588253cee79d0944d1f05a9718b03ce8b237d28fca53cb69742adee471d",
-  "output_sha256": "29f54ce1d0e4cdb35aa7f6d1fb5bb9e12636cd224455105488638cebaa35e82b",
+  "bundle_sha256": "ceda8f080655bdb29b5121b83df1e32a3c74c3f5541d927fe418ac1e62e9398f",
+  "output_sha256": "31b4a413c16e4cf5eef455db862ca5d98b081866cc72ee6493a59eb45040625e",
   "production_connected": false,
   "real_datastore_verified": false,
   "native_verified": false,

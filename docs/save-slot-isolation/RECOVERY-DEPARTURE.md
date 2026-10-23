@@ -21,3 +21,5 @@ The first draft test stopped at a request-budget delay before reaching the inten
 ## Still required before adoption
 
 This is a recovery-only **private departure path**, not completed production lifecycle integration. Route server departure/shutdown to it only when the recovery owner exists; leave normal healthy sessions' rest flush intact. Complete terminal-held idle heartbeat/expiry and safe session replacement, production factory/tick/menu routing and schema-3 entry. Pending unrelated rest/life work needs an explicit integration policy. Native coroutine/provider checks, actual Roblox service interruption/rejoin and durable schema-3 readers/writers remain open. No gameplay credential, migration-complete, release, phone-performance or publication claim follows from these tests.
+
+Subsequent private factory binding changes the baseline callback path. Current combined source/CLI/type evidence is in `RECOVERY-RUNTIME.md` (50,745 checks,26 candidates); earlier native evidence remains source-specific and does not verify the new coordinator.

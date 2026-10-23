@@ -26,10 +26,28 @@ function Baseline.new(backend:any,user:string):any
  return setmetatable({source=backend,boundSource=backend,user=user,pkey="P_"..user,issued=0,acknowledged=0,activeUpdates=0,base=nil,held=nil,
   permits=setmetatable({},{__mode="k"}),main={}},Baseline)
 end
-local function updateProvider(self:any,key:string,fn:any,raw:boolean?):(boolean,any,string?)
+-- Optional factory binding fences initial-load/normal-worker callbacks too.
+-- Standalone sidecars keep their earlier API until explicitly bound pre-load.
+function Baseline.bindSession(self:any,session:any)
+ assert(not Work.pulse() and self.boundSession==nil and self.issued==0 and self.activeUpdates==0 and self.held==nil
+  and self.source==self.boundSource and session.backend==self and tostring(session.cfg.userId)==self.user,"bind a fresh tracked session before load")
+ self.boundSession=session
+end
+local function updateProvider(self:any,key:string,fn:any,raw:boolean?,departure:any?):(boolean,any,string?)
+ local s=self.boundSession;local load=if s then s._loadSerial else nil;local id=if s then s.id else nil
+ local function valid():boolean
+  if not s then return true end
+  return self.boundSession==s and self.source==self.boundSource and s.backend==self and s._loadSerial==load and s.id==id
+   and tostring(s.cfg.userId)==self.user and (if departure then self:departureValid(departure) else not s.closed)
+ end
+ if not valid() then return false,nil,"bound session callback scope unavailable" end
  self.activeUpdates+=1
  local method=if raw then self.source.updateRaw else self.source.update
- local result=table.pack(pcall(method,self.source,key,fn));self.activeUpdates-=1
+ local result=table.pack(pcall(method,self.source,key,function(old:any):any
+  if not valid() then return nil end
+  return fn(old)
+ end));self.activeUpdates-=1
+ if not valid() then return false,nil,"bound session changed during provider update" end
  if not result[1] then return false,nil,tostring(result[2]) end
  return table.unpack(result,2,result.n)
 end
@@ -127,7 +145,7 @@ function Baseline.departureUpdate(self:any,t:any,fn:any):(boolean,any,string?)
  return updateProvider(self,self.pkey,function(old:any):any
   if not self:departureValid(t) then return nil end
   return fn(old)
- end)
+ end,false,t)
 end
 function Baseline.departureRead(self:any,t:any):(boolean,any,string?)
  if Work.pulse() or not self:departureValid(t) then return false,nil,"closed departure scope unavailable" end

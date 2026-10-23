@@ -23,3 +23,5 @@ The initial Studio fixture stopped at an overly broad all-DataModel executable c
 ## Remaining integration
 
 Route factory/session initialization, recovery selection, frame/tick work, terminal maintenance and departure through one production owner before adoption. Complete safe session replacement with retained local changes and schema-3 entry/read/write/life credentials; queued unrelated rest/life work still needs an explicit routing policy. The current production runtime is unchanged at 441eaca. Full platform tests on that runtime remain separate evidence. Actual Roblox storage interruption/takeover/rejoin, full native migration and release/main/laptop synchronization remain open. The overall goal is active; nothing was published.
+
+Subsequent private factory binding changes the baseline callback path. Current combined source/CLI/type evidence is in `RECOVERY-RUNTIME.md` (50,745 checks,26 candidates); earlier native evidence remains source-specific and does not verify the new coordinator.

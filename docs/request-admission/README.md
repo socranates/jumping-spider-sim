@@ -1,5 +1,7 @@
 # Typed request admission candidate
 
+The subsequent [discovery worker candidate](WORKERS.md) adds provider-boundary accounting, conservative legacy-debt import and a faster queue calculation. Its source and qualification are separate from the primitive receipts below; normal game activation remains closed.
+
 Private implementation following the native delay attribution in `../recovery-native-cost/RESULTS.md`. **Not installed in production, the owner state machines, or the earlier native fixture.** It replaces neither storage verification nor lease/transaction authority. No end-to-end recovery speedup is claimed.
 
 Current `qualified-3`: **30 named cases /4853 checks /0**:4771 policy checks and82 checks around the exact production DataStoreBackend from `bd67582`, with injected providers/options. Both candidate modules compile and are strict-clean in the standalone Luau analyzer. The production224-module/default Windows/Linux receipts remain unchanged. This qualification is CLI/synthetic, not native or online proof.

@@ -123,5 +123,17 @@ test("legacy-debt-validation-and-exact-rolling-boundary",function()
  local freshGate=gate();local freshScope=assert(freshGate:open("a","1"));assert(freshGate:request(freshScope,"read"))
  check(not freshGate:importLegacy(freshScope,{}),"import after typed intake allowed")
 end)
+test("actual-reader-thrown-provider-keeps-backoff",function()
+ local b,clock,budget,s,g,scope,r,j,base=fixture(false)
+ r:cancel(j);local read=b.readRawFresh;local attempts=0
+ b.readRawFresh=function(self,key) attempts+=1;if attempts==1 then error("503: thrown provider",0) end;return read(self,key) end
+ r=Reader.new(s,codec,fresh,{admission={gate=g,scope=scope},work={now=function() return 0 end}});j=assert(r:begin("main"))
+ budget.read=80
+ check(r:step(j) and j.state=="pending" and j.requests==1 and j.failures==1,"thrown provider bypassed the actual reader failure/backoff path")
+ check(j.nextAt>clock.now and not r:step(j) and attempts==1,"throwing backend retried before backoff")
+ clock.now=j.nextAt;drive(r,j)
+ check(j.state=="offered" and j.requests==3 and attempts==3,"thrown backend did not recover through the actual reader")
+ check(s.counters.requests==base.requests+3 and Json.canonical(b.data)==base.bytes,"throwing attempt count/original storage changed")
+end)
 print("WORKER_ADMISSION passed="..passed.." failed=0 groups="..groups)
 end

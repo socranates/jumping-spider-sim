@@ -26,15 +26,21 @@ function Worker.new(session:any,job:any,lane:any,maxRequests:number,guard:()->bo
    if not finite(now) or not valid() or job.requests>=maxRequests then error("worker scope/cap changed before provider",0) end
    -- No external callback between accounting and the captured backend method.
    self.scheduler:begin(nil,now);self.counters.requests+=1;job.requests+=1;self.starts+=1
+   local returned
    if name=="update" then
-    return methods[name](self.backend,key,function(old:any):any
+    returned=table.pack(pcall(methods[name],self.backend,key,function(old:any):any
      if not valid() then return nil end
      local value=transform(old)
      if not valid() then return nil end
      return value
-    end)
+    end))
+   else
+    returned=table.pack(pcall(methods[name],self.backend,key))
    end
-   return methods[name](self.backend,key)
+   -- A provider exception is an actual failed attempt. Preserve the worker's
+   -- existing retry/backoff path rather than treating it as an admission denial.
+   if not returned[1] then return false,nil,tostring(returned[2]) end
+   return table.unpack(returned,2,returned.n)
   end
  end
  self.facade=Facade.new(gate,scope,wrapped)

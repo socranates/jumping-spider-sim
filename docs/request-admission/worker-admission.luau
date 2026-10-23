@@ -140,17 +140,33 @@ local function amounts(self:any,actor:string,exclude:any):(any,any,any)
  end
  return all,own,held
 end
-local function fits(self:any,r:any,available:any):boolean
- if not current(self,r) then return false end
- for _,other in self.tickets do
-  if other~=r and other.actor==r.actor and other.state=="started" then return false end
+-- Build once per admission attempt. No callback or yield can change these
+-- totals while checking the earlier queue, so repeated history scans add no
+-- safety and turn a busy queue into quadratic work.
+local function ledger(self:any):any
+ local all={read=0,write=0};local actors={};local held={read=0,write=0};local busy={}
+ local function add(actor:string,w:any)
+  local own=actors[actor];if not own then own={read=0,write=0};actors[actor]=own end
+  all.read+=w.read;all.write+=w.write;own.read+=w.read;own.write+=w.write
  end
- local w=weights[r.kind];local all,own,held=amounts(self,r.actor,r)
+ for _,row in self.history do add(row.actor,weights[row.kind]) end
+ for _,r in self.tickets do
+  local w=weights[r.kind]
+  if r.state=="started" then busy[r.actor]=true;held.read+=w.read;held.write+=w.write
+  elseif r.state=="reserved" then add(r.actor,w);held.read+=w.read;held.write+=w.write end
+ end
+ return {all=all,actors=actors,held=held,busy=busy}
+end
+local function fits(self:any,r:any,available:any,totals:any):boolean
+ if not current(self,r) then return false end
+ if totals.busy[r.actor] then return false end
+ local w=weights[r.kind];local all,held=totals.all,totals.held;local own=totals.actors[r.actor]
  for _,kind in {"read","write"} do
   if w[kind]>0 then
    local suffix=if kind=="read" then "Read" else "Write"
-   if own[kind]+w[kind]>self.cfg["actor"..suffix] or all[kind]+w[kind]>self.cfg["server"..suffix]
-    or available[kind]-held[kind]-self.headroom<w[kind] then return false end
+   local excluded=if r.state=="reserved" then w[kind] else 0
+   if (if own then own[kind] else 0)-excluded+w[kind]>self.cfg["actor"..suffix] or all[kind]-excluded+w[kind]>self.cfg["server"..suffix]
+    or available[kind]-held[kind]+excluded-self.headroom<w[kind] then return false end
   end
  end
  return true
@@ -173,11 +189,12 @@ local function admit(self:any,ticket:any):(any?,number?,string?)
  now,why=clock(self);if not now then return nil,nil,why end
  if self.version~=observedVersion then return nil,nil,"admission changed during final clock check" end
  if not available or not current(self,r) then return nil,nil,problem or "request scope ended" end
- if not fits(self,r,available) then return nil,nil,"waiting for admission" end
+ local totals=ledger(self)
+ if not fits(self,r,available,totals) then return nil,nil,"waiting for admission" end
  local w=weights[r.kind]
  for _,earlier in self.queue do
   if earlier.order>=r.order then break end
-  if earlier.state=="queued" and now-earlier.lastPoll<=self.reservationSeconds and fits(self,earlier,available) then
+  if earlier.state=="queued" and now-earlier.lastPoll<=self.reservationSeconds and fits(self,earlier,available,totals) then
    local e=weights[earlier.kind]
    if e.read*w.read>0 or e.write*w.write>0 then return nil,nil,"earlier eligible request has priority" end
   end

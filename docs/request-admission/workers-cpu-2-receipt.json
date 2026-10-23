@@ -1,0 +1,10 @@
+{
+  "input_path": "docs/request-admission/worker-admission.luau",
+  "input_sha256": "8baa35a43481bd4a1f44751c7a244ec595bf8be220b0cc23263fcd022eb76257",
+  "bundle_sha256": "68cab83dfc2bb5910e8c1c63e3a7e948a9524474e5805c3dccdf32e46268a000",
+  "output_sha256": "ef51306ad7a47fb48a3fad2e79fd86e9fbcc4bfeb199eb887864d6cf39848660",
+  "exit_code": 0,
+  "samples_per_case": 20,
+  "native_verified": false,
+  "frame_rate_claim": false
+}

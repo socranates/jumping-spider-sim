@@ -1,0 +1,10 @@
+{
+  "input_path": "docs/request-admission/worker-admission-ledger.luau",
+  "input_sha256": "8baa35a43481bd4a1f44751c7a244ec595bf8be220b0cc23263fcd022eb76257",
+  "bundle_sha256": "68cab83dfc2bb5910e8c1c63e3a7e948a9524474e5805c3dccdf32e46268a000",
+  "output_sha256": "ba292b25bfbdfc1493d0235070d685c27aa4628779ad1ef1aa30dad6b20c98f9",
+  "exit_code": 0,
+  "samples_per_case": 20,
+  "native_verified": false,
+  "frame_rate_claim": false
+}

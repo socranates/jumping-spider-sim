@@ -1,0 +1,10 @@
+{
+  "input_path": "docs/request-admission/workers-before-ledger-admission.luau",
+  "input_sha256": "81824e915ef6364236a3d097b363fa85cc0b21de88d3222b8948ef38c4e48727",
+  "bundle_sha256": "012e07ed3f9438d22c9379e087d4ec9e9cd1530236164bf8c1b5955aa1cc93f8",
+  "output_sha256": "531d76a9e0d3beab468e2d4abbd64f1e5f75c73ee3b2441becb8c22a9eae2f5a",
+  "exit_code": 0,
+  "samples_per_case": 20,
+  "native_verified": false,
+  "frame_rate_claim": false
+}

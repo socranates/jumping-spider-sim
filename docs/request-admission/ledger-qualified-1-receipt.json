@@ -1,0 +1,12 @@
+{
+  "inputs": {
+    "docs/request-admission/workers-before-ledger-admission.luau": "81824e915ef6364236a3d097b363fa85cc0b21de88d3222b8948ef38c4e48727",
+    "docs/request-admission/worker-admission.luau": "8baa35a43481bd4a1f44751c7a244ec595bf8be220b0cc23263fcd022eb76257",
+    "docs/request-admission/ledger-tests.luau": "a01ab791170564a1b6563d30bed4b78f3a310b30983ca97cd1351b350f01f9a1"
+  },
+  "bundle_sha256": "a38e29894982d14d6235ac340ccda1eb46014c6a9ff512ac517f8ea7853cdb67",
+  "output_sha256": "255f983a0e74b23f31c2cac268b66fcd7274fa3c92e74eec446f5f901ff9ae47",
+  "exit_code": 0,
+  "clock": "synthetic",
+  "native_verified": false
+}

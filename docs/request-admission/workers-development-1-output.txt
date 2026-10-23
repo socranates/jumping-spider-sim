@@ -1,0 +1,2 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-workers-ekx569vb/run.luau:51146: Out of local registers when trying to allocate _: exceeded limit 200
+stacktrace:

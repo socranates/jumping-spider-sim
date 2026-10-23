@@ -1,0 +1,4 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\tmpx52al794\src\Shared\Persistence\RecoveryDestinationPrototype.luau [game/ReplicatedStorage/Shared/Persistence/RecoveryDestinationPrototype](43,17): TypeError: Cannot call a value of type {PreySpec & { dusk: { from: number, to: number }?, kind: string, low: number, profile: string }} in union:
+  {PreySpec & { dusk: { from: number, to: number }?, kind: string, low: number, profile: string }} | {|  |}

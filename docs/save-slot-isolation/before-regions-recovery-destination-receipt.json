@@ -1,0 +1,20 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 1,
+  "inputs": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-meals-tests.luau": "69ccbc33d086b1ac21f92c251879b92e254050b9d97b9d0993c6a2ea3f180f8b",
+    "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
+    "recovery-life-tests.luau": "385b3dd40072f3c2fa4e760e5a8b58cd65ba729766dbcb9af673031e630adda5",
+    "recovery-destination-prototype.luau": "849136ae38d828d41c21a8f62c9721a582e18e6ebc0786e466585bb6c38aff9a",
+    "recovery-destination-tests.luau": "4f2b270f1569eb868070861d64c4a2e88ddbca581c969a9cbf441fdb31024234"
+  },
+  "bundle_sha256": "b84d5f6f82aa3b4fcc5d647774f1fbb09c8f8451b67e51c034d02eb132fe27d0",
+  "output_sha256": "9e6b0539a635b341587c6281d8e24b4da03047e9b34358c87d3abcd3183cc738",
+  "production_connected": false,
+  "real_datastore_verified": false,
+  "native_verified": false,
+  "destination_commit_authorized": false
+}

@@ -1,0 +1,7 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+C:/Users/natha/AppData/Local/Temp/tmp7n57jv30.luau:45493: late streamed region made no prey
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp7n57jv30.luau:45493 function destinationCheck
+C:/Users/natha/AppData/Local/Temp/tmp7n57jv30.luau:45556

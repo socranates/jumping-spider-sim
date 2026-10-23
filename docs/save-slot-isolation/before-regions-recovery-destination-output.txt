@@ -1,0 +1,7 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+C:/Users/natha/AppData/Local/Temp/tmprj_pxkjh.luau:45493: old garden replaced fresh Preserve populations
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmprj_pxkjh.luau:45493 function destinationCheck
+C:/Users/natha/AppData/Local/Temp/tmprj_pxkjh.luau:45530

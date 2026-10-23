@@ -115,5 +115,19 @@ check(driver.hud.caption.Visible,"Normal can reenable an ongoing sound")
 panel.io.reset();frames(2)
 check(driver.setting("Captions")=="off" and not driver.hud.caption.Visible,"Reset uses preserve Off rather than legacy Normal")
 check(driver.hud.food.Visible and not driver.hud.foodText.Visible and driver.hud.foodText.Text=="","caption settings never label the hunger reserve")
+-- The cat keeps walking in a different room even while the sill prey wait.
+do
+ local room=assert(Map.region("room_floor_e"))
+ driver.place(room.spawn.pos);frames(30)
+ local cat=assert(driver.cat);local originalStep=cat.step
+ cat.step=function() end;cat.pose="walk";cat.pos=room.spawn.pos+Vector3.new(45,0,0);cat.heading=Vector3.zAxis
+ frames(7)
+ local folder=assert(workspace:FindFirstChild("Cat"));local paw=assert(folder:FindFirstChild("FLPaw"))
+ local homeTime=driver.prey.now;local previous=paw.Position;local changed=false
+ for _=1,20 do frames(1);if (paw.Position-previous).Magnitude>.01 then changed=true end end
+ check(driver.world.region.kind=="room_floor" and driver.prey.now==homeTime,"cat regression exercises another room with stopped sill prey clock")
+ check(changed,"cat legs animate while sill prey clock is stopped")
+ cat.step=originalStep
+end
 print(`MINIMAL passed={passed} failed={failed}`)
 if failed>0 then error("minimal HUD checks failed") end

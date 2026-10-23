@@ -1,0 +1,6 @@
+FAIL MINIMAL cat legs animate while sill prey clock is stopped
+MINIMAL passed=76 failed=1
+C:/Users/natha/AppData/Local/Temp/tmpzubxd1dm.luau:59312: minimal HUD checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpzubxd1dm.luau:59312

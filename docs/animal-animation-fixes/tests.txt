@@ -1,0 +1,6 @@
+MINIMAL passed=77 failed=0
+LIVING_WORLD passed=4095 failed=0
+DOG_GAIT passed=29959 failed=0 planted=2604 swing=1918
+BODIES passed=3610 failed=0
+SHADOWS: the test garden from the sill, 0 of 23 visible boxes cast none
+SHADOWS passed=319 failed=0

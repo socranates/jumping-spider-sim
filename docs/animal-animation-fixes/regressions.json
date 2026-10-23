@@ -1,0 +1,18 @@
+[
+  {
+    "source": "roblox_port/src/Client/SpiderClient.client.luau",
+    "test": "minimal_hud.luau",
+    "exit_code": 1,
+    "output": "before-minimal_hud.txt",
+    "old_sha256": "7e02aa40770a943fbab915e50c39921fca89ac6030b8156ce8cb2dced0786fc2",
+    "fixed_sha256": "36b71c459fca4187fbc5ca069b3b2469b6746fa400bae26f31b38faa4ca97f77"
+  },
+  {
+    "source": "roblox_port/src/Client/LivingWorld.luau",
+    "test": "living_world.luau",
+    "exit_code": 1,
+    "output": "before-living_world.txt",
+    "old_sha256": "270664ccf742dbbeeffe2944bfc8b583cae33b7754837d2a02ebbe708c65d7d5",
+    "fixed_sha256": "74e3b772a2f381ece1131dd9d5e41de8c98dae23a5f219229485e24af7bc7b2a"
+  }
+]

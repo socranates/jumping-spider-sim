@@ -1,0 +1,113 @@
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+FAIL LIVING_WORLD collar stays on neck while walking, turning and sniffing
+FAIL LIVING_WORLD tag follows neck with collar
+FAIL LIVING_WORLD collar follows neck rotation
+LIVING_WORLD passed=3987 failed=108
+C:/Users/natha/AppData/Local/Temp/tmp7xnpmmmt.luau:57179: living habitat checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp7xnpmmmt.luau:57179

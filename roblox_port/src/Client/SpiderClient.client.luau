@@ -2556,7 +2556,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
-		M.catBody:draw(M.cat, prey.now, if soundPaused then 0 else simFrame, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr,camera.CFrame.Position)
+		-- The home prey clock stops outside the sill; the cat roams across rooms.
+		M.catBody:draw(M.cat, M.World.prey.clock, if soundPaused then 0 else simFrame, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr,camera.CFrame.Position)
 	end
 	M.Prof.lap("sound")
 	local silk = motor.silk

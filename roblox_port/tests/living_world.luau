@@ -473,6 +473,11 @@ case("dog feet have actual physical ground throughout the outdoor circuit",funct
  local root=WorldBuild.world(workspace)
  local living=LivingWorld.new(workspace,root,"full",WorldMap)
  local hidden=0;local first=nil;local gap=0;local blocked=0
+ local neck,collar,tag
+ for _,part in living.dog.parts do
+  if part.Name=="Neck" then neck=part elseif part.Name=="Collar" then collar=part elseif part.Name=="Tag" then tag=part end
+ end
+ assert(neck and collar and tag)
  local obstacles={}
  for _,r in WorldMap.regions() do for _,p in Region.pieces(r) do
   if p.hi.Y> -76.6 and p.lo.Y< -24.6 then table.insert(obstacles,p) end
@@ -490,6 +495,9 @@ case("dog feet have actual physical ground throughout the outdoor circuit",funct
   if not living.dog.shown then hidden+=1;first=first or pose.position end
   for _,f in living.dog.gait.feet do gap=math.max(gap,(f.ankle-f.anchor-Vector3.yAxis*3.5).Magnitude) end
   if i%100==0 and living.dog.shown then
+   check((neck.CFrame:PointToObjectSpace(collar.Position)-Vector3.new(0,1,0)).Magnitude<.001,"collar stays on neck while walking, turning and sniffing")
+   check((neck.CFrame:PointToObjectSpace(tag.Position)-Vector3.new(0,-3,-10)).Magnitude<.001,"tag follows neck with collar")
+   check(neck.CFrame.UpVector:Dot(collar.CFrame.UpVector)>.99999,"collar follows neck rotation")
    for leg,f in living.dog.gait.feet do
     for bone=0,1 do
      local p=living.dog.parts[living.dog.legStart+(leg-1)*3+bone]

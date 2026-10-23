@@ -385,11 +385,12 @@ function LivingWorld.drawDog(self: any,pos: Vector3,state: any,reduced: boolean,
  local stride=if reduced or pose.sniff then 0 else pose.stride
  r.sniff=if reduced then (if pose.sniff then 1 else 0) else math.clamp(r.sniff+(if pose.sniff then dt*3.5 else -dt*5),0,1)
  local headTurn=CFrame.new(0,-36*r.sniff,-12*r.sniff)*CFrame.new(0,55,-31)*CFrame.Angles(-.55*r.sniff,0,0)*CFrame.new(0,-55,31)
+ local neckTurn=CFrame.new(0,45-15*r.sniff,-24-6.5*r.sniff)*CFrame.Angles(.882*r.sniff,0,0)*CFrame.new(0,-45,24)
  for i,p in r.parts do
   local f=r.frames[i]
   if p.Name=="Head" or p.Name=="Muzzle" or p.Name=="Nose" or p.Name=="Jaw" or string.find(p.Name,"Eye",1,true) or string.find(p.Name,"Ear",1,true) then
    f=headTurn*f
-  elseif p.Name=="Neck" then f=CFrame.new(0,45-15*r.sniff,-24-6.5*r.sniff)*CFrame.Angles(.882*r.sniff,0,0)
+  elseif p.Name=="Neck" or p.Name=="Collar" or p.Name=="Tag" then f=neckTurn*f
   elseif p.Name=="Tail" then f=CFrame.new(0,36,27)*CFrame.Angles(0,if reduced then 0 else pose.tail,0)*CFrame.new(0,-36,-27)*f
   elseif i>=r.legStart then
    local leg=math.floor((i-r.legStart)/3)+1

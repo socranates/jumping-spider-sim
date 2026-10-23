@@ -1,0 +1,68 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "private_inputs_committed": true,
+  "private_commit": "6491e300a0d198d2cf91345156bf5ab0445ebd78",
+  "full_checks": 211864,
+  "full_named_groups": 48,
+  "full_failed": 0,
+  "baseline_checks": 211717,
+  "typed_reader_checks": 127,
+  "typed_reader_groups": 8,
+  "bridge_checks": 20,
+  "bridge_groups": 6,
+  "portable_gate_backend_bridge_checks": 4873,
+  "ledger_equivalence_checks": 12215,
+  "ledger_equivalence_steps": 1200,
+  "before_fix_provider_throw_bound": true,
+  "cli_cpu_before": [
+    {
+      "actors": 16,
+      "debt": 6,
+      "pending": 32,
+      "median_ms": 0.2226,
+      "p95_ms": 0.2377,
+      "max_ms": 0.2387
+    },
+    {
+      "actors": 64,
+      "debt": 150,
+      "pending": 256,
+      "median_ms": 112.303,
+      "p95_ms": 115.6105,
+      "max_ms": 120.2181
+    }
+  ],
+  "cli_cpu_after": [
+    {
+      "actors": 16,
+      "debt": 6,
+      "pending": 32,
+      "median_ms": 0.0494,
+      "p95_ms": 0.0571,
+      "max_ms": 0.0891
+    },
+    {
+      "actors": 64,
+      "debt": 150,
+      "pending": 256,
+      "median_ms": 2.121,
+      "p95_ms": 2.7207,
+      "max_ms": 3.4205
+    }
+  ],
+  "roblox_frame_rate_improvement_proved": false,
+  "overlay_candidates": 44,
+  "strict_clean": true,
+  "provider": "memory",
+  "clock": "synthetic",
+  "typed_reader_override_qualified": true,
+  "other_workers_typed": false,
+  "service_epoch_lanes_installed": false,
+  "cooperative_driver_installed": false,
+  "normal_startup_installed": false,
+  "native_verified": false,
+  "online_verified": false,
+  "loading_speedup_proved": false,
+  "published": false,
+  "goal_complete": false
+}

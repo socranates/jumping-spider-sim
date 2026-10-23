@@ -1,0 +1,20 @@
+[
+  {
+    "path": "RESUME-AFTER-RESTART.md",
+    "tail_bytes": 101931,
+    "tail_sha256": "832930bd34f54919558213b41feec121e778397118d4e23192e2621c0436f0d4",
+    "prefix_bytes": 2029
+  },
+  {
+    "path": "chet/save-continue.md",
+    "tail_bytes": 2958964,
+    "tail_sha256": "3f9d982f739d20bd491d51cedadf974ae5fef2962af96d98ba02f9c149a74b0c",
+    "prefix_bytes": 2029
+  },
+  {
+    "path": "docs/recovery-application/README.md",
+    "tail_bytes": 50289,
+    "tail_sha256": "87684ea6b5f164b84a6d58aab1a286b60db986a3b48f95e7011422b2144ebc10",
+    "prefix_bytes": 2029
+  }
+]

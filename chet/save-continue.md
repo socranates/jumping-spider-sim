@@ -1,3 +1,13 @@
+# Latest checkpoint - real-clock native service passed, 2026-10-23
+
+Private native checkpoint d135b3c3510d9a9859310b3a9c62bb94a56f09d0; production remains bd67582b5d53473f067244fc1e2e1f94adde173b. Native run1792797359585 passes **70 client +23 server checks**, real engine scheduling/clock at1x, actual SpiderClient menus and real RemoteEvents, engine codec and yielding memory DataStoreBackend. All273 Sources were fingerprinted before Play;220 unchanged production,51 qualified targets from50 sources including four explicit overrides (SaveService/SaveSession/WorldMap/Checkpoint), plus two diagnostics. Complete model compiles/full strict-clean. The earlier CLI289497/184/0 result remains separate.
+
+Native tests cover all three stored fresh modes, held/failed adoption, obsolete delivery, seven account epochs, real-provider initial cancellation after commit and deferred cancellation before any SDK start. Final independent ledger matches287 actual SDK starts; no provider/ticket/scope remains, lock released,239/239 application GetOptions destroyed, zero service exceptions/CreatorError. Log truncation is explicitly retained; complete bounded Studio Output is hash-bound in a supplement. Play is stopped; immutable model unchanged, separate after-run editor copy saved. Source/receipts and limits: docs/request-admission/NATIVE-SERVICE.md.
+
+**Next:** isolated synthetic WindowsillTest_v1 actual leave/rejoin using the full service and real budget observation, then normal startup qualification and gameplay/controller/comfort/audio/device/sustained-performance/release gates before activation/main/publication/synchronization. Native memory proof is not online qualification. Main adoption2.978s (8.066s to playing including held ACK); ordinary stored checkpoints about10s preserve existing per-key pacing. Server step max17.852ms; whole-frame gaps up to266.5ms remain an investigation item. No matched general speedup/FPS claim. Never target real saves or publish the diagnostic model. Overall goal remains active.
+
+---
+
 # Latest checkpoint - service-owned account admission qualified privately, 2026-10-23
 
 Private candidate a1f042e0b8eb287d5dc2cf98986039f50569aacf; production remains bd67582b5d53473f067244fc1e2e1f94adde173b. The final full CLI run passes **289497 checks /184 named groups /0 failures**, including1466 actual account-service checks in36 groups. All51 overlay targets compile/full strict-clean from50 distinct sources, explicitly UTF-8. Separate unchanged STATE1488/STATE_CLIENT161 checks pass. verify-service.py reconstructs exact inputs/bundles/types/outputs and binds the committed candidate in service-verification.json.

@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T23:09:24.238699+00:00",
+  "as_of_utc": "2026-10-23T23:21:53.006530+00:00",
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
   "goal_complete": false,
   "published": false,
@@ -451,8 +451,8 @@
     },
     {
       "id": "save-request-budget",
-      "status": "private-service-qualified-native-online-release-open",
-      "evidence_boundary": "Private full account-service cohort passes289497/184/0;51 UTF-8 compile/strict-clean targets from50 sources. Real service construction/cancellation/cleanup/replacement/New and bounded dispatch qualified with memory DataStoreBackend and synthetic clocks.42 independent ledger audits and15 repeated-outage checks separate. Cold/quiesced complete-history boundary; production unchanged, normal startup/native/online/performance/release open.",
+      "status": "private-service-native-qualified-online-release-open",
+      "evidence_boundary": "Private CLI289497/184/0 with51 UTF-8 compile/strict-clean targets from50 sources. Actual service construction/cancellation/cleanup/replacement/New, bounded dispatch and full physical-account debt qualified with memory DataStoreBackend and synthetic clocks;42 ledger audits and15 outage checks separate. Subsequent native run1792797359585 passes70 client+23 server checks at real1x clock/scheduling with actual application/RemoteEvents, yielding memory storage, independent SDK ledger, exact progress/archives and no remaining scope/provider.273 Sources fingerprinted;220 unchanged production and four declared overrides. Cold/quiesced complete-history boundary. Production unchanged; normal startup, actual isolated test-store leave/rejoin, sustained performance and release remain open. Frame gaps up to266.5ms require attribution.",
       "references": [
         "docs/recovery-verified-gates/README.md",
         "docs/save-slot-isolation/session-verified-native-qualification.json",
@@ -490,14 +490,18 @@
         "docs/request-admission/SERVICE-WORKERS.md",
         "docs/request-admission/service-verification.json",
         "docs/request-admission/verify-service.py",
-        "docs/request-admission/service-checkpoint-history.json"
+        "docs/request-admission/service-checkpoint-history.json",
+        "docs/request-admission/NATIVE-SERVICE.md",
+        "docs/request-admission/native-service-attempt2.json",
+        "docs/request-admission/native-service-prepared-attempt2.json",
+        "docs/request-admission/native-service-attempt2-output-supplement.json"
       ],
       "historical_status_before_ordinary_boundary_audit": "corrected-adopted-both-platforms-and-isolated-native-verified"
     },
     {
       "id": "save-initial-lock-freshness",
-      "status": "fixed-private-candidate-awaiting-service-native-release",
-      "evidence_boundary": "Exact original delayed-callback correctness assertion passes with private ordinary Session and actual factory baseline: active at221, stored/scheduler beat221, exact positive ACK. Callback time and fresh acknowledgement are required. Original production assertion still fails and remains archived; no live installation/native incidence claim.",
+      "status": "fixed-private-service-native-integration-qualified-online-release-open",
+      "evidence_boundary": "Exact original delayed-callback correctness assertion passes with private ordinary Session and actual factory baseline: active at221, stored/scheduler beat221, exact positive ACK. Callback time and fresh acknowledgement are required. Original production assertion still fails and remains archived; no live installation/native incidence claim. The fixed full service candidate subsequently passes native integration70 client+23 server checks; specific original counterexample remains CLI evidence, not a native before/after reproduction. Actual online/release still open.",
       "references": [
         "docs/request-admission/SESSION-BOUNDARIES.md",
         "docs/request-admission/session-boundaries-before-fix-1-late-lock-receipt.json",
@@ -506,15 +510,19 @@
         "docs/request-admission/ordinary-verification.json",
         "docs/request-admission/verify-ordinary.py",
         "docs/request-admission/ordinary-boundaries-qualified-2-late-lock-receipt.json",
-        "docs/request-admission/ordinary-boundaries-qualified-2-late-lock-output.txt"
+        "docs/request-admission/ordinary-boundaries-qualified-2-late-lock-output.txt",
+        "docs/request-admission/NATIVE-SERVICE.md",
+        "docs/request-admission/native-service-attempt2.json",
+        "docs/request-admission/native-service-prepared-attempt2.json",
+        "docs/request-admission/native-service-attempt2-output-supplement.json"
       ],
       "historical_status_before_private_ordinary_fix": "reproduced-unfixed",
       "historical_evidence_before_private_ordinary_fix": "Actual production SaveSession with factory-bound baseline, synthetic delayed first callback: active at221 with stored lock beat100 (LOCK_STALE120), scheduler beat221 and baseline ACK. Correctness assertion intentionally fails. No native incidence claim and no fix yet."
     },
     {
       "id": "save-inflight-initial-read-accounting",
-      "status": "fixed-private-candidate-awaiting-service-native-release",
-      "evidence_boundary": "Exact original suspended initial-read correctness assertion passes with private ordinary Session and actual factory baseline: provider/Session/history2/2/2 before the read returns. Actual starts are charged before dispatch. Original production assertion still fails and remains archived; no live installation/native incidence claim.",
+      "status": "fixed-private-service-native-integration-qualified-online-release-open",
+      "evidence_boundary": "Exact original suspended initial-read correctness assertion passes with private ordinary Session and actual factory baseline: provider/Session/history2/2/2 before the read returns. Actual starts are charged before dispatch. Original production assertion still fails and remains archived; no live installation/native incidence claim. The fixed full service candidate subsequently passes native integration70 client+23 server checks; specific original counterexample remains CLI evidence, not a native before/after reproduction. Actual online/release still open.",
       "references": [
         "docs/request-admission/SESSION-BOUNDARIES.md",
         "docs/request-admission/session-boundaries-before-fix-1-read-account-receipt.json",
@@ -523,7 +531,11 @@
         "docs/request-admission/ordinary-verification.json",
         "docs/request-admission/verify-ordinary.py",
         "docs/request-admission/ordinary-boundaries-qualified-2-read-account-receipt.json",
-        "docs/request-admission/ordinary-boundaries-qualified-2-read-account-output.txt"
+        "docs/request-admission/ordinary-boundaries-qualified-2-read-account-output.txt",
+        "docs/request-admission/NATIVE-SERVICE.md",
+        "docs/request-admission/native-service-attempt2.json",
+        "docs/request-admission/native-service-prepared-attempt2.json",
+        "docs/request-admission/native-service-attempt2-output-supplement.json"
       ],
       "historical_status_before_private_ordinary_fix": "reproduced-unfixed",
       "historical_evidence_before_private_ordinary_fix": "Actual production SaveSession with factory-bound baseline, after a physical MemoryBackend rest read suspends: provider starts2, Session requests/history1. readRests charges only after readCurrent returns. Correctness assertion intentionally fails. Shared typed admission must account before dispatch; no fix yet."
@@ -2591,6 +2603,42 @@
       "docs/request-admission/service-verification.json",
       "docs/request-admission/verify-service.py",
       "docs/request-admission/service-checkpoint-history.json"
+    ]
+  },
+  "latest_request_admission_native_service": {
+    "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+    "run": "1792797359585",
+    "scripts": 273,
+    "production_untouched": 220,
+    "production_overrides": [
+      "Server/SaveService.luau",
+      "Shared/Persistence/Checkpoint.luau",
+      "Shared/Persistence/SaveSession.luau",
+      "Shared/World/WorldMap.luau"
+    ],
+    "terminal": "passed",
+    "client_checks": 70,
+    "server_checks": 23,
+    "clock_scale": 1,
+    "native_verified": true,
+    "online_verified": false,
+    "published": false,
+    "normal_startup_installed": false,
+    "goal_complete": false,
+    "main_continue_real_seconds": 8.06591510772705,
+    "main_checkpoint_real_seconds": 10.050903081893921,
+    "free_checkpoint_real_seconds": 10.012542009353638,
+    "easy_checkpoint_real_seconds": 10.01476001739502,
+    "private_native_commit": "d135b3c3510d9a9859310b3a9c62bb94a56f09d0",
+    "all_sources_fingerprinted_before_play": true,
+    "play_stopped": true,
+    "loading_speedup_proved": false,
+    "frame_rate_improvement_proved": false,
+    "references": [
+      "docs/request-admission/NATIVE-SERVICE.md",
+      "docs/request-admission/native-service-attempt2.json",
+      "docs/request-admission/native-service-prepared-attempt2.json",
+      "docs/request-admission/native-service-attempt2-output-supplement.json"
     ]
   }
 }

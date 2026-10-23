@@ -1,0 +1,2 @@
+ADMISSION_CPU actors=16 debt=6 pending=32 median_ms=0.374800 p95_ms=0.395000 max_ms=0.401500
+ADMISSION_CPU actors=64 debt=150 pending=256 median_ms=118.231800 p95_ms=132.409900 max_ms=166.803400

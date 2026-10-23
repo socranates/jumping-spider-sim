@@ -1,0 +1,40 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "inputs": {
+    "docs/request-admission/worker-admission.luau": "81824e915ef6364236a3d097b363fa85cc0b21de88d3222b8948ef38c4e48727",
+    "docs/request-admission/facade.luau": "b7377be9950918711411330777a30dade8fbbfb20bae1015745b52a4f0553edf",
+    "docs/request-admission/tests.luau": "d5a8a7c400c8288673230f17cd4ad52963eebfa8653340fb9daac8aa87fc4cc0",
+    "docs/request-admission/provider-tests.luau": "559b9b1c25e56d6a06836a068becaa0a8d77245fd0f83a868e4e5cd255a27188",
+    "roblox_port/src/Server/DataStoreBackend.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "roblox_port/src/Shared/Persistence/SaveWork.luau": "268cedc7bc81730d3f650b36fe9016e485928d4d7b1a957332a16093819f746e",
+    "roblox_port/src/Shared/Persistence/Json.luau": "9b6599b4c1476c5c5114bacb5106b2a869d799a78988d20688b572c6d0f31384",
+    "roblox_port/src/Shared/Data/SaveRules.luau": "bfb00a1828ee32298b9232ffc9f78b0bc637f08e10f34d1c589db335ee71d3b9",
+    "roblox_port/src/Shared/Persistence/MemoryBackend.luau": "4f27e644fdd2ba7a20a79e283f4ec27267d5c1d56685ab3f1f52f536aa15c1f5",
+    "roblox_port/src/Shared/Persistence/SaveScheduler.luau": "5d2c739936adc5f8fdc7e91c6105346db1c99c70b99aa6ec246c54d34dd144bb",
+    "docs/request-admission/worker.luau": "e37bb0e0be0098891f2b6d8661b762670f07c8635014055282dbb30de1e3b487",
+    "docs/request-admission/worker-facade.luau": "6d05797ad8546e7b90740e72bb0ffa43cb3b45cd2d8cf0c2d2d4d8d1709ec1a4",
+    "docs/request-admission/bridge-tests.luau": "f68a6f48b764823d43d1fd52780f9a4d7c129a1491da1591d6856fc0a6d66a51"
+  },
+  "bundle_sha256": "6074b5d54c695fac7c09b892b5141f054782f557a02121b0e0a8d6235e433464",
+  "output_sha256": "277cc58899ca58d49be807224fe556798b2e8217660d17446034d3d7561ca03e",
+  "exit_code": 0,
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "sha256": "139066ebd8622866d9e512d82d5f24ac06f4e18647dcc37912798bd8463eb5d4"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "elapsed_seconds": 0.12673544883728027,
+  "policy_installed_in_production": false,
+  "backend_code_is_production": true,
+  "backend_provider_is_synthetic": true,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

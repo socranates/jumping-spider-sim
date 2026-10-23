@@ -1,0 +1,9 @@
+{
+  "input_sha256": "81824e915ef6364236a3d097b363fa85cc0b21de88d3222b8948ef38c4e48727",
+  "bundle_sha256": "012e07ed3f9438d22c9379e087d4ec9e9cd1530236164bf8c1b5955aa1cc93f8",
+  "output_sha256": "6e4d36af3c14fe46a22524686c0db53d54b4be1506e65ac375a7dc7d4f7fb1fa",
+  "exit_code": 0,
+  "samples_per_case": 20,
+  "native_verified": false,
+  "frame_rate_claim": false
+}

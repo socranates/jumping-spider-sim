@@ -1,0 +1,11 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-p5jlk5ta\src\Server\RecoveryProfileOwnerPrototype.luau [game/ServerScriptService/Server/RecoveryProfileOwnerPrototype](301,15): TypeError: Unknown global 's'; consider assigning to it first
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-p5jlk5ta\src\Server\RecoveryProfileOwnerPrototype.luau [game/ServerScriptService/Server/RecoveryProfileOwnerPrototype](301,83): TypeError: Unknown global 's'; consider assigning to it first
+src/Server/RecoveryProfileOwnerPrototype.luau(32,12): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(67,8): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(134,12): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(185,8): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(210,11): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(242,10): LocalShadow: Variable 's' shadows a global variable used at line 301
+src/Server/RecoveryProfileOwnerPrototype.luau(258,12): LocalShadow: Variable 's' shadows a global variable used at line 301

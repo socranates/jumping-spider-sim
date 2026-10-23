@@ -22,7 +22,7 @@ local function routeMatches(self:any):boolean
 end
 local function available(self:any):boolean
  local s=self.session
- return not Work.pulse() and not self.busy and not self.leaving and not s.closed and not s.flushing and not s.busy
+ return not Work.pulse() and not self.busy and not self.leaving and not self.intakeClosed and not s.closed and not s.flushing and not s.busy
   and not self.pipeline.busy and (s.backend.activeUpdates or 0)==0
   and (self.phase=="normal" or not self.scopeInvalid and routeMatches(self))
 end
@@ -57,12 +57,14 @@ local function hold(self:any):(any?,string?)
  return held,why
 end
 local function lost(self:any,why:string)
+ if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
  self.phase,self.problem="lost",why;self.pipeline.leaseLost=true
  -- The wrapper also fences an unadopted read phase. No normal flush/load can
  -- replay a whole stale snapshot after an ownership uncertainty.
  hold(self)
  self.result={requiresFreshSession=true,requiresPausedWorker=true,gameplayAuthorized=false,localProgressRetained=true}
+ for _,r in self.session.intents.requests do if r.state=="writable" then self.session.intents:readonly(r,why) end end
 end
 local function startReadLease(self:any):boolean
  local component
@@ -117,6 +119,9 @@ function Runtime.cancelEntry(self:any):boolean
  if self.leaving or self.phase~="entering" or not self.entry:cancel(self.entryJob) then return false end
  self.phase,self.problem="entry_required","entry cancelled";return true
 end
+function Runtime.saveRecovered(self:any,mode:any,serial:any,credential:any,life:any,restSerial:any,record:any):boolean
+ return available(self) and self.phase=="recovered" and self.saveLoop~=nil and self.saveLoop:submit(mode,serial,credential,life,restSerial,record)
+end
 function Runtime.dismiss(self:any):boolean
  if not available(self) or self.accepted or (self.phase~="offered" and self.phase~="offer_refused" and self.phase~="discovering") then return false end
  if self.discovery and self.discovery.state=="pending" then self.reader:cancel(self.discovery) end
@@ -159,6 +164,11 @@ local function stepInner(self:any):boolean
   if self.idleJob.state=="lost" then lost(self,self.idleJob.problem or "held lease lost") end
   return asked
  end
+ if self.phase=="recovered" and self.saveLoop then
+  local asked=self.saveLoop:step()
+  if not self.leaving and not s.closed and self.saveLoop.state=="lost" then lost(self,self.saveLoop.problem or "recovered save loop lost") end
+  return asked
+ end
  local lease,leaseJob=self.lease,self.leaseJob
  local asked=lease:step(leaseJob)
  if self.leaving or s.closed or self.lease~=lease or self.leaseJob~=leaseJob then return asked end
@@ -169,6 +179,7 @@ local function stepInner(self:any):boolean
   if self.leaving or s.closed then return asked end
   if self.entryJob.state=="verified" then
    self.phase,self.result="recovered",self.entryJob.result
+   if self.recovery.saveFactory then stopLease(self);self.saveLoop=self.recovery.saveFactory.new(self) end
    -- A decision callback may yield. Install the completed route first so late
    -- completion cannot reopen a session closed by departure during notification.
    self.result.decisionPending=false;s.intents:notify(self.entryJob.request)
@@ -206,6 +217,7 @@ function Runtime.depart(self:any,deadline:number?):(any?,string?)
  if not finite(now) or not finite(untilAt) then return nil,"finite departure deadline required" end
  if self.route and self.phase~="normal" and (now<self.route.lastNow or not routeMatches(self)) then self.scopeInvalid=true end
  self.leaving=true;self.flushDeadline=untilAt
+ if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
  if self.reader and self.discovery and self.discovery.state=="pending" then self.reader:cancel(self.discovery) end
  if untilAt<=now or self.scopeInvalid then
@@ -224,6 +236,16 @@ function Runtime.depart(self:any,deadline:number?):(any?,string?)
  self.departure,self.departureJob=d,j;return j,nil
 end
 function Runtime.flush(self:any,deadline:number?)
+ if self.saveLoop and self.phase=="recovered" and not self.leaving then
+  local limit=deadline or self.session.now()+Rules.FLUSH_DEADLINE
+  local drainUntil=self.session.now()+math.max(0,(limit-self.session.now())/2)
+  self.intakeClosed=true
+  while self.saveLoop:hasWork() and self.phase=="recovered" and self.session.now()<drainUntil do
+   self:step()
+   if self.saveLoop:hasWork() then self.config.sleep(math.min(.25,math.max(0,drainUntil-self.session.now()))) end
+  end
+  deadline=limit
+ end
  local j,why=self:depart(deadline)
  if not j then
   if why=="normal flush required" then

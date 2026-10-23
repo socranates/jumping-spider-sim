@@ -1,3 +1,5 @@
+Current private routine scheduling is documented in `RECOVERY-SAVE-LOOP.md` and verified by its latest combined cohort. The entry-only evidence below is historical for its then-current dependencies; production/native/service adoption remains open.
+
 # Private schema-3 recovery entry
 
 The private Runtime now has an opt-in entry handshake after successful archive/commit/rebind. Its default remains the enforced read-only `entry_required` gate. Install the server-owned `RecoveryEntryPrototype` as `recovery.entryFactory` to enable `Runtime:enter()`, `entryApplied(message)` and `cancelEntry()`. Production SaveService, SaveClient, remotes and menus do not install it yet.

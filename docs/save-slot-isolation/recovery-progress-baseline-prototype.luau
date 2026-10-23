@@ -120,6 +120,21 @@ function Baseline.adopt(self:any,ticket:any,raw:any):boolean
  if not self:valid(ticket) or type(raw)~="table" or not table.isfrozen(raw) then return false end
  self.base=raw;self.held=nil;ticket.used=true;return true
 end
+-- A routine recovered write retains both its acknowledged baseline and the
+-- captured local choices until exact readback and local adoption. Departure
+-- needs both if a choice is changed back while an ambiguous write is in flight.
+function Baseline.reserveProgress(self:any,held:any,snapshot:any):(any?,string?)
+ if Work.pulse() or not self:valid(held) or not held.enforced or self.pendingProgress~=nil or type(snapshot)~="table" or not table.isfrozen(snapshot) then return nil,"progress reservation unavailable" end
+ local t=table.freeze({owner=self,held=held,base=held.base,snapshot=snapshot,load=held.load,id=held.session.id})
+ self.pendingProgress=t;return t,nil
+end
+function Baseline.progressValid(self:any,t:any):boolean
+ return type(t)=="table" and self.pendingProgress==t and t.owner==self and self:valid(t.held) and t.held.base==t.base and t.held.session.id==t.id and t.held.session._loadSerial==t.load
+end
+function Baseline.advanceProgress(self:any,t:any,raw:any):boolean
+ if Work.pulse() or not self:progressValid(t) or type(raw)~="table" or not table.isfrozen(raw) then return false end
+ self.base=raw;t.held.base=raw;self.pendingProgress=nil;return true
+end
 -- Departure is a distinct, closed scope. It cannot revive a recovery permit or
 -- enable the ordinary worker, and can touch only this owner's progress key.
 function Baseline.sealDeparture(self:any,session:any,owner:any):(any?,string?)
@@ -127,7 +142,7 @@ function Baseline.sealDeparture(self:any,session:any,owner:any):(any?,string?)
  local held=self.held
  if type(owner)~="table" or self.departure~=nil or not self:valid(held) or held.session~=session or not held.enforced
   or session.recoveryOwner~=owner or owner.session~=session then return nil,"current enforced recovery owner required" end
- local ticket={owner=self,session=session,recovery=owner,held=held,base=held.base,load=session._loadSerial,id=session.id,used=false}
+ local ticket={owner=self,session=session,recovery=owner,held=held,base=held.base,pendingProgress=self.pendingProgress,load=session._loadSerial,id=session.id,used=false}
  -- All public session intake/load/flush paths check closed before proceeding.
  -- Already-issued calls may finish; the departure owner drains them before
  -- capturing final local progress or making another request.
@@ -153,7 +168,7 @@ function Baseline.departureRead(self:any,t:any):(boolean,any,string?)
 end
 function Baseline.finishDeparture(self:any,t:any,released:boolean):boolean
  if self.departure~=t or t.used then return false end
- t.used=true;t.session.flushing=false
+ t.used=true;t.session.flushing=false;self.pendingProgress=nil
  if released then t.session.lockHeld=false end
  return true -- closed and the enforced hold deliberately remain in place
 end

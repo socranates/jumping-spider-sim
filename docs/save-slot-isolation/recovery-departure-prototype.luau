@@ -93,7 +93,7 @@ local function stepInner(self:any,j:any):boolean
    rejected=nil;j.expected=nil
    if not live(self,j) then rejected="departure scope changed during callback";return nil end
    local own,problem=ownedRaw(self,old);if not own then rejected=problem;return nil end
-   local merged,errorText=Reconcile.prepare(j.scope.base,j.progress,j.time,old,Packet.MAX_PROGRESS_CHARS)
+   local merged,errorText=Reconcile.pending(j.scope.pendingProgress,j.scope.base,j.progress,j.time,old,Packet.MAX_PROGRESS_CHARS)
    if not merged then rejected=errorText;return nil end
    local result=if merged.dirty then Envelope.make(Progress.SPEC,merged.progress,merged.progressTime,old,{session=old.session}) else Envelope.withLock(old,nil)
    local text=Json.canonical(result)

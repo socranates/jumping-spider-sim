@@ -31,4 +31,18 @@ function Reconcile.prepare(baseRaw:any,localProgress:any,localTime:number,remote
  local dirty=not Progress.same(merged.progress,opened.payload)
  return {progress=merged.progress,progressTime=if dirty then math.max(localTime,remoteRaw.updatedAt) else remoteRaw.updatedAt,dirty=dirty},nil
 end
+-- Replay the reserved write first, then only choices authored after its local
+-- snapshot. This preserves B->A reversions whether B committed or not.
+function Reconcile.pending(pending:any,baseRaw:any,localProgress:any,localTime:number,remoteRaw:any,maxCharacters:number):(any?,string?)
+ if pending==nil then return Reconcile.prepare(baseRaw,localProgress,localTime,remoteRaw,maxCharacters) end
+ local first,why=Reconcile.prepare(pending.base,pending.snapshot.payload,pending.snapshot.updatedAt,remoteRaw,maxCharacters)
+ if not first then return nil,why end
+ local virtual=Envelope.make(Progress.SPEC,first.progress,first.progressTime,nil)
+ local final,problem=Reconcile.prepare(pending.snapshot,localProgress,localTime,virtual,maxCharacters)
+ if not final then return nil,problem end
+ local op=Envelope.open(Progress.SPEC,remoteRaw,false)
+ if not op.payload then return nil,"pending progress lacks supported remote" end
+ final.dirty=not Progress.same(final.progress,op.payload)
+ return final,nil
+end
 return table.freeze(Reconcile)

@@ -1,7 +1,7 @@
 {
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
-  "private_inputs_committed": false,
-  "private_commit": null,
+  "private_inputs_committed": true,
+  "private_commit": "a1f042e0b8eb287d5dc2cf98986039f50569aacf",
   "preceding_checks": 288031,
   "account_service_checks": 1466,
   "account_service_groups": 36,

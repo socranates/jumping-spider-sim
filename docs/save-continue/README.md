@@ -1,3 +1,15 @@
+# Current verification: Linux passed; Windows17569 running
+
+Current runtime/tests405e9df16f5a8dbccadbcab9c8a654487d161445 on codex/save-continue. Linux39880600604 completed76 suites/468114 checks/0 failures, compile222, strict clean and runner5. The corrected snapshot-return client suite passes27/0. Current immutable Windows full17569 is active; expected468114 is not a completed Windows result. Root verification still refuses its missing terminal gate. Do not restart this live process.
+
+Earlierccc0abb Windows56925 is terminal exit1:76 suites/468113 passed/1 failed (CLIENT26/1). Its entire raw log, input hashes and failure summary are preserved under docs/pond-drawing-reuse. Earlierccc0abb Linux passed468114/0; that did not erase the Windows failure. The controlled29-frame diagnostic proved the old reserve oracle compared a later live value against the correctly restored snapshot. No gameplay code changed in405e9df.
+
+Private recovery archive preparation now passes73 CLI/82 native assertions, all224 native fingerprints, zero CreatorErrors, compile and strict analysis. It freezes owned raw copies of all four save slots, including unknown/corrupt envelopes and backups, with bounded characters/nodes/depth and cancellation. It does not implement durable archive storage or progress import. The diagnostic was stopped/saved/closed/exited; original package bytes restored and prior stopped Studio rig retained. See docs/save-slot-isolation/RECOVERY-ARCHIVE.md. No player save was read or changed.
+
+Pond drawing remains the exact tested renderer with18.13/21.32 percent lower isolated component CPU (full/low), not a whole-game FPS claim. Legacy migration, natural lifecycle/streaming, online/device/performance and release work remain open. Nothing published; goal active.
+
+Earlier status below is historical.
+
 # Current: snapshot return test corrected; full gates pending
 
 Source405e9df16f5a8dbccadbcab9c8a654487d161445 on codex/save-continue changes only client_smoke's oracle afterccc0abb. A29-frame controlled delay reproduced the old assertion while actual returned energy exactly matched the kept snapshot. The corrected test decodes that snapshot, waits for return using zero-time frames, checks exact saved time/tick/reserves and physical retreat position, then resumes frames and checks derived retreat state. The full private client suite passed27/0 before adopting the exact tested file. Gameplay code, feeding, settings and menus are unchanged.

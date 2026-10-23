@@ -1,0 +1,12 @@
+{
+  "window": 421397974,
+  "window_closed": true,
+  "prior_window": 94504044,
+  "prior_window_remained": true,
+  "guard_executed": false,
+  "play_executed": false,
+  "superseded_by": "Windowsill-recovery-archive-405e9df-v2",
+  "reason": "Corrected synthetic current/backup fixture aliasing before testing; raw stored values own independent decoded trees",
+  "saved_serialization_sha256": "33d14fd42616a6b9b616fa9cd41d3634923b7c17f7bcdf7d53b54d01cd570916",
+  "original_restored_sha256": "0c1f64c0565daafcd0b6f16253747e6bd835490ff101ae852b89fc091fdf58b0"
+}

@@ -1,0 +1,12 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "cli_assertions": 73,
+  "native_assertions": 82,
+  "native_scripts": 224,
+  "creator_errors": 0,
+  "strict_clean": true,
+  "production_changed": false,
+  "durable_archive_implemented": false,
+  "progress_import_implemented": false,
+  "published": false
+}

@@ -1,0 +1,15 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "run": "1792717406534",
+  "assertions": 82,
+  "scripts": 224,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "candidate_sha256": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+  "place_sha256": "cfd476aec8c617b40ebec77d6e2bfbf1ff4d2c79352f734b351f4b325984005d",
+  "output_sha256": "5a1592808b388884e6774ed275bceb3bb13d9594d30324343d9977c4c76dcf3a",
+  "production_changed": false,
+  "durable_archive_implemented": false,
+  "progress_import_implemented": false,
+  "scope": "Private archive plan, native JSON round trips and unchanged actual client checkpoint; no DataStore/durable migration proof; never publish"
+}

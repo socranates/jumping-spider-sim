@@ -1,0 +1,10 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "exit_code": 0,
+  "candidate_sha256": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+  "test_sha256": "bd9ce7677103d47f764edda00f107df137834438a770115247def9bfe22950eb",
+  "output_sha256": "6cba1e3c69276fac885193935a2c9f595082ee176128449358c13e7f06299141",
+  "production_changed": false,
+  "durable_archive_implemented": false,
+  "progress_import_implemented": false
+}

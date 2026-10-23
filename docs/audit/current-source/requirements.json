@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T00:52:04.243450+00:00",
+  "as_of_utc": "2026-10-23T01:07:06.116665+00:00",
   "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
   "goal_complete": false,
   "published": false,
@@ -23,12 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "snapshot-test-corrected-current-full-gates-pending",
-      "evidence_boundary": "Current405e9df changes only the checkpoint-return test oracle after a controlled delay reproduced a false comparison with a later live reserve. Corrected full client suite27/0; immutable snapshot/time/reserve assertions strengthened. Originalccc0abb Windows56925 continues with observed CLIENT26/1; its failed attempt will be retained. New current full gates pending. Existing compilation/native renderer proof is reusable by exact unchanged production hashes; no current full or release claim.",
+      "status": "linux-verified-windows-running",
+      "evidence_boundary": "Current405e9df Linux39880600604 terminal success76/468114/0, compile222/strict/runner5. Immutable current Windows17569 running. Earlierccc0abb Windows56925 terminal76/468113/1 with full raw evidence retained; diagnosed snapshot-oracle timing assumption fixed by comparing immutable kept state before resuming, client27/0. No current completed Windows/full gate claim.",
       "references": [
         "docs/checkpoint-return-oracle/README.md",
-        "docs/pond-drawing-reuse/return-energy-advanced29-diagnostic.json",
-        "docs/pond-drawing-reuse/return-test-v2-receipt.json"
+        "docs/checkpoint-return-oracle/ci-final.json",
+        "docs/pond-drawing-reuse/windows-failed-summary.json"
       ]
     },
     {
@@ -72,12 +72,13 @@
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
         "docs/save-slot-isolation/map-view-types-receipt.json",
-        "docs/save-slot-isolation/RECORDED-INSPECTION.md"
+        "docs/save-slot-isolation/RECORDED-INSPECTION.md",
+        "docs/save-slot-isolation/RECOVERY-ARCHIVE.md"
       ]
     },
     {
@@ -259,7 +260,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current405e9df runtime/tests pushed on codex/save-continue; latest change only corrects a reproduced snapshot-test timing assumption. Private client27/0. Current full gates pending; originalccc0abb Windows56925 has observed one failure and remains running. Pond optimization/native evidence retained with exact unchanged runtime hashes. No release/main integration/publication/laptop sync; migration/lifecycle/online/device audit open.",
+      "evidence_boundary": "Current405e9df runtime/tests pushed on codex/save-continue. Linux76/468114/0 complete; Windows17569 running. Prior failed Windows cohort retained. Private archive preparation73 CLI/82 native verified without production edits; durable archive/import pending. No release/main integration/publication/laptop sync; broader audit remains open.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md"
@@ -341,8 +342,21 @@
   },
   "latest_snapshot_oracle_milestone": {
     "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
-    "status": "focused-client-verified-full-gates-pending",
+    "status": "linux-verified-windows-running",
     "evidence": "docs/checkpoint-return-oracle/README.md",
+    "published": false,
+    "windows_handle": 17569,
+    "linux_run": 39880600604
+  },
+  "latest_recovery_archive_prototype": {
+    "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+    "cli_assertions": 73,
+    "native_assertions": 82,
+    "strict_clean": true,
+    "evidence": "docs/save-slot-isolation/recovery-archive-verification.json",
+    "production_changed": false,
+    "durable_archive_implemented": false,
+    "progress_import_implemented": false,
     "published": false
   }
 }

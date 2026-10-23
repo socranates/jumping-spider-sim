@@ -4,6 +4,8 @@ Status: policy selected; implementation pending. The user delegated this choice 
 
 Subsequent private work onccc0abb: [recorded-world inspection](RECORDED-INSPECTION.md) validates a populated Test Garden fixture without changing the Preserve or enabling ordinary restore.33 checks,11 cooperative suspensions, both module compilations and full strict analysis pass. This is a preparation component, not an implemented archive or progress import.
 
+Subsequent405e9df private [raw archive preparation](RECOVERY-ARCHIVE.md) passes73 CLI/82 native checks plus compile/strict. It preserves complete opaque source values under bounds and cancellation. Durable raw reads/publication and actual progress import are still unimplemented; ordinary Continue is not loosened.
+
 ## Selected recovery policy
 
 The selected behavior is option 1:

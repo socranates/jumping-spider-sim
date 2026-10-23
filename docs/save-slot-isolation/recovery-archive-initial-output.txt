@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmpgmqr2ifg.luau:44806: archive size/shape bound bypassed
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpgmqr2ifg.luau:44806 function check
+C:/Users/natha/AppData/Local/Temp/tmpgmqr2ifg.luau:44872

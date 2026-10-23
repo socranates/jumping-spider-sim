@@ -1,0 +1,10 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "suites": 76,
+  "passed": 468113,
+  "failed": 1,
+  "exit_code": 1,
+  "output_sha256": "fb8dcbe7ed16333f5581fd52da0a8d68a320d1c6987177829832f58dd200561e",
+  "failure": "Client smoke compared restored reserve with later live sample; controlled delay reproduced; test corrected in405e9df",
+  "replaced_by": "405e9df16f5a8dbccadbcab9c8a654487d161445"
+}

@@ -1,5 +1,7 @@
 # Typed archive collection and publication
 
+The subsequent [commit/pipeline candidate](COMMIT-WORKERS.md) connects the proposal/rest/progress writers and root recovery phases to the typed route. This archive milestone remains separately bound to its own receipts; ordinary engine activation is still closed.
+
 This extends [the entry/lease candidate](ENTRY-WORKERS.md) with actual replacements for the source collector, archive repository and archive controller. The complete gate still is **not installed in ordinary Runtime, server account lanes or engine startup**. Commit, Pipeline, ordinary/current/progress saving, New and departure remain unconverted. Nothing here proves online durability, native loading speed or a published release.
 
 ## Nested starts and state

@@ -1,0 +1,7 @@
+SESSION_FRESH_MATRIX main same
+SESSION_FRESH_MATRIX main changed
+SESSION_FRESH_MATRIX main missing
+SESSION_FRESH_MATRIX main corrupt
+C:/Users/natha/AppData/Local/Temp/tmp3p2qg6na.luau:44807: attempt to perform arithmetic (add) on nil and number
+stacktrace:
+C:/Users/natha/AppData/Local/Temp/tmp3p2qg6na.luau:44807

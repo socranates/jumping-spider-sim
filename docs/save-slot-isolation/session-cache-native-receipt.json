@@ -1,0 +1,18 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "run": "1792720002107",
+  "assertions": 111,
+  "scripts": 224,
+  "creator_errors": 0,
+  "production_scripts_disabled": true,
+  "place_sha256": "9ccfee08e6b19715a83e9f5b7e49816e23efd75c48d483e700eb1928b6ae1a2e",
+  "candidates": {
+    "fresh-read-backend-candidate.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "session-fresh-candidate.luau": "e6ecd86cd0a89f7daeb6d08414260162e20e8ff706672726f81900ecc14338e2"
+  },
+  "output_sha256": "d21006cfd45c0657ef9ea7d33d0560265e31fc6edfb912bafcd5eb11c53fe16d",
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "progress_import_implemented": false,
+  "scope": "Real SaveSession/DataStoreBackend against cached fake DataStore; actual engine options; no real DataStore or progress migration; never publish"
+}

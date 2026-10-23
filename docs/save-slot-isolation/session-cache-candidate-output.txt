@@ -1,0 +1,4 @@
+SESSION_CACHE_CASE main stale_grant_refused
+SESSION_CACHE_CASE free stale_grant_refused
+SESSION_CACHE_CASE easy stale_grant_refused
+SESSION_CACHE_PROBE passed=27 failed=0 fresh=true

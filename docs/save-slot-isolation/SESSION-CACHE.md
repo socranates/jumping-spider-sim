@@ -1,0 +1,20 @@
+# Rest authority must use fresh observations
+
+The 405e9df baseline reproduces a stale authority acknowledgement in all three modes. Load and preview cache rest A; a foreign writer replaces it with B within four seconds, keeping the same timestamp and life token. Continue revalidation reads cached A and grants a credential against A. The final UpdateAsync comparison still detects B, revokes the credential and preserves B. The retained 30-check counterexample proves this intermediate grant, not a lost-save or live-service incident.
+
+The adopted fix changes the three SaveSession rest reads (initial load, preview and intent validation) to use the backend's explicit readFresh method. MemoryBackend and existing uncached test providers retain their read fallback. A failed fresh request never falls back to cached data. Existing backoff, ownership, cancellation and final write comparisons remain in force. No save schema changes, extra meals, Fresh calls or legacy-world acceptance changes are involved.
+
+DataStoreBackend now provides readFresh with DataStoreGetOptions.UseCache=false and the same rest-codec behavior as ordinary read. readRawFresh preserves the complete stored value before decoding or backup substitution for future archive integration. Ordinary read remains unchanged. Options objects are destroyed on success and error, including the previously verified engine-object lifecycle cases. The [official Roblox caching guidance](https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching) documents the four-second cache and uncached verification. Uncached requests consume actual request quotas; existing scheduler/backoff remains, and broad online quota/load verification is still open.
+
+Evidence is bound by verify-session-cache.py and session-fresh-adoption.json:
+
+- Retained baseline: 30 assertions reproduce stale grants while proving the final stored record survives.
+- Same stale-write cases against the candidate: 27 assertions refuse all three stale grants.
+- Candidate matrix: 150 assertions across unchanged, equal-time/same-life changed, missing, corrupt, newer, unavailable/retry and uncached MemoryBackend fallback cases.
+- Real adapter plus real SaveSession, simulated cached DataStore: 111 assertions across six scenarios in each mode. These same cases are added to state.luau, increasing its expected count from 1013 to 1124.
+- Seven existing save suites against the private candidate: 1513 assertions, zero failures. Both module compilations, sourcemap and full strict analysis pass.
+- Server-context Studio diagnostic: 111 assertions, all 224 source fingerprints verified, zero CreatorErrors. Actual Roblox DataStoreGetOptions objects; fake datastore/cache and frozen valid checkpoints captured by the real checkpoint code. All production scripts disabled, only the test probe enabled. This is not full-game or real DataStore durability coverage.
+
+The initial extended-matrix fixture accidentally used envelope.version instead of envelope.schema. Its exact fixture/output/failure receipt are retained; fixing the fixture did not change candidate source or acceptance criteria. A hidden Studio launch exposed no targetable window; that owned, unrun process was stopped with the original package hash unchanged. A separate visible Studio session ran successfully. The diagnostic was stopped/saved/closed/exited; its serialized bytes were archived and the original package hash restored. The pre-existing Studio window was retained. Never publish the diagnostic package.
+
+The exact tested modules have been adopted; full Windows/Linux gates for the new source are pending. The 405e9df full-platform results remain historical proof for that earlier source. Nothing published. The selected older-save policy remains portable progress into Preserve plus an immutable complete original archive; archive controller integration, projection/schema/atomic commit, real DataStore/rejoin, lifecycle/streaming/device/performance and release checks remain open.

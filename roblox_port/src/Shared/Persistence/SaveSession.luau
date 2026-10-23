@@ -25,6 +25,15 @@ local Json = require(script.Parent.Json)
 local SaveObservation = require(script.Parent.SaveObservation)
 local SaveIntent = require(script.Parent.SaveIntent)
 
+-- Rest observations that grant authority must bypass a provider's read cache.
+-- MemoryBackend and other providers without a cache retain their read contract.
+-- A failed fresh read is an error; it must never fall back to stale data.
+local function readCurrent(self: any, key: string): (boolean, any, string?)
+ local fresh = self.backend.readFresh
+ if type(fresh)=="function" then return fresh(self.backend,key) end
+ return self.backend:read(key)
+end
+
 local function canonical(v: any): string
 	return (Json.canonical(v)) or ""
 end
@@ -235,7 +244,7 @@ end
 local function previewOne(self: any,mode: string)
  local now=self.now()
  self.sched:begin(nil,now);self.counters.requests+=1
- local ok,value,err=self.backend:read(self.rkey[mode])
+ local ok,value,err=readCurrent(self,self.rkey[mode])
  if self.closed then return end -- departure can reach its deadline while a read yields
  if not ok then
   local failures=(self.previewFailures[mode] or 0)+1;self.previewFailures[mode]=failures
@@ -260,7 +269,7 @@ end
 local function readRests(self: any)
 	for _, mode in SaveRules.MODES do
 		if not self.restLoaded[mode] then
-			local ok, value, err = self.backend:read(self.rkey[mode])
+			local ok, value, err = readCurrent(self,self.rkey[mode])
 			self.sched:begin(nil, self.now())
 			self.counters.requests += 1
 			if not ok then
@@ -529,7 +538,7 @@ local function validateIntent(self: any,r: any)
   return
  end
  local now=self.now();self.sched:begin(nil,now);self.counters.requests+=1
- local ok,raw,err=self.backend:read(self.rkey[mode])
+ local ok,raw,err=readCurrent(self,self.rkey[mode])
  if self.closed or self.intents.requests[mode]~=r or self.state~="active" or not self.lockHeld then return end
  if not ok then
   r.failures=(r.failures or 0)+1;r.nextAt=self.now()+SaveScheduler.backoff(r.failures,SaveStores.classify(err));return

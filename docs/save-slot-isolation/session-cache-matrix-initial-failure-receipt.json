@@ -1,0 +1,10 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "candidate": true,
+  "session_sha256": "e6ecd86cd0a89f7daeb6d08414260162e20e8ff706672726f81900ecc14338e2",
+  "test_sha256": "be0a1319a1010efd694bf69ce47f1aba31632a8b9a7473652b859152c9a7ce8f",
+  "exit_code": 1,
+  "output_sha256": "5b70664030cecfc474ef0de2401cf66b988ee128e4c56c11b71205959b4ee3ab",
+  "production_changed": false,
+  "real_datastore_verified": false
+}

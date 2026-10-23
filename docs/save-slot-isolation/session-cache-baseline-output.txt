@@ -1,0 +1,4 @@
+SESSION_CACHE_CASE main stale_grant_reproduced_final_CAS_protected
+SESSION_CACHE_CASE free stale_grant_reproduced_final_CAS_protected
+SESSION_CACHE_CASE easy stale_grant_reproduced_final_CAS_protected
+SESSION_CACHE_PROBE passed=30 failed=0 fresh=false

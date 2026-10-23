@@ -1,0 +1,13 @@
+{
+  "base_source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "adopted": {
+    "roblox_port/src/Shared/Persistence/SaveSession.luau": "e6ecd86cd0a89f7daeb6d08414260162e20e8ff706672726f81900ecc14338e2",
+    "roblox_port/src/Server/DataStoreBackend.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38"
+  },
+  "regression_file": "roblox_port/tests/state.luau",
+  "regression_sha256": "1d12cd9f7ada725cd677ef30b933b85f287f29e42263c44995c43a1f17d54fbc",
+  "added_assertions": 111,
+  "full_gates": "pending",
+  "published": false,
+  "progress_import_implemented": false
+}

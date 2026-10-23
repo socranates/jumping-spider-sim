@@ -2980,5 +2980,42 @@ for _,operation in {"read","lock"} do
 end
 end)
 
+case("optional service owner is the only work and intake route",function()
+ local now=100;local b=MemoryBackend.new();local sent={};local calls={};local owned;local emitOwner
+ local service=SaveService.new({backend=b,now=function() return now end,sleep=function(dt) now+=dt end,spawn=function(f,...) f(...) end,
+  send=function(_player,msg) table.insert(sent,msg) end,jobId="owner-hook",
+  ownerFactory=function(cfg,emit)
+   local session=SaveSession.new(cfg);local result={session=session};emitOwner=emit
+   for _,name in {"load","step","flush","setProgress","beginLife","requestLife","refreshOffer","setRestForIntent","setRestForLife","enableOffers","demote"} do
+    result[name]=function(_self,...) calls[name]=(calls[name] or 0)+1;return session[name](session,...) end
+   end
+   result.applyRecovery=function(_self,msg) calls.applyRecovery=(calls.applyRecovery or 0)+1;return msg.id=="exact" end
+   check(session.counters.requests==0,"owner constructor performed storage work");owned=result;return result
+  end})
+ local player={UserId=9950,Name="owner-test"};service:addPlayer(player)
+ check(calls.load==1 and service.entries[player].session==owned.session,"service bypassed owned load or session")
+ emitOwner({kind="recovery_entry",offer={id="pre-hello"}});check(#sent==0,"owned sender spoke before negotiation")
+ service:onMessage(player,{kind="recovery_applied",id="exact"});check(calls.applyRecovery==nil,"receipt reached owner before hello")
+ service:onMessage(player,{kind="hello",v=SaveRules.OFFER_PROTOCOL});check(calls.enableOffers==1,"hello bypassed owner negotiation")
+ local n=#sent;emitOwner({kind="recovery_entry",offer={id="exact"}})
+ check(#sent==n+1 and sent[#sent].epoch==owned.session.id and type(sent[#sent].sequence)=="number","owned sender bypassed transport stamps")
+ emitOwner({kind="decision",decision={state="writable"}});check(#sent==n+1,"owned sender accepted an unsupported packet kind")
+ now+=5;service:onMessage(player,{kind="recovery_applied",id="exact"});check(calls.applyRecovery==1,"matching receipt did not reach owner")
+ service:onMessage(player,{kind="progress",progress=SaveProgress.default()});check(calls.setProgress==1,"progress bypassed owner")
+ now+=5;service:onMessage(player,{kind="life_intent",intent="new",mode="main",serial=1});check(calls.requestLife==1,"intent bypassed owner")
+ for _=1,12 do now+=1;service:step() end
+ check(calls.step~=nil and owned.session.intents.requests.main.state=="writable","owned worker did not perform real intent grant")
+ local r=owned.session.intents.requests.main
+ now+=5;service:onMessage(player,{kind="rest",mode="main",record={},serial=r.serial,credential=r.credential,life=r.life,restSerial=1})
+ check(calls.setRestForIntent==1,"checkpoint bypassed owner intake")
+ now+=5;service:onMessage(player,{kind="refresh_offer",mode="free"});check(calls.refreshOffer==1,"refresh bypassed owner")
+ local stable=owned.session;local requests=b.requests;owned.session={id="foreign"};service:step()
+ check(b.requests==requests,"silent owner session replacement performed storage work");owned.session=stable
+ service:removePlayer(player);check(calls.flush==1 and stable.closed,"departure bypassed owned closed flush")
+ local after=#sent;emitOwner({kind="recovery_entry",offer={id="late"}});check(#sent==after,"departed owner sent a late entry offer")
+ local other={UserId=9951,Name="owner-shutdown"};service:addPlayer(other);service:shutdown()
+ check(calls.flush==2 and owned.session.closed,"shutdown bypassed owned flush")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

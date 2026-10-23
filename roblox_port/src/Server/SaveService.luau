@@ -24,6 +24,7 @@ export type Player = { UserId: number, Name: string }
 export type Config = {
 	backend: any, now: () -> number, sleep: (number) -> (), spawn: ((...any) -> ...any, ...any) -> (),
 	send: (Player, { [string]: any }) -> (), jobId: string?, log: ((string) -> ())?,
+	ownerFactory: ((any, (any) -> ()) -> any)?, -- server-only opt-in single owner; never supplied by a client
 	keyOf: ((Player) -> string | number)?, -- the name a player's records are filed under (default: their UserId); the test place files each run under a fresh one
 }
 
@@ -59,6 +60,11 @@ local function sendTo(self: any, player: Player, msg: { [string]: any })
 	if not ok then log(self, "send failed: " .. tostring(err)) end
 end
 
+-- Queries use the actual session; all mutation/work goes through one owner.
+local function owner(entry:any):any
+ if entry.owner then assert(entry.owner.session==entry.session,"save owner session replacement requires an explicit transport handoff") end
+ return entry.owner or entry.session
+end
 local function loadedMessage(entry: any): { [string]: any }
 	local session=entry.session
 	local snap = session:snapshot()
@@ -76,7 +82,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
 	local entry: any = { player = player, hello = false, loaded = false, leaving = false, sequence=0, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
-	entry.session = SaveSession.new({
+	local sessionConfig = {
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
 		onChange = function(status: string, reason: string?)
@@ -102,24 +108,37 @@ function SaveService.addPlayer(self: any, player: Player)
   end,
   onRest = function(mode: string, record: any)
 			if entry.hello and not entry.leaving then
-				if entry.protocol==SaveRules.OFFER_PROTOCOL then entry.session:refreshOffer(mode)
+				if entry.protocol==SaveRules.OFFER_PROTOCOL then owner(entry):refreshOffer(mode)
 				else sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
 			end
 		end,
-	})
-	self.entries[player] = entry
+ }
+ if self.cfg.ownerFactory then
+  local owned=self.cfg.ownerFactory(sessionConfig,function(msg:any)
+   if self.entries[player]~=entry or entry.leaving or not entry.loaded or not entry.hello or entry.protocol~=SaveRules.OFFER_PROTOCOL then return end
+   if type(msg)~="table" or msg.kind~="recovery_entry" then return end
+   sendTo(self,player,msg)
+  end)
+  assert(type(owned)=="table" and type(owned.session)=="table" and owned.session.id==sessionId and owned.session.state=="loading"
+   and tostring(owned.session.cfg.userId)==tostring(sessionConfig.userId) and owned.session.counters.requests==0,"owner factory must return an unloaded bound session")
+  for _,method in {"load","step","flush","setProgress","beginLife","requestLife","refreshOffer","setRestForIntent","setRestForLife","enableOffers","demote"} do
+   assert(type(owned[method])=="function","save owner method missing: "..method)
+  end
+  entry.owner,entry.session=owned,owned.session
+ else entry.session=SaveSession.new(sessionConfig) end
+ self.entries[player] = entry
 	self.cfg.spawn(function()
-		local ok, err = pcall(function() entry.session:load() end)
+		local ok, err = pcall(function() owner(entry):load() end)
 		if not ok then
 			log(self, "load raised: " .. tostring(err))
-			entry.session:demote("load_failed", true)
+			owner(entry):demote("load_failed", true)
 		end
 		entry.loaded = true
 		if entry.unsupported then
-			if entry.session.state=="active" then entry.session:demote("offline",false) else entry.session.canRetry=false end
+			if entry.session.state=="active" then owner(entry):demote("offline",false) else entry.session.canRetry=false end
 		end
 		if entry.leaving then
-			local flushed, flushError = pcall(function() entry.session:flush() end)
+			local flushed, flushError = pcall(function() owner(entry):flush() end)
 			-- (ROBLOX-91: only a departure that was counted is uncounted: shutdown also marks a still-loading entry as leaving, and the count went negative)
 			if entry.counted then
 				entry.counted = false
@@ -142,12 +161,12 @@ local function handle(self: any, entry: any, msg: any)
 			self.stats.dropped+=1
 			if not entry.hello then
 				entry.unsupported=true
-				if entry.session.state=="active" or entry.session.state=="loading" then entry.session:demote("offline",false) else entry.session.canRetry=false end
+				if entry.session.state=="active" or entry.session.state=="loading" then owner(entry):demote("offline",false) else entry.session.canRetry=false end
 			end
 			return
 		end
 		local wasUnsupported=entry.unsupported;entry.unsupported=false;entry.protocol=protocol
-		if protocol==SaveRules.OFFER_PROTOCOL then entry.session:enableOffers() end
+		if protocol==SaveRules.OFFER_PROTOCOL then owner(entry):enableOffers() end
 		if entry.session.state=="session" and (entry.session.reason=="offline" or (wasUnsupported and (entry.session.reason=="other_session" or entry.session.reason=="load_failed"))) then entry.session.canRetry=true;entry.session.retryAt=now end
 		entry.hello = true
 		if entry.loaded then sendTo(self, entry.player, loadedMessage(entry)) end
@@ -155,10 +174,10 @@ local function handle(self: any, entry: any, msg: any)
 		self.stats.dropped+=1 -- no candidates/permissions before compatible negotiation
 	elseif kind == "progress" then
 		if not take(entry.progressBucket, now) then self.stats.limited += 1; return end
-		if not entry.session:setProgress(msg.progress) then self.stats.dropped += 1 end
+		if not owner(entry):setProgress(msg.progress) then self.stats.dropped += 1 end
 	elseif kind == "begin_life" then
   if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
-  if type(msg.mode)~="string" or not entry.session:beginLife(msg.mode,msg.serial) then
+  if type(msg.mode)~="string" or not owner(entry):beginLife(msg.mode,msg.serial) then
    self.stats.dropped+=1
    if type(msg.mode)=="string" and entry.session.restProtected[msg.mode] then
     local status,reason=entry.session:status()
@@ -168,14 +187,18 @@ local function handle(self: any, entry: any, msg: any)
  elseif kind=="life_intent" or kind=="refresh_offer" then
   if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
   if entry.protocol~=SaveRules.OFFER_PROTOCOL then self.stats.dropped+=1;return end
-  local accepted=if kind=="life_intent" then entry.session:requestLife(msg.intent,msg.mode,msg.serial,msg.offerId) else entry.session:refreshOffer(msg.mode)
+  local accepted=if kind=="life_intent" then owner(entry):requestLife(msg.intent,msg.mode,msg.serial,msg.offerId) else owner(entry):refreshOffer(msg.mode)
   if not accepted then self.stats.dropped+=1 end
+ elseif kind=="recovery_applied" then
+  if entry.protocol~=SaveRules.OFFER_PROTOCOL or not entry.owner or type(entry.owner.applyRecovery)~="function" then self.stats.dropped+=1;return end
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if not entry.owner:applyRecovery(msg) then self.stats.dropped+=1 end
  elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
 		local mode = msg.mode
 		if type(mode)~="string" then self.stats.dropped+=1;return end
 		if entry.protocol==SaveRules.OFFER_PROTOCOL and (type(msg.restSerial)~="number" or msg.restSerial~=msg.restSerial or msg.restSerial<1 or msg.restSerial>SaveRules.MAX_LIFE_SERIAL or msg.restSerial~=math.floor(msg.restSerial)) then self.stats.dropped+=1;return end
-		local accepted=if entry.protocol==SaveRules.OFFER_PROTOCOL then entry.session:setRestForIntent(mode,msg.record,msg.life,msg.serial,msg.credential,msg.restSerial) else entry.session:setRestForLife(mode,msg.record,msg.life)
+		local accepted=if entry.protocol==SaveRules.OFFER_PROTOCOL then owner(entry):setRestForIntent(mode,msg.record,msg.life,msg.serial,msg.credential,msg.restSerial) else owner(entry):setRestForLife(mode,msg.record,msg.life)
 		if not accepted then self.stats.dropped+=1 end
 	else
 		self.stats.dropped += 1
@@ -210,7 +233,7 @@ function SaveService.removePlayer(self: any, player: Player)
 	entry.counted = true
 	self.departing += 1 -- BindToClose must also await a PlayerRemoving write already in flight.
 	if not entry.loaded then return end -- the loading thread finishes the job (see addPlayer)
-	local ok, err = pcall(function() entry.session:flush() end)
+	local ok, err = pcall(function() owner(entry):flush() end)
 	entry.counted = false
 	self.departing -= 1
 	if not ok then log(self, "flush raised: " .. tostring(err)) end
@@ -221,7 +244,7 @@ function SaveService.step(self: any)
 	for _, entry in self.entries do
 		if entry.loaded and not entry.leaving then
 			self.cfg.spawn(function()
-				local ok, err = pcall(function() entry.session:step() end)
+				local ok, err = pcall(function() owner(entry):step() end)
 				if not ok then log(self, "step raised: " .. tostring(err)) end
 			end)
 		end
@@ -243,7 +266,7 @@ function SaveService.shutdown(self: any)
 		if entry.loaded then
 			pending += 1
 			self.cfg.spawn(function()
-				local ok, err = pcall(function() entry.session:flush(deadline) end)
+				local ok, err = pcall(function() owner(entry):flush(deadline) end)
 				if not ok then log(self, "flush raised: " .. tostring(err)) end
 				pending -= 1
 			end)

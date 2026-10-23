@@ -5,7 +5,7 @@ import hashlib,io,json,os,re,subprocess,sys,urllib.request,urllib.error,zipfile
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
 RUN=str(json.loads((HERE/'ci-start.json').read_text(encoding='utf8'))['id'])
-SOURCE=__import__('subprocess').check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=HERE.parents[1],text=True).strip()
+SOURCE='ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157'
 API='https://api.github.com/repos/socranates/jumping-spider-sim'
 HEADERS={'Accept':'application/vnd.github+json','User-Agent':'Windowsill-audit'}
 

@@ -1,0 +1,1 @@
+RECORDED_INSPECTION passed=33 failed=0 suspensions=11

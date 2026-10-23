@@ -1,7 +1,7 @@
 from pathlib import Path
 import json,urllib.request
 HERE=Path(__file__).resolve().parent
-SOURCE=__import__('subprocess').check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=HERE.parents[1],text=True).strip()
+SOURCE='ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157'
 url='https://api.github.com/repos/socranates/jumping-spider-sim/actions/workflows/roblox-port.yml/runs?head_sha='+SOURCE
 with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Windowsill-audit','Accept':'application/vnd.github+json'}),timeout=30) as response:
  runs=json.load(response)['workflow_runs']

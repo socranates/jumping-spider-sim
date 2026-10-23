@@ -1,0 +1,2 @@
+RETURN_ENERGY live=0.29622293333329663 observed_before=0.29622293333329663 saved=0.29622293333329663 delta_saved=0 same_root=true same_jaws=true
+CLIENT passed=27 failed=0

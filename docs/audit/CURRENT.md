@@ -1,3 +1,15 @@
+# Current: snapshot return test corrected; full gates pending
+
+Source405e9df16f5a8dbccadbcab9c8a654487d161445 on codex/save-continue changes only client_smoke's oracle afterccc0abb. A29-frame controlled delay reproduced the old assertion while actual returned energy exactly matched the kept snapshot. The corrected test decodes that snapshot, waits for return using zero-time frames, checks exact saved time/tick/reserves and physical retreat position, then resumes frames and checks derived retreat state. The full private client suite passed27/0 before adopting the exact tested file. Gameplay code, feeding, settings and menus are unchanged.
+
+Originalccc0abb Windows56925 remains running with an observed CLIENT26/1 failure; preserve its terminal log/receipt. Its Linux run39879471174 is a separate source cohort. The current405e9df Windows full run must wait for56925 to be terminal. New full Windows/Linux results are pending;468114 across76 suites is only the expected count. Existing222-module compile/strict/runner5 receipts are reused by exact production-file hashes because this commit changes only a test; current Linux also checks them. Root verification refuses missing current full gates. No release claim.
+
+The pond renderer remains b2fdc562, with prior native geometry985/batch41 and measured component CPU18.13/21.32 percent lower full/low. Its exact production bytes and all other production files are unchanged by this test correction. Native component results do not prove whole-game FPS or device performance.
+
+Private historical-world inspection now passes33 assertions including11 suspensions, both compilations and full strict analysis. It validates a generated populated Test Garden fixture without switching the Preserve or enabling ordinary restoration; see docs/save-slot-isolation/RECORDED-INSPECTION.md. Complete archive/progress migration remains pending. Nothing published; broader goal active.
+
+Earlier status below is historical.
+
 # Latest: pond drawing reuse adopted; full gates pending
 
 The tested b2fdc562 renderer is now in production source, unpublished. Pond drawing component CPU decreased18.13/21.32 percent (full/low), with identical checked geometry. Default bodies3610/0 includes2702 frozen-reference regressions. Full Windows/Linux checks for this new source are pending; expected468114 is not a completed result. The older59146e1 save-validator source completed465412 on each platform and native20. Its proof remains historical and pinned. See docs/pond-drawing-reuse/README.md for scope and gates. No whole-game FPS claim; no publication. Legacy save migration is still pending. Broader goal remains active.

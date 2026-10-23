@@ -1,0 +1,9 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "exit_code": 0,
+  "bundle_sha256": "ffd60e26efc85a9a566bc78254829274161ffe31656fa1dc2a4c67ac1b93c1f7",
+  "test_sha256": "72ac1606716e89c5188cf1967ad0a8e4967746f460009077c46b62f8ef96f9ad",
+  "output_sha256": "9cef85f931ccbe1a4f51e52dfc337d4a009c31b6de9d48aa9288136d5a005c42",
+  "assertion_unchanged": true,
+  "production_changed": false
+}

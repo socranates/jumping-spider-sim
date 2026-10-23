@@ -1,0 +1,8 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "exit_code": 1,
+  "candidate_sha256": "1b3a24943eb460553eeb50d6b6b0de657201d2bbcaeb57d8593abd036fa34ff6",
+  "output_sha256": "7cec2004589d08d980c2249b5a7825500d0cabdc80cc70c5a03786a2ee92ea26",
+  "runtime_changed": false,
+  "adopted": false
+}

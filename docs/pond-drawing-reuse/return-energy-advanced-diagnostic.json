@@ -1,0 +1,10 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "exit_code": 0,
+  "bundle_sha256": "3aed535db6f37c77ab7ba7c2b4fd739c2f9cbb7834a0cd071e98f97f3c47788c",
+  "test_sha256": "72ac1606716e89c5188cf1967ad0a8e4967746f460009077c46b62f8ef96f9ad",
+  "output_sha256": "d8e1ba294464fd28357f4b4573e7b0c0deb492da093f1f09af8d0e1ddc91ef14",
+  "assertion_unchanged": true,
+  "production_changed": false,
+  "advance_after_snapshot_frames": 12
+}

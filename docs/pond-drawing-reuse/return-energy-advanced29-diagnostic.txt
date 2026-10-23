@@ -1,0 +1,8 @@
+RETURN_ENERGY live=0.29689493333329664 observed_before=0.29655893333329664 saved=0.29689493333329664 delta_saved=0 same_root=true same_jaws=true
+FAIL client: Backspace returns to the checkpoint kept by a rest, or to the start when there is none
+    C:/Users/natha/AppData/Local/Temp/tmpnej7o5x9.luau:59417: the reserves did not go back
+CLIENT passed=26 failed=1
+C:/Users/natha/AppData/Local/Temp/tmpnej7o5x9.luau:59784: client smoke failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpnej7o5x9.luau:59784

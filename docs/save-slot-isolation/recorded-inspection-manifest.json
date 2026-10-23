@@ -1,0 +1,14 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "originals": {
+    "roblox_port/src/Shared/World/WorldMap.luau": "d0ea26ee6737d1ca0d9cfb04de6cf258fd7f5286dac3d61f9239db7d56581672",
+    "roblox_port/src/Shared/Persistence/Checkpoint.luau": "4f91289a5a8240e6d30ff794ef0fb53ac3f8cd449e52d8e575db9a19710f8866"
+  },
+  "candidates": {
+    "roblox_port/src/Shared/World/WorldMap.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "roblox_port/src/Shared/Persistence/Checkpoint.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0"
+  },
+  "production_changed": false,
+  "restore_enabled": false,
+  "migration_implemented": false
+}

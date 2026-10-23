@@ -1,0 +1,9 @@
+{
+  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "exit_code": 0,
+  "test_sha256": "8e939b1088fd04f72c4ecf780d4849ad7f6f71b11cef57779686f23d389157f8",
+  "output_sha256": "cbb173b8d12aff4c493f73aa8fdbf5a3131f34cad53d6abe89012f082aa4eb0e",
+  "production_changed": false,
+  "restore_enabled": false,
+  "migration_implemented": false
+}

@@ -1,0 +1,7 @@
+FAIL client: Backspace returns to the checkpoint kept by a rest, or to the start when there is none
+    C:/Users/natha/AppData/Local/Temp/tmp68ag3s5p.luau:59422: not back resting in the crack
+CLIENT passed=26 failed=1
+C:/Users/natha/AppData/Local/Temp/tmp68ag3s5p.luau:59792: client smoke failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp68ag3s5p.luau:59792

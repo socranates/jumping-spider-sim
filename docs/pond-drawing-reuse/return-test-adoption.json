@@ -1,0 +1,10 @@
+{
+  "original_sha256": "72ac1606716e89c5188cf1967ad0a8e4967746f460009077c46b62f8ef96f9ad",
+  "candidate_sha256": "ff9513f3a58e87a4b3b9c80ed0105584bae2aa26dd83f9d30b777ab4a3d6c35f",
+  "client_passed": 27,
+  "client_failed": 0,
+  "runtime_changed": false,
+  "adopted": true,
+  "current_full_gates_pending": true,
+  "published": false
+}

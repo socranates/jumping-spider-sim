@@ -2,6 +2,8 @@
 
 Status: policy selected; implementation pending. The user delegated this choice on 2026-10-22. Import portable spider progress into the Preserve while retaining the complete original save in an untouched archive. No schema or production behavior has changed yet; runtime032926f retains protected historical slots.
 
+Subsequent private work onccc0abb: [recorded-world inspection](RECORDED-INSPECTION.md) validates a populated Test Garden fixture without changing the Preserve or enabling ordinary restore.33 checks,11 cooperative suspensions, both module compilations and full strict analysis pass. This is a preparation component, not an implemented archive or progress import.
+
 ## Selected recovery policy
 
 The selected behavior is option 1:

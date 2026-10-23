@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-23T00:40:58.440623+00:00",
-  "source": "ccc0abbd8a1f6a0b37dbb6244c46c2a1b106f157",
+  "as_of_utc": "2026-10-23T00:52:04.243450+00:00",
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -23,12 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "current-full-gates-running",
-      "evidence_boundary": "Currentccc0abb bodies3610/0, compile222/strict/runner5 pass. Immutable Windows56925 and Linux39879471174 are running;468114 expected is not completed proof. Historical59146e1 Windows/Linux both76/465412/0 and native20 remain pinned. Current private pond geometry985/batch41/all224/zero CreatorErrors cover the exact adopted renderer; no full current native walkthrough claim.",
+      "status": "snapshot-test-corrected-current-full-gates-pending",
+      "evidence_boundary": "Current405e9df changes only the checkpoint-return test oracle after a controlled delay reproduced a false comparison with a later live reserve. Corrected full client suite27/0; immutable snapshot/time/reserve assertions strengthened. Originalccc0abb Windows56925 continues with observed CLIENT26/1; its failed attempt will be retained. New current full gates pending. Existing compilation/native renderer proof is reusable by exact unchanged production hashes; no current full or release claim.",
       "references": [
-        "docs/pond-drawing-reuse/README.md",
-        "docs/pond-drawing-reuse/ci-start.json",
-        "docs/spatial-save-validation/verification.json"
+        "docs/checkpoint-return-oracle/README.md",
+        "docs/pond-drawing-reuse/return-energy-advanced29-diagnostic.json",
+        "docs/pond-drawing-reuse/return-test-v2-receipt.json"
       ]
     },
     {
@@ -72,11 +72,12 @@
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
-        "docs/save-slot-isolation/map-view-types-receipt.json"
+        "docs/save-slot-isolation/map-view-types-receipt.json",
+        "docs/save-slot-isolation/RECORDED-INSPECTION.md"
       ]
     },
     {
@@ -258,7 +259,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Currentccc0abb runtime/tests pushed on codex/save-continue. Exact tested pond renderer adopted; bodies3610/0, compile222/strict/runner5 pass; new full Windows56925 and Linux39879471174 running. Historical59146e1 both full platforms465412/0 and native20 verified. Source release XML/BuildInfo remain older; no publication/main integration/laptop synchronization. Legacy migration and broader lifecycle/online/device audit remain open.",
+      "evidence_boundary": "Current405e9df runtime/tests pushed on codex/save-continue; latest change only corrects a reproduced snapshot-test timing assumption. Private client27/0. Current full gates pending; originalccc0abb Windows56925 has observed one failure and remains running. Pond optimization/native evidence retained with exact unchanged runtime hashes. No release/main integration/publication/laptop sync; migration/lifecycle/online/device audit open.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md"
@@ -337,5 +338,11 @@
     "linux_run": 39879471174,
     "published": false,
     "whole_game_fps_gain_proven": false
+  },
+  "latest_snapshot_oracle_milestone": {
+    "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+    "status": "focused-client-verified-full-gates-pending",
+    "evidence": "docs/checkpoint-return-oracle/README.md",
+    "published": false
   }
 }

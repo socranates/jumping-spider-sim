@@ -25,8 +25,15 @@ function Adapter.new(config: any): any
  local cfg = {}; for key, value in config do cfg[key] = value end
  cfg.keyOf = function(player: any): any
   local p = self.peers[player]
+  assert(p and not self.closing, "owner construction has no live visit")
   if p and p.installing then return p.installing.user end -- preserve the physical account key
-  return if config.keyOf then config.keyOf(player) else player.UserId
+  local user = if config.keyOf then config.keyOf(player) else player.UserId
+  assert(self.peers[player] == p and not self.closing, "account lookup outlived its visit")
+  -- Initial construction needs the same lifetime fence as replacement. The
+  -- service has not registered an entry yet when a cooperative factory yields.
+  local installation: any = {player=player,peer=p,user=user}
+  self.installations[tostring(user)], p.installing = installation, installation
+  return user
  end
  cfg.ownerFactory = function(ownerConfig: any, emitter: any): any
   local key = tostring(ownerConfig.userId); local installation = self.installations[key]
@@ -59,8 +66,26 @@ function Adapter.new(config: any): any
 end
 function Adapter.addPlayer(self: any, player: any)
  if self.closing or self.peers[player] then return end
- self.peers[player] = {enabled = false, frozen = false, serial = 0}
- self.base:addPlayer(player)
+ local p: any = {enabled = false, frozen = false, serial = 0}
+ self.peers[player] = p
+ local installed = pcall(self.base.addPlayer, self.base, player)
+ local installation = p.installing
+ if installation then
+  local key = tostring(installation.user)
+  if self.installations[key] == installation then self.installations[key] = nil end
+  p.installing = nil
+ end
+ if self.peers[player] ~= p or self.closing then
+  local orphan = self.base.entries[player]
+  if installation and orphan and orphan.session.id == installation.sessionId then pcall(self.base.removePlayer, self.base, player) end
+  return false
+ end
+ if not installed then
+  p.failed = true
+  local orphan = self.base.entries[player]
+  if installation and orphan and orphan.session.id == installation.sessionId then pcall(self.base.removePlayer, self.base, player) end
+ end
+ return installed
 end
 local function drop(self: any) self.base.stats.dropped += 1 end
 local function scope(t: any, message: any): boolean

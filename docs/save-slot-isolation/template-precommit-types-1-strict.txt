@@ -1,0 +1,10 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\tmpz02130v9\src\Server\RecoveryTemplates.luau [game/ServerScriptService/Server/RecoveryTemplates](80,32): TypeError: Expected this to be '(() -> CheckpointResult)?', but got '() -> ()'
+caused by:
+  None of the union options are compatible. For example:
+Expected this to be '() -> CheckpointResult', but got '() -> ()'
+caused by:
+  Return type is not compatible.
+Function only returns 0 values, but 1 is required here
+c:\Users\natha\AppData\Local\Temp\tmpz02130v9\src\Server\RecoveryTemplates.luau [game/ServerScriptService/Server/RecoveryTemplates](97,5): TypeError: Types Instance and nil cannot be compared with == because they do not have the same metatable

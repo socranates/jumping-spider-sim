@@ -66,10 +66,13 @@ local function fixture(options)
    table.insert(f.queue,Json.copy(message))
   end,
   ownerFactory=function(config,emit)
+   if options.initialFactoryFail and #f.owners==0 then error("synthetic initial factory failure") end
    if options.factoryFail and #f.owners>0 then error("synthetic replacement factory failure") end
    local prior=f.owner
    if prior then check(prior:replacementClosed(),"new owner constructed before exact old closure") end
-   if options.pauseFactory and prior and not f.factoryPaused then f.factoryPaused=true;coroutine.yield("replacement-factory-paused") end
+   if not f.factoryPaused and (options.pauseFactory and prior or options.pauseInitialFactory and not prior) then
+    f.factoryPaused=true;coroutine.yield("replacement-factory-paused")
+   end
    local profiles={}
    for _,mode in Rules.MODES do
     local context=newWorld();context.garden={};context.life.mode=if mode=="free" then "free" else "main"
@@ -128,7 +131,7 @@ local function fixture(options)
   if options.readyFail then return false end
   f.menus+=1;f.paused=false;return true
  end}) end
- f.client=client;server:addPlayer(player)
+ f.client=client;if not options.deferAdd then server:addPlayer(player) end
  function f.tick()
   client:update();server:step()
   while #f.queue>0 do listener(table.remove(f.queue,1)) end
@@ -154,6 +157,49 @@ local function fixture(options)
   check(client:requestReplacement(),"negotiated application replacement refused")
  end
  return f
+end
+-- A player can leave before a cooperative initial factory returns its unloaded
+-- owner. Its late return must not acquire a lease or restore the removed entry.
+do
+ local f=fixture({deferAdd=true,pauseInitialFactory=true})
+ local co=coroutine.create(function() f.server:addPlayer(f.player) end)
+ local ok,why=coroutine.resume(co);assert(ok,why);check(why=="replacement-factory-paused","initial owner factory did not suspend")
+ local before=f.b.requests;local kept=nonP(f.b)
+ f.server:removePlayer(f.player)
+ ok,why=coroutine.resume(co);assert(ok,why)
+ check(f.server.base.entries[f.player]==nil and f.b.requests==before and nonP(f.b)==kept,"late initial factory revived a removed player or acquired a lease")
+ check(#f.owners==1 and f.owners[1].session.closed and f.owners[1].session.counters.requests==0,"cancelled initial unloaded owner was not discarded")
+end
+-- Shutdown and a subsequent visit must also fence the first suspended factory.
+do
+ local f=fixture({deferAdd=true,pauseInitialFactory=true})
+ local co=coroutine.create(function() f.server:addPlayer(f.player) end)
+ local ok,why=coroutine.resume(co);assert(ok,why)
+ check(why=="replacement-factory-paused","initial shutdown fixture did not pause")
+ local before=f.b.requests;f.server:shutdown()
+ ok,why=coroutine.resume(co);assert(ok,why)
+ check(f.server.base.entries[f.player]==nil and f.b.requests==before and next(f.server.installations)==nil,"shutdown let an initial constructor acquire a lease")
+ check(#f.owners==1 and f.owners[1].session.closed and f.owners[1].session.counters.requests==0,"shutdown leaked its unloaded initial owner")
+end
+do
+ local f=fixture({deferAdd=true,pauseInitialFactory=true})
+ local co=coroutine.create(function() f.server:addPlayer(f.player) end)
+ local ok,why=coroutine.resume(co);assert(ok,why)
+ check(why=="replacement-factory-paused","initial rejoin fixture did not pause")
+ f.server:removePlayer(f.player);f.server:addPlayer(f.player)
+ local entry=f.server.base.entries[f.player];local fresh=f.owners[1];local before=f.b.requests
+ check(entry and entry.owner==fresh and not fresh.session.closed,"fresh rejoin failed before old constructor returned")
+ ok,why=coroutine.resume(co);assert(ok,why)
+ check(f.server.base.entries[f.player]==entry and not fresh.session.closed and f.b.requests==before,"late initial constructor replaced or closed the rejoined visit")
+ check(#f.owners==2 and f.owners[2].session.closed and f.owners[2].session.counters.requests==0 and next(f.server.installations)==nil,"old initial visit kept authority after rejoin")
+ f.server:removePlayer(f.player)
+end
+do
+ local f=fixture({deferAdd=true,initialFactoryFail=true})
+ local before=f.b.requests
+ check(f.server:addPlayer(f.player)==false and f.server.peers[f.player].failed,"initial factory failure claimed success")
+ check(f.server.base.entries[f.player]==nil and f.b.requests==before and next(f.server.installations)==nil,"failed initial factory left authority or storage work")
+ f.server:removePlayer(f.player)
 end
 for _,mode in Rules.MODES do
  local f=fixture();f.recover(mode)

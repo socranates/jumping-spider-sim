@@ -1,0 +1,16 @@
+{
+  "source": "46c299f5e36038d06f164c968e5fda78bb4407e8",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-template-46c299f-full\\Windowsill-template-review.rbxlx",
+  "model_sha256": "aa4cdd0aa4c11b20ce6c089ef5ea10d569b1e592017c92c6285dba8c0497dd1f",
+  "manifest_sha256": "a20b846550e697de3798cce58873239f0af0a5208b2a1c2d47c99948d18e033b",
+  "guard_sha256": "dc1fc62ab0d79a91ea51cebad184fa2caacf38df726426da03de8b0035c7f0de",
+  "client_probe_sha256": "b37189c6aae34d95da88cde8cc132b15234ad7b2674a0e82bf01665bd93004b4",
+  "server_probe_sha256": "3a9b263c0c112f280eb7e5983d3bffe68bd8c132171f9c018d6098cd8f37f10f",
+  "scripts": 225,
+  "production_scripts_exact": 223,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

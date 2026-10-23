@@ -1,0 +1,12 @@
+2026-10-23T16:35:38.972Z,169.972946,290c,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_GUARD] 46c299f5e36038d06f164c968e5fda78bb4407e8 225 persistence_disabled
+2026-10-23T16:35:50.885Z,181.885559,13bc,6,Info [FLog::CreatorOutput] [SERVER_TEMPLATE_NATIVE_BEGIN] 1792773351454
+2026-10-23T16:35:51.110Z,182.110214,4fa0,6,Info [FLog::CreatorOutput] [SERVER_TEMPLATE_NATIVE_MEASURE] 1792773351454 {"build_ms":36.717699993459973,"comparison_gain_claim":false,"mode_count":3,"template_chars":47623} nil
+2026-10-23T16:35:51.110Z,182.110214,4fa0,6,Info [FLog::CreatorOutput] [SERVER_TEMPLATE_NATIVE_PASS] 1792773351454 27
+2026-10-23T16:35:55.960Z,186.960922,0698,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_BEGIN] 1792773356531
+2026-10-23T16:36:04.107Z,195.107788,4fa0,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_DIAGNOSTIC_BEFORE] 1792773356531 {"velocity":"19919.998046875, -4158.599609375, 7679.99951171875","targetReady":false,"roundtripError":0,"at":"-22, 0.3100000023841858, 6","predicted":"310, -69, 134","targetRegion":"room_floor_e","target":"310, -69, 134","mode":"air","gravity":"0, -35, 0","predictedRegion":"room_floor_e"}
+2026-10-23T16:36:04.176Z,195.176422,13bc,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_DIAGNOSTIC_AFTER] 1792773356531 {"velocityDelta":0,"moved":0,"targetReady":false,"lifeDelta":0,"menu":false,"position":"-22, 0.3100000023841858, 6","loading":true,"mode":"air","title":false,"needsDelta":0}
+2026-10-23T16:36:04.728Z,195.728226,0698,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_CASES] 1792773356531 hold partial resume same_objects second_out menu_while_waiting projected_tick
+2026-10-23T16:36:06.042Z,197.042236,2938,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_RECOVERY_PAUSE] 1792773356531 actual_adoption generation_increment_1 menu_hidden clocks_energy_frozen stale_release_refused current_release_resumes
+2026-10-23T16:36:06.553Z,197.553421,0698,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_LEGACY_SLOT] 1792773356531 physical_slot rules easy_bytes end_offer fresh_slots
+2026-10-23T16:36:06.553Z,197.553421,0698,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_VIEWPORT] 1792773356531 1105 433
+2026-10-23T16:36:06.554Z,197.554428,0698,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_PASS] 1792773356531 82

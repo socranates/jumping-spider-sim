@@ -1,0 +1,19 @@
+{
+  "source": "46c299f5e36038d06f164c968e5fda78bb4407e8",
+  "preceding_checks": 204275,
+  "authored_catalog_entry_rest_and_replacement_checks": 513,
+  "total_checks": 204788,
+  "failed": 0,
+  "private_candidates": 40,
+  "compile_and_full_strict_clean": true,
+  "authored_production_builder_used_in_server_factory": true,
+  "all_three_modes_receive_actual_entry_and_next_rest_stored_ack": true,
+  "replacement_reuses_unchanged_cached_templates": true,
+  "no_client_played_template_input": true,
+  "initial_constructor_disconnect_shutdown_rejoin_and_failure_fenced": true,
+  "ordinary_engine_recovery_installed": false,
+  "native_full_recovery_verified": false,
+  "real_datastore_verified": false,
+  "published": false,
+  "goal_complete": false
+}

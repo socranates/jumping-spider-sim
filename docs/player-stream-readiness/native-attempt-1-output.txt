@@ -1,0 +1,5 @@
+2026-10-23T12:34:45.212Z,216.212097,34c0,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_GUARD] bf94f9d034018613ed088db001e4f909a52db249 223 persistence_disabled
+2026-10-23T12:35:59.923Z,290.923218,34c0,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_BEGIN] 1792758960176
+2026-10-23T12:36:07.917Z,298.917938,5bb4,6,Warning [FLog::CreatorWarning] Warning: [PLAYER_STREAM_NATIVE_FAIL] 1792758960176 Players.socranates.PlayerScripts.Client.SilkPlayback:19: native prospective fixed tick advanced into absent collision
+Players.socranates.PlayerScripts.Client.SilkPlayback:19
+Players.socranates.PlayerScripts.Client.SilkPlayback:23

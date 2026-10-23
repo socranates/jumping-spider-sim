@@ -1,0 +1,129 @@
+{
+  "id": 39953763936,
+  "head_sha": "bf94f9d034018613ed088db001e4f909a52db249",
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39953763936",
+  "created_at": "2026-10-23T12:30:01Z",
+  "updated_at": "2026-10-23T12:42:18Z",
+  "jobs_evidence": {
+    "total_count": 1,
+    "jobs": [
+      {
+        "id": 120414395134,
+        "run_id": 39953763936,
+        "workflow_name": "roblox-port",
+        "head_branch": "codex/save-continue",
+        "run_url": "https://api.github.com/repos/socranates/jumping-spider-sim/actions/runs/39953763936",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOU8Ep6M8AAAAcCUHa_g",
+        "head_sha": "bf94f9d034018613ed088db001e4f909a52db249",
+        "url": "https://api.github.com/repos/socranates/jumping-spider-sim/actions/jobs/120414395134",
+        "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39953763936/job/120414395134",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-23T12:30:01Z",
+        "started_at": "2026-10-23T12:30:03Z",
+        "completed_at": "2026-10-23T12:42:17Z",
+        "name": "checks",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-23T12:30:04Z",
+            "completed_at": "2026-10-23T12:30:05Z"
+          },
+          {
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-23T12:30:05Z",
+            "completed_at": "2026-10-23T12:30:08Z"
+          },
+          {
+            "name": "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-23T12:30:08Z",
+            "completed_at": "2026-10-23T12:30:10Z"
+          },
+          {
+            "name": "Every module compiles",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-23T12:30:10Z",
+            "completed_at": "2026-10-23T12:30:11Z"
+          },
+          {
+            "name": "Strict types",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-23T12:30:11Z",
+            "completed_at": "2026-10-23T12:30:14Z"
+          },
+          {
+            "name": "All suites",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-23T12:30:14Z",
+            "completed_at": "2026-10-23T12:42:15Z"
+          },
+          {
+            "name": "Runner failure and cleanup regressions",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-23T12:42:15Z",
+            "completed_at": "2026-10-23T12:42:15Z"
+          },
+          {
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-10-23T12:42:15Z",
+            "completed_at": "2026-10-23T12:42:15Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-10-23T12:42:15Z",
+            "completed_at": "2026-10-23T12:42:15Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/socranates/jumping-spider-sim/check-runs/120414395134",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "runner_id": 1000000141,
+        "runner_name": "GitHub Actions 1000000141",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  },
+  "logs_sha256": {
+    "ci-toolchain.txt": "aadc931e3e3290abf0b73e31e76935b90b3dd6bc5e4cd9beda3c9481d9331969",
+    "ci-compile.txt": "b9a09c334fd9dba4127c3668c167ade3d6384b73edd90acf607a7717e5377962",
+    "ci-types.txt": "726ad742aa8350a2fa9ae70bdd13c567f278eaeac53f3c125c11a20c82dfc512",
+    "ci-suites.txt": "719761092ddc613769847f53735f1a9750eba88824c2ec01cce9db6874f19e7a",
+    "ci-runner.txt": "12e7c9b27708f810dab421a0e9030e2f28b9a7cb1869f31fe420030a6ce917d7"
+  },
+  "workflow_sha256": "265141262982f6374b25174e360fe8cd6fea286ad5419a3ab6d497f2c93c208f",
+  "modules_compiled": 222,
+  "suites": 76,
+  "passed": 468866,
+  "failed": 0,
+  "runner_regressions": 5,
+  "all_download_checksums_verified": true,
+  "published": false
+}

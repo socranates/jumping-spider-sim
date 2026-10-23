@@ -1,18 +1,13 @@
-# Player collision disappearance: reproduced gap
+# Collision disappearance: baseline, first fix and native counterexample
 
-Source `257e1a43ae00076a6e59f284c0f2ca0ff09f72e9` passes both ordinary full production suites, 76/468,859/0. This additional condition is not covered by that pass.
+The current correction and qualification live in `../player-stream-render-readiness/README.md`. Preserve this directory as historical evidence.
 
-`run-probe.py baseline-1` bundles the existing actual SpiderClient box-world fixture and inserts `probe.luau` before its cleanup. It begins Free play, places the spider attached to the already-complete bed floor, removes that region's actual collision folder, sets the shim streaming flag, and runs 60 frames. It restores the removed folder even on failure.
+- Baseline `257e1a4`: the actual SpiderClient under the CLI box-world shim continued falling after its known floor folder disappeared. Position moved 0.145833 studs, mode became air, life and needs clocks advanced one second. Free play; not an energy-loss or native network-pressure claim. `baseline-1-*` retains the expected negative result.
+- First fix `bf94f9d`: fresh current-region collision checks and a per-fixed-tick projected destination guard pause player simulation until complete collision returns. Focused suite 43/0, Linux full 76 suites / 468,866 checks / zero failures, 222 compiles, clean strict and five runner regressions. Its 34-candidate private overlay types pass. See `ci-final.json` and `checks.json`. **No full Windows run was started for this superseded source**, and its combined `verify-gates.py`/candidate builder were not run.
+- Native attempt 1: exact 223 script fingerprints, persistence disabled, unbound model. Supported hold/partial return/resume/repeated removal/menu checks reached, then the combined projected airborne assertion failed.
+- Native attempt 2: identical production source plus diagnostic prints. It confirmed zero position/velocity/life/needs change, but `playerLoading=false` while the projected destination remained absent. The per-render current-only check cleared the fixed-tick destination wait on renders without a tick. The generic failure message overstated motion; retain the diagnostic values as the explanation.
+- Source `695e772` fixes that flag by supplying the same destination to the per-render check. `focused-2.txt` passes 43/0, including twelve quarter-tick renders. That run began before a comment-only edit; committed-source qualification is separate in the current directory. The current native full-detail fixture passes 60/0 with thirty stable follow-up frames.
 
-The negative result is retained in `baseline-1-output.txt` and `baseline-1-receipt.json`:
+Both failed native sessions were stopped; their original models are unchanged and editor copies saved separately before closing. Exact failed probes are `native-probe-attempt-1.luau` and `native-probe-attempt-2.luau`. `native-probe.luau` is the later stronger fixture with follow-up frames; its hash deliberately differs from both historical prepared models. Never treat a prepared receipt as execution proof or run one of these diagnostic models as a published build.
 
-- Position changes from `(11, -89.69, -50)` to `(11, -89.835833, -50)`, 0.145833 studs downward.
-- Motor state changes from attached to air.
-- Life elapsed time and `NeedsModel.elapsedS` each advance one second.
-- The new assertion fails because the player was not held when known-region collision disappeared.
-
-This fixture uses Free play to avoid unrelated danger, so it proves advancement of the needs clock, not hunger-energy loss or death. It is the real client code running under the CLI box-world shim, not native Roblox streaming pressure or a reproduction of a particular published-game fall. The existing warning-only `WorldClient.update` and the absence of a player collision gate explain the observed path. Both source and assembled-bundle/output hashes are retained.
-
-The initial Python invocation stopped before launching Luau due to an invalid encoding alias; it was corrected to `utf-8-sig`. Baseline1 is the actual terminal Luau run, former exec40452, with the expected failure.
-
-Next add a live player collision gate, preserving position, velocity, state and simulation clocks while known geometry is absent, then resume when it returns. Cover full removal, partial return, second removal after a prior ready result, fixed ticks and prospective airborne seam crossing. Keep normal off-map jumps/falls and intentionally flat legacy fixtures working. Gate on collision, not optional decorations; avoid caching a prior ready result as current authority. Prove it with actual-client checks and a native current-source probe before claiming the user-facing issue fixed.
+Raw CI logs retain timestamp-only lines with trailing spaces so their recorded hashes stay valid; do not normalize them merely to satisfy a whitespace diff check.

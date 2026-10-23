@@ -1,0 +1,7 @@
+2026-10-23T13:00:41.365Z,76.365753,0ff4,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_GUARD] 695e772d9d1ece490dd32132c655ac60c226c7b8 223 persistence_disabled
+2026-10-23T13:00:58.661Z,93.661461,0ff4,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_BEGIN] 1792760459256
+2026-10-23T13:01:06.765Z,101.765488,12c0,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_DIAGNOSTIC_BEFORE] 1792760459256 {"velocity":"19919.998046875, -4158.599609375, 7679.99951171875","targetReady":false,"roundtripError":0,"at":"-22, 0.3100000023841858, 6","predicted":"310, -69, 134","targetRegion":"room_floor_e","target":"310, -69, 134","mode":"air","gravity":"0, -35, 0","predictedRegion":"room_floor_e"}
+2026-10-23T13:01:06.824Z,101.824905,12c0,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_DIAGNOSTIC_AFTER] 1792760459256 {"velocityDelta":0,"moved":0,"targetReady":false,"lifeDelta":0,"menu":false,"position":"-22, 0.3100000023841858, 6","loading":true,"mode":"air","title":false,"needsDelta":0}
+2026-10-23T13:01:07.373Z,102.373459,4020,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_CASES] 1792760459256 hold partial resume same_objects second_out menu_while_waiting projected_tick
+2026-10-23T13:01:07.374Z,102.374458,4020,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_VIEWPORT] 1792760459256 1105 433
+2026-10-23T13:01:07.374Z,102.374458,4020,6,Info [FLog::CreatorOutput] [PLAYER_STREAM_NATIVE_PASS] 1792760459256 60

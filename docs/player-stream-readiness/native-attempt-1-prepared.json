@@ -1,0 +1,16 @@
+{
+  "source": "bf94f9d034018613ed088db001e4f909a52db249",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-player-bf94f9d-full\\Windowsill-player-stream-review.rbxlx",
+  "model_sha256": "ff990fd6adc35f621895f4092a2d8f2e5eddac21d23d598e549d44e3363fcb0f",
+  "manifest_sha256": "c47ffceb86f4ca1b851325a7e4a09d9d0f1fd30bb76ad697a8ecfd58bbbc8001",
+  "guard_sha256": "200b667c14ed6a90f7ed3f8cea426a80e0e6e1e24fa74e7f4f2e9a0cdd8a5125",
+  "probe_sha256": "9b3880303fd156dde2f5deaaaf7e8b8fb39b2ae30ed9111a013b5b98ce34b638",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

@@ -1,0 +1,7 @@
+2026-10-23T12:30:11.4307064Z ##[group]Run out=$(bash tools/check.sh types 2>&1 | grep -v '^\[INFO\]\|didChangeWatchedFiles' || true)
+2026-10-23T12:30:11.4307795Z [36;1mout=$(bash tools/check.sh types 2>&1 | grep -v '^\[INFO\]\|didChangeWatchedFiles' || true)[0m
+2026-10-23T12:30:11.4308239Z [36;1mecho "$out"[0m
+2026-10-23T12:30:11.4308456Z [36;1mtest -z "$out"[0m
+2026-10-23T12:30:11.4370491Z shell: /usr/bin/bash -e {0}
+2026-10-23T12:30:11.4370779Z ##[endgroup]
+2026-10-23T12:30:14.1023922Z 

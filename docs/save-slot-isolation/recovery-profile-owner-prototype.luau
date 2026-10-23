@@ -117,7 +117,7 @@ end
 local function valid(kind: any, mode: any, serial: any, offerId: any): boolean
  return slot(mode) and (kind == "new" or kind == "continue") and type(serial) == "number" and serial == serial
   and serial >= 1 and serial <= Rules.MAX_LIFE_SERIAL and serial % 1 == 0
-  and (kind == "new" and offerId == nil or kind == "continue" and type(offerId) == "string"
+  and (kind == "new" and offerId == nil or type(offerId) == "string"
    and #offerId > 0 and #offerId <= Rules.MAX_LIFE_TOKEN_CHARS)
 end
 function Profile.requestLife(self: any, kind: any, mode: any, serial: any, offerId: any): boolean
@@ -212,7 +212,8 @@ function Profile.step(self: any): boolean
  if not alive(self) or self.busy or self.runtime.busy or self.session.busy then return false end
  local rt = self.runtime
  if not self.recoveryEnabled then return BaseOwner.step(self) end
- if self.switchRequired and rt.accepted then
+ if self.replacementPending and not self.replacementReady then return false end
+ if self.switchRequired and (rt.accepted or self.replacementPending) then
   return stepSwitchHold(self)
  end
  processChoice(self)

@@ -112,7 +112,7 @@ function Adapter.onMessage(self: any, player: any, message: any)
  if t then
   if not Protocol.known(message, {kind=true,v=true,epoch=true,serial=true,id=true,progress=true}) then drop(self); return end
   if message.kind == "session_replace_request" and message.v == Protocol.VERSION and message.epoch == t.epoch and message.serial == t.serial then
-   if t.stage ~= "closing" then reply(self, player, t) end; return
+   if t.stage ~= "closing" and t.stage ~= "preparing" then reply(self, player, t) end; return
   end
   if not scope(t, message) then drop(self); return end
   if message.kind == "session_replace_ack" and t.stage == "offered" then closeOld(self, player, t); return end
@@ -173,17 +173,18 @@ function Adapter.onMessage(self: any, player: any, message: any)
  self.counter += 1
  t = {peer=p,entry=entry,owner=entry.owner,epoch=entry.session.id,serial=message.serial,
   id=Json.checksum(entry.session.id .. ":" .. tostring(message.serial) .. ":" .. tostring(self.counter)),
-  stage="offered",started=now,last=-math.huge}
+  stage="preparing",started=now,last=-math.huge}
  self.transitions[player] = t -- ordinary output/intake closes before callbacks
- if not entry.owner:setProgress(message.progress) or not entry.owner:prepareReplacement() then
-  t.stage = "failed"; reply(self, player, t); return
- end
+ local okay,prepared=pcall(function() return entry.owner:setProgress(message.progress) and entry.owner:prepareReplacement() end)
+ if self.transitions[player]~=t or self.peers[player]~=p or self.closing or t.stage~="preparing" then return end
+ t.stage=if okay and prepared==true then "offered" else "failed"
  reply(self, player, t)
 end
 function Adapter.step(self: any)
  if self.closing then return end
  self.base:step() -- an awaiting-ACK owner maintains only its held lease
  for player, t in self.transitions do
+  if t.stage=="preparing" and self.now()-t.started<Protocol.TIMEOUT then continue end
   if t.stage ~= "closing" and self.now() - t.last >= Protocol.RETRY then
    if self.now() - t.started >= Protocol.TIMEOUT then t.stage = "failed" end
    reply(self, player, t)

@@ -11,14 +11,37 @@ function Owner.new(config: any, emit: any, common: any, profiles: any): any
 end
 function Owner.prepareReplacement(self: any): boolean
  local rt, s = self.runtime, self.session
- if self.closed or s.closed or rt.leaving or not rt.accepted or rt.scopeInvalid or rt.pipeline.leaseLost
-  or not s.backend:valid(s.backend.held) then return false end
- self.switchRequired, self.pendingSelection, self.queue = true, nil, {}
+ -- A selected observation may be left before migration accepts any writes.
+ -- Its held physical lease still requires the same verified departure; only
+ -- an acknowledged fresh session may open the next choice screen.
+ if self.closed or s.closed or rt.leaving or rt.scopeInvalid or rt.pipeline.leaseLost then return false end
+ local held=s.backend.held
+ if held==nil and (rt.accepted or not self.recoveryEnabled or not rt.route
+  or (rt.phase~="discovering" and rt.phase~="offered" and rt.phase~="offer_refused")) then return false end
+ if held~=nil and not s.backend:valid(held) then return false end
+ self.switchRequired, self.pendingSelection, self.queue, self.replacementPending = true, nil, {}, true
  rt.intakeClosed = true
  for _, r in s.intents.requests do s.intents:changed(r, "session_replacement") end
  if rt.reader and rt.discovery and rt.discovery.state == "pending" then rt.reader:cancel(rt.discovery) end
- if rt.phase == "recovering" then rt:cancelRecovery() elseif rt.phase == "entering" then rt:cancelEntry() end
+ if (rt.phase :: string) == "recovering" then rt:cancelRecovery() elseif (rt.phase :: string) == "entering" then rt:cancelEntry() end
  if rt.saveLoop then rt.saveLoop:cancel() end
+ if held==nil then
+  -- The observed read phase normally keeps an ordinary lease without an
+  -- enforcing baseline. Stop intake, drain its provider, then take a distinct
+  -- closed-departure hold. Never relabel it as an accepted migration.
+  local deadline=s.now()+Rules.FLUSH_DEADLINE
+  while self.busy or rt.busy or s.busy or rt.pipeline.busy or (s.backend.activeUpdates or 0)>0
+   or rt.lease and rt.lease.busy or rt.reader and rt.reader.busy do
+   if self.closed or rt.leaving or s.now()>=deadline then return false end
+   rt.config.sleep(math.min(.025,math.max(0,deadline-s.now())))
+  end
+  if self.closed or s.closed or rt.leaving or rt.scopeInvalid or rt.pipeline.leaseLost or s.now()>=deadline then return false end
+  if rt.lease then rt.lease:cancel() end
+  if rt.reader and rt.discovery and rt.discovery.state=="pending" then rt.reader:cancel(rt.discovery) end
+  held=s.backend:hold(s,true);if not held then return false end
+  s.recoveryOwner=rt.pipeline
+ end
+ self.replacementReady=true
  return true
 end
 function Owner.inheritReplacementDebt(self: any, debt: any)

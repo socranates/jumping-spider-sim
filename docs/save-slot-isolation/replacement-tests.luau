@@ -48,6 +48,7 @@ local function fixture(options)
  end
  local server=__replacementService.new({backend=Backend.new(ds,codec),now=function() return f.clock.now end,sleep=function(dt)
    f.clock.now+=dt
+   if options.pausePrepareWait and not f.preparePaused then f.preparePaused=true;coroutine.yield("replacement-prepare-paused") end
    if f.resumeClose and coroutine.status(f.resumeClose)=="suspended" then local ok,why=coroutine.resume(f.resumeClose);assert(ok,why) end
   end,
   spawn=function(fn,...) fn(...) end,jobId="replacement-wire",
@@ -334,6 +335,28 @@ end
 do
  local f=fixture({changingKey=true});f.recover("main");f.begin();f.drive(function() return f.client.transition==nil end)
  check(f.keyLookups==1 and tostring(f.owner.session.cfg.userId)=="46001" and f.b.data.P_46002==nil,"replacement re-evaluated physical account key")
+end
+-- An early menu exit must drain a still-running preaccept reader before its
+-- replacement offer. Retries/forged ACKs during that yield cannot close it.
+do
+ local f=fixture({pausePrepareWait=true})
+ f.drive(function() return f.client:recoveryReady() and not f.client:offerPending() and f.client:offerInfo("easy")~=nil end)
+ local info=f.client:offerInfo("main");check(f.client:continueLife("main",info.id),"preaccept choice refused")
+ local old=f.owner;check(not old.runtime.accepted and old.session.backend.held==nil,"preaccept owner already held migration")
+ local kept=nonP(f.b);check(f.client:requestReplacement(),"preaccept replacement was unavailable")
+ old.busy=true
+ local co=coroutine.create(function() f.client:update() end)
+ local ok,why=coroutine.resume(co);assert(ok,why)
+ check(why=="replacement-prepare-paused","preaccept provider did not drain cooperatively")
+ local t=f.server.transitions[f.player];local received=#f.received;local before=f.b.requests
+ check(t and t.stage=="preparing" and #f.owners==1,"preaccept exit offered a new owner before provider drained")
+ f.server:onMessage(f.player,{kind="session_replace_request",v=1,epoch=t.epoch,serial=t.serial,progress=f.progress})
+ f.server:onMessage(f.player,{kind="session_replace_ack",v=1,epoch=t.epoch,serial=t.serial,id=t.id})
+ f.server:step()
+ check(#f.received==received and f.b.requests==before and not old.session.closed,"preparing retry/forged ACK bypassed quiescence")
+ old.busy=false;ok,why=coroutine.resume(co);assert(ok,why)
+ f.drive(function() return f.client.transition==nil and #f.owners==2 end)
+ check(old:replacementClosed() and nonP(f.b)==kept,"preaccept departure changed original lives or overlapped owners")
 end
 print("SESSION_REPLACEMENT passed="..count.." failed=0")
 end

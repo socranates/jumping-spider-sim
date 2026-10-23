@@ -793,6 +793,7 @@ end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?, selectedSlot: string?): boolean
+ if offered==nil and saveState.application and saveState.application:held() then return false end
  if offered==nil and next(checkpoints.store.data)~=nil then
   return saveState.beginLocalReturn(nil,"reset")
  end
@@ -868,6 +869,7 @@ local function closeScreens()
  if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?): boolean
+ if saveState.application and saveState.application:busy() then return false end
  if not initialRecord or (easy and not session.finishedMain) then return false end
  if saveClient and saveClient:offerPending(if mode=="free" then "free" elseif easy then "easy" else "main") then return false end
  if saveState.restore then saveState.restore:cancel() end
@@ -897,6 +899,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?, displayedO
  closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
+ if saveState.application then saveState.application:finishChoice() end
  return true
 end
 local function continueAnother()
@@ -1152,6 +1155,10 @@ local openMenu: (boolean?) -> ()
 local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if saveState.application and saveState.application:busy() then
+  if choice=="RecoveryExit" then saveState.application:exit() end
+  saveState.application:render();return
+ end
  if choice=="CancelRestore" then
   if saveState.localRestore.job then saveState.cancelLocalReturn(false) else saveState.restore:cancel();openMenu(true) end
   return
@@ -1163,7 +1170,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Continue" or choice=="ContinueEasy" or choice=="RemoteMain" or choice=="RemoteEasy" or choice=="RemoteFree" then
   local mode=if choice=="ContinueEasy" or choice=="RemoteEasy" then "easy" elseif choice=="RemoteFree" then "free" else "main"
   if mode=="easy" and not session.finishedMain then return end
-  local remote=string.sub(choice,1,6)=="Remote" or not stores[mode]:hasKnownRest()
+  local remote=string.sub(choice,1,6)=="Remote" or not stores[mode]:hasKnownRest() or saveState.application and saveState.application:choosing()
   if remote then
    if session.started and confirming~=choice then
     confirming=choice;saveState.confirmOffer=saveState.menuOffers[mode]
@@ -1183,7 +1190,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   return
  end
  if choice=="Free" then
-  local saved=stores.free:hasKnownRest()
+  local saved=stores.free:hasKnownRest() and not (saveState.application and saveState.application:choosing())
   local info=saveClient:offerInfo("free")
   if saved then saveState.beginLocalReturn("free","menu")
   elseif info and info.playable then
@@ -1205,7 +1212,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   local info=saveClient:offerInfo(slot)
   if (session.started or stores[slot]:hasKnownRest() or (info and info.playable)) and confirming~=choice then
    confirming=choice;saveState.confirmOffer=saveState.menuOffers[slot]
-   menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
+   menu:showChoices("Begin a new life?",if saveState.application and saveState.application:choosing() and info and info.protected then "This new spider will not be saved. The protected last rest is kept." elseif choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end
@@ -1224,25 +1231,33 @@ end
 -- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
 -- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
 openMenu=function(renderOnly: boolean?)
+ if saveState.application and saveState.application:busy() then saveState.application:render();return end
  if (saveState.restore and saveState.restore.job) or (saveState.localRestore and saveState.localRestore.job) then
   menu:showChoices("Returning to the last rest","Preparing the saved spider. Your current spider stays until this finishes.","",{{id="CancelRestore",text="Cancel"}},true,"CancelRestore")
   return
  end
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
- local started=session.started
+ local started=session.started and not (saveState.application and saveState.application:choosing())
  saveState.menuOffers={}
  for _,slot in M.SaveRules.MODES do
   local info=saveClient:offerInfo(slot);saveState.menuOffers[slot]=if info then info.id else nil
   if not renderOnly then saveClient:refreshOffer(slot) end
  end
  local choices: {CaughtPanel.Choice}={}
- local function add(id: string) table.insert(choices,{id=id,text=M.TitleText.choice(id,started)}) end
+ local function add(id: string)
+  local text=M.TitleText.choice(id,started)
+  if saveState.application and saveState.application:choosing() and (id=="New" or id=="Easy") then
+   local info=saveClient:offerInfo(if id=="New" then "main" else "easy")
+   if info and info.protected then text..=" without saving" end
+  end
+  table.insert(choices,{id=id,text=text})
+ end
  if started then add("Resume");add("Controls") end
  for _,slot in {"main","easy","free"} do
   if slot=="easy" and not session.finishedMain then continue end
   local info=saveClient:offerInfo(slot);local decision=saveClient:decision(slot)
-  local localRest=stores[slot]:hasKnownRest()
+  local localRest=stores[slot]:hasKnownRest() and not (saveState.application and saveState.application:choosing())
   if slot~="free" and (localRest or (info and info.playable and not saveClient:offerPending(slot))) then
    local id=if slot=="main" then "Continue" else "ContinueEasy"
    local text=M.TitleText.choice(id,started)
@@ -1256,7 +1271,7 @@ openMenu=function(renderOnly: boolean?)
  if not saveClient:offerPending("main") then add("New") end
  if session.finishedMain and not saveClient:offerPending("easy") then add("Easy") end
  local freeInfo=saveClient:offerInfo("free")
- if not saveClient:offerPending("free") then table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and not stores.free:hasKnownRest() then "Continue Free play without saving" else M.TitleText.choice("Free",started)}) end
+ if not saveClient:offerPending("free") then table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and (not stores.free:hasKnownRest() or saveState.application and saveState.application:choosing()) then "Continue Free play without saving" else M.TitleText.choice("Free",started)}) end
  table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
  if started or #book.opened>0 then table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE}) end
  menu:setLook(if started then "card" else "title")
@@ -1280,6 +1295,7 @@ nbPanel=NotebookPanel.new(player:WaitForChild("PlayerGui"),book,function(to: str
  else setHudShown(true) end
 end)
 openNotebook=function(to: string?)
+ if saveState.application and saveState.application:busy() then openMenu(true);return end
  if nbPanel:isShowing() then return end
  if to=="menu" then menu:hide()
  elseif to=="end" then panel:hide()
@@ -1339,6 +1355,7 @@ settingsPanel=M.SettingsPanel.new(player:WaitForChild("PlayerGui"),{
  if to=="menu" then openMenu() else setHudShown(true) end
 end)
 openSettings=function(to: string?)
+ if saveState.application and saveState.application:busy() then openMenu(true);return end
  if settingsPanel:isShowing() then return end
  if to=="menu" then menu:hide()
  elseif modal() then return
@@ -1478,6 +1495,7 @@ function saveState.cancelLocalReturn(resume:boolean?)
  saveState.localReturnScreen(j.stamp,resume)
 end
 function saveState.beginLocalReturn(mode:string?,action:string):boolean
+ if saveState.application and saveState.application:held() then return false end
  local slot=mode
  if not slot then for name,st in stores :: {[string]:any} do if st==checkpoints then slot=name end end end
  if not slot or (slot=="easy" and not session.finishedMain) then return false end
@@ -1552,9 +1570,12 @@ saveState.restore=require(script.Parent.SaveRestore).new({
   saveClient:abortContinue(stamp.mode,stamp.serial,stamp.epoch)
   saveState.restoreError="That rest could not be loaded. Your current spider is kept.";openMenu(true)
  end,
- completed=function(_stamp: any) closeScreens() end,
+ completed=function(_stamp: any)
+  if saveState.application then saveState.application:finishChoice() end
+  closeScreens()
+ end,
 })
-saveClient = SaveClient.new({
+saveState.clientConfig = {
 	rules = M.SaveRules, now = os.clock,
  continuation={copy=M.SaveJson.copy,offerWork={new=require(Shared.Persistence.SaveWork).new,options={budget=.002,maxSeconds=120}},
   validate=function(mode: string,record: any,allowRetired: boolean): boolean
@@ -1587,7 +1608,49 @@ saveClient = SaveClient.new({
 	onRest = function(mode: string, record: any) adoptRest(mode, record) end,
 	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
 	build = progressSnapshot,
-})
+}
+saveClient = SaveClient.new(saveState.clientConfig)
+-- Trusted integration seam: factories are server-compatible modules supplied by
+-- engine startup, never an attribute/remote/player setting. Ordinary startup
+-- does not install recovery. Rebinding an already-started transport is refused.
+function saveState.installRecovery(factories:any): (boolean,string?)
+ if saveState.application or saveClient.phase~="searching" or saveClient.remotes~=nil or saveClient.bound.epoch~=nil then return false,"transport already started" end
+ if type(factories)~="table" or type(factories.client)~="function" or type(factories.entry)~="function" then return false,"trusted factories required" end
+ local app=require(script.Parent.RecoveryApplication).new({
+  pause=saveState.pauseRecovery,held=function() return saveState.recoveryPause~=nil end,
+  invalidate=saveState.invalidateRest,generation=function() return saveState.worldGeneration end,
+  started=function() return session.started end,healthy=function() return not saveState.broken end,
+  pauseUI=function()
+   panel:hide();nbPanel.gui.Enabled=false;settingsPanel.gui.Enabled=false
+   controls:clear();dropAll();setHudShown(false)
+  end,
+  visible=function() return menu:isShowing() end,
+  show=function(phase:string,canExit:boolean)
+   controls:clear();dropAll();setHudShown(false);menu:setLook("card")
+   menu:showChoices(if phase=="failed" then "The saved spider could not be opened" elseif phase=="replacing" then "Changing saved spiders" else "Opening the saved spider",
+    if phase=="failed" then "This spider stays paused." else "The world waits while the saved spider is checked.",
+    if canExit then "You can choose another spider." else "If this cannot finish, leave and rejoin to choose again.",
+    if canExit then {{id="RecoveryExit",text="Choose another spider"}} else {},true)
+   menu:setHint(M.TitleText.navHint(device));menu:setTextScale(if setting("LargeText")==true then 1.5 else 1)
+  end,
+  freshMenu=function()
+   confirming=nil;session.started=false;menuStarted=true
+   panel:hide();nbPanel.gui.Enabled=false;settingsPanel.gui.Enabled=false
+   openMenu(true);return menu:isShowing()
+  end,
+  resumeUI=closeScreens,
+ })
+ local ok,candidate=pcall(function(): (any,any)
+  local client=factories.client(app:configure(saveState.clientConfig),app:replacementOptions())
+  local adapter=factories.entry({client=function() return client end,state=saveState,world=checkpointWorld,
+   now=function() return client.cfg.now() end,workOptions={budget=.002,maxSeconds=120},
+   prepareAdoption=saveState.restore.cfg.prepare})
+  app:bind(client,adapter);return client,adapter
+ end)
+ if not ok then return false,tostring(candidate) end
+ saveState.application=app;saveClient=candidate
+ return true,nil
+end
 saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
@@ -1638,6 +1701,7 @@ function saveState.fail(err: any)
 	saveState.broken = true
  if saveState.restore then saveState.restore:cancel() end
  if saveClient and saveClient.bound then saveClient.bound:closeOffers() end
+ if saveState.application and saveState.application:held() then saveState.application:fail(err) end
 	warn("[Windowsill] saving is off for this visit: " .. tostring(err))
 	hud:toast(M.SaveText.BROKEN, true)
 	hud:saveNotice(M.SaveText.brokenLine())
@@ -1645,6 +1709,7 @@ function saveState.fail(err: any)
 end
 -- Saving cannot stop the frame. A failed network path stays off for the visit; local last rests still prepare.
 function saveState.frame()
+ if saveState.application then saveState.application:update() end
  local localJob=saveState.localRestore.job
  local localOk,localError=pcall(function() saveState.localRestore:update() end)
  if not localOk then
@@ -1670,7 +1735,7 @@ end
 
 controls = SpiderInput.bind({
 	blocked = function(): boolean return (rivalLegs.navigation ~= nil and rivalLegs.navigation.status ~= "ready") or modal() or M.title:holding() end, -- Loading and the intro own the controls.
-	menu = function() if saveState.localRestore.job then saveState.cancelLocalReturn(true) elseif settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
+	menu = function() if saveState.application and saveState.application:held() then openMenu(true) elseif saveState.localRestore.job then saveState.cancelLocalReturn(true) elseif settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
 	focus = function(phase: string)
@@ -1734,7 +1799,7 @@ controls = SpiderInput.bind({
 	end,
 	drop = function() if life.growth:isMoulting() or mateLegs.couple.active or spiderPick.inspecting then return end; ant.stopDisplay(); motor:requestDrop() end,
 	clear = dropAll,
-	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
+	reset = function() if saveState.application and saveState.application:held() then openMenu(true) elseif not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() if spiderPick.inspecting then return end; rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function()
 		if mateLegs.couple.active then return end

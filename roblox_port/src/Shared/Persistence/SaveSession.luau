@@ -152,6 +152,7 @@ end
 -- Goes session-only. Gameplay records stay in memory until ownership is recovered
 -- (when `retry` is true); a queued metadata-only request may release our old lock.
 function SaveSession.demote(self: any, reason: string, retry: boolean)
+ self._loadSerial=(self._loadSerial or 0)+1 -- invalidate suspended older acquisitions/reads
 	revokeIntents(self,reason)
 	-- No yielding store call here: demotion can run inside a message callback.
 	-- A later step/flush releases only a lock still owned by this exact session.
@@ -266,12 +267,20 @@ local function previewOne(self: any,mode: string)
  if callback then pcall(callback,mode,self.observations:offer(mode)) end
 end
 
-local function readRests(self: any)
-	for _, mode in SaveRules.MODES do
-		if not self.restLoaded[mode] then
+local function readRests(self: any, maxReads: number?)
+ local generation=self._loadSerial
+ local start=self.restReadCursor or 1
+ local reads=0
+ for offset=0,#SaveRules.MODES-1 do
+  local index=(start+offset-1)%#SaveRules.MODES+1
+  local mode=SaveRules.MODES[index]
+  if not self.restLoaded[mode] then
+   if maxReads and reads>=maxReads then break end
+   reads+=1;self.restReadCursor=index%#SaveRules.MODES+1
 			local ok, value, err = readCurrent(self,self.rkey[mode])
 			self.sched:begin(nil, self.now())
 			self.counters.requests += 1
+   if self.closed or self.state~="active" or not self.lockHeld or self._loadSerial~=generation then return end
 			if not ok then
 				log(self, `could not read the {mode} rest: {tostring(err)}`)
 				self.restRetryAt = self.now() + SaveScheduler.backoff(1, SaveStores.classify(err))
@@ -324,10 +333,13 @@ local function readRests(self: any)
 end
 
 -- Loads the player's records. Yields (backend calls). Returns the state: "active" or "session".
-function SaveSession.load(self: any): string
-	if self.closed then return self.state end
+function SaveSession.load(self: any, deferRests: boolean?): (string,boolean?)
+	if self.closed then return self.state,false end
+ self._loadSerial=(self._loadSerial or 0)+1
+ local ticket=self._loadSerial
 	revokeIntents(self,"revalidating")
 	local verdict, info = attemptLock(self)
+ if self.closed or self._loadSerial~=ticket then return self.state,false end
 	local first = self.state == "loading"
 	if verdict == "ok" then
 		self.sched:abandon("release") -- a deliberate successful load owns the lease again
@@ -335,7 +347,9 @@ function SaveSession.load(self: any): string
 		self.state, self.reason, self.lockHeld, self.canRetry = "active", nil, true, false
 		self.sched:beat(self.now())
 		self.restLoaded = {} -- read again: another session may have written a rest while this one could not
-		readRests(self)
+  self.restRetryAt=0
+  self.restReloading=deferRests==true
+  if not deferRests then readRests(self) end
 	elseif verdict == "locked" then
 		if info and info.payload then self.progress = SaveProgress.merge(info.payload, self.progress, info.updatedAt or 0, self.progressTime) end
 		self.state = "session"
@@ -358,8 +372,9 @@ function SaveSession.load(self: any): string
 		self.state = "session"
 		self:demote("load_failed", true)
 	end
+	if self.closed or self._loadSerial~=ticket then return self.state,false end
 	if first or self.state == "active" then self:notify() end
-	return self.state
+	return self.state,true
 end
 
 -- ---------------------------------------------------------------- what the client gives and what is known
@@ -817,8 +832,8 @@ local function stepInner(self: any): boolean
 		elseif self.canRetry and now >= self.retryAt and self.sched:budgetOk(now) then
 			self.retryAt = now + SaveRules.RETRY_LOAD
 			local wasReason = self.reason
-			self:load()
-			if SaveSession.isActive(self) then
+			local _,applied=self:load(true) -- one lock request; subsequent steps read the rest slots
+			if applied and not self.closed and SaveSession.isActive(self) then
 				log(self, `holds the record again (was: {tostring(wasReason)})`)
 				local f = self.cfg.onLoaded
 				if f then f(self:snapshot()) end
@@ -835,14 +850,20 @@ local function stepInner(self: any): boolean
 		elseif not SaveSession.restsLoaded(self) then
 			if now >= self.restRetryAt and self.sched:budgetOk(now) then
 				local before: { [string]: any } = {}
-				for _, mode in SaveRules.MODES do before[mode] = self.rests[mode] end
-				readRests(self)
+    local beforeLoaded: {[string]:boolean} = {}
+				for _, mode in SaveRules.MODES do before[mode] = self.rests[mode];beforeLoaded[mode]=self.restLoaded[mode]==true end
+    local generation=self._loadSerial
+				readRests(self,1)
+    if self.closed or self.state~="active" or not self.lockHeld or self._loadSerial~=generation then return true end
 				for _, mode in SaveRules.MODES do
-					if self.rests[mode] ~= nil and before[mode] == nil then
+					if self.restLoaded[mode] and self.rests[mode] ~= nil and (before[mode] == nil or (self.restReloading and not beforeLoaded[mode])) then
 						local f = self.cfg.onRest
 						if f then f(mode, self.rests[mode]) end
 					end
 				end
+    if self.restReloading and self.state=="active" and SaveSession.restsLoaded(self) then
+     self.restReloading=false
+    end
 			else
 				did = false
 			end
@@ -886,7 +907,7 @@ function SaveSession.step(self: any): boolean
 		log(self, "step failed: " .. tostring(did))
 		return false
 	end
-	self:notify()
+	if not self.closed then self:notify() end
 	return did :: boolean
 end
 
@@ -896,7 +917,7 @@ function SaveSession.snapshot(self: any): any
 	local rests: { [string]: any } = {}
 	for _, mode in SaveRules.MODES do
   local request=self.lifeRequests[mode]
-  if not request or request.done then rests[mode]=self.rests[mode] end
+  if (not request or request.done) and (not self.restReloading or self.restLoaded[mode]) then rests[mode]=self.rests[mode] end
  end
  return { status = status, reason = reason, progress = self.progress, rests = rests, lives = Json.copy(self.lifeTokens), protected = self:protectedSlots() }
 end

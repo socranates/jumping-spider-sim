@@ -1,0 +1,12 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "session_sha256": "8ad013b9f00326bdc686bb1c72be7717075ce55b5595ecf0347bc540f73e2aee",
+  "regression_sha256": "f451220bafa78a1f5e77a6a79ddd773b48ef0361cece7e61afda3a18a7822247",
+  "added_assertions": 127,
+  "expected_state_assertions": 1251,
+  "expected_full_assertions": 468352,
+  "native_assertions": 127,
+  "full_gates": "pending",
+  "published": false,
+  "progress_import_implemented": false
+}

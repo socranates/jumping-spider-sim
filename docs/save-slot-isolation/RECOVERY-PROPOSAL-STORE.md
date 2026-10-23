@@ -1,0 +1,21 @@
+# Private immutable proposal publication and restart
+
+`recovery-proposal-store-prototype.luau` publishes only M1 keys. It never reads or writes P, R or A1, never changes original saves and grants no destination-write or gameplay authority. Before using it in production, the recovery controller must verify the completed archive and maintain source/selection/ownership fences. This module does not substitute a local fence for remote ownership proof.
+
+## Protocol
+
+The caller supplies a prepared packet anchor and a synchronous revocation fence. Begin owns and freezes the bounded opaque transport before later operations can yield. The state machine first reads the M1 key with an explicitly uncached raw method. A missing key advances to UpdateAsync, whose callback inserts only when the value is nil; every existing value, including false/corrupt/future values, is left untouched. UpdateAsync may retry its callback; it has no allocation, decompression or external side effects. Each step makes at most one backend request. The caller must supply request scheduling, retry backoff and a total deadline; there is no internal rapid retry loop.
+
+Both successful and ambiguous write acknowledgements lead to fresh raw readback. An acknowledgement or returned candidate alone never produces ready. A read failure is not missing. A missing readback after a write yields retry, requiring explicit caller backoff/retry. A valid matching stored proposal wins byte-for-byte, even if a new encoding or newer session progress observation produced a different candidate. Its fixed timestamp, choices and rare binding are retained; newer observations must later be merged separately during global absorption.
+
+Matching requires the exact owner, slot, M1 id, archive manifest and selected raw-source descriptor, plus full packet validation. Invalid data and a different scope refuse without overwriting. Input/readback structure is bounded to 256 nodes/depth 8 and the storage character limit before copying; expanded checkpoint/progress validation uses the packet's separate bounds. Stored and exposed values are owned/frozen. Fences run before/after requests, inside the update callback and before visibility. Cancellation during a request cannot expose a result; an already committed immutable M1 can remain for a later legitimate restart. This is not a claim that revocation can undo a remote write.
+
+## Evidence and limits
+
+79 focused checks pass with the preceding 581 packet/progress/destination/life/meal checks (660 total); full strict analysis passes with nine private candidate modules. Tests use actual MemoryBackend over a reversible codec fixture, not a real DataStore or native Zstandard. They cover first publication, exact-byte restart, competing differently encoded proposals, later observations, lost acknowledgements before/after write, read failures, false/corrupt/future conflicts, archive conflict, cyclic input/readback, caller mutation, fence revocation and reentrant cancellation. A fake successful acknowledgement without any stored value never grants ready. Each tested step is checked for at most one request and all publication requests are M1-only.
+
+The retained first draft fails the retry test because its old write-error marker prevents an explicit retry from advancing. The corrected retry clears that marker before a new fresh read. Before-empty-readback evidence retains the subsequent green cohort; the current cohort adds bounded handling of a successful acknowledgement followed by absence. The verifier binds current and failed bundles to exact inputs and output hashes.
+
+Packet validation is bounded but currently synchronous outside SaveWork; no frame-time or native performance claim is made. Future controller integration must schedule validation cooperatively and measure native decoding/validation latency before release. Provider callbacks, actual caching/service behavior, compressed data sizes, request quotas and cross-session races still need native/service qualification.
+
+Still required: actual controller/A1 verification composition; exact raw selected-R CAS with ownership/intent policy; lossless P absorption; schema-3 readers and later writers preserving pending proposals; mating/hatching/ended-life entry; native and real-service interrupted/rejoin proof. No production source or published game changed.

@@ -1,0 +1,10 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+C:/Users/natha/AppData/Local/Temp/tmpchm49bcj.luau:47089: retry did not publish
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpchm49bcj.luau:47089 function check
+C:/Users/natha/AppData/Local/Temp/tmpchm49bcj.luau:47123

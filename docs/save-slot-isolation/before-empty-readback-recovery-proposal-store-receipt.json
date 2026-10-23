@@ -1,0 +1,29 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 0,
+  "inputs": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-meals-tests.luau": "69ccbc33d086b1ac21f92c251879b92e254050b9d97b9d0993c6a2ea3f180f8b",
+    "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
+    "recovery-life-tests.luau": "385b3dd40072f3c2fa4e760e5a8b58cd65ba729766dbcb9af673031e630adda5",
+    "Checkpoint.luau": "4f91289a5a8240e6d30ff794ef0fb53ac3f8cd449e52d8e575db9a19710f8866",
+    "SaveRest.luau": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d",
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
+    "recovery-destination-tests.luau": "40c93d45fb107b501904d4a9f5071252e3a5d6a47150f75e8fad38e90d54f102",
+    "recovery-progress-prototype.luau": "9e79e0427851ff8cb6a31654e294cd5c0da18e2801df3ad43b082a6c8a6f633d",
+    "recovery-progress-tests.luau": "8f602d2493d8a6ca789e1cc52c08395d708bc4082d3a2869a4374683465e923b",
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
+    "recovery-packet-tests.luau": "23aaaf4851c654675e6f95944d934e884dbe7933a08f7d7784bcead327c73f62",
+    "recovery-proposal-store-prototype.luau": "81f118f4d7d6998d6efeef3d8609dfdc05fa269666b67bea21683c7c9e5ef421",
+    "recovery-proposal-store-tests.luau": "9b86d300d4b6177913e528b65ae72303a378da264d4da973dc50be53498263e0"
+  },
+  "bundle_sha256": "396441205cab9dd8156f23c86878b3b749e81f8179c64b799da890fb05b57e3c",
+  "output_sha256": "cafb7d5d7c46483507ae2e303100c70f72a35d71a829c408230314b2a5a1c5a2",
+  "production_connected": false,
+  "real_datastore_verified": false,
+  "native_verified": false,
+  "destination_commit_authorized": false
+}

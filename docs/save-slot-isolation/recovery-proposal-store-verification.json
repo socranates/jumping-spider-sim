@@ -1,0 +1,22 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "proposal_store_assertions": 79,
+  "packet_regression_assertions": 38,
+  "progress_regression_assertions": 62,
+  "destination_regression_assertions": 72,
+  "life_regression_assertions": 360,
+  "meal_regression_assertions": 49,
+  "current_runtime_bundle_verified": true,
+  "strict_clean": true,
+  "immutable_restart_bytes_verified": true,
+  "competing_proposals_verified": true,
+  "lost_acknowledgements_verified": true,
+  "failed_retry_counterexample_reproduced": true,
+  "production_connected": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "controller_integrated": false,
+  "destination_commit_authorized": false,
+  "complete_migration": false,
+  "published": false
+}

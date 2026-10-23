@@ -1,7 +1,7 @@
 {
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
-  "private_inputs_committed": false,
-  "private_commit": null,
+  "private_inputs_committed": true,
+  "private_commit": "24e8bfbaff5a378080dd3fb3918476da1c8766f9",
   "preceding_checks": 282370,
   "ordinary_Session_checks": 583,
   "ordinary_Runtime_checks": 1122,

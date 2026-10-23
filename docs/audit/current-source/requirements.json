@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T21:45:28.678837Z",
+  "as_of_utc": "2026-10-23T22:14:31.571827Z",
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
   "goal_complete": false,
   "published": false,
@@ -451,8 +451,8 @@
     },
     {
       "id": "save-request-budget",
-      "status": "private-held-qualified-ordinary-session-and-service-still-open",
-      "evidence_boundary": "Exact8ad013b9 session adopted in4220d0c, with127 regular checks and STATE1251/0. Both full platforms76/468352/0, compile222, strict and runner 5 pass, plus native127/224 fingerprints/zero errors under strengthened callback accounting. Prior20f59026 failed integration1250/2 and was withdrawn before commit. Actual service/rejoin/full transport remain unverified. Private typed admission candidate:30 groups/4853 checks/0 with2 compile/strict-clean modules; exact production DataStoreBackend exercised with injected providers. Clock-reentrancy counterexample retained and fixed; plain record validation added. Not integrated with actual owner workers, native fixture or normal startup; no loading speedup or online qualification. Current request-admission limits are test configuration only. Typed discovery override qualified privately:211864 checks/48 named groups/0,44 candidates compile/strict-clean; portable gate/backend/bridge4873 and independent1200-step ledger comparison12215/0. Paired CLI busy-queue median112.303 ->2.121ms from eliminating repeated history scans. Conservative legacy-debt import and actual-provider accounting implemented; thrown backend exception/backoff regression reproduced and fixed. Remaining workers/service epoch lanes/driver are unconverted; no normal startup, native/online activation, FPS or loading speedup claim. Private actual discovery/entry/read-lease candidate passes212214 checks/58 named groups/0 with44 compile/strict-clean candidates;341 entry/lease and9 scheduler-callback guard checks above preceding211864. Controlled and actual StartupBudget cancellation counterexamples reproduced/fixed with worker-v2; actual wrapper adds4 separate checks. Cold typed entry retains all10 fresh reads plus exact client receipt, renews through80-second handoff, and rejects changed final storage. Nested archive/commit/pipeline/save/New/departure, service account lanes and cooperative driver remain unconverted. No normal startup/native/online/FPS/loading claim. Private archive admission candidate:213918 checks/73 named groups/0,46 mounted targets compile/full strict-clean (45 distinct sources), plus5650 portable checks. Typed nested collector/repository/controller use atomic actual-start counters, stable pending transforms, fresh exact archive readback, reentry exclusion and safe committed cancellation/drain. worker-v3 and nested Operation fix reproduced unbounded scheduler history;180-read traces retain60 timestamps and lifetime counts/debt. Pipeline/Commit/writers/save/New/departure/service lanes/driver remain unconverted; no normal startup/native/online/FPS/loading claim. Private typed cold pipeline/proposal/rest/global-absorption/commit candidate:217320 checks/84 named groups/0,46 targets compile/full strict-clean (45 sources). Main raw/compressed and actual Runtime Free/Easy accepted recovery reach entry-required without gameplay authority. Lost acknowledgements, exact raw target/readback, queued final lease, foreign owner, cancelled committed raw write/drain, caps, resume and changed rebind witness pass. Main52/43 requests are synthetic counts only. Recovered save-loop/current/routine progress, New/retire/departure/load/service lanes/driver remain unconverted; no normal startup/native/online/FPS/loading claim. Private typed recovered progress/current-rest/save-loop candidate:254680 fixed checks/95 named groups/0,46 targets compile/full strict-clean (45 sources). Main/Free/Easy actual-entry fixtures pass subsequent progress/checkpoint/idle saves; latest choices during suspended providers, queued writes, exact stored ACKs, per-key timing, ambiguous P/R outcomes, foreign ownership, caps/deadlines and committed-write cancellation/drain pass. Restoring the old aggregate-limited due call reproduces its scheduling defect; typed scheduling retains per-key due time instead. New/fresh/retirement policy owners, departure/load/service lifecycle and cooperative driver remain unqualified with admission. No normal startup/native/online/FPS/loading/publication claim. Private typed New/departure/Runtime lifecycle candidate:272651 fixed checks/111 named groups/0,46 targets compile/full strict-clean (45 sources). New preserves originals/M1 before retirement without granting gameplay. Closed departure reconciles latest/pending progress, cancels queued maintenance and verifies uncached lock release. Restoring the prior Runtime timeout branch reproduces a queued operation leak; Departure.expire fixes it. Main/Free/Easy retire/fresh/depart and returning-retired New-only paths pass; suspended committed cancellation/drain retains storage/debt. Direct typed Runtime replacement is guarded until service-owned fresh lanes exist. Terminal-held Idle, initial/normal Session/provider/service lifecycle and cooperative driver remain open. No normal startup/native/online/FPS/loading/publication claim. Private terminal-held maintenance candidate:282370 fixed checks/119 named groups/0,46 targets compile/full strict-clean (45 sources). All terminal phases retain fresh lock-only maintenance with typed waits/callback replay, actual-start accounting, safe suspended cancellation/drain, selected retry and Runtime held/departure routing. Original A1/M1 and latest choices remain. Ordinary Session admission and service/driver remain open. Two actual production/factory-baseline counterexamples remain UNFIXED: delayed initial callback acknowledges an expired stored lock while recording a newer scheduler beat; in-flight initial rest read is not charged until return. Intentionally failing source-bound probes are separate from passing held regression totals. No normal startup/native/online/FPS/loading/publication claim.",
+      "status": "private-ordinary-qualified-service-lifetimes-and-native-still-open",
+      "evidence_boundary": "Exact8ad013b9 session adopted in4220d0c, with127 regular checks and STATE1251/0. Both full platforms76/468352/0, compile222, strict and runner 5 pass, plus native127/224 fingerprints/zero errors under strengthened callback accounting. Prior20f59026 failed integration1250/2 and was withdrawn before commit. Actual service/rejoin/full transport remain unverified. Private typed admission candidate:30 groups/4853 checks/0 with2 compile/strict-clean modules; exact production DataStoreBackend exercised with injected providers. Clock-reentrancy counterexample retained and fixed; plain record validation added. Not integrated with actual owner workers, native fixture or normal startup; no loading speedup or online qualification. Current request-admission limits are test configuration only. Typed discovery override qualified privately:211864 checks/48 named groups/0,44 candidates compile/strict-clean; portable gate/backend/bridge4873 and independent1200-step ledger comparison12215/0. Paired CLI busy-queue median112.303 ->2.121ms from eliminating repeated history scans. Conservative legacy-debt import and actual-provider accounting implemented; thrown backend exception/backoff regression reproduced and fixed. Remaining workers/service epoch lanes/driver are unconverted; no normal startup, native/online activation, FPS or loading speedup claim. Private actual discovery/entry/read-lease candidate passes212214 checks/58 named groups/0 with44 compile/strict-clean candidates;341 entry/lease and9 scheduler-callback guard checks above preceding211864. Controlled and actual StartupBudget cancellation counterexamples reproduced/fixed with worker-v2; actual wrapper adds4 separate checks. Cold typed entry retains all10 fresh reads plus exact client receipt, renews through80-second handoff, and rejects changed final storage. Nested archive/commit/pipeline/save/New/departure, service account lanes and cooperative driver remain unconverted. No normal startup/native/online/FPS/loading claim. Private archive admission candidate:213918 checks/73 named groups/0,46 mounted targets compile/full strict-clean (45 distinct sources), plus5650 portable checks. Typed nested collector/repository/controller use atomic actual-start counters, stable pending transforms, fresh exact archive readback, reentry exclusion and safe committed cancellation/drain. worker-v3 and nested Operation fix reproduced unbounded scheduler history;180-read traces retain60 timestamps and lifetime counts/debt. Pipeline/Commit/writers/save/New/departure/service lanes/driver remain unconverted; no normal startup/native/online/FPS/loading claim. Private typed cold pipeline/proposal/rest/global-absorption/commit candidate:217320 checks/84 named groups/0,46 targets compile/full strict-clean (45 sources). Main raw/compressed and actual Runtime Free/Easy accepted recovery reach entry-required without gameplay authority. Lost acknowledgements, exact raw target/readback, queued final lease, foreign owner, cancelled committed raw write/drain, caps, resume and changed rebind witness pass. Main52/43 requests are synthetic counts only. Recovered save-loop/current/routine progress, New/retire/departure/load/service lanes/driver remain unconverted; no normal startup/native/online/FPS/loading claim. Private typed recovered progress/current-rest/save-loop candidate:254680 fixed checks/95 named groups/0,46 targets compile/full strict-clean (45 sources). Main/Free/Easy actual-entry fixtures pass subsequent progress/checkpoint/idle saves; latest choices during suspended providers, queued writes, exact stored ACKs, per-key timing, ambiguous P/R outcomes, foreign ownership, caps/deadlines and committed-write cancellation/drain pass. Restoring the old aggregate-limited due call reproduces its scheduling defect; typed scheduling retains per-key due time instead. New/fresh/retirement policy owners, departure/load/service lifecycle and cooperative driver remain unqualified with admission. No normal startup/native/online/FPS/loading/publication claim. Private typed New/departure/Runtime lifecycle candidate:272651 fixed checks/111 named groups/0,46 targets compile/full strict-clean (45 sources). New preserves originals/M1 before retirement without granting gameplay. Closed departure reconciles latest/pending progress, cancels queued maintenance and verifies uncached lock release. Restoring the prior Runtime timeout branch reproduces a queued operation leak; Departure.expire fixes it. Main/Free/Easy retire/fresh/depart and returning-retired New-only paths pass; suspended committed cancellation/drain retains storage/debt. Direct typed Runtime replacement is guarded until service-owned fresh lanes exist. Terminal-held Idle, initial/normal Session/provider/service lifecycle and cooperative driver remain open. No normal startup/native/online/FPS/loading/publication claim. Private terminal-held maintenance candidate:282370 fixed checks/119 named groups/0,46 targets compile/full strict-clean (45 sources). All terminal phases retain fresh lock-only maintenance with typed waits/callback replay, actual-start accounting, safe suspended cancellation/drain, selected retry and Runtime held/departure routing. Original A1/M1 and latest choices remain. Ordinary Session admission and service/driver remain open. Two actual production/factory-baseline counterexamples remain UNFIXED: delayed initial callback acknowledges an expired stored lock while recording a newer scheduler beat; in-flight initial rest read is not charged until return. Intentionally failing source-bound probes are separate from passing held regression totals. No normal startup/native/online/FPS/loading/publication claim. Private ordinary Session/Runtime candidate now passes284075 fixed checks/138 named groups/0,48 compile/full strict-clean targets (47 sources), plus separate STATE1488/STATE_CLIENT161. All eight ordinary I/O entry sites use retained typed requests; actual Runtime carries one lane from construction through entry/saving/departure in all modes. The two loader counterexamples are fixed privately and original failing production receipts retained. Coarse os.time waits qualified and prior rejection reproduced. Profile option rebinding, service account ownership, failed/cancelled initial construction, cleanup/drain, removal/shutdown and replacement remain open. No normal startup/native/online/FPS/loading/publication claim.",
       "references": [
         "docs/recovery-verified-gates/README.md",
         "docs/save-slot-isolation/session-verified-native-qualification.json",
@@ -480,29 +480,46 @@
         "docs/request-admission/HELD-WORKERS.md",
         "docs/request-admission/held-verification.json",
         "docs/request-admission/verify-held.py",
-        "docs/request-admission/SESSION-BOUNDARIES.md"
+        "docs/request-admission/SESSION-BOUNDARIES.md",
+        "docs/request-admission/ORDINARY-WORKERS.md",
+        "docs/request-admission/ordinary-verification.json",
+        "docs/request-admission/verify-ordinary.py"
       ],
       "historical_status_before_ordinary_boundary_audit": "corrected-adopted-both-platforms-and-isolated-native-verified"
     },
     {
       "id": "save-initial-lock-freshness",
-      "status": "reproduced-unfixed",
-      "evidence_boundary": "Actual production SaveSession with factory-bound baseline, synthetic delayed first callback: active at221 with stored lock beat100 (LOCK_STALE120), scheduler beat221 and baseline ACK. Correctness assertion intentionally fails. No native incidence claim and no fix yet.",
+      "status": "fixed-private-candidate-awaiting-service-native-release",
+      "evidence_boundary": "Exact original delayed-callback correctness assertion passes with private ordinary Session and actual factory baseline: active at221, stored/scheduler beat221, exact positive ACK. Callback time and fresh acknowledgement are required. Original production assertion still fails and remains archived; no live installation/native incidence claim.",
       "references": [
         "docs/request-admission/SESSION-BOUNDARIES.md",
         "docs/request-admission/session-boundaries-before-fix-1-late-lock-receipt.json",
-        "docs/request-admission/session-boundaries-before-fix-1-late-lock-output.txt"
-      ]
+        "docs/request-admission/session-boundaries-before-fix-1-late-lock-output.txt",
+        "docs/request-admission/ORDINARY-WORKERS.md",
+        "docs/request-admission/ordinary-verification.json",
+        "docs/request-admission/verify-ordinary.py",
+        "docs/request-admission/ordinary-boundaries-qualified-2-late-lock-receipt.json",
+        "docs/request-admission/ordinary-boundaries-qualified-2-late-lock-output.txt"
+      ],
+      "historical_status_before_private_ordinary_fix": "reproduced-unfixed",
+      "historical_evidence_before_private_ordinary_fix": "Actual production SaveSession with factory-bound baseline, synthetic delayed first callback: active at221 with stored lock beat100 (LOCK_STALE120), scheduler beat221 and baseline ACK. Correctness assertion intentionally fails. No native incidence claim and no fix yet."
     },
     {
       "id": "save-inflight-initial-read-accounting",
-      "status": "reproduced-unfixed",
-      "evidence_boundary": "Actual production SaveSession with factory-bound baseline, after a physical MemoryBackend rest read suspends: provider starts2, Session requests/history1. readRests charges only after readCurrent returns. Correctness assertion intentionally fails. Shared typed admission must account before dispatch; no fix yet.",
+      "status": "fixed-private-candidate-awaiting-service-native-release",
+      "evidence_boundary": "Exact original suspended initial-read correctness assertion passes with private ordinary Session and actual factory baseline: provider/Session/history2/2/2 before the read returns. Actual starts are charged before dispatch. Original production assertion still fails and remains archived; no live installation/native incidence claim.",
       "references": [
         "docs/request-admission/SESSION-BOUNDARIES.md",
         "docs/request-admission/session-boundaries-before-fix-1-read-account-receipt.json",
-        "docs/request-admission/session-boundaries-before-fix-1-read-account-output.txt"
-      ]
+        "docs/request-admission/session-boundaries-before-fix-1-read-account-output.txt",
+        "docs/request-admission/ORDINARY-WORKERS.md",
+        "docs/request-admission/ordinary-verification.json",
+        "docs/request-admission/verify-ordinary.py",
+        "docs/request-admission/ordinary-boundaries-qualified-2-read-account-receipt.json",
+        "docs/request-admission/ordinary-boundaries-qualified-2-read-account-output.txt"
+      ],
+      "historical_status_before_private_ordinary_fix": "reproduced-unfixed",
+      "historical_evidence_before_private_ordinary_fix": "Actual production SaveSession with factory-bound baseline, after a physical MemoryBackend rest read suspends: provider starts2, Session requests/history1. readRests charges only after readCurrent returns. Correctness assertion intentionally fails. Shared typed admission must account before dispatch; no fix yet."
     }
   ],
   "latest_save_milestone": {
@@ -2443,6 +2460,46 @@
       "docs/request-admission/held-verification.json",
       "docs/request-admission/verify-held.py",
       "docs/request-admission/SESSION-BOUNDARIES.md"
+    ]
+  },
+  "latest_request_admission_ordinary": {
+    "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+    "private_inputs_committed": true,
+    "private_commit": "24e8bfbaff5a378080dd3fb3918476da1c8766f9",
+    "preceding_checks": 282370,
+    "ordinary_Session_checks": 583,
+    "ordinary_Runtime_checks": 1122,
+    "full_checks": 284075,
+    "full_named_groups": 138,
+    "full_failed": 0,
+    "overlay_targets": 48,
+    "distinct_private_sources": 47,
+    "strict_clean": true,
+    "separate_STATE_checks": 1488,
+    "separate_STATE_CLIENT_checks": 161,
+    "ordinary_Session_typed": true,
+    "Runtime_lane_from_constructor_verified": true,
+    "initial_lock_freshness_fixed_private": true,
+    "inflight_read_accounting_fixed_private": true,
+    "coarse_clock_before_fix_failure_reproduced": true,
+    "interrupted_run_not_qualification": true,
+    "provider": "memory",
+    "clock": "synthetic",
+    "all_workers_typed": false,
+    "service_lanes_installed": false,
+    "profile_replacement_lifetimes_qualified": false,
+    "cooperative_service_driver_installed": false,
+    "normal_startup_installed": false,
+    "native_verified": false,
+    "online_verified": false,
+    "loading_speedup_proved": false,
+    "published": false,
+    "goal_complete": false,
+    "references": [
+      "docs/request-admission/ORDINARY-WORKERS.md",
+      "docs/request-admission/ordinary-verification.json",
+      "docs/request-admission/verify-ordinary.py",
+      "docs/request-admission/ordinary-checkpoint-history.json"
     ]
   }
 }

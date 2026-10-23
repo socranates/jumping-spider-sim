@@ -311,10 +311,13 @@ end
 
 -- Each frame, before the sim's ticks (`dt`, ROBLOX-116: the frame's seconds, for the hut's own moment): the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
 -- report of where it is to the server (`now`: os.clock() unless a test gives a clock), the looks near it (ROBLOX-108), the boxes' shadows (ROBLOX-121), and whether
--- the region it is in has arrived whole (warned about once if not).
-function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?)
+-- the region it is in has arrived whole (warned about once if not). `nextPosition`
+-- keeps the fixed-tick destination hold live even on a render without a tick.
+function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?, nextPosition: Vector3?)
 	self.region = self.map.at(pos) or self.region
- self:playerCanAdvance(pos)
+	-- A render can contain no fixed tick. Keep a refused destination waiting on
+	-- those frames too, rather than clearing the hold just because here is ready.
+	self:playerCanAdvance(pos, nextPosition)
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
 	local clock = now or os.clock()

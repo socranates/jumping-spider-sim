@@ -1091,6 +1091,14 @@ check("fixed tick refuses a prospective airborne step into absent authored colli
   assert(d.world.playerLoading and d.motor.pos==at and d.motor.vel==vel and d.motor.mode=="air","fixed tick entered missing collision or discarded airborne state")
   assert(d.life.elapsed==elapsed and d.needs.elapsedS==needsTime,"fixed tick advanced clocks before its readiness gate")
   print("PLAYER_STREAM_NEXT_TICK refused=true velocity_retained=true clocks_frozen=true")
+  -- Native high-refresh renders exposed a false clearing of the wait flag on
+  -- frames too short to contain a fixed tick. Exercise that exact cadence.
+  for _=1,12 do
+   frame((1/60)/4)
+   assert(d.world.playerLoading and d.motor.pos==at and d.motor.vel==vel and d.motor.mode=="air","sub-tick render released the pending destination hold")
+   assert(d.life.elapsed==elapsed and d.needs.elapsedS==needsTime,"sub-tick collision hold advanced clocks")
+  end
+  print("PLAYER_STREAM_RENDER_WAIT sub_tick_frames=12 waiting_stable=true clocks_frozen=true")
  end,debug.traceback)
  if folder then folder.Parent=parent end
  assert(d.fresh("free",false,nil));frames(1)

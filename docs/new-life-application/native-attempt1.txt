@@ -1,0 +1,21 @@
+2026-10-23T19:01:16.415Z,280.415924,1c10,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_GUARD] bd67582b5d53473f067244fc1e2e1f94adde173b 265 memory_only unbound do_not_publish
+2026-10-23T19:01:43.665Z,307.665161,5344,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-23T19:01:43.669Z,307.669189,5344,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-23T19:01:43.924Z,307.924744,5344,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_SERVER_BEGIN] 1792782104322 clock_scale=10 storage=memory codec=engine
+2026-10-23T19:01:49.011Z,313.011200,1168,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_CLIENT_BEGIN] 1792782104322 clock_scale=10 real_remotes=true codec=engine
+2026-10-23T19:01:49.796Z,313.796967,5344,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the main rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:01:49.835Z,313.835968,1168,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the free rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:01:49.864Z,313.864960,1d70,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-23T19:01:49.922Z,313.922913,316c,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the easy rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:02:01.656Z,325.656006,1168,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the main rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:02:01.691Z,325.691223,316c,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the free rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:02:01.719Z,325.719360,5344,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_SERVICE] [save 46001] the easy rest is invalid: garden: bed_a is not a region with prey
+2026-10-23T19:02:02.120Z,326.120758,5344,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_CLIENT_FAIL] 1792782104322 Players.socranates.PlayerScripts.Client.SilkPlayback:18: native held world admitted reset/local return
+Players.socranates.PlayerScripts.Client.SilkPlayback:18 function paused
+Players.socranates.PlayerScripts.Client.SilkPlayback:104
+Players.socranates.PlayerScripts.Client.SilkPlayback:71
+Players.socranates.PlayerScripts.Client.SpiderClient:2762
+2026-10-23T19:02:14.174Z,338.174927,6168,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|53237
+2026-10-23T19:02:14.174Z,338.174927,6168,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|53237
+2026-10-23T19:02:15.496Z,339.496094,1168,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_SERVER_END] 1792782104322 {"archiveComplete":false,"archives":[],"checks":5,"epoch":"native-new-app:378:2","errors":0,"lockReleased":false,"optionsCreated":20,"optionsDestroyed":20,"originalExact":{"easy":false,"free":false,"main":false},"owners":[{"closed":true,"id":"native-new-app:258:1","phase":"closed"},{"closed":false,"id":"native-new-app:378:2","phase":"offer_refused"}],"phase":"offer_refused","rests":{"easy":"a83e0cc92d138bfc","free":"7440488fdc126092","main":"2c00aec6a47342fb"},"run":"1792782104322"} nil
+2026-10-23T19:03:20.136Z,404.136078,5c5c,6,Info [FLog::CreatorOutput] 'Windowsill-native-new-application.rbxlx' auto-recovery file was created

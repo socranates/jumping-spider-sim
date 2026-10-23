@@ -1,0 +1,26 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-new-application-bd67582-attempt1\\Windowsill-native-new-application.rbxlx",
+  "place_sha256": "9ae7d18c272e63302f1d1b3f1ac81fd962c550ce0606c081d4552c1a4133c8f3",
+  "manifest_sha256": "fca8608f7de01364a6f250b2589e7987d3b3be44b80ff1117793a894ece9e730",
+  "guard_sha256": "416029d941d374124316fcada119618177373b57a7c72a3e079861456dc149f2",
+  "scripts": 265,
+  "production_untouched": 222,
+  "private_candidates": 41,
+  "production_overrides": [
+    "WorldMap",
+    "Checkpoint"
+  ],
+  "diagnostics": {
+    "docs/new-life-application/native-client.luau": "861853b6b27add9ae0fb88521eeb9b0b7edc3cbb93a501fecbfdb4843533a028",
+    "docs/new-life-application/native-server.server.luau": "b04baa56f357ecf35dd831ae60b5a1c948e29df25ed242c62b9e6809def13a61"
+  },
+  "production_persistence_disabled": true,
+  "memory_store": true,
+  "engine_codec": true,
+  "clock_scale": 10,
+  "executed": false,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

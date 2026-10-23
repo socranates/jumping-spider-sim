@@ -1,0 +1,23 @@
+{
+  "as_of_utc": "2026-10-23T19:11:38.998370+00:00",
+  "artifacts": [
+    {
+      "attempt": 1,
+      "original": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-new-application-bd67582-attempt1\\Windowsill-native-new-application.rbxlx",
+      "original_sha256": "9ae7d18c272e63302f1d1b3f1ac81fd962c550ce0606c081d4552c1a4133c8f3",
+      "editor_copy": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-new-application-bd67582-attempt1\\after-run-editor-copy.rbxl",
+      "editor_copy_sha256": "940272ee22fd3aab651031563daef86e0a81a62fb20b3de591b0a7e552b636f3",
+      "stopped": true
+    },
+    {
+      "attempt": 2,
+      "original": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-new-application-bd67582-attempt2\\Windowsill-native-new-application.rbxlx",
+      "original_sha256": "afb4824c7b46fd90e8e33070f5bb755b8f8b81e806b3a6edebc3463ea737446b",
+      "editor_copy": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-new-application-bd67582-attempt2\\after-run-editor-copy.rbxl",
+      "editor_copy_sha256": "f76784d2516b00d80da2021d7710d8904f4f8695688d121dacd84ef633c5a706",
+      "stopped": true
+    }
+  ],
+  "original_models_unchanged": true,
+  "published": false
+}

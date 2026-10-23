@@ -1,0 +1,19 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "windows_suites": 78,
+  "windows_checks": 468967,
+  "windows_failed": 0,
+  "windows_output_sha256": "727c3c000fa858cb4bb2de8f84bc2105978f48326b0903e7c0ff6e611767d77a",
+  "linux_run": 40004870155,
+  "linux_suites": 78,
+  "linux_checks": 468967,
+  "linux_failed": 0,
+  "compile": 224,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "current_private_work_separate": true,
+  "native_application_recovery_verified": false,
+  "real_datastore_verified": false,
+  "published": false,
+  "goal_complete": false
+}

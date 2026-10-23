@@ -1,9 +1,9 @@
 {
   "id": "40004870155",
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
-  "status": "in_progress",
-  "conclusion": null,
-  "observed_at_utc": "2026-10-23T18:46:07.512005+00:00",
+  "status": "completed",
+  "conclusion": "success",
+  "observed_at_utc": "2026-10-23T18:49:59.397393+00:00",
   "steps": [
     [
       "Set up job",
@@ -32,18 +32,23 @@
     ],
     [
       "All suites",
-      "in_progress",
-      null
+      "completed",
+      "success"
     ],
     [
       "Runner failure and cleanup regressions",
-      "pending",
-      null
+      "completed",
+      "success"
     ],
     [
       "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-      "pending",
-      null
+      "completed",
+      "success"
+    ],
+    [
+      "Complete job",
+      "completed",
+      "success"
     ]
   ]
 }

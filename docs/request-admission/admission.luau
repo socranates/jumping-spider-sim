@@ -8,7 +8,7 @@ local function finite(v:any):boolean return type(v)=="number" and v==v and math.
 local function integer(v:any,lo:number,hi:number):boolean return finite(v) and v%1==0 and v>=lo and v<=hi end
 local function token(v:any,max:number):boolean return type(v)=="string" and #v>0 and #v<=max end
 function Admission.new(cfg:any):any
- assert(type(cfg)=="table" and type(cfg.now)=="function" and type(cfg.available)=="function","clock and current platform allowance required")
+ assert(type(cfg)=="table" and getmetatable(cfg)==nil and type(cfg.now)=="function" and type(cfg.available)=="function","plain configuration, clock and current platform allowance required")
  for _,name in {"actorRead","actorWrite","serverRead","serverWrite"} do assert(integer(cfg[name],1,10000),"explicit finite policy limit required: "..name) end
  local headroom=cfg.headroom or 2;local actors=cfg.maxActors or 16;local pending=cfg.maxPending or 64
  local reservation=cfg.reservationSeconds or 2;local lifetime=cfg.ticketSeconds or 120
@@ -131,7 +131,7 @@ end
 local function allowance(self:any):(any?,string?)
  local version=self.version;local called,available=pcall(self.cfg.available)
  if self.version~=version then return nil,"admission changed during allowance lookup" end
- if not called or type(available)~="table" or not finite(available.read) or not finite(available.write) or available.read<0 or available.write<0 then return nil,"current platform allowance unavailable" end
+ if not called or type(available)~="table" or getmetatable(available)~=nil or not finite(available.read) or not finite(available.write) or available.read<0 or available.write<0 then return nil,"current platform allowance unavailable" end
  return {read=math.floor(available.read),write=math.floor(available.write)},nil
 end
 local function admit(self:any,ticket:any):(any?,number?,string?)

@@ -152,7 +152,7 @@ group("provider-failure-is-charged",function()
 end)
 group("invalid-allowance-and-clock-refuse-without-start",function()
  local g,f,p=fixture();local a=open(g,"a");local t=request(g,a,"read")
- for _,v in {false,{read=0/0,write=100},{read=math.huge,write=100},{read=-1,write=100},{read="100",write=100}} do
+ for _,v in {false,{read=0/0,write=100},{read=math.huge,write=100},{read=-1,write=100},{read="100",write=100},setmetatable({read=100,write=100},{})} do
   f.lookup=function() return v end;check(not g:dispatch(t,p("a","read")));check(#f.starts==0)
  end
  f.lookup=function() error("budget API unavailable") end;check(not g:dispatch(t,p("a","read")));check(#f.starts==0)

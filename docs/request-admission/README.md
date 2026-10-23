@@ -2,7 +2,7 @@
 
 Private implementation following the native delay attribution in `../recovery-native-cost/RESULTS.md`. **Not installed in production, the owner state machines, or the earlier native fixture.** It replaces neither storage verification nor lease/transaction authority. No end-to-end recovery speedup is claimed.
 
-Current `qualified-2`: **30 named cases /4851 checks /0**:4769 policy checks and82 checks around the exact production DataStoreBackend from `bd67582`, with injected providers/options. Both candidate modules compile and are strict-clean in the standalone Luau analyzer. The production224-module/default Windows/Linux receipts remain unchanged. This qualification is CLI/synthetic, not native or online proof.
+Current `qualified-3`: **30 named cases /4853 checks /0**:4771 policy checks and82 checks around the exact production DataStoreBackend from `bd67582`, with injected providers/options. Both candidate modules compile and are strict-clean in the standalone Luau analyzer. The production224-module/default Windows/Linux receipts remain unchanged. This qualification is CLI/synthetic, not native or online proof.
 
 ## Ownership and limits
 
@@ -12,7 +12,7 @@ Create one Admission gate for the participating server, with trusted `now()` and
 
 Request tokens are opaque and frozen. Cancelled, expired, forged or previously started handles cannot start a provider. Reserving does not spend a request; dispatch rechecks the live scope, current allowance and rolling caps. Reservations expire after a bounded lifetime and cannot be resurrected. Queued requests also have a finite total lifetime. Fairness prioritizes earlier eligible conflicting requests whose owners are polling; a stalled owner loses that priority after the reservation interval, so an abandoned poller cannot block a live owner for the entire ticket lifetime.
 
-Allowance callbacks may fail, yield or reenter. Version and lifetime fences reject a stale lookup, and a second fence protects the final clock check. In-flight calls are conservatively subtracted from observed headroom; their rolling charge is never refunded on failure or cancellation. Backend failures and unknown clock/budget state remain distinct from successful admission. A clock rollback refuses starts without clearing history.
+Allowance callbacks may fail, yield or reenter. Configuration and allowance records must be plain tables, so property metatables cannot run hidden callbacks after lookup validation. Version and lifetime fences reject a stale lookup, and a second fence protects the final clock check. In-flight calls are conservatively subtracted from observed headroom; their rolling charge is never refunded on failure or cancellation. Backend failures and unknown clock/budget state remain distinct from successful admission. A clock rollback refuses starts without clearing history.
 
 No timers or background tasks are created. Capacity, reservations, ticket lifetimes, identity space and actor retention are bounded. Callers must poll and explicitly cancel/close as their own state machines change. Actual performance at configured maximum sizes is still unmeasured.
 

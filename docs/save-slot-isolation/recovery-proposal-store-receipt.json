@@ -12,7 +12,7 @@
     "SaveRest.luau": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d",
     "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
     "recovery-destination-tests.luau": "40c93d45fb107b501904d4a9f5071252e3a5d6a47150f75e8fad38e90d54f102",
-    "recovery-progress-prototype.luau": "9e79e0427851ff8cb6a31654e294cd5c0da18e2801df3ad43b082a6c8a6f633d",
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
     "recovery-progress-tests.luau": "8f602d2493d8a6ca789e1cc52c08395d708bc4082d3a2869a4374683465e923b",
     "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
     "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
@@ -20,7 +20,7 @@
     "recovery-proposal-store-prototype.luau": "1ef86ba87bf474032165e2ddb9993d3f27a1b28b38c3d0b234cffe250204ff47",
     "recovery-proposal-store-tests.luau": "214a12744d0ce5b85aaa0cdbf2d5419731abb8b2c9d618deb1aaae291a685828"
   },
-  "bundle_sha256": "dfd8ad7dcfc88e1b8358150e2e6e7629c43b27a180f42a73f4757b97f923eb5e",
+  "bundle_sha256": "4e42c3343e54a948055211629b3b3ba132b58c6830258c1fb84aa90780ddd05e",
   "output_sha256": "9fd34ff6ec0f7bc9a8f4f241045c9f3315ef6b569d7cd7be04ccca24c4479322",
   "production_connected": false,
   "real_datastore_verified": false,

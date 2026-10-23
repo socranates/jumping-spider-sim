@@ -1,0 +1,34 @@
+{
+  "candidates": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
+    "recovery-progress-prototype.luau": "643269f477c2d61b2a0d606ef63cc548fb4ee0b1c7baa7b8daa08b17e3eeb898",
+    "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
+    "recovery-proposal-store-prototype.luau": "1ef86ba87bf474032165e2ddb9993d3f27a1b28b38c3d0b234cffe250204ff47",
+    "recovery-raw-backend-prototype.luau": "04e2f48bbfb2e36b21b89ca08af11a07814406ffadcc6a9406c29477ba75d173",
+    "recovery-rest-writer-prototype.luau": "64634b6ec76f88cab531e2240e95117a2d18a462b6e5a3bf56bcd5f5ebce3fda",
+    "recovery-progress-writer-prototype.luau": "bab0da29a416098cc5c950858e6b34abf16640b8946385ee41940691667ace7e"
+  },
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "d19185abfdf528f768c2ceddce4f41e776edd34509011729c44ce0547d6877a5"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 1,
+      "output_sha256": "3bb60b3f894d37de7d372f6aa66b0dd72a91553b3620f94c44344d4726ecbe29"
+    }
+  ],
+  "production_connected": false
+}

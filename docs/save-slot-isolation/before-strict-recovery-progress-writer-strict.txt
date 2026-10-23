@@ -1,0 +1,11 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Shared\Persistence\RecoveryProgressPrototype.luau [game/ReplicatedStorage/Shared/Persistence/RecoveryProgressPrototype](81,43): TypeError: Expected this to be 'number', but got 'number?'
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Shared\Persistence\RecoveryProgressPrototype.luau [game/ReplicatedStorage/Shared/Persistence/RecoveryProgressPrototype](86,48): TypeError: Expected this to be 'number', but got 'number?'
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Server\RecoveryProgressWriterPrototype.luau [game/ServerScriptService/Server/RecoveryProgressWriterPrototype](86,37): TypeError: Expected this to be 'nil', but got 'string'
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Server\RecoveryProgressWriterPrototype.luau [game/ServerScriptService/Server/RecoveryProgressWriterPrototype](88,36): TypeError: Expected this to be 'nil', but got 'string?'
+caused by:
+  Not all union options are compatible.
+Expected this to be 'nil', but got 'string'
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Shared\Persistence\RecoveryProgressPrototype.luau [game/ReplicatedStorage/Shared/Persistence/RecoveryProgressPrototype](81,43): TypeError: Expected this to be 'number', but got 'number?'
+c:\Users\natha\AppData\Local\Temp\tmprh_p_a7u\src\Shared\Persistence\RecoveryProgressPrototype.luau [game/ReplicatedStorage/Shared/Persistence/RecoveryProgressPrototype](86,48): TypeError: Expected this to be 'number', but got 'number?'

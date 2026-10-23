@@ -5,13 +5,13 @@
     "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
     "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
     "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
-    "recovery-progress-prototype.luau": "9e79e0427851ff8cb6a31654e294cd5c0da18e2801df3ad43b082a6c8a6f633d"
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102"
   },
   "steps": [
     {
       "name": "compile",
       "exit_code": 0,
-      "output_sha256": "e7f9974a6fbc0d1cc2710d65da1c22a55aedf3c3d9d122be151d3e4c498e0f01"
+      "output_sha256": "860df9f7a4db8dbd7f25d101c6b1fea0fbe2b31a36a215d3626ab5def0a603ba"
     },
     {
       "name": "sourcemap",

@@ -1,0 +1,20 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "progress_assertions": 62,
+  "destination_regression_assertions": 72,
+  "life_regression_assertions": 360,
+  "meal_regression_assertions": 49,
+  "cooperative_suspensions": 21,
+  "current_runtime_bundle_verified": true,
+  "strict_clean": true,
+  "schema1_preferences_mapped": true,
+  "notebook_and_rare_capacity_refusal_verified": true,
+  "rare_rewind_and_existing_visit_tested": true,
+  "global_and_destination_rare_identity_composed": true,
+  "production_connected": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "destination_commit_authorized": false,
+  "complete_migration": false,
+  "published": false
+}

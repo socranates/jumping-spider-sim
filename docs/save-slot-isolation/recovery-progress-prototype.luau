@@ -61,6 +61,30 @@ local function freeze(t:any)
  for _,v in t do pulse();freeze(v) end
  if not table.isfrozen(t) then table.freeze(t) end
 end
+-- Recovery commit helper: recompute against the latest supported primary, never
+-- a stale prepared P snapshot. Current stored choices win equal timestamps so
+-- replay cannot undo a later observation sharing the same coarse clock tick.
+function Projection.mergePending(raw:any,incoming:any,incomingTime:number):(any?,string?)
+ if not finite(incomingTime) then return nil,"invalid proposal progress clock" end
+ local boundary=SaveRest.bounded(raw,Rules.MAX_PROGRESS_NODES*2+64,Rules.MAX_DEPTH+2)
+ if boundary then return nil,boundary end
+ local opened=Envelope.open(Progress.SPEC,raw,false)
+ if opened.status~="ok" and opened.status~="migrated" then return nil,"progress primary is "..opened.status end
+ local base,why=normalize(raw.payload,raw.schema);if not base then return nil,why end
+ if opened.payload==nil or not Progress.same(base,opened.payload) then return nil,"progress migration changed unsupported data" end
+ local incomingBoundary=SaveRest.bounded(incoming,Rules.MAX_PROGRESS_NODES,Rules.MAX_DEPTH)
+ if incomingBoundary then return nil,incomingBoundary end
+ local pending,errorText=normalize(incoming,Progress.SCHEMA);if not pending then return nil,errorText end
+ if not capacity(base,pending) then return nil,"combined progress exceeds lossless history capacity" end
+ local sourceTime=opened.updatedAt
+ if type(sourceTime)~="number" or not finite(sourceTime) then return nil,"invalid stored progress clock" end
+ local merged=Progress.merge(base,pending,sourceTime,incomingTime)
+ if incomingTime==sourceTime then
+  if base.appearance~=nil then merged.appearance=base.appearance end
+  for k,v in base.settings do merged.settings[k]=v end
+ end
+ return {progress=merged,progressTime=math.max(sourceTime,incomingTime),changed=not Progress.same(base,merged) or sourceTime<incomingTime},nil
+end
 function Projection.prepare(raw:any,incoming:any,incomingTime:number,capsule:any,slot:string):(any?,string?)
  if not finite(incomingTime) or not table.find(Rules.MODES,slot) then return nil,"invalid progress clock/slot" end
  local boundary=SaveRest.bounded(raw,Rules.MAX_PROGRESS_NODES*2+64,Rules.MAX_DEPTH+2)

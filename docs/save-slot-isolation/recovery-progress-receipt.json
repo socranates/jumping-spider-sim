@@ -12,10 +12,10 @@
     "SaveRest.luau": "0cf3e57bf977f9ed9ea8578bcd871795e1b857f13e0f5543916c8883184e128d",
     "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
     "recovery-destination-tests.luau": "40c93d45fb107b501904d4a9f5071252e3a5d6a47150f75e8fad38e90d54f102",
-    "recovery-progress-prototype.luau": "9e79e0427851ff8cb6a31654e294cd5c0da18e2801df3ad43b082a6c8a6f633d",
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
     "recovery-progress-tests.luau": "8f602d2493d8a6ca789e1cc52c08395d708bc4082d3a2869a4374683465e923b"
   },
-  "bundle_sha256": "340540d4ba7e4231a2f34cf5630094c06e137017be0f9da35816ca920a831870",
+  "bundle_sha256": "77b9438573430af90e381865ca88b38a4f131b57be911fe887fb0696f66df14a",
   "output_sha256": "f108262724fd9e6754f0995b8235cea2a04df27b211013ea1060b05919080018",
   "production_connected": false,
   "real_datastore_verified": false,

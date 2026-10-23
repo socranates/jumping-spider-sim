@@ -6,7 +6,7 @@
     "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
     "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
     "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
-    "recovery-progress-prototype.luau": "9e79e0427851ff8cb6a31654e294cd5c0da18e2801df3ad43b082a6c8a6f633d",
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
     "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
     "recovery-proposal-store-prototype.luau": "1ef86ba87bf474032165e2ddb9993d3f27a1b28b38c3d0b234cffe250204ff47",
     "recovery-raw-backend-prototype.luau": "04e2f48bbfb2e36b21b89ca08af11a07814406ffadcc6a9406c29477ba75d173",
@@ -16,7 +16,7 @@
     {
       "name": "compile",
       "exit_code": 0,
-      "output_sha256": "b8814b66309e13b6e61e544a96da956636ef6d91cb91e327dd02acb117297b8b"
+      "output_sha256": "b2ce6810fdf1797a9bf6c730cd70b10a2b51c70cb976cf6ce787cf449c2b8e47"
     },
     {
       "name": "sourcemap",

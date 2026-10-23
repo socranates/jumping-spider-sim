@@ -139,5 +139,15 @@ do
  local result=worker:take()
  check(result and result[1]==nil and s.progress==current and w.held==held,"in-flight local input became visible as a partial rebind")
 end
+do
+ local b=Memory.new();b.readRawFresh=b.read;b.readFresh=b.read;b.updateRaw=b.update
+ local w=Base.new(b,"900")
+ b.update=function() error("provider-threw") end
+ local ok,_,why=w:update("P_900",function() return {} end)
+ check(not ok and string.find(why,"provider-threw",1,true)~=nil and w.activeUpdates==0 and w.base==nil,"throw leaked active count or advanced baseline")
+ b.updateRaw=function() error("raw-provider-threw") end
+ local rawOk,_,rawWhy=w:updateRaw("R_900_main",function() return {} end)
+ check(not rawOk and string.find(rawWhy,"raw-provider-threw",1,true)~=nil and w.activeUpdates==0,"raw throw leaked active count")
+end
 print("RECOVERY_SESSION_REBIND passed="..count.." failed=0")
 end

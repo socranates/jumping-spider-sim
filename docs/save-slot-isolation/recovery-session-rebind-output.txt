@@ -11,4 +11,4 @@ RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
 RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
 RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
 RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
-RECOVERY_SESSION_REBIND passed=1371 failed=0
+RECOVERY_SESSION_REBIND passed=1373 failed=0

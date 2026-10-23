@@ -3,14 +3,12 @@
 -- entry, world mutation or life/write credential is issued by this helper.
 local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Rules=require(Shared.Data.SaveRules)
-local Envelope=require(Shared.Persistence.SaveEnvelope)
-local Progress=require(Shared.Persistence.SaveProgress)
 local Projection=require(Shared.Persistence.RecoveryProgressPrototype)
+local Reconcile=require(Shared.Persistence.RecoveryProgressReconcilePrototype)
 local Json=require(Shared.Persistence.Json)
 local Work=require(Shared.Persistence.SaveWork)
 local Fence=require(Shared.Persistence.RecoverySessionFencePrototype)
 local Packet=require(script.Parent.RecoveryPacketPrototype)
-local SaveRest=require(Shared.Persistence.SaveRest)
 local Rebind={}
 local plans:any=setmetatable({},{__mode="k"})
 local function finite(n:any):boolean return type(n)=="number" and n==n and math.abs(n)<math.huge end
@@ -62,24 +60,9 @@ function Rebind.prepare(t:any,anchor:any,rawProgress:any,rawRest:any,codec:any,c
  if not covered or covered.changed then return nil,problem or "pending global proposal has not been absorbed" end
  -- Three-way choice merge. Only values changed from the acknowledged pre-
  -- recovery baseline are local choices; unchanged stale fields must not replay.
- local base,errorText=Projection.mergePending(t.baseline.base,Progress.default(),t.baseline.base.updatedAt);if not base then return nil,errorText end
- if SaveRest.bounded(t.progress,Rules.MAX_PROGRESS_NODES,Rules.MAX_DEPTH) then return nil,"local progress exceeds bound" end
- local current,currentError=Projection.mergePending(Envelope.make(Progress.SPEC,t.progress,t.time,nil),Progress.default(),t.time)
- if not current then return nil,currentError end
- local delta=Json.copy(current.progress);delta.settings={};delta.appearance=nil
- for key,value in current.progress.settings do if base.progress.settings[key]~=value then delta.settings[key]=value end end
- if current.progress.appearance~=base.progress.appearance then delta.appearance=current.progress.appearance end
- local merged,mergeError=Projection.mergePending(rawProgress,delta,t.time);if not merged then return nil,mergeError end
- if t.time==rawProgress.updatedAt then
-  for key,value in delta.settings do merged.progress.settings[key]=value end
-  if delta.appearance~=nil then merged.progress.appearance=delta.appearance end
- end
- local text=Json.canonical(merged.progress);if not text or #text>Packet.MAX_PROGRESS_CHARS then return nil,"rebound progress exceeds budget" end
- local opened=Envelope.open(Progress.SPEC,rawProgress,false)
- if opened.payload==nil then return nil,"progress decoder returned no supported payload" end
- local dirty=not Progress.same(merged.progress,opened.payload)
- local plan={progress=merged.progress,progressTime=if dirty then math.max(t.time,rawProgress.updatedAt) else rawProgress.updatedAt,
-  rawProgress=Json.copy(rawProgress),dirty=dirty,checkpoint=Json.copy(payload.checkpoint),entryKind=payload.entryKind,save_life=payload.save_life}
+ local merged,mergeError=Reconcile.prepare(t.baseline.base,t.progress,t.time,rawProgress,Packet.MAX_PROGRESS_CHARS);if not merged then return nil,mergeError end
+ local plan={progress=merged.progress,progressTime=merged.progressTime,
+  rawProgress=Json.copy(rawProgress),dirty=merged.dirty,checkpoint=Json.copy(payload.checkpoint),entryKind=payload.entryKind,save_life=payload.save_life}
  freeze(plan)
  if not Rebind.valid(t) then return nil,"session changed during rebind preparation" end
  plans[plan]=t;return plan,nil

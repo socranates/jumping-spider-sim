@@ -18,15 +18,16 @@
     "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
     "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150",
     "recovery-offer-reader-prototype.luau": "fa57229d40f546696d9ef46636144e9571383762ada9978735ff90c286679ce7",
-    "recovery-progress-baseline-prototype.luau": "a85f4ad81795f9edf34f64d878722a809fc0be286ca04c74ff8e17b25880f68a",
-    "recovery-session-rebind-prototype.luau": "7e36adbabe1069f5bfd2c7bd6c759a0d80e7464ac3258cf3b1c491dc61fac0a3",
-    "recovery-pipeline-prototype.luau": "650a27cd962c535a0317c88d65185a7489a06a47dcd262e1400e8ccc4152351d"
+    "recovery-progress-baseline-prototype.luau": "7b23df97632bff2a91dba84341f76dc94e5093e7c608617a9c09d4f67267ebbe",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-pipeline-prototype.luau": "1098a2e5bf87121060bb6f44e09998c8a2d63a28bf2beb870d48f537fb4dcb1f",
+    "recovery-progress-reconcile-prototype.luau": "d4fe473207f9bace824425f4c30f156d6a7e58ac60e17f5878844d93ba08f9c5"
   },
   "steps": [
     {
       "name": "compile",
       "exit_code": 0,
-      "output_sha256": "51ba21aeae1a4665d5e8ff43ea2bb5525bdb1ba293199f5270b995f64c758b21"
+      "output_sha256": "d024bcdceb74bf3b635c0782178e2ef5ce7a785be6eff020b5d4893e56f3578b"
     },
     {
       "name": "sourcemap",

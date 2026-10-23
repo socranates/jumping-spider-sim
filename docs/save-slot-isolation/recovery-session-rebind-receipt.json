@@ -1,5 +1,5 @@
 {
-  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
   "exit_code": 0,
   "inputs": {
     "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
@@ -32,12 +32,13 @@
     "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150",
     "recovery-offer-reader-prototype.luau": "fa57229d40f546696d9ef46636144e9571383762ada9978735ff90c286679ce7",
     "recovery-offer-reader-tests.luau": "38094292b6e64ca58364b17ba34f52cd45c489e61482166744773b010fe4a3db",
-    "recovery-progress-baseline-prototype.luau": "a85f4ad81795f9edf34f64d878722a809fc0be286ca04c74ff8e17b25880f68a",
-    "recovery-session-rebind-prototype.luau": "7e36adbabe1069f5bfd2c7bd6c759a0d80e7464ac3258cf3b1c491dc61fac0a3",
-    "recovery-session-rebind-tests.luau": "25b6d2a3f52351255f2d823866a0c4d9e79c5afd8d26706a04fcd6c4e72fce1b"
+    "recovery-progress-reconcile-prototype.luau": "d4fe473207f9bace824425f4c30f156d6a7e58ac60e17f5878844d93ba08f9c5",
+    "recovery-progress-baseline-prototype.luau": "7b23df97632bff2a91dba84341f76dc94e5093e7c608617a9c09d4f67267ebbe",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-session-rebind-tests.luau": "5488b6deee3ad33fce903045b66657b2c7987af3ba493e630e736e0c385b6417"
   },
-  "bundle_sha256": "d98237cd5277fe636099131ecb49531e777dea1516ca671ca6b3081d1b2968ea",
-  "output_sha256": "0b8f26016dccaf642ba6c84159bd0fc485302e1ee5ade135c033a38e26a9cb5b",
+  "bundle_sha256": "f1a94374f7147427ec5bdd9436b3821b0938c3221168d972984bdc7760d6d20f",
+  "output_sha256": "40002029d7a4e9e0bd41134840c361f376dd1ce7f00338060e63792c47f951d8",
   "production_connected": false,
   "real_datastore_verified": false,
   "native_verified": false,

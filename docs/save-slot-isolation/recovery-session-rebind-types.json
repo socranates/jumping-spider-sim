@@ -18,14 +18,15 @@
     "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
     "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150",
     "recovery-offer-reader-prototype.luau": "fa57229d40f546696d9ef46636144e9571383762ada9978735ff90c286679ce7",
-    "recovery-progress-baseline-prototype.luau": "a85f4ad81795f9edf34f64d878722a809fc0be286ca04c74ff8e17b25880f68a",
-    "recovery-session-rebind-prototype.luau": "7e36adbabe1069f5bfd2c7bd6c759a0d80e7464ac3258cf3b1c491dc61fac0a3"
+    "recovery-progress-baseline-prototype.luau": "7b23df97632bff2a91dba84341f76dc94e5093e7c608617a9c09d4f67267ebbe",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-progress-reconcile-prototype.luau": "d4fe473207f9bace824425f4c30f156d6a7e58ac60e17f5878844d93ba08f9c5"
   },
   "steps": [
     {
       "name": "compile",
       "exit_code": 0,
-      "output_sha256": "1196e892a115561b587704f88fa56edb418331f16a5a72c6cc53bdef6c27e030"
+      "output_sha256": "e7f9974a6fbc0d1cc2710d65da1c22a55aedf3c3d9d122be151d3e4c498e0f01"
     },
     {
       "name": "sourcemap",

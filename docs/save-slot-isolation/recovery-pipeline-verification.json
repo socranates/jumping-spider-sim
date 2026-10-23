@@ -1,7 +1,7 @@
 {
-  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
-  "pipeline_assertions": 10845,
-  "preceding_regression_assertions": 8877,
+  "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
+  "pipeline_assertions": 12362,
+  "preceding_regression_assertions": 8879,
   "current_runtime_bundle_verified": true,
   "strict_clean": true,
   "accepted_intent_total_request_cap": 96,

@@ -1,5 +1,5 @@
 {
-  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
   "exit_code": 0,
   "inputs": {
     "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
@@ -32,14 +32,15 @@
     "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150",
     "recovery-offer-reader-prototype.luau": "fa57229d40f546696d9ef46636144e9571383762ada9978735ff90c286679ce7",
     "recovery-offer-reader-tests.luau": "38094292b6e64ca58364b17ba34f52cd45c489e61482166744773b010fe4a3db",
-    "recovery-progress-baseline-prototype.luau": "a85f4ad81795f9edf34f64d878722a809fc0be286ca04c74ff8e17b25880f68a",
-    "recovery-session-rebind-prototype.luau": "7e36adbabe1069f5bfd2c7bd6c759a0d80e7464ac3258cf3b1c491dc61fac0a3",
-    "recovery-session-rebind-tests.luau": "25b6d2a3f52351255f2d823866a0c4d9e79c5afd8d26706a04fcd6c4e72fce1b",
-    "recovery-pipeline-prototype.luau": "650a27cd962c535a0317c88d65185a7489a06a47dcd262e1400e8ccc4152351d",
-    "recovery-pipeline-tests.luau": "5866e5b5790ebeb7bb293518aa31ac70782fce2f8f7b1f54c8a7d2a66032acfb"
+    "recovery-progress-reconcile-prototype.luau": "d4fe473207f9bace824425f4c30f156d6a7e58ac60e17f5878844d93ba08f9c5",
+    "recovery-progress-baseline-prototype.luau": "7b23df97632bff2a91dba84341f76dc94e5093e7c608617a9c09d4f67267ebbe",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-session-rebind-tests.luau": "5488b6deee3ad33fce903045b66657b2c7987af3ba493e630e736e0c385b6417",
+    "recovery-pipeline-prototype.luau": "1098a2e5bf87121060bb6f44e09998c8a2d63a28bf2beb870d48f537fb4dcb1f",
+    "recovery-pipeline-tests.luau": "4e6ef65fba4c41f5615fb13bcb25af36f020a145f120eb519943dcb50df84a63"
   },
-  "bundle_sha256": "83978802290c5da45bf5ff8920dd0f8648f8d9cff120d10af26bd5b0b251caac",
-  "output_sha256": "71626b76604914196efa91680c0b2ad19876a51b34d77d3cc4af83be40377926",
+  "bundle_sha256": "b1f4d81629444d5d4c5a62c40ac690b293bb615a9014a28b125dedfa2bd961e9",
+  "output_sha256": "c3088702d05321d26606375c823c06030640e26bd71b606b6d5f9b375dad1baa",
   "production_connected": false,
   "real_datastore_verified": false,
   "native_verified": false,

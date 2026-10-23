@@ -23,8 +23,15 @@ end
 function Baseline.new(backend:any,user:string):any
  assert(type(user)=="string" and #user>0 and #user<=32 and string.match(user,"^[%w_-]+$"),"invalid baseline owner")
  assert(type(backend.update)=="function" and type(backend.readRawFresh)=="function" and type(backend.readFresh)=="function" and type(backend.read)=="function","baseline needs guarded update and explicit reads")
- return setmetatable({source=backend,boundSource=backend,user=user,pkey="P_"..user,issued=0,acknowledged=0,base=nil,held=nil,
+ return setmetatable({source=backend,boundSource=backend,user=user,pkey="P_"..user,issued=0,acknowledged=0,activeUpdates=0,base=nil,held=nil,
   permits=setmetatable({},{__mode="k"}),main={}},Baseline)
+end
+local function updateProvider(self:any,key:string,fn:any,raw:boolean?):(boolean,any,string?)
+ self.activeUpdates+=1
+ local method=if raw then self.source.updateRaw else self.source.update
+ local result=table.pack(pcall(method,self.source,key,fn));self.activeUpdates-=1
+ if not result[1] then return false,nil,tostring(result[2]) end
+ return table.unpack(result,2,result.n)
 end
 local function authorized(self:any,key:string):boolean
  local held=self.held
@@ -47,14 +54,14 @@ function Baseline.updateRaw(self:any,key:string,fn:any):(boolean,any,string?)
  if self.source~=self.boundSource then return false,nil,"backend provider changed" end
  if not authorized(self,key) then return false,nil,"recovery owner required for this save" end
  if type(self.source.updateRaw)~="function" then return false,nil,"raw update adapter unavailable" end
- return self.source:updateRaw(key,fn)
+ return updateProvider(self,key,fn,true)
 end
 function Baseline.update(self:any,key:string,fn:any):(boolean,any,string?)
  if self.source~=self.boundSource then return false,nil,"backend provider changed" end
  if not authorized(self,key) then return false,nil,"recovery owner required for this save" end
- if key~=self.pkey then return self.source:update(key,fn) end
+ if key~=self.pkey then return updateProvider(self,key,fn) end
  self.issued+=1;local serial=self.issued;local candidate:any=nil
- local ok,value,why=self.source:update(key,function(old:any):any candidate=nil;candidate=fn(old);return candidate end)
+ local ok,value,why=updateProvider(self,key,function(old:any):any candidate=nil;candidate=fn(old);return candidate end)
  -- Observe only an exact positively acknowledged result; neither a discarded
  -- callback candidate nor a lost acknowledgement can advance the baseline.
  if ok and type(candidate)=="table" and type(value)=="table" and serial>self.acknowledged

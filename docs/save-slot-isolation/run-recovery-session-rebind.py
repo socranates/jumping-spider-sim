@@ -6,10 +6,13 @@ def build():
  spec=importlib.util.spec_from_file_location('runner',ROOT/'roblox_port/tests/run.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
  assert text.endswith('end\n');text=text[:-4]
  baseline=H/'recovery-progress-baseline-prototype.luau';module=H/'recovery-session-rebind-prototype.luau';test=H/'recovery-session-rebind-tests.luau'
+ reconcile=H/'recovery-progress-reconcile-prototype.luau'
+ code=reconcile.read_text().replace('require(Shared.Persistence.RecoveryProgressPrototype)','__progressPrototype')
+ text+='local __progressReconcilePrototype=(function()\n'+r.requires(r.strict(code))+'\nend)()\n'
  text+='local __progressBaselinePrototype='+r.chunk(baseline)+'\n'
- code=module.read_text().replace('require(Shared.Persistence.RecoveryProgressPrototype)','__progressPrototype').replace('require(Shared.Persistence.RecoverySessionFencePrototype)','__sessionFence').replace('require(script.Parent.RecoveryPacketPrototype)','__packetPrototype')
+ code=module.read_text().replace('require(Shared.Persistence.RecoveryProgressReconcilePrototype)','__progressReconcilePrototype').replace('require(Shared.Persistence.RecoveryProgressPrototype)','__progressPrototype').replace('require(Shared.Persistence.RecoverySessionFencePrototype)','__sessionFence').replace('require(script.Parent.RecoveryPacketPrototype)','__packetPrototype')
  text+='local __sessionRebindPrototype=(function()\n'+r.requires(r.strict(code))+'\nend)()\n'+r.requires(test.read_text())+'\nend\n'
- return text,inputs+[baseline,module,test]
+ return text,inputs+[reconcile,baseline,module,test]
 
 def main():
  text,inputs=build();assert not (H/'recovery-session-rebind-output.txt').exists(),'Preserve previous evidence'

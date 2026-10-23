@@ -30,7 +30,7 @@ local function fixture(compressed,options)
  local reader=__offerReaderPrototype.new(s,codec,fresh,{work={now=function() return 0 end}});local discovered=assert(reader:begin("main"));drive(b,clock,s,reader,discovered);assert(discovered.state=="offered",discovered.problem)
  assert(s:requestLife("continue","main",1,discovered.offer.id))
  local cfg=options or {};cfg.work=cfg.work or {now=function() return 0 end}
- local owner=Owner.new(s,codec,b,template,fresh,cfg);local j=assert(owner:begin("main",1,discovered.offer.id,discovered))
+ local owner=Owner.new(s,codec,b,template,fresh,cfg);local j=if cfg.deferBegin then nil else assert(owner:begin("main",1,discovered.offer.id,discovered))
  return b,clock,s,wrapped,owner,j,discovered
 end
 local function archives(b) return Json.canonical({b.data.A1_46001_progress,b.data.A1_46001_main,b.data.A1_46001_free,b.data.A1_46001_easy,b.data.A1_46001_index}) end
@@ -101,6 +101,28 @@ do
  local b,clock,s,w,c,j=fixture(false);local other=Memory.new();other.readRawFresh=other.read;other.readFresh=other.read
  local before=b.requests;w.source=other;c:step(j)
  check(j.state=="refused" and b.requests==before and other.requests==0,"backend wrapper hid physical provider replacement")
+end
+for _,slot in {"main","free","easy"} do
+ for _,kind in {"rest","life"} do
+  local b,clock,s,w,c,j,discovered=fixture(false,{deferBegin=true})
+  if kind=="rest" then s.restPending[slot]={pending=true} else s.lifeRequests[slot]={done=false} end
+  local before=b.requests
+  local refused,why=c:begin("main",1,discovered.offer.id,discovered)
+  check(refused==nil and why=="finish existing rest/life work before recovery","pending "..kind.." in "..slot.." admitted recovery")
+  check(b.requests==before and w.held==nil and s.recoveryOwner==nil,"refused pending work acquired ownership or touched storage")
+ end
+end
+do
+ local b,clock,s,w,c,j,discovered=fixture(false,{deferBegin=true})
+ local update=b.update
+ b.update=function(self,key,fn) coroutine.yield("provider-paused");return update(self,key,fn) end
+ local co=coroutine.create(function() return w:update("P_46001",function(old) return old end) end)
+ assert(coroutine.resume(co));check(w.activeUpdates==1,"in-flight provider write was not counted")
+ local before=b.requests
+ check(c:begin("main",1,discovered.offer.id,discovered)==nil and b.requests==before and w.held==nil,"recovery began over in-flight provider write")
+ assert(coroutine.resume(co));b.update=update;check(w.activeUpdates==0,"completed provider write did not drain")
+ local started=assert(c:begin("main",1,discovered.offer.id,discovered));drive(b,clock,s,c,started)
+ check(started.state=="rebound","drained provider write blocked recovery permanently")
 end
 print("RECOVERY_PIPELINE passed="..count.." failed=0")
 end

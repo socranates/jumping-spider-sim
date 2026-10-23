@@ -24,7 +24,7 @@ The returned checkpoint/entry-kind/life descriptor is a **readonly handoff** wit
 
 ## Evidence and limits
 
-1,371 focused assertions pass alongside the preceding 7,506 regressions (8,877 total); full strict analysis is clean with twenty private candidates. The fixture installs the sidecar before actual SaveSession.load, discovers a pending target through the real offer reader, selects its protected Continue, completes the actual post-archive coordinator, then supplies fresh raw observations to the rebind helper.
+1,373 focused assertions pass alongside the preceding 7,506 regressions (8,879 total); full strict analysis is clean with twenty-one private candidates. The fixture installs the sidecar before actual SaveSession.load, discovers a pending target through the real offer reader, selects its protected Continue, completes the actual post-archive coordinator, then supplies fresh raw observations to the rebind helper.
 
 Tests cover held-baseline preservation through recovery writes; stale-snapshot counterexample; remote settings plus local notebook additions; same-tick authored settings/appearance; no extra adoption writes or rest credentials; successful subsequent ordinary P saving without reversion; covered-dirty acknowledgement; single-use plans; late local inputs and explicit recapture; foreign/expired/unknown/unabsorbed P; different target bytes; intervening P operations; lost acknowledgements; and reordered acknowledgements. Cooperative preparation rejects an input arriving while it is suspended, leaving that input and the baseline hold intact. An initial optional-payload strict error was retained and corrected with a nil guard.
 
@@ -33,3 +33,5 @@ This uses actual session/backend logic over MemoryBackend and the existing rever
 ## Remaining integration
 
 The production session factory must install baseline tracking before load, and a single owner must coordinate discovery/archive/commit/rebind with total request/deadline limits, heartbeat priority, departure handling and guarded fresh observations. Complete schema-3 readers/writers and pending-proposal retention, protected-observation rebasing, durable life/intent credentials, and rest/mating/hatching/ended-life entry before opening gameplay. Native compression/callback/heap/frame testing, real-service interruption/takeover/rejoin, adopted full gates and release remain open. No production source or real saves changed; nothing was published.
+
+The pure three-way merge now lives in `recovery-progress-reconcile-prototype.luau` for reuse by future lifecycle handling. Provider exception tests verify both ordinary and raw writes release their active-update count and do not advance the acknowledged baseline on error. The extraction does not connect migration to production.

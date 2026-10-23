@@ -1,0 +1,36 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+RECOVERY_PROPOSAL_STORE passed=79 failed=0
+RECOVERY_REST_WRITER passed=117 failed=0 suspensions=2616
+RECOVERY_PROGRESS_WRITER passed=182 failed=0
+RECOVERY_COMMIT_CONTROLLER completed_requests=31 simulated_seconds=186
+RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
+RECOVERY_SESSION_REBIND passed=1373 failed=0
+RECOVERY_PIPELINE cold_compressed=false requests=58 simulated_seconds=365
+RECOVERY_PIPELINE cold_compressed=true requests=58 simulated_seconds=365
+thread yielded unexpectedly
+stacktrace:
+[C] function yield
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49784
+[C] function pcall
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49126 function updateProvider
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49158 function update
+[C] function pcall
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:48649 function renewed
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:48689 function stepInner
+[C] function pcall
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:48757 function step
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49607 function stepInner
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49659
+[C] function pcall
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49190 function run
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49659 function step
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49675 function tick
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49686 function drive
+C:/Users/natha/AppData/Local/Temp/tmpsqv_h93w.luau:49790

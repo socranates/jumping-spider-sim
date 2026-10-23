@@ -219,12 +219,12 @@ do
 end
 do
  local SaveClient=require("../src/Client/SaveClient")
- local function peer(enabled)
+ local function peer(enabled,noRestore)
   local f={now=0,wire={},entries={},selected=0,restored=0,loaded=0};local deliver;local client
   local remotes={client={OnClientEvent={Connect=function(_self,fn) deliver=fn end}},server={FireServer=function(_self,msg) table.insert(f.wire,msg) end}}
   client=SaveClient.new({rules=Rules,now=function() return f.now end,findRemotes=function() return remotes end,
-   continuation={copy=Json.copy,validate=function(mode,r) return type(r)=="table" and r.mode==mode and type(r.value)=="number" end,
-    onRestore=function() f.restored+=1;return true end},
+   continuation={copy=function(value) f.copies=(f.copies or 0)+1;return Json.copy(value) end,validate=function(mode,r) return type(r)=="table" and r.mode==mode and type(r.value)=="number" end,
+    onRestore=if not noRestore then function() f.restored+=1;return if f.whenRestore then f.whenRestore() else true end else nil},
    recovery=if enabled then {onSelected=function(mode,serial) f.selected+=1;return if f.whenSelected then f.whenSelected(client,mode,serial) else true end,onEntry=function(o,epoch,sequence) table.insert(f.entries,{offer=o,epoch=epoch,sequence=sequence}) end} else nil,
    onLoaded=function() f.loaded+=1;f.readyInCallback=client:recoveryReady() end,onRest=function() error("legacy restore callback") end,onStatus=function() end,build=function() return {} end})
   f.client=client;f.deliver=function(msg) deliver(msg) end
@@ -291,6 +291,13 @@ do
  old.deliver(old.entry(20));check(old.client.legacyTemporary and not old.client:recoveryReady() and #old.entries==0,"old server negotiated new recovery")
  local invalid=pcall(function() SaveClient.new({rules=Rules,now=function() return 0 end,recovery={onEntry=function() end}}) end)
  check(not invalid,"incomplete recovery callbacks may not advertise support")
+ local plain=peer(false,true);plain.load(nil,false);local copied=plain.copies
+ check(plain.client:continueLife("main","protected") and plain.copies==copied+1,"adapter without restore handler copied an unused callback graph")
+ local normalCross=peer(true);normalCross.load(1,true);normalCross.client:continueLife("main","protected");local late=normalCross.entry(20)
+ normalCross.deliver({kind="offer",epoch="cap",sequence=15,mode="free",offer={id="free",protected=false,record={mode="free",value=2}}})
+ normalCross.whenRestore=function() normalCross.deliver(late);return true end
+ check(normalCross.client:continueLife("free","free"),"normal cross-mode Continue failed")
+ check(#normalCross.entries==0,"normal restore callback received older mode's recovery entry")
  local copies,selected=0,0
  local bounded=setup({copy=function(value) copies+=1;return Json.copy(value) end,recoveryVersion=1,onProtectedSelected=function() selected+=1;return true end,
   onRestore=function() error("protected preview was copied for restore") end})

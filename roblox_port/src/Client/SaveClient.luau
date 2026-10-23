@@ -42,10 +42,7 @@ function SaveClient.new(cfg: Config): any
     self.recoveryChoice={mode=mode,request=self.bound.requests[mode],epoch=self.bound.epoch};self.recoveryOffer=nil
     return cfg.recovery.onSelected(mode,serial)
    end else nil,
-   onRestore=function(mode:string,record:any,serial:number):boolean?
-    self.recoveryChoice=nil;self.recoveryOffer=nil
-    return if opt.onRestore then opt.onRestore(mode,record,serial) else nil
-   end})
+   onRestore=opt.onRestore})
  end
  return self
 end
@@ -57,7 +54,7 @@ end
 local function recoveryCurrent(self:any):any
  local c=self.recoveryChoice
  if not self:recoveryReady() or not c or self.activeSlot~=c.mode or c.epoch~=self.bound.epoch or self.bound.requests[c.mode]~=c.request
-  or c.request.kind~="continue" or c.request.state~="readonly" then return nil end
+  or self.bound.serial~=c.request.serial or c.request.kind~="continue" or c.request.state~="readonly" then return nil end
  return c
 end
 local function positive(self:any,n:any):boolean

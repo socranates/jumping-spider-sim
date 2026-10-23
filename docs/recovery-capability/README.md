@@ -16,10 +16,15 @@ The private owner enables discovery only after the service calls `enableRecovery
 
 ## Verification status
 
-The retained `focused-*` outputs are preliminary targeted runs before the source commit, not full production passes. The final targeted continuation run has 257 passing checks; the state run has 1,488. Private `capability-focused-*` outputs are focused cohorts, never complete recovery runs. Focused 2 caught a test mistake: Runtime initializes `accepted` to false, not nil; the assertion now checks that recovery was not accepted.
+The retained `focused-*` outputs are preliminary targeted runs before the source commit, not full production passes. The final targeted continuation run has 260 passing checks; the state run has 1,488. Private `capability-focused-*` outputs are focused cohorts, never complete recovery runs. Focused 2 caught a test mistake: Runtime initializes `accepted` to false, not nil; the assertion now checks that recovery was not accepted.
 
-Full source-bound production and complete private gates will be recorded separately. The earlier `save-service-owner-final/` and `recovery-service-owner-verification.json` belong to source2170f99 and are historical for this change. Do not claim whole-game native recovery, online datastore, physical-device behavior or release from these transport checks.
+Full source-bound production and complete private gates will be recorded separately. The earlier `save-service-owner-final/` and `recovery-service-owner-verification.json` belong to source 2170f99 and are historical for this change. Do not claim whole-game native recovery, online datastore, physical-device behavior or release from these transport checks.
 
 ## Remaining adoption work
 
 Implement actual mode-specific destination profiles and the SpiderClient menu callbacks using its normal restore/model/store rebinding machinery. Keep simulation paused until the matching real writable decision and handle preparation failure, cancellation, timeout and grant loss. Add explicit session replacement/epoch handoff; the service still refuses silent session replacement. Measure and bound entry payload/resend costs. Then perform native full-lifecycle, isolated online rejoin, device/performance and release verification before enabling the owner in engine startup. The broader reliability/optimization goal remains active.
+
+
+## Final callback-copy refinement
+
+Focused 5 retains the failing counterexample: an adapter with no restore callback received an unnecessary callback copy. Focused 6 passes after retaining the original optional callback directly. Recovery now also fences the global choice serial, so any later mode choice revokes entry authority before its normal restore callback runs. The callback can deliver a late old-mode entry reentrantly without adopting it. The final continuation total is260. The first committed capability source, f205c4e, has a complete private run (2853+184404=187257), 222 production compiles/clean strict/runner5 and34-candidate overlay types, but its CI start and receipts are historical after this refinement. Current complete gates belong to `../recovery-capability-final/`; do not restart any old job or treat a start receipt as terminal success.

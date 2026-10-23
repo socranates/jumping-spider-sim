@@ -1,0 +1,23 @@
+{
+  "candidate_sha256": "ddeac6aa3a706d55497320a7e91d3b4ce67eeb9a0dbbf6a6018745443b17cc93",
+  "archive_sha256": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "b80e5c2a17798c9fd03e2c00c01bb12ca957995eac68c79ce838f6dab0f1999c"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    }
+  ],
+  "production_changed": false,
+  "real_datastore_verified": false
+}

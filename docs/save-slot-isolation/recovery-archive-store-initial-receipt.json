@@ -1,0 +1,12 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "exit_code": 0,
+  "candidate_sha256": "5c0d9c060c8a3a4b7eb1a50c2ee35b182c59437ec9382af1ff3659ca05041afd",
+  "archive_sha256": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+  "test_sha256": "7e1cb26efa8f5e57d884d7ed811f77d39cf883d129efd6aff83fc47fb03cec1c",
+  "output_sha256": "9ed21fa4f5681a12006e0f85f9781d950755bb05ed1ae5ec6b1167a18e0a2d54",
+  "production_changed": false,
+  "backend": "MemoryBackend fault simulation",
+  "real_datastore_verified": false,
+  "progress_import_implemented": false
+}

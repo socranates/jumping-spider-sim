@@ -1,0 +1,14 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "publication_cli_assertions": 272,
+  "fresh_read_cli_assertions": 32,
+  "native_assertions": 304,
+  "native_scripts": 226,
+  "creator_errors": 0,
+  "strict_clean": true,
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "progress_import_implemented": false,
+  "ordinary_production_reads_unchanged": true,
+  "published": false
+}

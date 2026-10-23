@@ -1,0 +1,19 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "run": "1792718921006",
+  "assertions": 304,
+  "scripts": 226,
+  "creator_errors": 0,
+  "production_scripts_disabled": true,
+  "place_sha256": "916d00dcbc4e4a2ec2747b530b669f5a70946c9d567f148dfb39a419d68519e0",
+  "candidates": {
+    "fresh-read-backend-candidate.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-archive-store-prototype.luau": "80440f94430eea417e9d65736c7a259b92a6235016732fab9bcae36e8dddacb0"
+  },
+  "output_sha256": "b46bf29c9e80724c0d1191042fedb1a1e1127683952de9b691c5cd88cd4e2089",
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "progress_import_implemented": false,
+  "scope": "Server-context MemoryBackend/fake cached datastore protocol and real DataStoreGetOptions lifecycle; production scripts disabled; no real DataStore or progress import proof; never publish"
+}

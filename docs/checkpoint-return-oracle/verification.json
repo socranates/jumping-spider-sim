@@ -1,0 +1,19 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "current_workspace_inputs_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 468114,
+  "linux_suites": 76,
+  "linux_passed": 468114,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_geometry_assertions": 985,
+  "native_batch_assertions": 41,
+  "native_scope": "private component comparison, exact adopted body bytes; all other production sources unchanged",
+  "whole_game_fps_gain_proven": false,
+  "legacy_world_migration_implemented": false,
+  "goal_complete": false,
+  "published": false
+}

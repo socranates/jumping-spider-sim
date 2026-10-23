@@ -1,0 +1,7 @@
+{
+  "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+  "original_sha256": "9a0a140ed3837222deed02063f8df14c36d91e0151b5c41295a3816971356552",
+  "candidate_sha256": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+  "production_changed": false,
+  "documentation": "https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching"
+}

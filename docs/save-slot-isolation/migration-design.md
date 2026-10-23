@@ -6,6 +6,8 @@ Subsequent private work onccc0abb: [recorded-world inspection](RECORDED-INSPECTI
 
 Subsequent405e9df private [raw archive preparation](RECOVERY-ARCHIVE.md) passes73 CLI/82 native checks plus compile/strict. It preserves complete opaque source values under bounds and cancellation. Durable raw reads/publication and actual progress import are still unimplemented; ordinary Continue is not loosened.
 
+Private publication/fresh-read components are now implemented and verified separately: [272+32 CLI/304 native checks](RECOVERY-PUBLICATION.md), including restart reconstruction, bounded per-step requests, real coroutine suspension, uncached verification and actual options-object cleanup. They remain outside production; actual server authority/raw collection, real DataStore durability and progress projection still need integration and proof.
+
 ## Selected recovery policy
 
 The selected behavior is option 1:

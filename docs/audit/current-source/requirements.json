@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T01:07:06.116665+00:00",
+  "as_of_utc": "2026-10-23T01:32:49.931719+00:00",
   "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
   "goal_complete": false,
   "published": false,
@@ -23,11 +23,11 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "linux-verified-windows-running",
-      "evidence_boundary": "Current405e9df Linux39880600604 terminal success76/468114/0, compile222/strict/runner5. Immutable current Windows17569 running. Earlierccc0abb Windows56925 terminal76/468113/1 with full raw evidence retained; diagnosed snapshot-oracle timing assumption fixed by comparing immutable kept state before resuming, client27/0. No current completed Windows/full gate claim.",
+      "status": "both-platforms-verified",
+      "evidence_boundary": "Current405e9df Windows17569 and Linux39880600604 both terminal76/468114/0; source-bound root verification, compile222, strict and runner5 pass. Native pond component985/41 is bound to exact adopted bytes, not a current full-game walkthrough. Previousccc0abb Windows failure is retained separately and its snapshot-oracle assumption corrected.",
       "references": [
         "docs/checkpoint-return-oracle/README.md",
-        "docs/checkpoint-return-oracle/ci-final.json",
+        "docs/checkpoint-return-oracle/verification.json",
         "docs/pond-drawing-reuse/windows-failed-summary.json"
       ]
     },
@@ -72,13 +72,14 @@
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
         "docs/save-slot-isolation/map-view-types-receipt.json",
         "docs/save-slot-isolation/RECORDED-INSPECTION.md",
-        "docs/save-slot-isolation/RECOVERY-ARCHIVE.md"
+        "docs/save-slot-isolation/RECOVERY-ARCHIVE.md",
+        "docs/save-slot-isolation/RECOVERY-PUBLICATION.md"
       ]
     },
     {
@@ -260,7 +261,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current405e9df runtime/tests pushed on codex/save-continue. Linux76/468114/0 complete; Windows17569 running. Prior failed Windows cohort retained. Private archive preparation73 CLI/82 native verified without production edits; durable archive/import pending. No release/main integration/publication/laptop sync; broader audit remains open.",
+      "evidence_boundary": "Current405e9df both full platforms76/468114/0 verified, compile222/strict/runner5; own branch codex/save-continue. Private archive/publication/raw-read components and source-bound evidence retained. No production migration, real DataStore durability, release/main integration/publication/laptop sync; broader audit remains open.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md"
@@ -282,6 +283,16 @@
         "docs/startup-world-readiness/README.md",
         "docs/startup-world-readiness/receipt.json",
         "docs/navigation-startup/native-timeout-receipt.json"
+      ]
+    },
+    {
+      "id": "data-store-freshness",
+      "status": "private-prototype-verified-integration-audit-pending",
+      "evidence_boundary": "Current production DataStoreBackend.read uses default cached GetAsync; SaveSession validateIntent at line532 and rest/preview reads use it. Private readFresh/readRawFresh and mandatory uncached archive readback pass32 CLI within304 native tests, with real engine options cleanup but fake datastore/cache. Audit actual SaveSession ambiguous-write/intent traces before choosing production call sites. No observed live failure or whole-game fix claimed.",
+      "references": [
+        "docs/save-slot-isolation/RECOVERY-PUBLICATION.md",
+        "docs/save-slot-isolation/fresh-read-receipt.json",
+        "docs/save-slot-isolation/recovery-store-native-receipt.json"
       ]
     }
   ],
@@ -342,7 +353,7 @@
   },
   "latest_snapshot_oracle_milestone": {
     "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
-    "status": "linux-verified-windows-running",
+    "status": "both-platforms-verified",
     "evidence": "docs/checkpoint-return-oracle/README.md",
     "published": false,
     "windows_handle": 17569,
@@ -356,6 +367,18 @@
     "evidence": "docs/save-slot-isolation/recovery-archive-verification.json",
     "production_changed": false,
     "durable_archive_implemented": false,
+    "progress_import_implemented": false,
+    "published": false
+  },
+  "latest_recovery_publication_prototype": {
+    "source": "405e9df16f5a8dbccadbcab9c8a654487d161445",
+    "publication_cli_assertions": 272,
+    "fresh_read_cli_assertions": 32,
+    "native_assertions": 304,
+    "strict_clean": true,
+    "evidence": "docs/save-slot-isolation/recovery-store-verification.json",
+    "production_changed": false,
+    "real_datastore_verified": false,
     "progress_import_implemented": false,
     "published": false
   }

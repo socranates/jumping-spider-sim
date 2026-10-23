@@ -1,3 +1,13 @@
+# Current405e9df: both full platforms verified; recovery components private
+
+Windows17569 and Linux39880600604 are terminal success:76 suites/468114 checks/0 failures each. Current source-bound root verification passes, all222 modules compile, strict clean and runner5 pass. The adopted pond renderer's separate native985 geometry/41 batch comparisons remain byte-bound; its measured18.13/21.32 percent lower component CPU is not a whole-game FPS claim. All jobs in this cohort are terminal. Nothing published.
+
+Private archive publication/fresh-read components now pass272+32 CLI/304 native assertions, all226 native fingerprints, zero CreatorErrors and combined compile/strict. The protocol uses an immutable first recovery record, verifies each part, writes the completion marker last, handles restart/cancellation/conflicts, and requires uncached readback. It never writes original P_/R_ keys. The native server package disabled all production scripts; it tests protocol/API correctness, not a live DataStore or full game. Diagnostic closed/restored. See docs/save-slot-isolation/RECOVERY-PUBLICATION.md.
+
+Existing production ordinary reads remain cached. SaveSession intent/ambiguous-write readbacks need a separate cache-aware integration trace before any broader fix claim. Recovery also still needs server authority/raw collection, budgets, portable projection, schema/atomic commit, actual isolated DataStore/rejoin and release checks. The older-world policy remains progress into Preserve with a complete unchanged original archive; it is not yet a playable migration. Broader natural lifecycle/streaming/device/memory/performance and release work remain open; goal active.
+
+Earlier status below is historical.
+
 # Current verification: Linux passed; Windows17569 running
 
 Current runtime/tests405e9df16f5a8dbccadbcab9c8a654487d161445 on codex/save-continue. Linux39880600604 completed76 suites/468114 checks/0 failures, compile222, strict clean and runner5. The corrected snapshot-return client suite passes27/0. Current immutable Windows full17569 is active; expected468114 is not a completed Windows result. Root verification still refuses its missing terminal gate. Do not restart this live process.

@@ -57,7 +57,7 @@ local function storedArchive(user:string,parts:any):(any?,string?)
  if not same(parts.index,{format=ArchiveStore.FORMAT,version=1,owner=user,complete=true,index=plan.index}) then return nil,"complete archive index differs" end
  return plan,nil
 end
-function Reader.prepare(user:string,slot:string,raw:any,anchor:any,parts:any,codec:any,context:any,requestedKind:string?,currentFormat:any?):(any?,string?)
+function Reader.prepare(user:string,slot:string,raw:any,anchor:any,parts:any,codec:any,context:any,requestedKind:string?,currentFormat:any?,retiredNewLife:boolean?):(any?,string?)
  if not owner(user) or not table.find(Rules.MODES,slot) or requestedKind~=nil and requestedKind~="primary" and requestedKind~="backup" then return nil,"invalid recovery offer scope" end
  if SaveRest.bounded(raw,if currentFormat then Rules.MAX_REST_NODES*2+1024 else Archive.MAX_NODES,if currentFormat then Rules.MAX_DEPTH+6 else Archive.MAX_DEPTH+2) then return nil,"stored rest exceeds structural bound" end
  local selectedRaw=raw;local kind=requestedKind or "primary";local plan=nil;local pendingSource:any=nil
@@ -86,7 +86,14 @@ function Reader.prepare(user:string,slot:string,raw:any,anchor:any,parts:any,cod
       if not currentFormat.matchesProposal(current,anchor,codec,context) then return nil,"continued provenance differs from original proposal" end
      end
      if not current then return nil,problem end
-     if current.save_retired or not current.checkpoint then return nil,"retired recovery requires explicit New Life" end
+     if current.save_retired then
+      if not retiredNewLife then return nil,"retired recovery requires explicit New Life" end
+      local out={record={save_retired=true,save_life=current.save_life},identity={checksum=logical.checksum,updatedAt=logical.updatedAt,life=current.save_life,kind="primary"},
+       pending=false,continued=true,retired=true,entryArchive=plan,protected=true,gameplayAuthorized=false,
+       retiredState={rawRest=Json.copy(raw),anchor=Json.copy(anchor),current=Json.copy(current)}}
+      freeze(out);return out,nil
+     end
+     if not current.checkpoint then return nil,"retired recovery requires explicit New Life" end
      local currentWhy=currentFormat.check(slot,current,context);if currentWhy then return nil,currentWhy end
      local out={record=Json.copy(current.checkpoint),identity={checksum=logical.checksum,updatedAt=logical.updatedAt,life=current.save_life,kind="primary"},
       pending=false,continued=true,entryArchive=plan,protected=true,gameplayAuthorized=false}
@@ -153,8 +160,12 @@ function Reader.takeContinuedArchive(self:any,j:any):any?
  if Work.pulse() or self.current~=j or j.state~="offered" or not j.continued or not j.entryArchive then return nil end
  local plan=j.entryArchive;j.entryArchive=nil;return plan
 end
+function Reader.takeRetiredState(self:any,j:any):any?
+ if Work.pulse() or self.current~=j or j.state~="offered" or not j.retired or not j.retiredState then return nil end
+ local state=j.retiredState;j.retiredState=nil;return state
+end
 local function prepare(self:any,j:any)
- j.work=Work.new(function() return Reader.prepare(j.user,j.mode,j.raw,j.anchor,j.parts,self.codec,self.context,j.kind,self.currentFormat) end,self.options.work);j.phase="prepare"
+ j.work=Work.new(function() return Reader.prepare(j.user,j.mode,j.raw,j.anchor,j.parts,self.codec,self.context,j.kind,self.currentFormat,self.options.retiredNewLife==true) end,self.options.work);j.phase="prepare"
 end
 local function stepInner(self:any,j:any):boolean
  local s=self.session;local now=s.now()
@@ -169,7 +180,7 @@ local function stepInner(self:any,j:any):boolean
   local found=result[1];local offer=s.observations:publish(j.mode,found.record,found.identity,true)
   if not offer then stop(j,"refused","protected offer publication refused");return false end
   j.offer,j.archivePlan,j.pending,j.continued=offer,found.archivePlan,found.pending,found.continued==true
-  j.entryArchive=found.entryArchive
+  j.entryArchive=found.entryArchive;j.retired=found.retired==true;j.retiredState=found.retiredState
   j.identity=table.freeze(Json.copy(found.identity));j.state,j.problem="offered",nil;clean(j)
   -- No callbacks before the observation is stable and staging has been released.
   if s.cfg.onOffer then pcall(s.cfg.onOffer,j.mode,offer) end

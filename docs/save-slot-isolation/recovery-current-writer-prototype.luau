@@ -60,9 +60,17 @@ local function valid(self:any,t:any):boolean
   and s._loadSerial==t.load and s.id==t.id and tostring(s.cfg.userId)==t.user and s.pkey==t.pkey and s.rkey[t.mode]==t.key
   and s.sched==t.scheduler and s.intents==t.intents and s.recoveryOwner==t.owner and s.backend.held==t.held
   and (t.held==nil or s.backend:valid(t.held)) and not s.closed and not s.flushing and s.state=="active" and s.lockHeld
-  and s.intents.requests[t.mode]==r and r.kind=="continue" and r.revision==t.revision
-  and s.intents:authorized(t.mode,t.serial,t.credential,t.life)
-  and r.receivedSerial==(if t.started then t.restSerial else t.received)
+  and s.intents.requests[t.mode]==r and (r.kind=="continue" or t.retiredRuntime~=nil and r.kind=="new") and r.revision==t.revision
+  and (t.retiredRuntime~=nil and t.retiredRuntime.session==s and not t.retiredRuntime.leaving
+   and (t.retiredRuntime.phase=="retired" or t.retiredRuntime.phase=="freshening") and t.retiredRuntime.result.retired==true
+   and t.retiredRuntime.result.rawRest==t.retiredRaw and t.retiredRuntime.result.archive==t.retiredArchive and t.retiredRuntime.result.anchor==t.retiredAnchor
+   and r.credential==nil and (r.state=="changed" and r.reason=="life_retired"
+    or r.kind=="new" and r.state=="readonly" and r.protected==true and t.retiredSelection~=nil
+     and t.retiredRuntime.retiredSelection==t.retiredSelection and t.retiredSelection.request==r
+     and s.observations.choices[t.mode]==t.retiredSelection.choice and t.retiredSelection.choice.offer.id==r.offerId
+     and same(r.base,t.retiredSelection.identity) and same(t.retiredSelection.choice.offer.identity,t.retiredSelection.identity))
+   or t.retiredRuntime==nil and s.intents:authorized(t.mode,t.serial,t.credential,t.life))
+  and (r.receivedSerial or 0)==(if t.started then t.restSerial else t.received)
 end
 function Writer.capture(self:any,mode:string,serial:number,credential:string,life:any,restSerial:number):(any?,string?)
  local s=self.session
@@ -78,9 +86,23 @@ function Writer.capture(self:any,mode:string,serial:number,credential:string,lif
  if t.pkey~="P_"..t.user or t.key~="R_"..t.user.."_"..mode or not valid(self,t) then return nil,"continuation identity changed" end
  local handle=table.freeze({});captures[handle]={writer=self,ticket=t};return handle,nil
 end
-local function prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any,retirement:string?):(any?,string?)
+function Writer.captureRetired(self:any,runtime:any):(any?,string?)
+ local s=self.session;local loop=runtime.saveLoop;local r=if loop then loop.request else runtime.retiredRequest;local now=s.now();local held=s.backend.held
+ if Work.pulse() or self.busy or s.busy or s.closed or s.flushing or (s.backend.activeUpdates or 0)>0 or self.current and self.current.state=="pending"
+  or runtime.session~=s or runtime.phase~="retired" or runtime.leaving or runtime.intakeClosed or not runtime.result.retired
+  or (loop~=nil and (loop.state~="retired" or loop.writer~=self)) or (loop==nil and runtime.freshWriter~=self) or not r or r.credential~=nil
+  or not finite(now) or not finite(s.sched.lastBeat) or now<s.sched.lastBeat or now-s.sched.lastBeat>=Rules.LOCK_STALE then return nil,"verified retired owner required" end
+ local restSerial=(r.receivedSerial or 0)+1;if not whole(restSerial) then return nil,"retirement ticket exhausted" end
+ local t={backend=s.backend,source=s.backend.source,raw=self.raw,store=self.store,codec=self.codec,context=self.context,
+  load=s._loadSerial,id=s.id,user=tostring(s.cfg.userId),pkey=s.pkey,key=s.rkey[r.mode],scheduler=s.sched,intents=s.intents,owner=s.recoveryOwner,held=held,
+  mode=r.mode,serial=r.serial,credential=nil,life=if loop then r.life else runtime.result.current.provenance.originLife,restSerial=restSerial,received=r.receivedSerial or 0,request=r,revision=r.revision,created=now,started=false,cancelled=false,
+  retiredRuntime=runtime,retiredSelection=runtime.retiredSelection,retiredRaw=runtime.result.rawRest,retiredArchive=runtime.result.archive,retiredAnchor=runtime.result.anchor}
+ if t.pkey~="P_"..t.user or t.key~="R_"..t.user.."_"..t.mode or not valid(self,t) then return nil,"retired identity changed" end
+ local handle=table.freeze({});captures[handle]={writer=self,ticket=t};return handle,nil
+end
+local function prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any,retirement:string?,fresh:boolean?):(any?,string?)
  local captured=captures[handle];local t=if captured and captured.writer==self then captured.ticket else nil
- if not t or t.started or not valid(self,t) then return nil,"current life changed before preparation" end
+ if not t or t.started or not valid(self,t) or (fresh==true)~=(t.retiredRuntime~=nil) then return nil,"current life changed before preparation" end
  local checked,why=Archive.check(originalArchive);if not checked then return nil,why end
  local packet,errorText=Packet.open(anchor,self.codec,self.context);if not packet then return nil,errorText end
  if anchor.owner~=t.user or anchor.slot~=t.mode or packet.save_life~=t.life or anchor.archive~=originalArchive.index.checksum
@@ -89,7 +111,7 @@ local function prepare(self:any,handle:any,originalArchive:any,anchor:any,priorR
  local decoded,logical=pcall(self.codec.decode,self.codec,priorRaw)
  if not decoded then return nil,tostring(logical) end
  local opened=Format.open(t.mode,logical,self.context)
- if opened.status~="ok" or not opened.payload or opened.payload.save_retired then return nil,"active schema3 current rest required" end
+ if opened.status~="ok" or not opened.payload or (opened.payload.save_retired==true)~=(fresh==true) then return nil,"expected schema3 life/retirement required" end
  local prior
  if opened.payload.format==Packet.FORMAT then
   if not same(priorRaw,anchor.target) then return nil,"initial stored rest differs from immutable target" end
@@ -100,40 +122,52 @@ local function prepare(self:any,handle:any,originalArchive:any,anchor:any,priorR
  end
  if not prior then return nil,errorText end
  if retirement and (not SaveRest.validLife(retirement) or retirement==t.life) then return nil,"distinct server retirement token required" end
- local nextRest,problem
- if retirement then nextRest,problem=Format.retire(prior,retirement,self.context) else nextRest,problem=Format.advance(prior,record,self.context) end
+ local nextRest:any=nil;local problem:string?=nil
+ if fresh then nextRest={save_retired=true,save_life=prior.save_life}
+ elseif retirement then nextRest,problem=Format.retire(prior,retirement,self.context) else nextRest,problem=Format.advance(prior,record,self.context) end
  if not nextRest then return nil,problem end
- if not retirement and nextRest.save_life~=t.life then return nil,"checkpoint differs from granted life" end
- local bad,details=Format.check(t.mode,nextRest,self.context);if bad then return nil,bad end
- local activeDetails:any=details
- if retirement then
-  local priorProblem,priorDetails=Format.check(t.mode,prior,self.context)
-  if priorProblem then return nil,priorProblem end
-  activeDetails=priorDetails
+ if not fresh and not retirement and nextRest.save_life~=t.life then return nil,"checkpoint differs from granted life" end
+ local requiredRare
+ if fresh then
+  if #SaveRest.SPECS[t.mode].validate(nextRest)>0 then return nil,"invalid ordinary retirement marker" end
+  requiredRare={serial=packet.binding.serial,visit=nil}
+ else
+  local bad,details=Format.check(t.mode,nextRest,self.context);if bad then return nil,bad end
+  local activeDetails:any=details
+  if retirement then
+   local priorProblem,priorDetails=Format.check(t.mode,prior,self.context)
+   if priorProblem then return nil,priorProblem end
+   activeDetails=priorDetails
+  end
+  local l=activeDetails.decoded.roots.life
+  if not finite(l.rareSerial) or l.rareSerial<packet.binding.serial or l.rareGeneration~=(l.generation or 0) then return nil,"current rare generation is not bound" end
+  requiredRare={serial=l.rareSerial,visit=Json.copy(l.rareVisit)}
  end
- local l=activeDetails.decoded.roots.life
- if not finite(l.rareSerial) or l.rareSerial<packet.binding.serial or l.rareGeneration~=(l.generation or 0) then return nil,"current rare generation is not bound" end
- local nextLogical=if same(opened.payload,nextRest) then logical else Envelope.make(Format.spec(t.mode,self.context),nextRest,math.max(t.created,logical.updatedAt),logical,{session=t.id})
+ local spec=if fresh then SaveRest.SPECS[t.mode] else Format.spec(t.mode,self.context)
+ local nextLogical=if same(opened.payload,nextRest) then logical else Envelope.make(spec,nextRest,math.max(t.created,logical.updatedAt),logical,{session=t.id})
  local candidate=priorRaw
  if not same(opened.payload,nextRest) then
   local encoded,result=pcall(self.codec.encode,self.codec,nextLogical)
   if not encoded then return nil,tostring(result) end
   candidate=result
  end -- preserve exact no-op bytes/backup
- local plan={retirement=retirement,anchor=Json.copy(anchor),archiveIndex={format=ArchiveStore.FORMAT,version=1,owner=t.user,complete=true,index=Json.copy(originalArchive.index)},
+ local plan={fresh=fresh==true,retirement=retirement,anchor=Json.copy(anchor),archiveIndex={format=ArchiveStore.FORMAT,version=1,owner=t.user,complete=true,index=Json.copy(originalArchive.index)},
   expected=Json.copy(priorRaw),candidate=Json.copy(candidate),logical=Json.copy(nextLogical),packetProgress=Json.copy(packet.progress),packetTime=packet.progressTime,
-  rare={serial=l.rareSerial,visit=Json.copy(l.rareVisit)}}
+  rare=requiredRare}
  freeze(plan.anchor);freeze(plan.archiveIndex);freeze(plan.expected);freeze(plan.candidate);freeze(plan.logical);freeze(plan.packetProgress);freeze(plan.rare)
  if not valid(self,t) then return nil,"current life changed during preparation" end
  captures[handle]=nil;table.freeze(plan);prepared[plan]={writer=self,ticket=t};return plan,nil
 end
 function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any):(any?,string?)
- return prepare(self,handle,originalArchive,anchor,priorRaw,record,nil)
+ return prepare(self,handle,originalArchive,anchor,priorRaw,record,nil,false)
+end
+function Writer.prepareFresh(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any):(any?,string?)
+ return prepare(self,handle,originalArchive,anchor,priorRaw,nil,nil,true)
 end
 function Writer.prepareRetirement(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,newLifeSerial:number):(any?,string?)
  local capture=captures[handle];local t=if capture and capture.writer==self then capture.ticket else nil
  if not t or not whole(newLifeSerial) or newLifeSerial<=t.serial then return nil,"later explicit New Life serial required" end
- return prepare(self,handle,originalArchive,anchor,priorRaw,nil,`{t.id}:{t.mode}:{newLifeSerial}`)
+ return prepare(self,handle,originalArchive,anchor,priorRaw,nil,`{t.id}:{t.mode}:{newLifeSerial}`,false)
 end
 function Writer.begin(self:any,plan:any):(any?,string?)
  local preparedScope=prepared[plan];local t=if preparedScope and preparedScope.writer==self then preparedScope.ticket else nil
@@ -233,11 +267,11 @@ local function stepInner(self:any,j:any):boolean
  else
   local good,problem=progress(self,j,value);if not good then refuse(j,problem or "final progress ownership changed");return true end
   local t=j.ticket;local r=t.request
-  if r.storedSerial>=t.restSerial then refuse(j,"current rest receipt superseded");return true end
+  if (r.storedSerial or 0)>=t.restSerial then refuse(j,"current rest receipt superseded");return true end
   r.storedSerial,r.storedCredential=t.restSerial,t.credential
   j.state,j.problem="verified",nil;j.result={stored=true,restSerial=t.restSerial,credential=t.credential,life=t.life,
-   identity={checksum=j.plan.logical.checksum,updatedAt=j.plan.logical.updatedAt,life=j.plan.logical.payload.save_life},retired=j.plan.retirement~=nil,gameplayAuthorized=false}
-  if not j.plan.retirement and s.cfg.onStored then pcall(s.cfg.onStored,t.mode,t.serial,t.credential,t.restSerial) end
+   identity={checksum=j.plan.logical.checksum,updatedAt=j.plan.logical.updatedAt,life=j.plan.logical.payload.save_life},retired=j.plan.retirement~=nil,freshMarker=j.plan.fresh,gameplayAuthorized=false}
+  if not j.plan.retirement and not j.plan.fresh and s.cfg.onStored then pcall(s.cfg.onStored,t.mode,t.serial,t.credential,t.restSerial) end
  end
  return true
 end

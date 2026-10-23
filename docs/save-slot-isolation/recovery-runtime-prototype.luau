@@ -62,6 +62,8 @@ local function hold(self:any):(any?,string?)
  return held,why
 end
 local function lost(self:any,why:string)
+ if self.freshWork then self.freshWork:cancel();self.freshWork=nil end
+ if self.freshJob and self.freshJob.state=="pending" then self.freshWriter:cancel(self.freshJob) end
  if self.startup then self.startup:close("recovery ownership lost") end
  if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
@@ -75,18 +77,19 @@ end
 local function startReadLease(self:any):boolean
  local component
  component=ReadLease.new(self.session,function():boolean
-  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required" or self.phase=="entering" or self.phase=="recovered" or self.phase=="retired")
+  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required" or self.phase=="entering" or self.phase=="recovered" or self.phase=="retired" or self.phase=="fresh_ready")
  end,self.session.backend.held)
  self.lease=component;local job,why=component:begin()
  if not job then lost(self,why or "read phase lease unavailable");return false end
  self.leaseJob=job;return true
 end
-function Runtime.discover(self:any,mode:string,kind:string?):(any?,string?)
+function Runtime.discover(self:any,mode:string,kind:string?,retiredNewLife:boolean?):(any?,string?)
  if not available(self) or (self.phase~="normal" and self.phase~="offered" and self.phase~="offer_refused" and self.phase~="held") or self.pipeline.leaseLost then return nil,"discovery routing unavailable" end
  for _,slot in Rules.MODES do
   if self.session.restPending[slot]~=nil or self.session.lifeRequests[slot] and not self.session.lifeRequests[slot].done then return nil,"finish existing rest/life work before discovery" end
  end
- local reader=Reader.new(self.session,self.recovery.codec,self.recovery.context,self.recovery.reader,self.recovery.currentFormat)
+ local options={};for k,v in self.recovery.reader or {} do options[k]=v end;options.retiredNewLife=retiredNewLife==true
+ local reader=Reader.new(self.session,self.recovery.codec,self.recovery.context,options,self.recovery.currentFormat)
  local job,why=reader:begin(mode,kind);if not job then return nil,why end
  if self.phase=="normal" then
   local s=self.session
@@ -99,7 +102,7 @@ end
 function Runtime.accept(self:any,mode:string,serial:number,offerId:string):(any?,string?)
  if not available(self) or (self.phase~="offered" and self.phase~="held") then return nil,"offered recovery scope required" end
  local d=self.discovery
- if not d or d.state~="offered" or d.mode~=mode or not d.offer or d.offer.id~=offerId then return nil,"current server discovery required" end
+ if not d or d.retired or d.state~="offered" or d.mode~=mode or not d.offer or d.offer.id~=offerId then return nil,"current server discovery required" end
  if not self.session:requestLife("continue",mode,serial,offerId) then return nil,"selected Continue refused" end
  if d.continued then
   -- A returning schema3 checkpoint already has a durable original archive and
@@ -192,7 +195,22 @@ local function stepInner(self:any):boolean
   if not self.leaving and not s.closed and self.saveLoop.state=="lost" then lost(self,self.saveLoop.problem or "recovered save loop lost") end
   return asked
  end
- if self.phase=="retired" and self.lease==nil and not startReadLease(self) then return false end
+ if self.phase=="freshening" then
+  if self.freshWork then
+   self.freshWork:step();if self.freshWork.state=="pending" then return false end
+   local result=self.freshWork:take();self.freshWork=nil
+   if not result or not result[1] then lost(self,if result then result[2] else "fresh marker preparation failed");return false end
+   local j,why=self.freshWriter:begin(result[1]);if not j then lost(self,why or "fresh marker admission failed");return false end
+   self.freshJob=j;return false
+  end
+  local j=self.freshJob;local asked=self.freshWriter:step(j)
+  if self.leaving or s.closed then return asked end
+  if j.state=="verified" then
+   self.freshMarker,self.freshLogical=j.plan.candidate,j.plan.logical;self.phase="fresh_ready";self.freshWriter.current=nil
+  elseif j.state~="pending" then lost(self,j.problem or "fresh marker refused") end
+  return asked
+ end
+ if (self.phase=="retired" or self.phase=="fresh_ready") and self.lease==nil and not startReadLease(self) then return false end
  local lease,leaseJob=self.lease,self.leaseJob
  local asked=lease:step(leaseJob)
  if self.leaving or s.closed or self.lease~=lease or self.leaseJob~=leaseJob then return asked end
@@ -239,6 +257,66 @@ function Runtime.retireRecovered(self:any,mode:any,serial:any,credential:any,lif
  if not available(self) or self.phase~="recovered" or not self.saveLoop then return false end
  return self.saveLoop:retire(mode,serial,credential,life,restSerial,newLifeSerial)
 end
+-- Explicit New Life discovery may expose a retired marker, never Continue.
+function Runtime.discoverNewLife(self:any,mode:string):(any?,string?)
+ if not self.recovery.currentFormat or not self.recovery.freshWriterFactory then return nil,"fresh-life recovery dependencies required" end
+ return self:discover(mode,nil,true)
+end
+function Runtime.acceptRetiredFresh(self:any,mode:string,serial:number,offerId:string):(any?,string?)
+ if not available(self) or self.phase~="offered" or not self.recovery.freshWriterFactory then return nil,"retired New Life offer required" end
+ local d=self.discovery;local s=self.session
+ if not d or d.state~="offered" or not d.retired or d.mode~=mode or not d.offer or d.offer.id~=offerId then return nil,"current retired offer required" end
+ if not s:requestLife("new",mode,serial,offerId) then return nil,"explicit New Life choice refused" end
+ local r=s.intents.requests[mode];local choice=s.observations.choices[mode]
+ if not available(self) or self.discovery~=d or self.phase~="offered" or not r or r.kind~="new" or r.state~="readonly" or r.credential~=nil or not r.protected
+  or r.serial~=serial or r.offerId~=offerId or not choice or choice.serial~=serial or not choice.offer or choice.offer.id~=offerId
+  or not sameIdentity(choice.offer.identity,d.identity) or not sameIdentity(r.base,d.identity) then return nil,"retired selection changed" end
+ local held,why=hold(self);if not held then return nil,why end
+ local archive=self.reader:takeContinuedArchive(d);local state=self.reader:takeRetiredState(d)
+ if not archive or not state then return nil,"retired original proof unavailable" end
+ self.retiredSelection=table.freeze({request=r,choice=choice,identity=d.identity});self.retiredRequest=r;self.retiredMode=mode
+ self.result={retired=true,rawRest=state.rawRest,anchor=state.anchor,current=state.current,archive=archive,gameplayAuthorized=false}
+ stopLease(self);self.phase="retired";self.accepted=true
+ self.freshWriter=self.recovery.freshWriterFactory.new(s,self.recovery.rawBackend,self.recovery.codec,self.recovery.context,if self.recovery.saveOptions then self.recovery.saveOptions.rest else nil)
+ if not startReadLease(self) then return nil,self.problem end
+ return self.retiredSelection,nil
+end
+function Runtime.prepareFreshLife(self:any):(any?,string?)
+ if not available(self) or self.phase~="retired" or (self.saveLoop==nil and self.freshWriter==nil) then return nil,"verified retirement required" end
+ self.freshWriter=if self.saveLoop then self.saveLoop.writer else self.freshWriter
+ local handle,why=self.freshWriter:captureRetired(self);if not handle then return nil,why end
+ stopLease(self);self.phase="freshening"
+ local options=if self.recovery.saveOptions then self.recovery.saveOptions.work else nil
+ self.freshWork=Work.new(function() return self.freshWriter:prepareFresh(handle,self.result.archive,self.result.anchor,self.result.rawRest) end,options)
+ return handle,nil
+end
+-- Close and drain the old owner before constructing a normal replacement.
+function Runtime.replaceFreshLife(self:any,newId:string,deadline:number?):(any?,string?)
+ if self.replacement then
+  if self.replacement.session.id==newId then return self.replacement,nil end
+  return nil,"replacement already selected"
+ end
+ if not available(self) or self.phase~="fresh_ready" or type(newId)~="string" or #newId<1 or #newId>96 or not string.match(newId,"^[%w_-]+$") or newId==self.session.id then return nil,"distinct fresh server session required" end
+ local source=self.session.backend.source;local marker=self.freshLogical;local mode=if self.saveLoop then self.saveLoop.mode else self.retiredMode
+ local serial=if self.retiredRequest then self.retiredRequest.serial else tonumber(string.match(marker.payload.save_life,":(%d+)$"))
+ if not serial or serial<1 or serial>Rules.MAX_LIFE_SERIAL then return nil,"retired New Life serial missing" end
+ self:flush(deadline)
+ local s=self.session
+ if (self.phase::string)~="closed" or not s.closed or s.flushing or s.lockHeld or self.busy or s.busy or self.pipeline.busy or self.saveLoop~=nil and self.saveLoop.busy
+  or (s.backend.activeUpdates or 0)>0 or s.backend.source~=source or source~=s.backend.boundSource
+  or not self.result.progressPreserved or not self.result.leaseReleased then return nil,"old owner did not drain and release" end
+ local cfg={};for k,v in self.config do cfg[k]=v end;cfg.backend=source;cfg.sessionId=newId
+ local replacement=Runtime.new(cfg,self.recovery)
+ replacement.freshStart=table.freeze({mode=mode,serial=serial,identity=table.freeze({kind="primary",checksum=marker.checksum,updatedAt=marker.updatedAt,life=marker.payload.save_life})})
+ self.replacement=replacement;return replacement,nil
+end
+-- Use the real normal observation and intent path; never synthesize a grant.
+function Runtime.requestFreshLife(self:any):boolean
+ if not available(self) or self.phase~="normal" or not self.freshStart or self.session.state~="active" or not self.session.offersEnabled then return false end
+ local f=self.freshStart;local s=self.session;local observed=s.observations.latest[f.mode]
+ if not observed or observed.protected or not sameIdentity(observed.identity,f.identity) or observed.record.save_retired~=true then return false end
+ return s:requestLife("new",f.mode,f.serial,observed.id)
+end
 function Runtime.depart(self:any,deadline:number?):(any?,string?)
  if Work.pulse() then return nil,"departure must run outside preparation" end
  if self.departureJob then return self.departureJob,nil end
@@ -247,6 +325,8 @@ function Runtime.depart(self:any,deadline:number?):(any?,string?)
  if not finite(now) or not finite(untilAt) then return nil,"finite departure deadline required" end
  if self.route and self.phase~="normal" and (now<self.route.lastNow or not routeMatches(self)) then self.scopeInvalid=true end
  if self.startup then self.startup:close("session departing") end
+ if self.freshWork then self.freshWork:cancel();self.freshWork=nil end
+ if self.freshJob and self.freshJob.state=="pending" then self.freshWriter:cancel(self.freshJob) end
  self.leaving=true;self.flushDeadline=untilAt
  if self.saveLoop then self.saveLoop:cancel() end
  if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end

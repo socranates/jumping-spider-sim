@@ -1,0 +1,5 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\tmpi5dwvgv9\src\Server\RecoveryCurrentWriterPrototype.luau [game/ServerScriptService/Server/RecoveryCurrentWriterPrototype](123,42): TypeError: Expected this to be '{| save_life: any, save_retired: boolean |}', but got 'any?'
+c:\Users\natha\AppData\Local\Temp\tmpi5dwvgv9\src\Server\RecoveryCurrentWriterPrototype.luau [game/ServerScriptService/Server/RecoveryCurrentWriterPrototype](123,109): TypeError: Expected this to be '{| save_life: any, save_retired: boolean |}', but got 'any?'
+c:\Users\natha\AppData\Local\Temp\tmpi5dwvgv9\src\Server\RecoveryRuntimePrototype.luau [game/ServerScriptService/Server/RecoveryRuntimePrototype](279,5): TypeError: Type "fresh_ready" cannot be compared with "closed"

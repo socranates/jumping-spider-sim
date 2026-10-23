@@ -272,14 +272,29 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	settleRest()
 	assert(life.resting and life.notice == "Last rest kept.", "no last rest: " .. life.notice)
-	local energy, hour, tick = needs.energy, life.clock.hour, prey.tick
+ -- Saving prepares asynchronously while the life continues. The oracle is
+ -- the immutable kept snapshot, not a later live sample after preparation.
+ local Checkpoint=require("../src/Shared/Persistence/Checkpoint")
+ local ObjectRecord=require("../src/Shared/Persistence/ObjectRecord")
+ local kept=driver.currentStore():loadBest()
+ assert(kept.ok,"no kept snapshot")
+ local decoded,why=ObjectRecord.decode(kept.record.world,Checkpoint.CLASSES,Checkpoint.refs(driver))
+ assert(decoded,table.concat(why or {},"; "))
+ local snapshot=decoded.roots
+ local energy,hour,tick=snapshot.needs.energy,snapshot.life.clock.hour,snapshot.prey.tick
+ -- Cross a 2Hz reserve update before returning, so a later-live-value oracle
+ -- would fail even though the actual snapshot restore is correct.
+ frames(29)
+ assert(math.abs(needs.energy-energy)>1e-6,"delay did not exercise hunger after the snapshot")
 	-- Walk away for a while: the world moves on.
 	key("Forward", true); frames(90); key("Forward", false); frames(60)
 	assert(not life.resting and prey.tick > tick + 100, "the world did not move on")
-	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
-	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
-	assert(math.abs(life.clock.hour - hour) < 0.01 and prey.tick < tick + 10, `not the checkpoint's time (hour {life.clock.hour}, tick {prey.tick})`)
+	key("Reset", true); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end)
+	assert(Layout.inRetreat(driver.motor.pos) and life.resting, "not back resting in the crack")
+	assert(life.clock.hour == hour and prey.tick == tick, `not the checkpoint's exact time (hour {life.clock.hour}, tick {prey.tick})`)
 	assert(needs == driver.needs and prey.feeding.needs == needs and math.abs(needs.energy - energy) < 1e-6, "the reserves did not go back")
+	frames(2) -- only resume after checking the atomic restored state
+	assert(driver.lifeSpider().inRetreat,"derived retreat state did not refresh")
 	-- (ROBLOX-113: the return's explanation is the gentle modes' only: Normal's end card says what a return is. The loop's words are as they were.)
 	assert(string.find(life.notice, "a return to the rest", 1, true) and not (find("SpiderPrompts", "Notice").Visible and string.find(find("SpiderPrompts", "Notice").Text, "a return to the rest", 1, true)), find("SpiderPrompts", "Notice").Text)
 end)

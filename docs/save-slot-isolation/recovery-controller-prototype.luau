@@ -58,7 +58,7 @@ function Controller.cancel(self:any,j:any):boolean
 end
 function Controller.begin(self:any,mode:string,serial:number,offerId:string,stamp:string):(any?,string?)
  if self.busy or self.session.busy or self.session.flushing then return nil,"save worker busy" end
- local ticket,why=Fence.capture(self.session,mode,serial,offerId);if not ticket then return nil,why end
+ local ticket,why=Fence.capture(self.session,mode,serial,offerId,self.options.intentKind);if not ticket then return nil,why end
  if self.current and self.current.state=="pending" then self:cancel(self.current) end
  local s=self.session;local now=s.now()
  local j:any={ticket=ticket,state="pending",phase="collect",started=now,nextAt=now,nextBeat=now,nextBeatAttempt=now,beatFailures=0,failures=0,requests=0,lastAck=nil,plan=nil}

@@ -55,10 +55,28 @@ local function enqueueProtected(self: any)
   if self.session.restProtected[mode] then self.queue[mode] = true end
  end
 end
+local function publishOrdinaryLoaded(self:any)
+ if not self.negotiated or not self.session.offersEnabled then return end
+ local s=self.session
+ for _,mode in Rules.MODES do
+  if s.restLoaded[mode] and not s.restProtected[mode] and s.restRevision[mode]~=nil then
+   local record=s.rests[mode]
+   if not record and SaveRest.validLife(s.lifeTokens[mode]) then record={save_retired=true,save_life=s.lifeTokens[mode]} end
+   if record then
+    local offer=s.observations:publish(mode,record,{kind="primary",checksum=s.restRevision[mode],updatedAt=s.restBase[mode],life=s.lifeTokens[mode]},false)
+    if offer and s.cfg.onOffer then s.cfg.onOffer(mode,offer) end
+   end
+  end
+ end
+end
+function Profile.enableOffers(self:any)
+ BaseOwner.enableOffers(self);publishOrdinaryLoaded(self)
+end
 function Profile.load(self: any): ...any
  local result = table.pack(BaseOwner.load(self))
  self.pendingDiscovery = nil -- the base owner deliberately serves one slot
  enqueueProtected(self)
+ publishOrdinaryLoaded(self)
  return table.unpack(result, 1, result.n)
 end
 function Profile.enableRecovery(self: any)
@@ -172,6 +190,11 @@ local function processChoice(self: any)
  if request ~= choice.request or request.state == "changed" then self.pendingSelection = nil; return end
  if not self.session.restProtected[choice.mode] then ordinary(self); return end
  if choice.kind ~= "continue" then
+  if self.mode ~= choice.mode and not bind(self, choice.mode) then return end
+  -- New keeps the exact displayed observation for its separately admitted
+  -- retirement policy. A background Continue discovery must not replace an
+  -- explicitly observed retired source or invalidate that New selection.
+  self.queue = {} -- an explicit New selection takes priority over background offers
   self.session.intents:readonly(request, "protected_new_life_requires_policy"); self.pendingSelection = nil; return
  end
  if self.readingChoice ~= choice or self.readJob ~= rt.discovery or not self.readJob or self.readJob.state == "pending" then return end
@@ -216,6 +239,7 @@ function Profile.step(self: any): boolean
  if self.switchRequired and (rt.accepted or self.replacementPending) then
   return stepSwitchHold(self)
  end
+ if self.newLifePolicy then return self.newLifePolicy:step(self.newLifeJob) end
  processChoice(self)
  if rt.accepted then return BaseOwner.step(self) end
  if canBind(self) then

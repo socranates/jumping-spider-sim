@@ -9,7 +9,7 @@ end
 function Owner.new(config: any, emit: any, common: any, profiles: any): any
  return setmetatable(Profile.new(config, emit, common, profiles), Owner)
 end
-function Owner.prepareReplacement(self: any): boolean
+function Owner.prepareReplacement(self: any, finalProgress: any?): boolean
  local rt, s = self.runtime, self.session
  -- A selected observation may be left before migration accepts any writes.
  -- Its held physical lease still requires the same verified departure; only
@@ -19,6 +19,13 @@ function Owner.prepareReplacement(self: any): boolean
  if held==nil and (rt.accepted or not self.recoveryEnabled or not rt.route
   or (rt.phase~="discovering" and rt.phase~="offered" and rt.phase~="offer_refused")) then return false end
  if held~=nil and not s.backend:valid(held) then return false end
+ -- The replacement transport supplies one validated final snapshot through
+ -- this explicit path. Ordinary intake may already be closed by a pending New
+ -- policy; reopening it just to capture departure progress would allow stale
+ -- traffic too. This only updates local P for the same guarded departure.
+ if finalProgress~=nil and not s:setProgress(finalProgress) then return false end
+ if self.closed or s.closed or rt.leaving or rt.scopeInvalid or rt.pipeline.leaseLost
+  or s.backend.held~=held or held~=nil and not s.backend:valid(held) then return false end
  self.switchRequired, self.pendingSelection, self.queue, self.replacementPending = true, nil, {}, true
  rt.intakeClosed = true
  for _, r in s.intents.requests do s.intents:changed(r, "session_replacement") end

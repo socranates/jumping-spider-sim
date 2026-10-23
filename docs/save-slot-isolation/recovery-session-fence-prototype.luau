@@ -14,17 +14,19 @@ local function selected(s:any,mode:string):(any,any)
  local c=s.observations.choices[mode]
  return if c then c.offer else nil,if c then c.serial else nil
 end
-function Fence.capture(s:any,mode:string,serial:number,offerId:string):(any?,string?)
+function Fence.capture(s:any,mode:string,serial:number,offerId:string,intentKind:string?):(any?,string?)
+ local kind=intentKind or "continue"
+ if kind~="continue" and kind~="new" then return nil,"unsupported fenced intent" end
  if not table.find(Rules.MODES,mode) or s.closed or s.busy or s.state~="active" or not s.lockHeld or not s.offersEnabled then return nil,"session unavailable" end
  local now=s.now();local beat=s.sched.lastBeat
  if not finite(now) or not finite(beat) or now<beat or now-beat>=Rules.LOCK_STALE then return nil,"lease observation expired" end
  local r=s.intents.requests[mode];local choice,choiceSerial=selected(s,mode)
- if not r or r.kind~="continue" or r.serial~=serial or r.offerId~=offerId or r.state~="readonly" or r.credential~=nil
+ if not r or r.kind~=kind or r.serial~=serial or r.offerId~=offerId or r.state~="readonly" or r.credential~=nil
   or not choice or choice.id~=offerId or choiceSerial~=serial or not same(choice.identity,r.base) then return nil,"selected Continue changed" end
  if s.restPending[mode]~=nil or s.lifeRequests[mode]~=nil then return nil,"destination work already pending" end
  -- Copy only fixed metadata, never a client supplied checkpoint or a full world.
  local id=table.freeze(Json.copy(choice.identity))
- local ticket={session=s,mode=mode,serial=serial,offerId=offerId,request=r,revision=r.revision,
+ local ticket={session=s,mode=mode,serial=serial,offerId=offerId,intentKind=kind,request=r,revision=r.revision,
   load=s._loadSerial,backend=s.backend,scheduler=s.sched,observations=s.observations,intents=s.intents,
   sessionId=s.id,owner=tostring(s.cfg.userId),pkey=s.pkey,rkey=s.rkey[mode],identity=id,
   protected=choice.protected,reason=r.reason,needsCheck=r.needsCheck,lastNow=now,cancelled=false}
@@ -37,7 +39,7 @@ local function current(t:any):boolean
  if s.closed or s.state~="active" or not s.lockHeld or not s.offersEnabled or s._loadSerial~=t.load
   or s.backend~=t.backend or s.sched~=t.scheduler or s.observations~=t.observations or s.intents~=t.intents
   or s.id~=t.sessionId or tostring(s.cfg.userId)~=t.owner or s.pkey~=t.pkey or s.rkey[t.mode]~=t.rkey
-  or s.intents.requests[t.mode]~=r or r.kind~="continue" or r.state~="readonly" or r.credential~=nil
+  or s.intents.requests[t.mode]~=r or r.kind~=(t.intentKind or "continue") or r.state~="readonly" or r.credential~=nil
   or r.serial~=t.serial or r.offerId~=t.offerId or r.revision~=t.revision or r.reason~=t.reason or r.needsCheck~=t.needsCheck
   or not same(r.base,t.identity) or s.restPending[t.mode]~=nil or s.lifeRequests[t.mode]~=nil then return false end
  local now=s.now();local beat=s.sched.lastBeat

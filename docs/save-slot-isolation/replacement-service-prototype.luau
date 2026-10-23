@@ -175,7 +175,7 @@ function Adapter.onMessage(self: any, player: any, message: any)
   id=Json.checksum(entry.session.id .. ":" .. tostring(message.serial) .. ":" .. tostring(self.counter)),
   stage="preparing",started=now,last=-math.huge}
  self.transitions[player] = t -- ordinary output/intake closes before callbacks
- local okay,prepared=pcall(function() return entry.owner:setProgress(message.progress) and entry.owner:prepareReplacement() end)
+ local okay,prepared=pcall(entry.owner.prepareReplacement,entry.owner,message.progress)
  if self.transitions[player]~=t or self.peers[player]~=p or self.closing or t.stage~="preparing" then return end
  t.stage=if okay and prepared==true then "offered" else "failed"
  reply(self, player, t)

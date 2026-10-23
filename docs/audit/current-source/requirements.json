@@ -491,5 +491,24 @@
     "destination_commit_authorized": false,
     "progress_import_implemented": false,
     "published": false
+  },
+  "latest_private_archive_controller": {
+    "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+    "assertions": 2621,
+    "heartbeat_priority_counterexample_reproduced": true,
+    "current_runtime_bundle_verified": true,
+    "strict_clean": true,
+    "actual_session_objects": true,
+    "backend": "MemoryBackend",
+    "long_pipeline_requests": 22,
+    "long_pipeline_simulated_seconds": 133,
+    "complete_and_interrupted_archive_restart_verified": true,
+    "changed_unselected_source_refused": true,
+    "production_connected": false,
+    "native_verified": false,
+    "real_datastore_verified": false,
+    "destination_commit_authorized": false,
+    "progress_import_implemented": false,
+    "published": false
   }
 }

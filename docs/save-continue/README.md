@@ -1,5 +1,7 @@
 # Current: corrected recovery full cohort green; raw collection composed privately
 
+Private controller milestone: actual session guard, raw collection, owned-lease renewal, request scheduling and immutable archive publication/restart now compose over MemoryBackend. 2621 checks and full strict pass; the retained draft fails the archive-backoff/heartbeat-priority counterexample. Complete/interrupted restarts and changed-unselected-slot refusal are covered. See docs/save-slot-isolation/RECOVERY-CONTROLLER.md. No production connection, native/service proof, destination permission or playable migration is claimed.
+
 Private recovery update: the raw collector now composes with an actual SaveSession/Continue-selection guard. 129 checks and full strict pass; the earlier expired-ticket resurrection counterexample fails as expected. Guards inspect bounded identity fields without copying a checkpoint and revoke permanently on invalidation. See docs/save-slot-isolation/RECOVERY-SESSION-FENCE.md. No production connection, destination permission, real remote lease/rejoin proof or playable migration is claimed.
 
 Production4220d0c: Windows44363 and Linux39890016962 both terminal76 suites/468352 checks/0 failures, all222 modules compile, strict and runner5 clean. Current root verification binds exact runtime/test/workflow bytes and the corrected native127/224-source evidence. Both full jobs are terminal. Nothing published.

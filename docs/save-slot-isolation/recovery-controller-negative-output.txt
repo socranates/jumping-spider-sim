@@ -1,0 +1,6 @@
+RECOVERY_CONTROLLER long_pipeline_requests=22 elapsed_seconds=133 cpu_without_budget=1
+C:/Users/natha/AppData/Local/Temp/tmpmzft5ee2.luau:45588: archive backoff starved lease renewal: nil
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpmzft5ee2.luau:45588 function checkController
+C:/Users/natha/AppData/Local/Temp/tmpmzft5ee2.luau:45743

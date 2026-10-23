@@ -1,0 +1,18 @@
+{
+  "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+  "run": "1792740801705",
+  "assertions": 22,
+  "script_fingerprints": 245,
+  "production_scripts_disabled": true,
+  "backend": "MemoryBackend",
+  "controlled_terminal_metadata": true,
+  "actual_discovery_pipeline_native_verified": false,
+  "place_sha256": "0bc02283cd875570304e3984af4991b644ef8a602b19a973a38871a5905e02c5",
+  "manifest_sha256": "92c24580602c084c88cd566c8cf354ef6ea07af7eeac8f870d6e6ec04790f6d8",
+  "events_sha256": "55c5770de091d6abc18cf4fce0076cff6151415888e36fd85ec86039a0c090b9",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261023T073156Z_Studio_4E4F6_last.log",
+  "creator_errors": 0,
+  "real_datastore_verified": false,
+  "natural_gameplay_verified": false,
+  "published": false
+}

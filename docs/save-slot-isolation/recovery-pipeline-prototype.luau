@@ -71,6 +71,7 @@ local function launch(self:any,j:any,phase:string,archive:any?):boolean
 end
 function Pipeline.begin(self:any,mode:string,serial:number,offerId:string,discovery:any):(any?,string?)
  local s=self.session
+ if self.leaseLost then return nil,"recovery lease lost; fresh session required" end
  if self.busy or s.busy or s.flushing or (s.backend.activeUpdates or 0)>0 or self.current and self.current.state=="pending" or s.recoveryOwner and s.recoveryOwner~=self then return nil,"another recovery owner is active" end
  if type(discovery)~="table" or discovery.state~="offered" or discovery.mode~=mode or discovery.sessionId~=s.id or discovery.load~=s._loadSerial
   or type(discovery.offer)~="table" or discovery.offer.id~=offerId then return nil,"current protected discovery required" end
@@ -83,6 +84,7 @@ function Pipeline.begin(self:any,mode:string,serial:number,offerId:string,discov
  if held==nil then held,why=s.backend:hold(s,true) end
  if not held then Fence.cancel(ticket);return nil,why end
  held.enforced=true
+ if self.idleOwner then self.idleOwner:cancel() end
  local j:any={ticket=ticket,held=held,state="pending",started=s.now(),startCount=s.counters.requests,requests=0,nextAt=s.now(),nextBeatAttempt=s.now(),failures=0,beatFailures=0}
  self.current=j;s.recoveryOwner=self
  j.guard=function() return self.current==j and j.state=="pending" and s.recoveryOwner==self and not s.flushing and s.backend:valid(held) and Fence.valid(ticket) end

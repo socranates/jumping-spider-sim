@@ -1,0 +1,10 @@
+{
+  "process_id": 21920,
+  "previous_process_id": 23456,
+  "process_present": false,
+  "window_present": false,
+  "original_package_sha256": "0bc02283cd875570304e3984af4991b644ef8a602b19a973a38871a5905e02c5",
+  "temporary_editor_changes_discarded": true,
+  "published": false,
+  "previous_original_package_sha256": "3ad2ca1a2c0a4a137188002162e6021880e3a676f19d585b0cdcd43cd5f7059e"
+}

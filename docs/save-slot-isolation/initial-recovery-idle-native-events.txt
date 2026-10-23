@@ -1,0 +1,14 @@
+2026-10-23T07:29:47.166Z,46.166615,452c,6,Info [FLog::CreatorOutput] [RECOVERY_IDLE_NATIVE_GUARD] 441eacaec05d0e1164473f19764f7d56f12b8482 245 production_scripts_disabled
+2026-10-23T07:29:59.909Z,58.909836,452c,6,Info [FLog::CreatorOutput] [RECOVERY_IDLE_NATIVE_BEGIN] 1792740599824
+2026-10-23T07:29:59.909Z,58.909836,452c,6,Warning [FLog::CreatorWarning] Warning: [RECOVERY_IDLE_NATIVE_FAIL] 1792740599824 ServerScriptService.Server.RecoveryIdleProbe:7: another executable script is enabled
+2026-10-23T07:30:48.730Z,107.730705,26c4,6,Info [FLog::CreatorOutput] > for _,it in game:GetDescendants() do if (it:IsA("Script") or it:IsA("LocalScript")) and not it.Disabled then print("[IDLE_ENABLED_SCRIPT]",it:GetFullName()) end end
+2026-10-23T07:30:48.742Z,107.742744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] Chat.ChatScript
+2026-10-23T07:30:48.742Z,107.742744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] Chat.BubbleChat
+2026-10-23T07:30:48.742Z,107.742744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] Chat.ChatServiceRunner
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] Players.socranates.PlayerGui.Freecam.FreecamScript
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] StarterPlayer.StarterPlayerScripts.PlayerScriptsLoader
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] StarterPlayer.StarterPlayerScripts.ChatScript
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] StarterPlayer.StarterPlayerScripts.BubbleChat
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] ServerScriptService.Server.RecoveryIdleProbe
+2026-10-23T07:30:48.743Z,107.743744,452c,6,Info [FLog::CreatorOutput] [IDLE_ENABLED_SCRIPT] ServerScriptService.ChatServiceRunner

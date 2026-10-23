@@ -1,3 +1,7 @@
+# Terminal verification update
+
+Both Windows and Linux passed76 suites /468859 checks /0 failures for257e1a4; the combined source/log verifier passed and the exact222-script candidate was built. Native/online recovery and release remain unverified. A new actual-client shim counterexample in ../player-stream-readiness/ now confirms player motion and hunger continue after streamed collision disappears. That targeted failure is the next correctness fix; full CLI success does not cover it.
+
 # Recovery handshake and client transport: final source gates
 
 Source under review: `257e1a43ae00076a6e59f284c0f2ca0ff09f72e9` on `codex/save-continue`. The initial implementation is `f205c4e`; this follow-up keeps a missing restore callback absent and fences recovery against every later global life choice. It retains the original normal-Continue copy behavior while preventing old-mode entry during a reentrant normal restore callback.

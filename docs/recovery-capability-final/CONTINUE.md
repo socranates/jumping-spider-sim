@@ -1,3 +1,7 @@
+# Current terminal status - 2026-10-23
+
+Windows83957 and Linux39949272235 are terminal successful, 76/468859/0 each, with combined proof and the production candidate created. Do not poll or restart them. Player baseline40452 is also terminal: expected failure proves the actual shim client becomes airborne and advances life/needs clocks one second in Free play while its known region collision is absent. Fix and qualify that next before more menu work or Studio. The prepared normal-client fixture remains unplayed. Read ADOPTION-CALL-SITES.md for inspected integration constraints. The original live-checkpoint notes below are historical. Goal active; nothing published.
+
 # Resume the current verification, not a new run
 
 Current source: `257e1a43ae00076a6e59f284c0f2ca0ff09f72e9`, pushed to `github/codex/save-continue`. Private current verifier is `docs/save-slot-isolation/verify-recovery-capability.py`; the previous service-owner verifier belongs to an older bundle.

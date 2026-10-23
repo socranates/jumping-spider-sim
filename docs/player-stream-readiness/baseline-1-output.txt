@@ -1,0 +1,19 @@
+world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+world_client: at sill the client holds 1469 parts of looks
+world_client: at outer_sill the client holds 1469 parts of looks
+world_client: at bed_a the client holds 1483 parts of looks
+world_client: at eaves the client holds 1496 parts of looks
+world_client: at shrub_west_a the client holds 1494 parts of looks
+world_client: at shrub_west_j the client holds 1483 parts of looks
+world_client: at kitchen_counter the client holds 1469 parts of looks
+world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+PLAYER_STREAM_WITNESS moved=0.1458333333333428 before=11.0000, -89.6900, -50.0000 after=11.0000, -89.8358, -50.0000 mode=air life_seconds=1.0000000000000009 needs_seconds=1.0000000000000009
+C:/Users/natha/AppData/Local/Temp/tmpgfr401cf.luau:60372: C:/Users/natha/AppData/Local/Temp/tmpgfr401cf.luau:60369: the actual player fell or moved while their region collision was absent
+C:/Users/natha/AppData/Local/Temp/tmpgfr401cf.luau:60369
+C:/Users/natha/AppData/Local/Temp/tmpgfr401cf.luau:60357
+
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpgfr401cf.luau:60372

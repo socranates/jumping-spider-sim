@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-23T11:56:38.087266+00:00",
-  "source": "2170f99e001c4c0a42e86454974f594820e86667",
+  "as_of_utc": "2026-10-23T12:18:44.165990+00:00",
+  "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -23,8 +23,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "current-source-verification-in-progress",
-      "evidence_boundary": "Last fully qualified source 2170f99 has both full 76/468506/0. Current 257e1a4 has 222 compiles/clean strict/runner5; Windows 83957 and Linux 39949272235 are live, expected 76/468859/0. Current private complete cohort 187257/0 and 34-candidate compile/strict passes. No current full-platform or native/release pass is claimed.",
+      "status": "both-platforms-verified-known-gameplay-gap",
+      "evidence_boundary": "Current257e1a4: both platforms76/468859/0, compile222, clean strict and runner5; Windows83957/Linux39949272235 terminal success with immutable source/log proof. Separate actual-client shim player stream-out reproduction fails: position drifts 0.145833 studs, mode becomes air, life and needs clocks advance 1 second (Free play). Full-suite pass does not cover that missing condition or native/release safety.",
       "references": [
         "docs/recovery-verified-gates/verification.json",
         "docs/recovery-verified-gates/README.md",
@@ -34,7 +34,9 @@
         "docs/save-service-owner-final/full-verification.json",
         "docs/save-service-owner-final/README.md",
         "docs/recovery-capability-final/checks.json",
-        "docs/recovery-capability-final/CONTINUE.md"
+        "docs/recovery-capability-final/CONTINUE.md",
+        "docs/recovery-capability-final/full-verification.json",
+        "docs/player-stream-readiness/baseline-1-receipt.json"
       ]
     },
     {
@@ -178,12 +180,14 @@
     },
     {
       "id": "network-streaming",
-      "status": "partial",
-      "evidence_boundary": "Current032926f also gates existing prey populations, beyond the e51 roaming-spider gate. Baseline2/3, candidate5/0 proves pause/hidden view, retained ownership/pose/RNG and resume under CLI emulation. Current combined native22 is prepared only. Prior e51 engine-backed creature11 remains historical. Natural server-driven streaming pressure/rearrival is unverified.",
+      "status": "player-stream-out-defect-reproduced",
+      "evidence_boundary": "Current032926f also gates existing prey populations, beyond the e51 roaming-spider gate. Baseline2/3, candidate5/0 proves pause/hidden view, retained ownership/pose/RNG and resume under CLI emulation. Current combined native22 is prepared only. Prior e51 engine-backed creature11 remains historical. Natural server-driven streaming pressure/rearrival is unverified. Current257e1a4 actual SpiderClient box-world witness proves the player is not held when its known collision folder disappears: moves 0.145833 studs into air and advances life/needs clocks 1 second (Free play). Fix pending, not native network pressure proof.",
       "references": [
         "docs/prey-stream-readiness/README.md",
         "docs/prey-stream-readiness/focused-receipt.json",
-        "docs/stream-readiness/native-receipt.json"
+        "docs/stream-readiness/native-receipt.json",
+        "docs/player-stream-readiness/baseline-1-output.txt",
+        "docs/player-stream-readiness/run-probe.py"
       ]
     },
     {
@@ -304,7 +308,7 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current 257e1a4 pushed to codex/save-continue with 187257 private recovery assertions, 222 compile/strict/runner5 and 34-candidate overlay types. Full Windows 83957 and Linux 39949272235 are running for that exact source; 2170f99 remains the last both-platform verified source. Actual menu/native/online adoption and publication remain open. Original OneDrive and unrelated local edits preserved.",
+      "evidence_boundary": "Current257e1a4 has both full76/468859/0 gates, private187257/0, compile222/strict/runner5, a bounded exact-source candidate and explicit handoff. Own branch codex/save-continue. Player stream-out now has a failing additional actual-client shim counterexample. Current native/release, actual recovery menu/profiles/online adoption remain open. Original OneDrive and unrelated edits preserved.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md",
@@ -855,7 +859,7 @@
     "complete_migration": false,
     "published": false
   },
-  "source_note": "The source field retains the latest production source with both full platform gates (2170f99). current_working_source (257e1a4) has verified compile/strict/runner and private recovery, but both full suites are still live. Individual older/native/candidate entries retain their historical exact sources and scopes.",
+  "source_note": "The source field is the latest production source with both full platform gates. A separate player stream-out counterexample fails on that same source; ordinary full-suite success is not overall correctness, native or release proof. Individual older/native entries retain their exact historical scopes.",
   "latest_runtime_changes": {
     "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
     "focused_assertions": 20611,
@@ -896,21 +900,19 @@
     "reference": "docs/wasp-drawing-reuse/native-receipt.json"
   },
   "production_candidate": {
-    "source": "2170f99e001c4c0a42e86454974f594820e86667",
-    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-2170f99\\TheWindowsill-production-candidate.rbxlx",
-    "place_sha256": "59bb06d720169a727976e6a80be3eb11058569edc439bc245ea8563992eba0bd",
+    "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-257e1a4\\TheWindowsill-production-candidate.rbxlx",
+    "place_sha256": "74ab47e5ff1758b83e4b03a609cb23fc898b01305be0d7b4edb1ef93733fc13e",
     "scripts": 222,
     "all_production_sources_exact": true,
     "injected_diagnostics": false,
     "persistence_disabled": false,
     "verified_platform_suites": 76,
-    "verified_platform_checks": 468506,
+    "verified_platform_checks": 468859,
     "native_current_source_verified": false,
     "owner_factory_installed": false,
     "full_release_audit_complete": false,
-    "published": false,
-    "historical_candidate": true,
-    "covers_latest_production_source": false
+    "published": false
   },
   "latest_private_recovery_departure": {
     "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
@@ -1413,17 +1415,76 @@
   },
   "latest_capability_production_gates": {
     "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
-    "windows_status": "running",
-    "windows_exec_session": 83957,
-    "linux_status": "in_progress",
+    "windows_suites": 76,
+    "windows_passed": 468859,
+    "windows_failed": 0,
+    "windows_output_sha256": "f544d8e629fa24cbe96049dac44a79f1f5a7289299a2a92523e027233031f4ec",
     "linux_run": 39949272235,
+    "linux_suites": 76,
+    "linux_passed": 468859,
+    "linux_failed": 0,
     "compile": 222,
     "strict_clean": true,
     "runner_regressions": 5,
-    "expected_suites": 76,
-    "expected_checks": 468859,
-    "full_pass_claimed": false,
+    "immutable_windows_snapshot_verified": true,
+    "owner_factory_default_not_installed_in_engine": true,
+    "client_recovery_default_not_configured": true,
+    "explicit_recovery_handshake_and_transport_verified": true,
+    "protected_selection_skips_two_legacy_copies": true,
+    "native_full_game_verified": false,
+    "real_service_rejoin_verified": false,
+    "goal_complete": false,
     "published": false,
-    "instructions": "docs/recovery-capability-final/CONTINUE.md"
+    "windows_status": "passed",
+    "windows_exec_session": 83957,
+    "linux_status": "passed",
+    "full_pass_claimed": true,
+    "evidence": "docs/recovery-capability-final/full-verification.json"
+  },
+  "historical_production_candidate_2170f99": {
+    "source": "2170f99e001c4c0a42e86454974f594820e86667",
+    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-2170f99\\TheWindowsill-production-candidate.rbxlx",
+    "place_sha256": "59bb06d720169a727976e6a80be3eb11058569edc439bc245ea8563992eba0bd",
+    "scripts": 222,
+    "all_production_sources_exact": true,
+    "injected_diagnostics": false,
+    "persistence_disabled": false,
+    "verified_platform_suites": 76,
+    "verified_platform_checks": 468506,
+    "native_current_source_verified": false,
+    "owner_factory_installed": false,
+    "full_release_audit_complete": false,
+    "published": false,
+    "historical_candidate": true,
+    "covers_latest_production_source": false
+  },
+  "latest_normal_client_native_preparation": {
+    "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+    "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-normal-257e1a4-full\\Windowsill-normal-client-review.rbxlx",
+    "model_sha256": "ba6c260040f149a30cf38489146d717a0bdd3584560111c7619b9219a7d66efd",
+    "manifest_sha256": "48dd03cb75b0ce712f8acc35eb3411162b0027bd1535a7da88ceb020d0afd72e",
+    "guard_sha256": "c06e724468a06899a25b45ef2a770f3b73e82235a42537e0536850abe66b6545",
+    "probe_sha256": "9b9be5a34f22543eae18075d4a9addd1d99a7672d0c8d62c42906a852d35919f",
+    "scripts": 223,
+    "production_scripts_exact": 222,
+    "persistence_disabled": true,
+    "executed": false,
+    "native_verified": false,
+    "recovery_native_verified": false,
+    "real_datastore_verified": false,
+    "published": false
+  },
+  "latest_player_stream_counterexample": {
+    "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+    "executed": true,
+    "test_passed": false,
+    "expected_negative_case": true,
+    "spider_moved_studs": 0.1458333333333428,
+    "mode_after": "air",
+    "native_streaming_proven": false,
+    "fixed": false,
+    "evidence": "docs/player-stream-readiness/baseline-1-receipt.json",
+    "life_and_needs_clock_advanced_seconds": 1,
+    "hunger_energy_loss_proven": false
   }
 }

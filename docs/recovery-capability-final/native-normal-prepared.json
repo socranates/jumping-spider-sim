@@ -1,0 +1,16 @@
+{
+  "source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-normal-257e1a4-full\\Windowsill-normal-client-review.rbxlx",
+  "model_sha256": "ba6c260040f149a30cf38489146d717a0bdd3584560111c7619b9219a7d66efd",
+  "manifest_sha256": "48dd03cb75b0ce712f8acc35eb3411162b0027bd1535a7da88ceb020d0afd72e",
+  "guard_sha256": "c06e724468a06899a25b45ef2a770f3b73e82235a42537e0536850abe66b6545",
+  "probe_sha256": "9b9be5a34f22543eae18075d4a9addd1d99a7672d0c8d62c42906a852d35919f",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

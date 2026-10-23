@@ -129,5 +129,32 @@ do
  check(changed,"cat legs animate while sill prey clock is stopped")
  cat.step=originalStep
 end
+-- Other roaming animals must not animate from the paused sill population.
+do
+ workspace:SetAttribute("WaspForce",nil)
+ local room=assert(Map.region("room_floor_e"));driver.place(room.spawn.pos);driver.life.clock.hour=12
+ local wasp=driver.wasp;local waspStep=wasp.step;wasp.step=function() end
+ wasp.wasp.visible=true;wasp.wasp.mode="walking";wasp.wasp.search=.8
+ wasp.wasp.position=room.spawn.pos+Vector3.new(5,1,0);wasp.wasp.heading=Vector3.zAxis
+ local frog=driver.frog;local frogStep=frog.step;frog.step=function() end
+ frog.here=true;frog.pos=room.spawn.pos+Vector3.new(20,0,0);frog.heading=Vector3.zAxis
+ frames(2)
+ local leg=assert(assert(workspace:FindFirstChild("Wasp")):FindFirstChild("LegL1Tarsus"))
+ local throat=assert(driver.pondBodies.frog.model:FindFirstChild("Throat"))
+ local darner=assert(driver.pondBodies.darner.parts[1])
+ local beforeLeg,beforeThroat,beforeDarner=leg.Position,throat.Size,darner.Position
+ local homeTime=driver.prey.now;local legMoved,throatMoved,darnerMoved=false,false,false
+ for _=1,20 do
+  frames(1)
+  legMoved=legMoved or (leg.Position-beforeLeg).Magnitude>.001
+  throatMoved=throatMoved or (throat.Size-beforeThroat).Magnitude>.001
+  darnerMoved=darnerMoved or (darner.Position-beforeDarner).Magnitude>.001
+ end
+ check(driver.prey.now==homeTime and driver.world.region.kind=="room_floor","roaming-animal test uses inactive sill population")
+ check(legMoved,"wasp walking legs animate away from sill")
+ check(throatMoved,"frog breath animates away from sill")
+ check(darnerMoved,"darner patrol advances away from sill")
+ wasp.step=waspStep;frog.step=frogStep
+end
 print(`MINIMAL passed={passed} failed={failed}`)
 if failed>0 then error("minimal HUD checks failed") end

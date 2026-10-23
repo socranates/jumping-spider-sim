@@ -1,0 +1,8 @@
+FAIL MINIMAL wasp walking legs animate away from sill
+FAIL MINIMAL frog breath animates away from sill
+FAIL MINIMAL darner patrol advances away from sill
+MINIMAL passed=78 failed=3
+C:/Users/natha/AppData/Local/Temp/tmphe_q7bbu.luau:59340: minimal HUD checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmphe_q7bbu.luau:59340

@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "inputs": {
+    "roblox_port/src/Client/SpiderClient.client.luau": "71953c24d6ec4cc9eac0eab2eaa2b63c92e58523662230176293b9a26a100910",
+    "roblox_port/tests/minimal_hud.luau": "509c865defc30467a2db00c4cca759c077858c83e019b293be9fadbd98c904b1"
+  },
+  "output_sha256": "8263b219300d4250de2b0abc180f51e71fec860e421fa6dfcadd09e6df314cc2",
+  "native_full_game_verified": false,
+  "published": false
+}

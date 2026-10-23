@@ -1,0 +1,16 @@
+MINIMAL passed=81 failed=0
+WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+WASP passed=16884 failed=0
+BODIES passed=3610 failed=0
+world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+world_client: at sill the client holds 1469 parts of looks
+world_client: at outer_sill the client holds 1469 parts of looks
+world_client: at bed_a the client holds 1483 parts of looks
+world_client: at eaves the client holds 1496 parts of looks
+world_client: at shrub_west_a the client holds 1494 parts of looks
+world_client: at shrub_west_j the client holds 1483 parts of looks
+world_client: at kitchen_counter the client holds 1469 parts of looks
+world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+WORLD_CLIENT passed=36 failed=0

@@ -2545,13 +2545,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
  soundscape:updateMeal(prey.feeding.bites,prey.feeding.mealsFinished,soundPaused,soundMuted,soundSpeed)
-	waspBody:draw(wasp.wasp, prey.now)
+	-- Roaming creatures use the world clock; the sill population waits elsewhere.
+	waspBody:draw(wasp.wasp, M.World.prey.clock)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
 	if M.mouseBody ~= nil then M.mouseBody:draw(M.mouse,setting("ReducedMotion")==true) end
 	if M.pondBodies ~= nil then -- (ROBLOX-122: the frog and the darner)
-		local dAt, dHeading = M.Pond.darner(914, prey.now, life.clock.hour)
+		local dAt, dHeading = M.Pond.darner(914, M.World.prey.clock, life.clock.hour)
 		if dAt ~= nil and (dAt - motor.pos).Magnitude < 150 then watch:onDarner() end
-		M.pondBodies:draw(M.frog, M.frogAt, dAt, dHeading, prey.now)
+		M.pondBodies:draw(M.frog, M.frogAt, dAt, dHeading, M.World.prey.clock)
 	end
 	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then

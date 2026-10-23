@@ -1,0 +1,13 @@
+{
+  "steps": [
+    {
+      "name": "sourcemap",
+      "exit_code": 0
+    },
+    {
+      "name": "strict",
+      "exit_code": 0
+    }
+  ],
+  "compile_passed": 222
+}

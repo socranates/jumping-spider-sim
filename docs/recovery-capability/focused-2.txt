@@ -1,0 +1,30 @@
+state: a rest is 17885 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 6.2 s
+SESSION_ADAPTER_CASE main same
+SESSION_ADAPTER_CASE main changed
+SESSION_ADAPTER_CASE main missing
+SESSION_ADAPTER_CASE main corrupt
+SESSION_ADAPTER_CASE main newer
+SESSION_ADAPTER_CASE main unavailable
+SESSION_ADAPTER_CASE free same
+SESSION_ADAPTER_CASE free changed
+SESSION_ADAPTER_CASE free missing
+SESSION_ADAPTER_CASE free corrupt
+SESSION_ADAPTER_CASE free newer
+SESSION_ADAPTER_CASE free unavailable
+SESSION_ADAPTER_CASE easy same
+SESSION_ADAPTER_CASE easy changed
+SESSION_ADAPTER_CASE easy missing
+SESSION_ADAPTER_CASE easy corrupt
+SESSION_ADAPTER_CASE easy newer
+SESSION_ADAPTER_CASE easy unavailable
+SESSION_BUDGET_CANDIDATE rest_retry bounded_and_complete
+SESSION_BUDGET_CANDIDATE lease_retry bounded_and_complete
+SESSION_BUDGET_YIELD read close fenced
+SESSION_BUDGET_YIELD read demote fenced
+SESSION_BUDGET_YIELD read supersede fenced
+SESSION_BUDGET_YIELD lock close fenced
+SESSION_BUDGET_YIELD lock demote fenced
+SESSION_BUDGET_YIELD lock supersede fenced
+STATE passed=1488 failed=0
+SAVE_CONTINUATION passed=251 failed=0

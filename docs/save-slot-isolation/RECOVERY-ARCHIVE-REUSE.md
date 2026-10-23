@@ -36,3 +36,8 @@ This remains private. Actual SaveService/client/remotes/menu adoption, engine-na
 ## Later service-owner qualification
 
 The preceding evidence remains historical. Production SaveService changed in 927e816 and 2170f99, and the new private owner composes this archive-reuse cohort through the actual service/client test transport. Use `verify-recovery-service-owner.py`, `recovery-service-owner-verification.json` and `RECOVERY-SERVICE-OWNER.md` for current 187149-assertion source binding and remaining activation gates. Archive reuse and immutable-original policy are unchanged; engine adoption, native full lifecycle and online saves are still unverified.
+
+
+## Later capability-qualified transport
+
+The preceding source-bound bundles are historical. Current production 257e1a4 and private owner/fixture require an explicit recovery handshake and use SaveClient entry/receipt callbacks. Use `verify-recovery-capability.py` and `recovery-capability-verification.json` for the current 187257-assertion bundle, all 34 candidate overlay types and committed-source context. Full platform gates are tracked in `../recovery-capability-final/`; actual game menu/profile adoption, native/online recovery and release remain open.

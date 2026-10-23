@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmp03qsztq0.luau:45139: continuation failures
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp03qsztq0.luau:45139
+FAIL CONTINUATION adapter without restore handler copied an unused callback graph
+SAVE_CONTINUATION passed=259 failed=1

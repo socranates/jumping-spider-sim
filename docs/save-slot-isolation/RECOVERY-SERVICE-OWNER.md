@@ -34,3 +34,8 @@ Do not install the prototype in live engine startup yet. The committed engine sc
 - Full engine-native lifecycle/compression/remotes, real online datastore/rejoin and release checks remain open. The unchanged budget observer's narrow native proof does not cover this service path.
 
 The production source's full Windows and Linux gates are separate from the private cohort. Inspect their terminal receipts before claiming a full production pass. The broader optimization/reliability goal remains active.
+
+
+## Later capability-qualified transport
+
+The preceding source-bound bundles are historical. Current production 257e1a4 and private owner/fixture require an explicit recovery handshake and use SaveClient entry/receipt callbacks. Use `verify-recovery-capability.py` and `recovery-capability-verification.json` for the current 187257-assertion bundle, all 34 candidate overlay types and committed-source context. Full platform gates are tracked in `../recovery-capability-final/`; actual game menu/profile adoption, native/online recovery and release remain open.

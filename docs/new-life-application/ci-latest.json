@@ -1,0 +1,49 @@
+{
+  "id": "40004870155",
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "status": "in_progress",
+  "conclusion": null,
+  "observed_at_utc": "2026-10-23T18:46:07.512005+00:00",
+  "steps": [
+    [
+      "Set up job",
+      "completed",
+      "success"
+    ],
+    [
+      "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "completed",
+      "success"
+    ],
+    [
+      "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+      "completed",
+      "success"
+    ],
+    [
+      "Every module compiles",
+      "completed",
+      "success"
+    ],
+    [
+      "Strict types",
+      "completed",
+      "success"
+    ],
+    [
+      "All suites",
+      "in_progress",
+      null
+    ],
+    [
+      "Runner failure and cleanup regressions",
+      "pending",
+      null
+    ],
+    [
+      "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "pending",
+      null
+    ]
+  ]
+}

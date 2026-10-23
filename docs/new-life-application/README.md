@@ -1,6 +1,8 @@
 # Actual-menu New Life integration
 
-Work in progress on `codex/save-continue`. This layer connects the privately qualified retirement worker to the production `RecoveryApplication` and actual SpiderClient menus. Ordinary engine startup still does not install the optional client adapter or server owner factory. No release is implied by these CLI results.
+CLI integration qualified at `bd67582b5d53473f067244fc1e2e1f94adde173b` on `codex/save-continue`: **34 groups /211717 fixed checks /0**, with82 actual New-menu and40 actual failure-menu checks. All prior32 groups retain their fixed totals. Production224 modules and41 private candidates compile, full strict checks pass and runner5 passes. `verify-private.py` reconstructs and binds the committed source, bundle, inputs, output and type logs. Current full Windows/Linux gates are separate and still running at this checkpoint.
+
+This layer connects the privately qualified retirement worker to the production `RecoveryApplication` and actual SpiderClient menus. Ordinary engine startup still does not install the optional client adapter or server owner factory. No release is implied by these CLI results.
 
 ## Flow
 

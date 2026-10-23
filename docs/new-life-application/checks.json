@@ -1,0 +1,24 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "compile_passed": 224,
+  "compile_sha256": "254b52cf94cdacd602d137cc12b1ed16ae57880aa8067340103a445051bc1dac",
+  "steps": [
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    },
+    {
+      "name": "runner",
+      "exit_code": 0,
+      "output_sha256": "8b9439b314207db7e5217bd8d94c64737c7610c9e8ac8dbcd059d860bc7355a6"
+    }
+  ],
+  "project_sha256": "42b296bbfc4fc027b76021d488eea971bb22f638e7fbc8f89c6955b26dcccbfd",
+  "definitions_sha256": "2857efa8245485f8c25c19c018ee1ef9b46afab4efd2ea70fc3257cd3faf7080"
+}

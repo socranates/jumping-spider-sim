@@ -1,0 +1,26 @@
+{
+  "RESUME-AFTER-RESTART.md": {
+    "old_bytes": 95468,
+    "old_sha256": "f36944863d97821425b5861ff6236ccb8bec3dfa4d2b12b03b1828755d78b4bc",
+    "prefix_bytes": 3755,
+    "prefix_sha256": "c3e6501dc84326db0a99f85b429c761eede426b15a7f950030f0efa5e54ee606",
+    "result_sha256": "c79ed58b7f46eecaaeba74116a9dcda70148b67d021f8fc3bfbd3a39af2c0f3a",
+    "historical_tail_exact": true
+  },
+  "chet/save-continue.md": {
+    "old_bytes": 2952501,
+    "old_sha256": "ea8349f4b889754dd225414fd0c406612e5a1a1734c809f4086399c4d25b135e",
+    "prefix_bytes": 3755,
+    "prefix_sha256": "c3e6501dc84326db0a99f85b429c761eede426b15a7f950030f0efa5e54ee606",
+    "result_sha256": "4a45d98f3027672c575140b67a645677d2bc0b6cd01314ca11714daad210fb31",
+    "historical_tail_exact": true
+  },
+  "docs/recovery-application/README.md": {
+    "old_bytes": 43826,
+    "old_sha256": "ffd33cbbcacd7fbca433f0056aa78ebfe72480b02d5d3456a9077f8a457b6456",
+    "prefix_bytes": 3755,
+    "prefix_sha256": "c3e6501dc84326db0a99f85b429c761eede426b15a7f950030f0efa5e54ee606",
+    "result_sha256": "f50a836ece76a555a0a31409d10392fae582b5c67ef569def35ab7f914c1bb6e",
+    "historical_tail_exact": true
+  }
+}

@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/tmpp738vyd3.luau:45191: expired ticket resurrected after a later heartbeat
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpp738vyd3.luau:45191 function checkFence
+C:/Users/natha/AppData/Local/Temp/tmpp738vyd3.luau:45274

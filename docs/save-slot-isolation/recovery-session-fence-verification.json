@@ -1,0 +1,15 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "assertions": 129,
+  "expired_ticket_resurrection_counterexample_reproduced": true,
+  "current_runtime_bundle_verified": true,
+  "strict_clean": true,
+  "actual_session_objects": true,
+  "backend": "MemoryBackend",
+  "production_connected": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "destination_commit_authorized": false,
+  "progress_import_implemented": false,
+  "published": false
+}

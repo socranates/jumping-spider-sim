@@ -1,0 +1,16 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 0,
+  "inputs": {
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
+    "recovery-session-fence-prototype.luau": "230632aa6ed12c7b4198491dae40323bd8e593e24e0cc06f5b40342ef35a7532",
+    "recovery-session-fence-tests.luau": "909fdbe3ed5c260468509f5aba08b5426b4b28f25b0e3a2a320d7b2fe6e62e0b"
+  },
+  "bundle_sha256": "63bfff206c8050c2650792e6a49665009d50cfb696772eb0752a76d94b907214",
+  "output_sha256": "220f739da24d893d5bd5d71c9fbebd2bec5da4a15819a35eec548aed7c0ce4a8",
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "native_verified": false,
+  "destination_commit_authorized": false
+}

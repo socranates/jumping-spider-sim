@@ -23,16 +23,35 @@ end
 function Baseline.new(backend:any,user:string):any
  assert(type(user)=="string" and #user>0 and #user<=32 and string.match(user,"^[%w_-]+$"),"invalid baseline owner")
  assert(type(backend.update)=="function" and type(backend.readRawFresh)=="function" and type(backend.readFresh)=="function" and type(backend.read)=="function","baseline needs guarded update and explicit reads")
- return setmetatable({source=backend,user=user,pkey="P_"..user,issued=0,acknowledged=0,base=nil,held=nil},Baseline)
+ return setmetatable({source=backend,boundSource=backend,user=user,pkey="P_"..user,issued=0,acknowledged=0,base=nil,held=nil,
+  permits=setmetatable({},{__mode="k"}),main={}},Baseline)
 end
-function Baseline.read(self:any,key:string):(boolean,any,string?) return self.source:read(key) end
-function Baseline.readFresh(self:any,key:string):(boolean,any,string?) return self.source:readFresh(key) end
-function Baseline.readRawFresh(self:any,key:string):(boolean,any,string?) return self.source:readRawFresh(key) end
+local function authorized(self:any,key:string):boolean
+ local held=self.held
+ if held==nil or not held.enforced or (key~=self.pkey and string.sub(key,1,#self.user+3)~="R_"..self.user.."_") then return true end
+ return self:permitted(held)
+end
+function Baseline.read(self:any,key:string):(boolean,any,string?)
+ if self.source~=self.boundSource then return false,nil,"backend provider changed" end
+ return self.source:read(key)
+end
+function Baseline.readFresh(self:any,key:string):(boolean,any,string?)
+ if self.source~=self.boundSource then return false,nil,"backend provider changed" end
+ return self.source:readFresh(key)
+end
+function Baseline.readRawFresh(self:any,key:string):(boolean,any,string?)
+ if self.source~=self.boundSource then return false,nil,"backend provider changed" end
+ return self.source:readRawFresh(key)
+end
 function Baseline.updateRaw(self:any,key:string,fn:any):(boolean,any,string?)
+ if self.source~=self.boundSource then return false,nil,"backend provider changed" end
+ if not authorized(self,key) then return false,nil,"recovery owner required for this save" end
  if type(self.source.updateRaw)~="function" then return false,nil,"raw update adapter unavailable" end
  return self.source:updateRaw(key,fn)
 end
 function Baseline.update(self:any,key:string,fn:any):(boolean,any,string?)
+ if self.source~=self.boundSource then return false,nil,"backend provider changed" end
+ if not authorized(self,key) then return false,nil,"recovery owner required for this save" end
  if key~=self.pkey then return self.source:update(key,fn) end
  self.issued+=1;local serial=self.issued;local candidate:any=nil
  local ok,value,why=self.source:update(key,function(old:any):any candidate=nil;candidate=fn(old);return candidate end)
@@ -49,17 +68,29 @@ function Baseline.update(self:any,key:string,fn:any):(boolean,any,string?)
  end
  return ok,value,why
 end
-function Baseline.hold(self:any,session:any):(any?,string?)
+function Baseline.hold(self:any,session:any,enforced:boolean?):(any?,string?)
  if Work.pulse() then return nil,"baseline hold must run outside preparation" end
- if self.held~=nil or self.base==nil or session.backend~=self or tostring(session.cfg.userId)~=self.user or session.state~="active" or not session.lockHeld then return nil,"acknowledged session baseline unavailable" end
- local ticket={owner=self,session=session,base=self.base,load=session._loadSerial,used=false}
+ if self.source~=self.boundSource or self.held~=nil or self.base==nil or session.backend~=self or tostring(session.cfg.userId)~=self.user or session.state~="active" or not session.lockHeld then return nil,"acknowledged session baseline unavailable" end
+ local ticket={owner=self,session=session,base=self.base,load=session._loadSerial,used=false,enforced=enforced==true}
  self.held=ticket;return ticket,nil
 end
 function Baseline.valid(self:any,ticket:any):boolean
- return type(ticket)=="table" and self.held==ticket and ticket.owner==self and not ticket.used and ticket.session.backend==self and ticket.session._loadSerial==ticket.load
+ return self.source==self.boundSource and type(ticket)=="table" and self.held==ticket and ticket.owner==self and not ticket.used and ticket.session.backend==self and ticket.session._loadSerial==ticket.load
+  and not ticket.session.closed and ticket.session.state=="active" and ticket.session.lockHeld
 end
--- Called only by the atomic local rebind after its guards pass. Holding is not
--- a write lock; the integration owner must pause ordinary session work meanwhile.
+function Baseline.permitted(self:any,ticket:any):boolean
+ return self:valid(ticket) and self.permits[coroutine.running() or self.main]==ticket
+end
+-- Scoped permits survive native yields on their own coroutine, never authorizing
+-- an unrelated caller. A failed callback restores the previous permit too.
+function Baseline.run(self:any,ticket:any,fn:any):...any
+ if not self:valid(ticket) or type(fn)~="function" then return false,"recovery baseline scope unavailable" end
+ local co=coroutine.running() or self.main;local prior=self.permits[co];self.permits[co]=ticket
+ local result=table.pack(pcall(fn));self.permits[co]=prior
+ return table.unpack(result,1,result.n)
+end
+-- Called only by the atomic local rebind after its guards pass. Default holds
+-- track history; enforcing holds additionally require a scoped run for writes.
 function Baseline.adopt(self:any,ticket:any,raw:any):boolean
  if not self:valid(ticket) or type(raw)~="table" or not table.isfrozen(raw) then return false end
  self.base=raw;self.held=nil;ticket.used=true;return true

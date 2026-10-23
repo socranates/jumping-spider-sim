@@ -1,0 +1,33 @@
+# Private accepted-intent recovery owner
+
+`RecoveryPipelinePrototype` connects the archive controller, post-archive commit, fresh M1/R/P observations and local session-progress adoption. It replaces manual phase handoffs after the player selects an actual protected discovery. The normal compressed and uncompressed cold paths each use 58 charged requests across 365 simulated seconds. They end with a readonly schema-3 entry descriptor, not gameplay or rest-write authority.
+
+## Scope and sequencing
+
+The session must have its tracked backend installed before load and an offer from the actual recorded-save reader selected through the real intent API. Begin captures that exact readonly Continue, holds the acknowledged progress baseline and attaches one owner to the session. It defaults to a total of 96 charged requests/900 seconds across archive, commit and adoption, including heartbeat/retry requests. Readonly discovery has its own earlier bounds; user deliberation before selecting Continue is not charged to this accepted-intent transaction.
+
+Admission probes M1 again rather than trusting discovery's old cold/pending flag. A validated matching M1 supplies the expected A1 descriptor for commit/resume; otherwise the cold archive controller collects and publishes the original source. A changed/foreign/unrecognized M1 refuses without overwriting it. The cold and resumed paths then use the same immutable proposal, exact selected-R CAS, global absorption and final commit verification. Completed child graphs are dropped when the next phase takes ownership; only their needed immutable descriptors are retained.
+
+The owner captures a rebind ticket, reads exact M1/R/P witnesses through the shared scheduler, runs pure handoff preparation cooperatively and consumes the resulting plan outside preparation. Later local inputs invalidate the plan and trigger a bounded fresh capture/read/prepare cycle. Its own heartbeat similarly restarts an in-progress adoption observation rather than applying a stale backend-operation serial. Child controllers retain heartbeat responsibility during their phases; the owner handles admission/adoption phases, avoiding duplicate renewal loops.
+
+Every step makes at most one backend request and respects the session's rolling minute allowance. Child limits are restricted to the remaining total budget/time; the parent also checks the live charged request counter before admitting more child work. No phase transition resets the overall limits. A successful adoption consumes the baseline hold, removes the owner marker and returns the readonly checkpoint/entry descriptor. The protected rest/selected intent is not unlocked and no life credential is issued.
+
+## Enforced write ownership
+
+The baseline sidecar now supports explicitly enforcing holds. Under one, ordinary P and owned-R updates are rejected before invoking a transform or provider. Default tracking-only holds keep the preceding standalone API behavior; this owner always enforces its hold. The raw selected-R adapter also requires this owner's current scoped permit and exact selected key.
+
+`Baseline.run` grants that permit only to its own coroutine for the duration of a protected call. Native yields do not leak it to another coroutine, and errors restore the previous scope. This is a capability gate, not a replacement for intent guards, worker serialization or remote ownership checks. Source provider identity is pinned in the sidecar: replacing the wrapped provider makes reads/writes/held scopes fail instead of hiding the change behind the stable wrapper pointer.
+
+Cancellation, refusal or budget exhaustion retains the enforced hold and owner marker. Ordinary queued writes must not resume with stale in-memory progress. An explicit later selection can reuse the same valid held baseline through the same owner, and fresh M1 admission resumes the saved proposal even if the displayed original observation predates the interruption. This does not authorize reviving an expired/reloaded/closed session scope.
+
+## Evidence
+
+10,845 owner assertions pass with the preceding 8,877 regressions (19,722 total); compilation/full strict analysis passes with twenty-one private candidates. The baseline/rebind cohort was separately refreshed and still passes its 1,371 assertions with clean strict analysis. Earlier tracking-only and pre-provider-pin artifacts remain retained.
+
+The owner tests use actual sessions, discovery, intents, archive publication, both commit writers and progress adoption over MemoryBackend. They cover compressed/uncompressed cold paths; one request per step/shared quota/combined cap; permit cleanup after every step; rejected ordinary P/R writes before provider access; error and coroutine isolation; post-rest cancellation/resume using the original displayed cold offer; immutable archive/proposal reuse; late-input recapture; total deadline/cap refusal with the write barrier retained; admission read retry; foreign final P lease; provider replacement; no credential issuance; and staging/worker cleanup. The normal paths' 58 requests/365 seconds are synthetic scheduler measurements, not service latency, native frame time or FPS results.
+
+## Remaining integration and lifecycle boundaries
+
+This owner is not wired into production SaveService, session creation, menus or the normal tick/leave routing. Before adoption, install baseline tracking at construction, route accepted recovery work to the owner and route normal work only when the owner permits it. Complete departure/flush behavior that preserves unpersisted local progress, terminal-held idle/expired-lease handling and safe rejoin/session replacement. The current failed owner intentionally remains paused; a generic flush/reload must not be used to bypass that hold. These are required integration work, not a completed lifecycle claim.
+
+Complete schema-3 readers/writers and pending-proposal retention, protected-observation rebasing, durable life/intent credentials and rest/mating/hatching/ended-life entry. Existing archive/proposal lifetime and unsupported historical seed/schema policies still need completion without overwriting originals. Then qualify native compression, callback latency/heap/frame costs, real DataStore interruption/takeover/rejoin, adopted full regression gates and release. No production source, real saves or published game changed; the overall goal remains active.

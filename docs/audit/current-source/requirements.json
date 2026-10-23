@@ -287,12 +287,13 @@
     },
     {
       "id": "data-store-freshness",
-      "status": "private-prototype-verified-integration-audit-pending",
-      "evidence_boundary": "Current production DataStoreBackend.read uses default cached GetAsync; SaveSession validateIntent at line532 and rest/preview reads use it. Private readFresh/readRawFresh and mandatory uncached archive readback pass32 CLI within304 native tests, with real engine options cleanup but fake datastore/cache. Audit actual SaveSession ambiguous-write/intent traces before choosing production call sites. No observed live failure or whole-game fix claimed.",
+      "status": "adopted-focused-native-verified-full-gates-running",
+      "evidence_boundary": "f405359 adopts uncached initial/preview/intent rest observations, preserving final UpdateAsync fences. Baseline30 reproduces stale grants without data loss; candidate27, matrix150, adapter111, seven regressions1513, compile/strict clean and isolated Studio111/224 fingerprints/zero errors pass. Adopted STATE1124/0 focused run. Full Windows/Linux pending; no actual DataStore durability or full-game session claim.",
       "references": [
-        "docs/save-slot-isolation/RECOVERY-PUBLICATION.md",
-        "docs/save-slot-isolation/fresh-read-receipt.json",
-        "docs/save-slot-isolation/recovery-store-native-receipt.json"
+        "docs/save-slot-isolation/SESSION-CACHE.md",
+        "docs/save-slot-isolation/session-cache-verification.json",
+        "docs/save-slot-isolation/session-fresh-adoption.json",
+        "docs/session-freshness-gates/README.md"
       ]
     }
   ],
@@ -381,5 +382,14 @@
     "real_datastore_verified": false,
     "progress_import_implemented": false,
     "published": false
+  },
+  "latest_session_freshness_milestone": {
+    "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+    "status": "adopted-focused-native-verified-full-gates-running",
+    "windows_handle": 95443,
+    "evidence": "docs/session-freshness-gates/README.md",
+    "published": false,
+    "real_datastore_verified": false,
+    "progress_import_implemented": false
   }
 }

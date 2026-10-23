@@ -1,3 +1,15 @@
+# Current: save freshness fix adopted; full gates running
+
+Runtime/tests f4053597d03b99a61cb97e2eef1ec64ed174f22a on codex/save-continue. Three rest observation reads now bypass the DataStore cache before save authority is granted. A retained baseline counterexample proves stale authority could previously be acknowledged, while the final write CAS still protected stored data. The exact native-tested SaveSession and DataStoreBackend modules are adopted, with 111 regression checks added to state.luau (1124/0 in the focused adopted run). No schemas or gameplay mechanics changed.
+
+Candidate evidence: stale-grant refusal27, extended matrix150, real adapter/session111, seven existing save suites1513, compile/full strict clean, and server-context Studio111 with224 fingerprints/zero CreatorErrors. The native diagnostic used a fake cached datastore, actual engine options and frozen valid checkpoints; all production scripts disabled. It was stopped/saved/closed/exited and original bytes restored. No real DataStore durability or complete game-session proof is claimed.
+
+Windows full handle95443 and the exact-source Linux push run are pending. Expected76 suites/468225 checks are an expectation, not a completed result. Earlier405e9df both-platform468114/0 remains historical. Nothing published or integrated into main/laptop. See docs/save-slot-isolation/SESSION-CACHE.md and docs/session-freshness-gates/README.md.
+
+The user's chosen recovery policy is portable spider progress into Preserve with the complete original save untouched in an archive. Production archive/controller/projection/schema/atomic commit and real service/rejoin tests remain unfinished. Broader lifecycle/streaming/device/memory/performance and release work remain open; goal active.
+
+Earlier status below is historical.
+
 # Current405e9df: both full platforms verified; recovery components private
 
 Windows17569 and Linux39880600604 are terminal success:76 suites/468114 checks/0 failures each. Current source-bound root verification passes, all222 modules compile, strict clean and runner5 pass. The adopted pond renderer's separate native985 geometry/41 batch comparisons remain byte-bound; its measured18.13/21.32 percent lower component CPU is not a whole-game FPS claim. All jobs in this cohort are terminal. Nothing published.

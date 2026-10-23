@@ -99,5 +99,21 @@ d.openMenu();assert(d.menu:choose("Continue"));assert(finish().ok)
 local previousWarn=warn;getfenv().warn=function() end;d.saveState.fail("synthetic transport failure");getfenv().warn=previousWarn
 d.place(point);d.openMenu();assert(d.menu:choose("Continue"));assert(finish().ok)
 check(d.saveState.broken and (d.motor.pos-point).Magnitude>1,"local return works with broken network saving")
+-- Recovery's real adoption path uses the same preparation/commit as an ordinary
+-- return, but must retain a separate hold until a matching authority grant.
+fresh();local recovered=save();d.place(point);d.openMenu(true)
+local oldHold=d.saveState.pauseRecovery();local currentHold=d.saveState.pauseRecovery()
+check(not oldHold.held() and currentHold.held() and not oldHold.release(),"obsolete recovery handle cannot release a replacement hold")
+local generation=d.saveState.worldGeneration;local priorStore=d.currentStore()
+local adopt=assert(d.saveState.restore.cfg.prepare(recovered,{mode="main"}));assert(adopt())
+check(d.saveState.worldGeneration==generation+1 and d.currentStore()~=priorStore,"actual recovery adoption retains the intentional generation/store transition")
+local elapsed,needsTime,energy=d.life.elapsed,d.needs.elapsedS,d.needs.energy
+d.menu:hide();for _=1,60 do frame(1/60) end
+check(currentHold.held() and d.life.elapsed==elapsed and d.needs.elapsedS==needsTime and d.needs.energy==energy,"hiding all menus does not resume a held adopted world")
+check(not oldHold.release() and currentHold.held(),"late release does not clear the current adopted-world hold")
+check(currentHold.release() and not currentHold.release() and not currentHold.held(),"current recovery release is single-use")
+for _=1,2 do frame(1/60) end
+check(d.life.elapsed>elapsed and d.needs.elapsedS>needsTime,"explicit current release resumes the actual game loop")
+print("RECOVERY_ENTRY_HOLD actual_adoption=true generation_increment=1 menu_hidden=true stale_release_refused=true explicit_current_release_resumes=true")
 print(`LOCAL_RETURN passed={passed} failed={failed}`)
 assert(failed==0,"local return failures")

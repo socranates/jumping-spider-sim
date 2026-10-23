@@ -328,11 +328,25 @@ local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the
 -- the last status and reason told, the last notebook signature and eye seconds sent, when the eye seconds were last looked at; `broken` (ROBLOX-92): the client's saving raised, so it
 -- is off for the visit (the game goes on); `look`: a saved spider waiting for the spider to stand safely.
 local saveState: any = { touched = {} :: { [string]: boolean }, applying = false, status = nil, reason = nil, sig = "", eye = 0.0, eyeCheck = os.clock(), broken = false, look = nil, worldGeneration=0 }
+-- Recovery entry owns this hold until its matching server grant. Menu visibility
+-- cannot release it, and an obsolete preparation cannot release a newer hold.
+-- No recovery owner is installed by the current engine startup.
+function saveState.pauseRecovery(): any
+ local token={};saveState.recoveryPause=token
+ return {
+  held=function():boolean return saveState.recoveryPause==token end,
+  release=function():boolean
+   if saveState.recoveryPause~=token then return false end
+   saveState.recoveryPause=nil;return true
+  end,
+ }
+end
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
 	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing() or mateLegs.phase == "ride" -- (ROBLOX-120: the ride on the wind has the game)
 		or M.World.playerLoading==true
+		or saveState.recoveryPause~=nil
 		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The

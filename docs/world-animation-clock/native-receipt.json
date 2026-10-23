@@ -1,0 +1,21 @@
+{
+  "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+  "run": "1792738483442",
+  "assertions": 17,
+  "script_fingerprints": 223,
+  "persistence_disabled": true,
+  "place_sha256": "8c993e25cf9a1ee5c70203291a4bc9b996b0e6067d77fbdf7bbae84538ca38ba",
+  "events_sha256": "577bcbfa12408c8fe3fc03fbdc1739cdd4497b20306d431a1420f0a622d442d5",
+  "viewport": [
+    1105,
+    428
+  ],
+  "actual_client_fixture": true,
+  "known_state_animal_pose_fixture": true,
+  "native_hud_and_clock_wiring_verified": true,
+  "natural_lifecycle_verified": false,
+  "physical_devices_verified": false,
+  "real_saves_verified": false,
+  "fps_verified": false,
+  "published": false
+}

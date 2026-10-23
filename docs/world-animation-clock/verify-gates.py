@@ -32,4 +32,11 @@ for name,digest in ci['logs_sha256'].items():assert hashlib.sha256((H/name).read
 assert subprocess.run(['git','diff','--quiet','HEAD','--','roblox_port/src','roblox_port/tests'],cwd=ROOT).returncode==0
 assert subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()==SOURCE
 result=dict(source=SOURCE,windows_suites=76,windows_passed=468487,windows_failed=0,windows_output_sha256=hashlib.sha256((W/'windows-full.txt').read_bytes()).hexdigest(),linux_run=ci['id'],linux_suites=76,linux_passed=468487,linux_failed=0,compile=222,strict_clean=True,runner_regressions=5,immutable_windows_snapshot_verified=True,native_full_game_verified=False,real_service_rejoin_verified=False,goal_complete=False,published=False)
+native=json.loads((H/'native-receipt.json').read_text(encoding='utf8'))
+assert native['source']==SOURCE and native['assertions']==17 and native['script_fingerprints']==223 and native['persistence_disabled']
+assert native['events_sha256']==hashlib.sha256((H/'native-events.txt').read_bytes()).hexdigest()
+closed=json.loads((H/'native-close.json').read_text(encoding='utf8'))
+assert closed['process_present'] is False and closed['window_present'] is False
+assert closed['original_package_sha256']==native['place_sha256']
+result.update(native_actual_client_fixture_assertions=17,native_script_fingerprints=223,native_hud_and_clock_wiring_verified=True,native_evidence_sha256=hashlib.sha256((H/'native-receipt.json').read_bytes()).hexdigest(),native_diagnostic_closed=True)
 (H/'full-verification.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(result,indent=2))

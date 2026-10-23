@@ -1,0 +1,14 @@
+{
+  "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-441eaca\\TheWindowsill-production-candidate.rbxlx",
+  "place_sha256": "c581461e6616a4a3957fb6d178afc22c917085127b3b8abb94f44031e3af3bc7",
+  "scripts": 222,
+  "all_production_sources_exact": true,
+  "injected_diagnostics": false,
+  "persistence_disabled": false,
+  "verified_platform_suites": 76,
+  "verified_platform_checks": 468487,
+  "native_ui_clock_assertions": 17,
+  "full_release_audit_complete": false,
+  "published": false
+}

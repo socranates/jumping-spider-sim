@@ -1,32 +1,40 @@
-# Checkpoint and resumed work
+# Current checkpoint - 2026-10-23
 
-Resumed by the user on 2026-10-23. Current production source is `441eacaec05d0e1164473f19764f7d56f12b8482`; Windows full session **13178** is running under `docs/world-animation-clock/full-windows/`. Do not restart it without checking the handle/process. The wasp reuse candidate failed its declared flight threshold and was not adopted. The new clock correction passes 20,611 focused checks, clean strict and 222 compilations.
+The user resumed after the restart. The optimization/reliability goal is active, not complete. No main merge or production publication occurred during this verification cohort.
 
-Historical pre-restart checkpoint follows. Paused at the user's request on 2026-10-23. The broad optimization/reliability goal is paused, not complete. No production release was published during this work.
-
-## Checkout
+## Checkout and source
 
 - Writable repo: `C:\Users\natha\windowsill-save-continue`
-- Branch: `codex/save-continue`; push remote: `github`
-- Production code/test source: `aaa6aeb862c9e87d0423b5859802ab9fc9edeba0`
-- `704cad1`: actual-rule moult counter and dusk home-discovery message. Keep seven/ten meal requirements; do not change them to ten meals/three days.
-- `aaa6aeb`: dog collar/tag follow the moving neck; cat animation uses the world clock outside the sill.
-- `d84c560`: private recovery admission write drain and shared reconciliation, still disconnected from production.
-- `cf991ef`: native animal evidence and Windows full-run start manifest.
+- Branch: `codex/save-continue`; push remote: `github`. Origin is the original OneDrive checkout.
+- Verified production source: `441eacaec05d0e1164473f19764f7d56f12b8482`.
+- `704cad1`: actual-rule moult counter and dusk home message. Preserve seven/ten meal requirements.
+- `aaa6aeb`: dog collar/tag follow the moving neck; cat animation advances outside the sill.
+- `441eaca`: wasp legs, frog breathing and darner patrol also use the advancing world clock. No animal behavior or save-format changes.
+- `d84c560`: private recovery admission write drain/shared reconciliation; disconnected from production.
 
-## Verified results and boundaries
+## Completed gates - do not restart these jobs
 
-Animal fixes: 38,060 passing checks across five focused suites; 222 compiled modules and clean strict analysis. The regression tests fail against the preceding production code. Exact production animal modules passed an isolated native Studio scene (1,400 frames), without CreatorErrors. GitHub run 39908828443 completed successfully on the exact production source. See `docs/animal-animation-fixes/`.
+Windows handle **13178 is TERMINAL, exit 0**. Linux CI **39912299139 is TERMINAL, success**. Both verify the same source: **76 suites / 468,487 passing checks / zero failures**, 222 compiled modules, clean strict analysis and five runner regressions. `docs/world-animation-clock/full-verification.json` binds complete logs and the immutable source snapshot. Old Windows handle98916 was intentionally cancelled for the user's restart; retain its separate partial evidence. It is neither a test failure nor a full pass.
 
-Windows full run handle 98916 is TERMINAL and was intentionally cancelled for this restart, not a gameplay failure. Its wrapper exited 4294967295 after the owned test runner/child were stopped. `windows-full-process.json` explicitly records cancellation and binds the partial log. Do not call this run a full pass or restart it as though the handle were still live. Before a replacement run, preserve its start/process/log files in a distinct interrupted-run archive and use a fresh output cohort. The complete existing Linux CI result remains separate evidence.
+The actual-client Studio fixture passed **17 assertions** at1105x428, matching all223 diagnostic script fingerprints, without CreatorErrors. It covers actual-rule counters including partial meals and second moult, Large Text, dusk text/fit, the wordless hunger bar, and animal rendering while the sill clock is stopped. Animal poses are controlled to isolate drawing. It does not prove naturally played hunting/life progression, physical inputs, FPS or online saving/rejoin.
 
-Studio and owned Luau/Python test processes were confirmed stopped. No native trial or heavy test is left running. The original hung Studio experiment was closed with the user's permission; the later isolated review was stopped and closed. Packages remain in `C:\Users\natha\claude-xfer\Windowsill-animal-animation-aaa6aeb-v2` and `Windowsill-wasp-reuse-aaa6aeb`.
+Studio was stopped and closed. Only temporary changes to our diagnostic document were discarded; the original package hash was rechecked. No owned heavy test/native job remains running. Never publish the diagnostic package.
 
-## Next work
+## Production candidate - built, not published
 
-1. Revalidate git/worktree state and resume only after the user returns. Preserve the three preexisting save-cost output modifications and untracked sourcemap; do not stage/revert them.
-2. Complete a replacement full Windows gate for the current production snapshot. Keep the interrupted evidence intact. Check terminal exit, all 76 suite summaries, failure lines and source hashes.
-3. Private wasp candidate is prepared in `docs/wasp-drawing-reuse/`; production WaspBody is unchanged. It passes 110,742 exact-output comparison checks plus 16,884 existing wasp checks; compile/full strict is clean. No native performance result yet. Run the prepared paired native trial only without competing heavy CLI work. Honor the predeclared thresholds in its README; do not adopt a marginal candidate or claim FPS gains from component CPU.
-4. Broader ledger: `docs/audit/current-source/requirements.json`. Its historical source/results are not blanket proof for the newer HUD/animal changes; refresh appropriate entries from current evidence. Recovery pipeline passed 12,362 plus 8,879 regressions, but production migration, departure lifecycle, schema-3 entry, real service/rejoin, full native/device audit, release/main/laptop synchronization and publication remain open.
+`C:\Users\natha\claude-xfer\Windowsill-production-441eaca\TheWindowsill-production-candidate.rbxlx`
 
-Possible related visual issue identified by source inspection, not yet fixed or tested: wasp and pond presentation still receive the home prey clock (`prey.now`) in SpiderClient, while the cat now correctly uses `M.World.prey.clock`. Check animation outside the sill and decide from a reproducer before changing those callers.
+`docs/world-animation-clock/production-candidate.json` binds its SHA-256. All222 production sources match the verified commit; no injected SilkPlayback diagnostic. Normal production persistence is enabled. Do not use this candidate as a disposable save test: construction is not release approval or proof of real-service durability.
+
+## Rejected optimization
+
+Private wasp pose reuse passed geometry comparisons but failed its declared flight CPU threshold:8.68% median reduction,3/4 pairs faster, required10% and4/4. It was not adopted. Do not claim whole-game FPS or leak improvements. See `docs/wasp-drawing-reuse/`.
+
+## Next work and boundaries
+
+1. Preserve the three preexisting save-cost output modifications and untracked sourcemap; do not stage or revert them.
+2. Continue `docs/audit/current-source/requirements.json`; do not repeat completed full gates without a code change, failure or new concern.
+3. Private recovery pipeline:12,362 owner assertions plus8,879 regressions pass. Complete departure/terminal-held lifecycle, production factory/tick/menu integration and schema-3 entry before adoption. Archive original saves/backups unchanged; import portable progress into Preserve.
+4. Actual service interruption/rejoin, natural life progression, current clipping/camera sweep, physical devices/accessibility, audio and representative performance remain open. Controlled fixtures do not close these.
+5. Main integration, publication and laptop release synchronization remain outstanding release work. The candidate and pushed audit branch are not a published game.
+6. Steam Island/Mote is a separate future project; it does not replace Windowsill controls/scope. Rare sightings expansion remains deferred during foundation work.

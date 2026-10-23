@@ -1,9 +1,10 @@
 """Build private reference/candidate comparison. Does not launch or publish."""
 from pathlib import Path
-import hashlib,json,subprocess
+import argparse,hashlib,json,subprocess
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 source=json.loads((H/'source.json').read_text())['source']
-out=Path(r'C:/Users/natha/claude-xfer')/('Windowsill-wasp-reuse-'+source[:7]);out.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--attempt',type=int,default=1);a=p.parse_args();assert 1<=a.attempt<=3
+out=Path(r'C:/Users/natha/claude-xfer')/('Windowsill-wasp-reuse-'+source[:7]+('-v'+str(a.attempt) if a.attempt>1 else ''));out.mkdir(exist_ok=False)
 tree={'$className':'DataModel','ReplicatedStorage':{'Shared':{'$path':str(PORT/'src/Shared')}},'StarterPlayer':{'StarterPlayerScripts':{'Trial':{'$path':str(H/'native.client.luau'),'$attributes':{'SourceCommit':source}},'Original':{'$path':str(H/'reference.luau')},'Candidate':{'$path':str(H/'candidate.luau')}}},'Players':{'$properties':{'CharacterAutoLoads':False}},'Workspace':{'$properties':{'StreamingEnabled':False},'$attributes':{'WaspReuseTrial':True}}}
 config=out/'trial.project.json';config.write_text(json.dumps(dict(name='WaspReuseTrial',tree=tree),indent=2),encoding='utf8',newline='\n')
 place=out/'WaspReuseTrial.rbxlx'

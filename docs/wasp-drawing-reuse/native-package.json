@@ -1,9 +1,9 @@
 {
   "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
-  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-wasp-reuse-aaa6aeb\\WaspReuseTrial.rbxlx",
-  "place_sha256": "242c9ca9249420c90bfcf8ae445d769f60c86e418aa862b289dd05e5dd8ea6b6",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-wasp-reuse-aaa6aeb-v3\\WaspReuseTrial.rbxlx",
+  "place_sha256": "9fe00bd8d2f0b06993157ab277da666a2fc61516ad6d99564dfc315ebd6172d8",
   "inputs": {
-    "native.client.luau": "097d37c74f3c12d1c06d4acbaaaa6b7bdfab66505910ae3482ce9f83a871afea",
+    "native.client.luau": "014af3473351ae4501a8192e39707045ab6e81785a9486a5f99ce1310e40d3d5",
     "reference.luau": "5838e07272bd80e0ca7062e458eb5f498f9d79f613ef81268b948502c40c9a8f",
     "candidate.luau": "ab10033f4d4a265851735a85588b3de75f0dae7f21ff13da5435f45a9808ea97"
   },

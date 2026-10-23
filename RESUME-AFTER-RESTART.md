@@ -1,6 +1,8 @@
-# Resume after the app update and laptop restart
+# Checkpoint and resumed work
 
-Paused at the user's request on 2026-10-23. The broad optimization/reliability goal is paused, not complete. No production release was published during this work.
+Resumed by the user on 2026-10-23. Current production source is `441eacaec05d0e1164473f19764f7d56f12b8482`; Windows full session **13178** is running under `docs/world-animation-clock/full-windows/`. Do not restart it without checking the handle/process. The wasp reuse candidate failed its declared flight threshold and was not adopted. The new clock correction passes 20,611 focused checks, clean strict and 222 compilations.
+
+Historical pre-restart checkpoint follows. Paused at the user's request on 2026-10-23. The broad optimization/reliability goal is paused, not complete. No production release was published during this work.
 
 ## Checkout
 

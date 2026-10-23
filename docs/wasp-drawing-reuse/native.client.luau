@@ -38,7 +38,15 @@ local function batch(rig,list)
 end
 local ok,problem=xpcall(function()
  print("[WASP_REUSE_NATIVE_BEGIN]",script:GetAttribute("SourceCommit"))
- task.wait(4)
+ -- Studio may report a 1x1 viewport before its first rendered frame.
+ local deadline=os.clock()+30;local settled=os.clock()
+ repeat
+  Run.RenderStepped:Wait()
+  local current=camera.ViewportSize
+  if current~=viewport then viewport=current;settled=os.clock() end
+  assert(os.clock()<deadline,"viewport did not settle")
+ until viewport.X>=320 and viewport.Y>=180 and os.clock()-settled>=2
+ losses=0
  for _,mode in {"flying","holding","walking","alternating"} do
   for _,s in samples[mode] do a:draw(s.state,s.time);b:draw(s.state,s.time);compare() end
   Run.RenderStepped:Wait()
@@ -54,7 +62,8 @@ local ok,problem=xpcall(function()
   end
  end
  check(losses==0 and camera.ViewportSize==viewport,"focus or viewport changed during trial")
- print("[WASP_REUSE_NATIVE_RESULT]",Http:JSONEncode({source=script:GetAttribute("SourceCommit"),checks=checks,rows=rows,focus_losses=losses,width=viewport.X,height=viewport.Y,calls_per_batch=360}))
+ for _,row in rows do print("[WASP_REUSE_NATIVE_ROW]",Http:JSONEncode(row)) end
+ print("[WASP_REUSE_NATIVE_RESULT]",Http:JSONEncode({source=script:GetAttribute("SourceCommit"),checks=checks,focus_losses=losses,width=viewport.X,height=viewport.Y,calls_per_batch=360}))
  print("[WASP_REUSE_NATIVE_PASS]",checks)
 end,debug.traceback)
 connection:Disconnect();a:destroy();b:destroy();root:Destroy()

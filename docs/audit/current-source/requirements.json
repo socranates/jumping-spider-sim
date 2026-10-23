@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T05:38:28.199815+00:00",
+  "as_of_utc": "2026-10-23T06:35:07.613292+00:00",
   "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
   "goal_complete": false,
   "published": false,
@@ -23,8 +23,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "both-platforms-verified",
-      "evidence_boundary": "Current4220d0c Windows44363 and Linux39890016962 both terminal76/468352/0, compile222, strict and runner5 clean. Root verifier binds exact current runtime/test/workflow bytes, corrected adopted session and native127/224 source fingerprints. Earlier failures remain preserved. Native scope is isolated protocol/MemoryBackend, not service/rejoin/full transport.",
+      "status": "newer-source-full-verification-pending",
+      "evidence_boundary": "Historical4220d0c passed both full platforms76/468352/0. Current441eaca fixes roaming-animal clocks; focused20611, strict and compile222 pass. Replacement Windows session13178 runs an immutable committed snapshot; interrupted98916 is terminal and explicitly cancelled, not a full pass. Current Linux/release verification must be checked independently.",
       "references": [
         "docs/recovery-verified-gates/verification.json",
         "docs/recovery-verified-gates/README.md",
@@ -806,5 +806,30 @@
     "destination_commit_authorized": false,
     "complete_migration": false,
     "published": false
+  },
+  "source_note": "The source field identifies the historical adopted audit cohort. Newer player-visible changes have separate receipts below and are not covered by its old full-run results.",
+  "latest_runtime_changes": {
+    "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+    "focused_assertions": 20611,
+    "strict_clean": true,
+    "compile_passed": 222,
+    "world_animation_clock_corrected": true,
+    "windows_full_status": "running",
+    "windows_full_session_id": 13178,
+    "windows_full_evidence": "docs/world-animation-clock/full-windows/windows-full-start.json",
+    "native_full_game_verified": false,
+    "published": false
+  },
+  "latest_wasp_pose_trial": {
+    "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
+    "native_assertions": 243361,
+    "status": "rejected",
+    "flight_median_reduction_percent": 8.67648600853801,
+    "flight_pairs_faster": 3,
+    "required_median_reduction_percent": 10,
+    "required_pairs_faster": 4,
+    "production_adopted": false,
+    "whole_game_fps_verified": false,
+    "reference": "docs/wasp-drawing-reuse/native-receipt.json"
   }
 }

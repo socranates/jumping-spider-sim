@@ -102,4 +102,41 @@ function Baseline.adopt(self:any,ticket:any,raw:any):boolean
  if not self:valid(ticket) or type(raw)~="table" or not table.isfrozen(raw) then return false end
  self.base=raw;self.held=nil;ticket.used=true;return true
 end
+-- Departure is a distinct, closed scope. It cannot revive a recovery permit or
+-- enable the ordinary worker, and can touch only this owner's progress key.
+function Baseline.sealDeparture(self:any,session:any,owner:any):(any?,string?)
+ if Work.pulse() then return nil,"departure must run outside preparation" end
+ local held=self.held
+ if type(owner)~="table" or self.departure~=nil or not self:valid(held) or held.session~=session or not held.enforced
+  or session.recoveryOwner~=owner or owner.session~=session then return nil,"current enforced recovery owner required" end
+ local ticket={owner=self,session=session,recovery=owner,held=held,base=held.base,load=session._loadSerial,id=session.id,used=false}
+ -- All public session intake/load/flush paths check closed before proceeding.
+ -- Already-issued calls may finish; the departure owner drains them before
+ -- capturing final local progress or making another request.
+ session.closed,session.flushing=true,true;self.departure=ticket
+ return ticket,nil
+end
+function Baseline.departureValid(self:any,t:any):boolean
+ return type(t)=="table" and self.departure==t and t.owner==self and not t.used and self.held==t.held
+  and self.source==self.boundSource and t.session.backend==self and t.session._loadSerial==t.load and t.session.id==t.id
+  and t.session.closed and t.session.flushing and t.session.state=="active" and t.session.lockHeld
+  and t.session.recoveryOwner==t.recovery and t.session.pkey==self.pkey and tostring(t.session.cfg.userId)==self.user
+end
+function Baseline.departureUpdate(self:any,t:any,fn:any):(boolean,any,string?)
+ if Work.pulse() or not self:departureValid(t) then return false,nil,"closed departure scope unavailable" end
+ return updateProvider(self,self.pkey,function(old:any):any
+  if not self:departureValid(t) then return nil end
+  return fn(old)
+ end)
+end
+function Baseline.departureRead(self:any,t:any):(boolean,any,string?)
+ if Work.pulse() or not self:departureValid(t) then return false,nil,"closed departure scope unavailable" end
+ return self.source:readRawFresh(self.pkey)
+end
+function Baseline.finishDeparture(self:any,t:any,released:boolean):boolean
+ if self.departure~=t or t.used then return false end
+ t.used=true;t.session.flushing=false
+ if released then t.session.lockHeld=false end
+ return true -- closed and the enforced hold deliberately remain in place
+end
 return table.freeze(Baseline)

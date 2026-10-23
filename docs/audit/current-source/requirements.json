@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T07:04:07.188057+00:00",
+  "as_of_utc": "2026-10-23T07:16:04.275185+00:00",
   "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
   "goal_complete": false,
   "published": false,
@@ -75,14 +75,15 @@
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated. Current441eaca combined private recovery/departure cohort passes24648 checks, with23 candidates strict-clean. Recovery-only closed departure drains in-flight work, atomically three-way merges final local P progress/releases its own fresh lease, and requires uncached exact readback. R/M1/A1 unchanged; cap8 requests/24seconds. Production departure routing, terminal-idle/rejoin lifecycle and schema-3 entry remain unimplemented.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
         "docs/save-slot-isolation/map-view-types-receipt.json",
         "docs/save-slot-isolation/RECORDED-INSPECTION.md",
         "docs/save-slot-isolation/RECOVERY-ARCHIVE.md",
-        "docs/save-slot-isolation/RECOVERY-PUBLICATION.md"
+        "docs/save-slot-isolation/RECOVERY-PUBLICATION.md",
+        "docs/save-slot-isolation/RECOVERY-DEPARTURE.md"
       ]
     },
     {
@@ -863,6 +864,36 @@
     "verified_platform_checks": 468487,
     "native_ui_clock_assertions": 17,
     "full_release_audit_complete": false,
+    "published": false
+  },
+  "latest_private_recovery_departure": {
+    "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+    "departure_assertions": 3407,
+    "preceding_regression_assertions": 21241,
+    "total_assertions": 24648,
+    "current_runtime_bundle_verified": true,
+    "private_candidates": 23,
+    "compile_entry_clean": true,
+    "strict_clean": true,
+    "closed_intake_and_inflight_drain_verified": true,
+    "atomic_three_way_progress_and_release_verified": true,
+    "normal_departure_requests": 2,
+    "departure_max_requests": 8,
+    "departure_timeout_seconds": 24,
+    "uncached_readback_required": true,
+    "lost_acknowledgement_and_callback_replay_verified": true,
+    "archive_rest_and_proposal_unchanged": true,
+    "large_history_preserved_without_trimming": true,
+    "foreign_stale_changed_scope_and_deadline_refused": true,
+    "terminal_held_departure_verified": true,
+    "production_connected": false,
+    "native_verified": false,
+    "real_datastore_verified": false,
+    "production_factory_and_tick_wired": false,
+    "departure_and_terminal_hold_lifecycle_complete": false,
+    "schema3_entry_integrated": false,
+    "complete_migration": false,
+    "goal_complete": false,
     "published": false
   }
 }

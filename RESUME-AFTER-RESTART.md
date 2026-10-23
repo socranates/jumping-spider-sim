@@ -34,7 +34,7 @@ Private wasp pose reuse passed geometry comparisons but failed its declared flig
 
 1. Preserve the three preexisting save-cost output modifications and untracked sourcemap; do not stage or revert them.
 2. Continue `docs/audit/current-source/requirements.json`; do not repeat completed full gates without a code change, failure or new concern.
-3. Private recovery pipeline:12,362 owner assertions plus8,879 regressions pass. Complete departure/terminal-held lifecycle, production factory/tick/menu integration and schema-3 entry before adoption. Archive original saves/backups unchanged; import portable progress into Preserve.
+3. Private recovery/departure cohort:24,648 checks pass (3,407 departure +21,241 regressions),23 candidates strict-clean. Recovery-only closed departure now preserves final local P changes and releases its own fresh lease with exact uncached readback. Production departure routing, terminal-held idle/expiry, factory/tick/menu integration and schema-3 entry remain required before adoption. See `docs/save-slot-isolation/RECOVERY-DEPARTURE.md`. Archive original saves/backups unchanged; import portable progress into Preserve.
 4. Actual service interruption/rejoin, natural life progression, current clipping/camera sweep, physical devices/accessibility, audio and representative performance remain open. Controlled fixtures do not close these.
 5. Main integration, publication and laptop release synchronization remain outstanding release work. The candidate and pushed audit branch are not a published game.
 6. Steam Island/Mote is a separate future project; it does not replace Windowsill controls/scope. Rare sightings expansion remains deferred during foundation work.

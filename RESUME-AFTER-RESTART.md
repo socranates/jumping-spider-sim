@@ -38,3 +38,7 @@ Private wasp pose reuse passed geometry comparisons but failed its declared flig
 4. Actual service interruption/rejoin, natural life progression, current clipping/camera sweep, physical devices/accessibility, audio and representative performance remain open. Controlled fixtures do not close these.
 5. Main integration, publication and laptop release synchronization remain outstanding release work. The candidate and pushed audit branch are not a published game.
 6. Steam Island/Mote is a separate future project; it does not replace Windowsill controls/scope. Rare sightings expansion remains deferred during foundation work.
+
+## Latest private schema3 format milestone
+
+Continued rest/retirement format passes82 new +50,745 preceding checks (50,827 total),27 candidates strict-clean. `RECOVERY-REST-FORMAT.md` documents immutable original provenance, current scene/generation handling, bounded current/backup rotation and explicit ended/retired refusal. Final cohort is `rest-format-attempt-4-*`, verified by `verify-recovery-rest-format.py`; do not rerun unchanged passing tests merely to rename them. No production code, native run or real DataStore write changed. Keep the runtime entry hold: authenticated writer/readers in SaveSession, actual scene entry, life credentials, existing-archive reuse across slots, fresh-life archive lifetime, native/service/rejoin, production wiring and release remain open.

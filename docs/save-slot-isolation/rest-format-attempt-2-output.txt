@@ -1,0 +1,2 @@
+C:/Users/natha/AppData/Local/Temp/tmpgtg2a55y.luau:51208: Ambiguous syntax: this looks like an argument list for a function call, but could also be a start of new statement; use ';' to separate statements
+stacktrace:

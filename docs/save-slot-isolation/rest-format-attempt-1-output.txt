@@ -1,0 +1,2 @@
+C:/Users/natha/AppData/Local/Temp/tmphy1mii4q.luau:51240: Out of local registers when trying to allocate encoded: exceeded limit 200
+stacktrace:

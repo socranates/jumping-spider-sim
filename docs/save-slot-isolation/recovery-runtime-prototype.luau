@@ -1,6 +1,6 @@
 --!strict
 -- Private single session owner. Factory/load/tick/selection/departure routing;
--- schema-3 entry and remote protocol/menu integration deliberately remain closed.
+-- Optional schema3 entry is private; production remote/menu wiring remains closed.
 local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Session=require(Shared.Persistence.SaveSession)
 local Rules=require(Shared.Data.SaveRules)
@@ -57,6 +57,7 @@ local function hold(self:any):(any?,string?)
  return held,why
 end
 local function lost(self:any,why:string)
+ if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
  self.phase,self.problem="lost",why;self.pipeline.leaseLost=true
  -- The wrapper also fences an unadopted read phase. No normal flush/load can
  -- replay a whole stale snapshot after an ownership uncertainty.
@@ -66,7 +67,7 @@ end
 local function startReadLease(self:any):boolean
  local component
  component=ReadLease.new(self.session,function():boolean
-  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required")
+  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required" or self.phase=="entering" or self.phase=="recovered")
  end,self.session.backend.held)
  self.lease=component;local job,why=component:begin()
  if not job then lost(self,why or "read phase lease unavailable");return false end
@@ -100,6 +101,21 @@ function Runtime.cancelRecovery(self:any):boolean
  if self.leaving or self.phase~="recovering" or not self.job then return false end
  if not self.pipeline:cancel(self.job) then return false end
  self.phase="held";return true -- idle starts only after any provider drains
+end
+-- Optional private server entry owner. Dependency injection keeps the existing
+-- default entry gate closed until its client protocol is explicitly installed.
+function Runtime.enter(self:any):(any?,string?)
+ if not available(self) or self.phase~="entry_required" or not self.recovery.entryFactory then return nil,"schema3 entry unavailable" end
+ local entry=self.recovery.entryFactory.new(self,self.recovery.entryOptions)
+ local j,why=entry:begin();if not j then return nil,why end
+ self.entry,self.entryJob=entry,j;self.phase,self.problem="entering",nil;return j,nil
+end
+function Runtime.entryApplied(self:any,msg:any):boolean
+ return available(self) and self.phase=="entering" and self.entry:applied(self.entryJob,msg)
+end
+function Runtime.cancelEntry(self:any):boolean
+ if self.leaving or self.phase~="entering" or not self.entry:cancel(self.entryJob) then return false end
+ self.phase,self.problem="entry_required","entry cancelled";return true
 end
 function Runtime.dismiss(self:any):boolean
  if not available(self) or self.accepted or (self.phase~="offered" and self.phase~="offer_refused" and self.phase~="discovering") then return false end
@@ -147,7 +163,19 @@ local function stepInner(self:any):boolean
  local asked=lease:step(leaseJob)
  if self.leaving or s.closed or self.lease~=lease or self.leaseJob~=leaseJob then return asked end
  if leaseJob.state=="lost" then lost(self,leaseJob.problem or "read lease lost");return asked end
- if asked or self.phase~="discovering" then return asked end
+ if asked then return true end
+ if self.phase=="entering" then
+  asked=self.entry:step(self.entryJob)
+  if self.leaving or s.closed then return asked end
+  if self.entryJob.state=="verified" then
+   self.phase,self.result="recovered",self.entryJob.result
+   -- A decision callback may yield. Install the completed route first so late
+   -- completion cannot reopen a session closed by departure during notification.
+   self.result.decisionPending=false;s.intents:notify(self.entryJob.request)
+  elseif self.entryJob.state~="pending" then self.phase,self.problem="entry_required",self.entryJob.problem end
+  return asked
+ end
+ if self.phase~="discovering" then return false end
  asked=self.reader:step(self.discovery)
  if self.leaving or s.closed then return asked end
  if self.discovery.state=="offered" then self.phase="offered"
@@ -178,6 +206,7 @@ function Runtime.depart(self:any,deadline:number?):(any?,string?)
  if not finite(now) or not finite(untilAt) then return nil,"finite departure deadline required" end
  if self.route and self.phase~="normal" and (now<self.route.lastNow or not routeMatches(self)) then self.scopeInvalid=true end
  self.leaving=true;self.flushDeadline=untilAt
+ if self.entry and self.entryJob and self.entryJob.state=="pending" then self.entry:cancel(self.entryJob) end
  if self.reader and self.discovery and self.discovery.state=="pending" then self.reader:cancel(self.discovery) end
  if untilAt<=now or self.scopeInvalid then
   self.session.closed,self.session.flushing=true,false;self.phase="closed"

@@ -1,3 +1,5 @@
+Current opt-in private schema3 entry is documented in `RECOVERY-ENTRY.md` and verified by `recovery-entry-verification.json`. The default gate remains read-only. The earlier routing evidence below is historical; the latest entry cohort binds the modified Runtime and all preceding tests. Production adoption remains open.
+
 # Private session factory and routing
 
 `RecoveryRuntimePrototype` composes the actual session, recorded-offer reader, accepted-intent pipeline, terminal-held maintenance and departure writer. Its constructor installs **and binds** the baseline sidecar before the first load. It copies configuration instead of changing the caller's backend. Normal healthy visits still use actual SaveSession stepping and flush; recovery phases never fall back to that whole-snapshot worker.

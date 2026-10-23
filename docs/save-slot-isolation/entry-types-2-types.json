@@ -1,0 +1,52 @@
+{
+  "candidates": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-life-prototype.luau": "a523763862a96bb11f315d401625e65870bb27dcf0f2e87888e3f041114be311",
+    "recovery-destination-prototype.luau": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
+    "recovery-progress-prototype.luau": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
+    "recovery-packet-prototype.luau": "cafd7ceb11900085933d3b0f982ee1e9d0898da44d9262679f1d0ca1f7b6d8c1",
+    "recovery-proposal-store-prototype.luau": "1ef86ba87bf474032165e2ddb9993d3f27a1b28b38c3d0b234cffe250204ff47",
+    "recovery-raw-backend-prototype.luau": "04e2f48bbfb2e36b21b89ca08af11a07814406ffadcc6a9406c29477ba75d173",
+    "recovery-rest-writer-prototype.luau": "64634b6ec76f88cab531e2240e95117a2d18a462b6e5a3bf56bcd5f5ebce3fda",
+    "recovery-progress-writer-prototype.luau": "ee5f76c75981f292b00a12388afb681b10e8511c863fc6db49f5f05eca7275fc",
+    "recovery-archive-store-prototype.luau": "80440f94430eea417e9d65736c7a259b92a6235016732fab9bcae36e8dddacb0",
+    "recovery-session-fence-prototype.luau": "25d7793a9c90d6c72fb22d897ab8d70ca87d8da6b86877f5dfa2502c23554ea9",
+    "recovery-commit-controller-prototype.luau": "04b42557c75a41a9116515908f781141ece78d8ea892f96d2248b94dc745deb6",
+    "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
+    "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150",
+    "recovery-offer-reader-prototype.luau": "fa57229d40f546696d9ef46636144e9571383762ada9978735ff90c286679ce7",
+    "recovery-progress-baseline-prototype.luau": "660ffbe9d4c5c470bce096eba87411d726b05b5ead850c9abb3f8db30991763d",
+    "recovery-session-rebind-prototype.luau": "5d23a59e239ea602e7e46c92339e5f7c6dff120d0bfae272a6896710a4585bcb",
+    "recovery-pipeline-prototype.luau": "73956a4abe8dbe490f62eb21c2aaa4d369747381c1e42e24fcb56ce548519ff8",
+    "recovery-progress-reconcile-prototype.luau": "d4fe473207f9bace824425f4c30f156d6a7e58ac60e17f5878844d93ba08f9c5",
+    "recovery-departure-prototype.luau": "c8e74949088d9ce34e52060082a9e77ebdebe1a925d3477dabc9c71129bdba1c",
+    "recovery-idle-prototype.luau": "ae5276200e201866a259b40968b461bc5bde5a885dc429ad1c295d9b8aae319e",
+    "recovery-read-lease-prototype.luau": "0985effc77ac711e7af58809819819d72ba0c19e889ef7a5da477c4defb7062c",
+    "recovery-runtime-prototype.luau": "ba9dcfb1ef2f92a88190348a00fff4c2b362f95897ff6deec0ddc919492de700",
+    "recovery-rest-format-prototype.luau": "8c05bb89c6f01379eb1e5033f8f14c3398f9acbbc19b155aa7f3c80cf0f44157",
+    "recovery-current-writer-prototype.luau": "9c16e0470dbc8d7a62b491798da35a05baabd83a29df0ae49edc8a20565982ba",
+    "recovery-entry-prototype.luau": "c290ef9a4ce663e0f455a33986db89964cfa7137e9109ec4694226827de742f8",
+    "recovery-entry-client-prototype.luau": "d1dd8839f54b1037a3d3521a656957a7a6a910c68038ae5875c9bb0cf4b63ba8"
+  },
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "66c1b34dbfa7e6ea87117ae4b15b27c84f2622b805fab9c82d007ce051ac32a9"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    }
+  ],
+  "production_connected": false
+}

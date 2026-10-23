@@ -38,16 +38,24 @@ PondBodies.FROG = { head = "6f9a3a", back = "6a6a3a", mottle = "3e4a26", ridge =
 	tympanum = "6a5a3a", leg = "5e6a34", band = "3a4426", tongue = "d88a8a" }
 -- The frog's parts in its own frame (its seat under it at y 0, ahead -z), the throat pumped by `throat` (0..1), its tongue out `tongue` studs (0: in).
 -- (ROBLOX-128) `swell` (0..1): the flanks filled by a lung breath.
+local function frogSizes(throat: number, swell: number?): (Vector3, Vector3)
+ local sw = 1 + 0.05 * (swell or 0)
+ return v(4.6 * sw, 2.3 * sw, 5.6), v(2.7, 0.7 + 0.45 * throat, 2.3)
+end
+local function frogTongue(out: { Spec }, tongue: number)
+ if tongue > 0.05 then rod(out, "Tongue", v(0, 0.9, -4.4), v(0, 0.9, -4.4 - tongue), 0.45, PondBodies.FROG.tongue) end
+end
+
 function PondBodies.frogParts(throat: number, tongue: number, swell: number?): { Spec }
 	local C = PondBodies.FROG
 	local out: { Spec } = {}
 	local pitch = CFrame.Angles(math.rad(-9), 0, 0) -- (it sits low, its front a little up on its short arms)
-	local sw = 1 + 0.05 * (swell or 0)
-	ell(out, "Body", v(0, 1.05, 0.5), v(4.6 * sw, 2.3 * sw, 5.6), C.back, false, pitch)
+	local bodySize, throatSize = frogSizes(throat, swell)
+	ell(out, "Body", v(0, 1.05, 0.5), bodySize, C.back, false, pitch)
 	ell(out, "Belly", v(0, 0.6, 0.6), v(4.2, 1.2, 5.2), C.belly, true, pitch)
 	ell(out, "Head", v(0, 1.4, -2.7), v(3.8, 1.8, 3.0), C.head)
 	ell(out, "Snout", v(0, 1.15, -3.8), v(2.6, 1.1, 1.4), C.head)
-	ell(out, "Throat", v(0, 0.75, -3.0), v(2.7, 0.7 + 0.45 * throat, 2.3), C.throat, true)
+	ell(out, "Throat", v(0, 0.75, -3.0), throatSize, C.throat, true)
 	for _, s in { -1, 1 } do
 		local w = if s < 0 then "L" else "R"
 		ell(out, "Eye" .. w, v(0.98 * s, 2.15, -2.85), v(0.8, 0.72, 0.8), C.eye)
@@ -67,7 +75,7 @@ function PondBodies.frogParts(throat: number, tongue: number, swell: number?): {
 		rod(out, "Toes" .. w, v(3.0 * s, 0.12, -0.9), v(3.5 * s, 0.08, -1.9), 0.3, C.leg, true)
 	end
 	ell(out, "Mottle", v(0, 2.05, 1.9), v(1.4, 0.25, 1.2), C.mottle, true)
-	if tongue > 0.05 then rod(out, "Tongue", v(0, 0.9, -4.4), v(0, 0.9, -4.4 - tongue), 0.45, C.tongue) end
+	frogTongue(out, tongue)
 	for _, s in out do if string.sub(s.name, 1, 3) == "Eye" then s.reflectance = 0.15 end end
 	return out
 end
@@ -110,13 +118,16 @@ local function build(self: any, name: string, specs: { Spec }): any
 		parts[i] = p
 	end
 	model.Parent = self.folder
-	return { model = model, parts = parts, count = #specs }
+	return { model = model, parts = parts, count = #specs, moved = {}, frames = {} }
 end
 
 local AWAY = CFrame.new(0, -600, 0)
+local HIDDEN: { Spec } = table.freeze({})
 local function place(rig: any, specs: { Spec }, frame: CFrame)
-	local moved: { BasePart } = {}
-	local frames: { CFrame } = {}
+	local moved: { BasePart } = rig.moved
+	local frames: { CFrame } = rig.frames
+	table.clear(moved)
+	table.clear(frames)
 	for i = 1, rig.count do
 		local part = rig.parts[i]
 		local spec = specs[i]
@@ -141,21 +152,36 @@ function PondBodies.draw(self: any, frog: any, target: Vector3?, darnerAt: Vecto
 		local inBreath = (now % PondBodies.BREATH) / 0.9
 		local breath = if inBreath < 1 then math.sin(inBreath * math.pi) else 0
 		local throat = 0.3 + 0.2 * math.sin(now * 2 * math.pi * 1.7) * (1 - breath) + 0.7 * breath
-		local specs = PondBodies.frogParts(throat, tongue, breath)
-		if self.frog == nil then self.frog = build(self, "GreenFrog", PondBodies.frogParts(0.5, 1)) end
+		if self.frog == nil then
+   local recipe = PondBodies.frogParts(0.5, 1)
+   self.frog = build(self, "GreenFrog", recipe)
+   self.frog.recipe = recipe
+   for _, spec in recipe do
+    if spec.name == "Body" then self.frog.bodySpec = spec elseif spec.name == "Throat" then self.frog.throatSpec = spec end
+   end
+   assert(self.frog.bodySpec and self.frog.throatSpec and recipe[self.frog.count].name == "Tongue", "frog recipe layout")
+  end
+  local specs = self.frog.recipe
+  self.frog.bodySpec.size, self.frog.throatSpec.size = frogSizes(throat, breath)
+  specs[self.frog.count] = nil
+  frogTongue(specs, tongue)
 		local h = frog.heading
 		local frame = CFrame.lookAt(frog.pos, frog.pos + Vector3.new(h.X, 0, h.Z))
 		place(self.frog, specs, frame)
 	elseif self.frog ~= nil then
-		place(self.frog, {}, CFrame.identity)
+		place(self.frog, HIDDEN, CFrame.identity)
 	end
 	if darnerAt ~= nil then
-		local specs = PondBodies.darnerParts(true)
-		if self.darner == nil then self.darner = build(self, "GreenDarner", specs) end
+		if self.darner == nil then
+			local specs = PondBodies.darnerParts(true)
+			self.darner = build(self, "GreenDarner", specs)
+			self.darner.recipe = specs
+		end
+		local specs = self.darner.recipe
 		local h = darnerHeading or Vector3.xAxis
 		place(self.darner, specs, CFrame.lookAt(darnerAt, darnerAt + h))
 	elseif self.darner ~= nil then
-		place(self.darner, {}, CFrame.identity)
+		place(self.darner, HIDDEN, CFrame.identity)
 	end
 end
 

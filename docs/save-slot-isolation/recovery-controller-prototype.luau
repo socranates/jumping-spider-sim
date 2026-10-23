@@ -103,8 +103,13 @@ local function renewed(self:any,j:any,now:number):boolean
  j.lastAck=now;j.nextBeat=now+Rules.HEARTBEAT;j.nextBeatAttempt=now;j.beatFailures=0;s.sched:beat(now)
  return true
 end
-local function selectedSource(j:any,plan:any):boolean
+local function selectedSource(self:any,j:any,plan:any):boolean
  local id=j.ticket.identity;local e=plan.entries[j.ticket.mode].raw
+ if self.options.restCodec then
+  local ok,value=pcall(self.options.restCodec.decode,self.options.restCodec,e,true)
+  if not ok then return false end
+  e=value
+ end
  if type(e)~="table" then return false end
  if id.kind=="backup" then e=e.backup end
  return type(e)=="table" and e.checksum==id.checksum and e.updatedAt==id.updatedAt and type(e.payload)=="table" and e.payload.save_life==id.life
@@ -121,18 +126,22 @@ local function stepInner(self:any,j:any):boolean
   -- A full request bucket may delay renewal. CPU-only collection/comparison
   -- can still progress under the unexpired guard; no network work is admitted.
  end
- if j.phase=="compare" then
+ if j.phase=="compare" or j.phase=="select" then
+  local selecting=j.phase=="select"
   j.work:step()
   if not j.guard() then stop(j,"cancelled","session/Continue changed");return false end
   if j.work.state=="pending" then return false end
   local result=j.work:take();j.work=nil
-  if not result or not result[1] then stop(j,"refused","existing archive belongs to a different source observation");return false end
-  j.phase="archive";return false
+  if not result or not result[1] then stop(j,"refused",if selecting then "selected source changed" else "existing archive belongs to a different source observation");return false end
+  j.phase=if selecting then "probe" else "archive";return false
  end
  if j.phase=="collect" then
   local c=j.collection
   if c.state=="complete" then
-   if not selectedSource(j,c.plan) then stop(j,"refused","selected source changed");return false end
+   if self.options.restCodec then
+    j.sourcePlan=c.plan;j.work=Work.new(function() return selectedSource(self,j,c.plan) end,self.options.work);j.phase="select";return false
+   end
+   if not selectedSource(self,j,c.plan) then stop(j,"refused","selected source changed");return false end
    j.sourcePlan=c.plan;j.phase="probe";return false
   end
   if c.state=="retry" then

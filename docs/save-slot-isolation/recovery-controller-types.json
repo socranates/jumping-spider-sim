@@ -4,7 +4,7 @@
     "recovery-source-collector-prototype.luau": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
     "recovery-archive-store-prototype.luau": "80440f94430eea417e9d65736c7a259b92a6235016732fab9bcae36e8dddacb0",
     "recovery-session-fence-prototype.luau": "25d7793a9c90d6c72fb22d897ab8d70ca87d8da6b86877f5dfa2502c23554ea9",
-    "recovery-controller-prototype.luau": "1c762aef72cc43cb86d7f1f055501eef2483ff0c100864dc118f91d823cb6d6a"
+    "recovery-controller-prototype.luau": "a4e89bcc8674cdf023370c780bae4c0d1a03c636f26fe773429c64dd934fd150"
   },
   "steps": [
     {

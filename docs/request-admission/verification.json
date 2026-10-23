@@ -1,0 +1,21 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "groups": 30,
+  "checks": 4853,
+  "failed": 0,
+  "policy_checks": 4771,
+  "backend_checks": 82,
+  "strict_modules": 2,
+  "actual_production_backend": true,
+  "providers_and_clock_synthetic": true,
+  "before_fix_counterexample_bound": true,
+  "reentrant_clock_fence_fixed": true,
+  "private_inputs_committed": true,
+  "private_commit": "dcd191d69ac6c04bac34e1bb6ad68bef6a9a0195",
+  "policy_installed_in_production": false,
+  "actual_owner_scheduler_integration": false,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false,
+  "goal_complete": false
+}

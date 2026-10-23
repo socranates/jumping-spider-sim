@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T19:29:27.391827+00:00",
+  "as_of_utc": "2026-10-23T19:50:11.049253+00:00",
   "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
   "goal_complete": false,
   "published": false,
@@ -274,7 +274,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected. Current695e772 controlled full-detail/Free-play garden sample after engine return:120 RenderStepped intervals at1105x433, mean16.676ms/p9518.193ms/max18.991ms. Short foreground diagnostic scene, not a paired gain or whole-game/device/long-session claim. Separate695e772 low/Normal controlled garden120frames mean16.807/p9518.176/max45.174ms at1105x433; no paired gain, phone or whole-game claim. Current bd67582 native attribution: two 70-client/10-server runs, real Remotes/memory/engine codec/10x protocol. Largest baseline canonical sample40108 bytes; Main choice-to-adoption41.812s then37.160s. Client entry preparation0.147s in baseline; second server archive/commit states observe full application budget1111/1142 and1366/1457 calls. Request admission is the next target, not an established payload bottleneck. Frame cadence changed alongside extra instrumentation; no causal speedup, online timing or representative FPS claim. Initialization/Easy whole-frame gaps remain unexplained.",
+      "evidence_boundary": "Encoder068a878 matched native four-pair comparison20738 assertions averages40.27percent less isolated encoder CPU; bounded save/return32 passes, capture108/98ms remains synchronous. Current59146e1 attribution2 full-detail scenes/all223 sources verified, no competing heavy CLI: render interval16.885/20.877ms, Lua6.263/6.619ms at1105x433. Broad sound category is mostly animal drawing, not Lua audio handlers. Source-bound raw results and closure verified; no paired whole-game FPS, heap gain or hard-budget claim. Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim. Subsequentccc0abb adopts the exact privately tested pond renderer: native isolated CPU18.13/21.32 percent lower full/low, positive heap growth88.60/92.45 percent lower,4/4 pairs faster each tier; geometry985 and batch41 pass. No whole-game FPS, allocation-rate or leak claim. Current441eaca full gates are complete on both platforms76/468487/0; this adds no whole-game FPS claim. Private wasp pose reuse failed its declared flight threshold and was rejected. Current695e772 controlled full-detail/Free-play garden sample after engine return:120 RenderStepped intervals at1105x433, mean16.676ms/p9518.193ms/max18.991ms. Short foreground diagnostic scene, not a paired gain or whole-game/device/long-session claim. Separate695e772 low/Normal controlled garden120frames mean16.807/p9518.176/max45.174ms at1105x433; no paired gain, phone or whole-game claim. Current bd67582 native attribution: two 70-client/10-server runs, real Remotes/memory/engine codec/10x protocol. Largest baseline canonical sample40108 bytes; Main choice-to-adoption41.812s then37.160s. Client entry preparation0.147s in baseline; second server archive/commit states observe full application budget1111/1142 and1366/1457 calls. Request admission is the next target, not an established payload bottleneck. Frame cadence changed alongside extra instrumentation; no causal speedup, online timing or representative FPS claim. Initialization/Easy whole-frame gaps remain unexplained. Private typed admission candidate:30 groups/4853 checks/0 with2 compile/strict-clean modules; exact production DataStoreBackend exercised with injected providers. Clock-reentrancy counterexample retained and fixed; plain record validation added. Not integrated with actual owner workers, native fixture or normal startup; no loading speedup or online qualification. Current request-admission limits are test configuration only.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -295,7 +295,9 @@
         "docs/player-stream-render-readiness/engine-full-opportunistic-receipt.json",
         "docs/player-stream-render-readiness/normal-stream-verification.json",
         "docs/recovery-native-cost/RESULTS.md",
-        "docs/recovery-native-cost/attribution-summary.json"
+        "docs/recovery-native-cost/attribution-summary.json",
+        "docs/request-admission/README.md",
+        "docs/request-admission/verification.json"
       ]
     },
     {
@@ -428,11 +430,13 @@
     {
       "id": "save-request-budget",
       "status": "corrected-adopted-both-platforms-and-isolated-native-verified",
-      "evidence_boundary": "Exact8ad013b9 session adopted in4220d0c, with127 regular checks and STATE1251/0. Both full platforms76/468352/0, compile222, strict and runner 5 pass, plus native127/224 fingerprints/zero errors under strengthened callback accounting. Prior20f59026 failed integration1250/2 and was withdrawn before commit. Actual service/rejoin/full transport remain unverified.",
+      "evidence_boundary": "Exact8ad013b9 session adopted in4220d0c, with127 regular checks and STATE1251/0. Both full platforms76/468352/0, compile222, strict and runner 5 pass, plus native127/224 fingerprints/zero errors under strengthened callback accounting. Prior20f59026 failed integration1250/2 and was withdrawn before commit. Actual service/rejoin/full transport remain unverified. Private typed admission candidate:30 groups/4853 checks/0 with2 compile/strict-clean modules; exact production DataStoreBackend exercised with injected providers. Clock-reentrancy counterexample retained and fixed; plain record validation added. Not integrated with actual owner workers, native fixture or normal startup; no loading speedup or online qualification. Current request-admission limits are test configuration only.",
       "references": [
         "docs/recovery-verified-gates/README.md",
         "docs/save-slot-isolation/session-verified-native-qualification.json",
-        "docs/save-slot-isolation/session-verified-adoption.json"
+        "docs/save-slot-isolation/session-verified-adoption.json",
+        "docs/request-admission/README.md",
+        "docs/request-admission/verification.json"
       ]
     }
   ],
@@ -2049,5 +2053,31 @@
     "baseline_main_choice_to_adoption": 41.81191897392273,
     "request_admission_remains_open": true,
     "controlled_speedup_claim": false
+  },
+  "latest_request_admission_candidate": {
+    "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+    "groups": 30,
+    "checks": 4853,
+    "failed": 0,
+    "policy_checks": 4771,
+    "backend_checks": 82,
+    "strict_modules": 2,
+    "actual_production_backend": true,
+    "providers_and_clock_synthetic": true,
+    "before_fix_counterexample_bound": true,
+    "reentrant_clock_fence_fixed": true,
+    "private_inputs_committed": true,
+    "private_commit": "dcd191d69ac6c04bac34e1bb6ad68bef6a9a0195",
+    "policy_installed_in_production": false,
+    "actual_owner_scheduler_integration": false,
+    "native_verified": false,
+    "online_verified": false,
+    "published": false,
+    "goal_complete": false,
+    "references": [
+      "docs/request-admission/README.md",
+      "docs/request-admission/verification.json",
+      "docs/request-admission/verify.py"
+    ]
   }
 }

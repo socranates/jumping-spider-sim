@@ -1,0 +1,91 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+RECOVERY_PROPOSAL_STORE passed=79 failed=0
+RECOVERY_REST_WRITER passed=117 failed=0 suspensions=2616
+RECOVERY_PROGRESS_WRITER passed=182 failed=0
+RECOVERY_COMMIT_CONTROLLER completed_requests=31 simulated_seconds=186
+RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
+RECOVERY_SESSION_REBIND passed=1373 failed=0
+RECOVERY_PIPELINE cold_compressed=false requests=58 simulated_seconds=365
+RECOVERY_PIPELINE cold_compressed=true requests=58 simulated_seconds=365
+RECOVERY_PIPELINE passed=12362 failed=0
+RECOVERY_DEPARTURE passed=3407 failed=0
+RECOVERY_IDLE passed=14134 failed=0
+RECOVERY_RUNTIME passed=11963 failed=0
+WORKER_ADMISSION_CASE	actual-reader-zero-budget-retains-one-request	57
+WORKER_ADMISSION_CASE	actual-pending-reader-all-seven-fresh-reads	4
+WORKER_ADMISSION_CASE	actual-reader-retries-only-provider-failures	24
+WORKER_ADMISSION_CASE	actual-reader-cancel-deadline-and-visit-close	16
+WORKER_ADMISSION_CASE	route-change-during-budget-query-refuses-provider	3
+WORKER_ADMISSION_CASE	yielded-provider-cancel-and-visit-debt	7
+WORKER_ADMISSION_CASE	legacy-debt-validation-and-exact-rolling-boundary	12
+WORKER_ADMISSION_CASE	actual-reader-thrown-provider-keeps-backoff	4
+WORKER_ADMISSION passed=127 failed=0 groups=8
+BRIDGE_CASE	job-cap-and-backend-error-tuple	4
+BRIDGE_CASE	transform-retry-lifetime-fences	3
+BRIDGE_CASE	committed-write-cancelled-before-ack	5
+BRIDGE_CASE	pending-identity-and-method-capture	3
+BRIDGE_CASE	counter-replacement-and-invalid-account-scope	2
+BRIDGE_CASE	thrown-provider-is-a-counted-retryable-failure	3
+ADMISSION_BRIDGE passed=20 failed=0 groups=6
+DISPATCH_GUARD passed=9 failed=0 groups=2
+ARCHIVE_ADMISSION_CASE	cold-archive-retains-child-state-and-exact-accounting	264
+ARCHIVE_ADMISSION_CASE	collector-failure-backoff-and-budget-wait-are-distinct	139
+ARCHIVE_ADMISSION_CASE	changed-unselected-source-refuses-before-publication	50
+ARCHIVE_ADMISSION_CASE	parent-cap-closes-all-child-operations	20
+ARCHIVE_ADMISSION_CASE	committed-publication-cancellation-keeps-debt-and-drains	132
+ARCHIVE_ADMISSION_CASE	completed-original-reuse-is-read-only-except-lease	123
+ARCHIVE_ADMISSION_CASE	blocked-renewal-allows-cpu-and-independent-reads	100
+ARCHIVE_ADMISSION_CASE	repository-running-marker-blocks-reentrant-step	99
+ARCHIVE_ADMISSION passed=927 failed=0 groups=8
+OPERATION_CASE	waiting-then-atomic-parent-child-and-marker	25
+OPERATION_CASE	counter-cap-change-during-scheduler-bookkeeping	3
+OPERATION_CASE	explicit-raw-adapter-without-rebinding-session	3
+OPERATION_CASE	callback-retry-and-late-committed-result-fenced	2
+OPERATION_CASE	duplicate-rows-and-marker-counter-alias-refused	4
+NESTED_OPERATION passed=37 failed=0 groups=5
+TYPED_HISTORY passed=740 failed=0 groups=2
+COMMIT_ADMISSION cold_compressed=false read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=false read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION_CASE	cold-plain-compressed-and-archive-policies	1118
+COMMIT_ADMISSION_CASE	selected-rest-readback-wait-does-not-repeat-cas	266
+COMMIT_ADMISSION_CASE	ambiguous-m1-rest-and-progress-writes-require-readback	558
+COMMIT_ADMISSION_CASE	root-cap-and-deadline-close-nested-work	66
+COMMIT_ADMISSION_CASE	cancel-committed-raw-rest-drains-without-rebind	147
+COMMIT_ADMISSION_CASE	resume-reuses-exact-m1-and-immutable-originals	233
+COMMIT_ADMISSION_CASE	foreign-final-lease-cannot-verify-commit	167
+COMMIT_ADMISSION_CASE	deferred-rebind-witness-is-fresh-and-held-on-change	176
+COMMIT_ADMISSION_CASE	queued-final-lease-must-execute-and-ack-current-owner	249
+COMMIT_ADMISSION passed=2980 failed=0 groups=9
+LIFECYCLE_NEW_CASE	all-modes-preserve-original-before-retirement	898
+LIFECYCLE_NEW_CASE	continued-new-reuses-exact-originals-and-proposal	284
+LIFECYCLE_NEW_CASE	queued-retirement-and-readback-keep-exact-cas	561
+LIFECYCLE_NEW_CASE	lost-retirement-ack-probes-before-retry	540
+LIFECYCLE_NEW_CASE	queued-new-cancel-selection-change-and-cap	84
+LIFECYCLE_NEW_CASE	cancel-suspended-committed-retirement-withholds-result-and-drains	234
+LIFECYCLE_NEW_CASE	verified-new-departure-cancels-queued-maintenance-first	245
+LIFECYCLE_NEW passed=2846 failed=0 groups=7
+LIFECYCLE_DEPARTURE_CASE	closed-departure-merges-and-releases-all-source-variants	838
+LIFECYCLE_DEPARTURE_CASE	unlocked-readback-waits-without-another-write	356
+LIFECYCLE_DEPARTURE_CASE	ambiguous-departure-read-failure-and-callback-retry	1288
+LIFECYCLE_DEPARTURE_CASE	foreign-ownership-expiry-and-provider-cap-refuse-closed	54
+LIFECYCLE_DEPARTURE_CASE	suspended-committed-departure-expires-and-drains	316
+LIFECYCLE_DEPARTURE passed=2852 failed=0 groups=5
+LIFECYCLE_RECOVERED_CASE	all-modes-retire-fresh-marker-and-closed-departure	5331
+LIFECYCLE_RECOVERED_CASE	unresolved-aba-progress-is-reconciled-by-typed-departure	3464
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:88952: Runtime timeout stranded queued departure
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:88952 function check
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:89303
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:89237 function test
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:89296 function runLifecycleRecoveredChecks
+C:/Users/natha/AppData/Local/Temp/windowsill-lifecycle-negative-6tgwk6ff/run.luau:89340

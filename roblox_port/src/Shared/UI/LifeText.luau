@@ -245,6 +245,16 @@ LifeText.MEALS = {
 local DEFAULT_MEAL = { rule = "2 small prey = 1 housefly", step = 2 }
 
 -- Housefly-equivalent meals: a small prey counts as half. Partial feeding is retained. `kind` (ROBLOX-96): the prey in the jaws, for the rule it says.
+-- The compact HUD reads the saved growth credit, including partially eaten prey.
+-- Requirements stay in Growth; no separate counter or save field can drift from them.
+function LifeText.moultCounter(g: any): string?
+ if g:isAdult() then return nil end
+ if g:isMoulting() then return "Moulting" end
+ local goal = g:mealGoal()
+ local count = if g.ready then goal else math.min(goal, math.floor(g.fedSinceMoult / g:readyAt() * goal * 100 + 1e-8) / 100)
+ return `{count}/{goal} meals · {if g.ready then "ready to moult" else "until next moult"}`
+end
+
 function LifeText.growth(g: any, required: number, meal: number, kind: string?): string
  if g:isAdult() then return "Adult: keep your hunger bar full." end
  if g:isMoulting() then return "Moulting: stay in the crack." end

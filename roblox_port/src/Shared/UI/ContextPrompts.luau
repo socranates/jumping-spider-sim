@@ -2,7 +2,6 @@
 -- Only the player-requested meal and dusk prompts enter the minimal play HUD.
 local ControlText=require(script.Parent.ControlText)
 local LifeClock=require(script.Parent.Parent.Life.LifeClock)
-local LifeText=require(script.Parent.LifeText)
 local P={};P.__index=P
 function P.new(): any return setmetatable({night=nil,dismissed=false,away=0,key="",view=nil},P) end
 function P.reset(self: any) self.night=nil;self.dismissed=false;self.away=0;self.key="";self.view=nil end
@@ -23,8 +22,7 @@ function P.step(self: any,dt: number,s: any): any
    if s.weak then text="Too hungry to sleep; find food."
    elseif s.canRest then text=`{if s.device=="touch" then "Rest" else key}: rest`
    elseif self.away<8 then
-    local home=LifeText.HOMES[s.home or "sill_crevice"] or LifeText.HOMES.sill_crevice
-    text="It is dark. Rest "..(if string.sub(home.name,1,6)=="under " then home.name else "in "..home.name).."."
+    text="It is getting dark. Find a home for the night."
     self.away+=dt
    end
   end

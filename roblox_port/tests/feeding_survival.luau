@@ -108,7 +108,7 @@ Text.setPadStyle("xbox");state.device="keyboard";state.struggling=false
 check(p:step(.1,state).hint=="Tap E: eat","subdued meal prompt")
 state.enabled=false;check(p:step(.1,state)==nil,"settings opt-out")
 state.enabled=true;state.held=false;state.hour=19
-check(p:step(.1,state)~=nil,"dusk in first day")
+check(p:step(.1,state).hint=="It is getting dark. Find a home for the night.","dusk asks player to discover a home")
 for _=1,100 do p:step(.1,state) end
 check(p:step(.1,state)==nil,"away prompt clears promptly")
 state.canRest=true;check(p:step(.1,state).hint=="E: rest","correct rest key at retreat")

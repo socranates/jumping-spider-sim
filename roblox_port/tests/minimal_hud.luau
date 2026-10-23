@@ -1,6 +1,26 @@
 local Hud=require("../src/Client/SpiderHud")
 local passed,failed=0,0
 local function check(ok,msg) if ok then passed+=1 else failed+=1;print("FAIL MINIMAL "..msg) end end
+local Growth=require("../src/Shared/Life/Growth")
+local LifeText=require("../src/Shared/UI/LifeText")
+local growth=Growth.new();growth:useGameRules(false)
+check(LifeText.moultCounter(growth)=="0/7 meals · until next moult","first counter uses actual seven-meal rule")
+growth:eat(Growth.FLY_FOOD*1.5)
+check(LifeText.moultCounter(growth)=="1.5/7 meals · until next moult","partial meals retain their growth credit")
+growth:eat(Growth.FLY_FOOD*10)
+check(LifeText.moultCounter(growth)=="7/7 meals · ready to moult","ready counter caps excess food")
+growth:beginMoult()
+check(LifeText.moultCounter(growth)=="Moulting","active moult shows its state")
+growth:passHours(Growth.MOULT_HOURS,Vector3.zero)
+check(LifeText.moultCounter(growth)=="0/10 meals · until next moult","second counter resets and keeps ten meals rather than days")
+local restored=Growth.new();restored:useGameRules(false);assert(restored:load(growth:toRecord()))
+check(LifeText.moultCounter(restored)==LifeText.moultCounter(growth),"restored growth gives same counter")
+for _,gentle in {false,true} do
+ growth.stage=2;growth.fedSinceMoult=0;growth:useGameRules(gentle)
+ check(LifeText.moultCounter(growth)==`0/{if gentle then 3 else 5} meals · until next moult`,"later counter follows mode requirement")
+end
+growth.stage=Growth.ADULT
+check(LifeText.moultCounter(growth)==nil,"adult has no remaining moult counter")
 local gui=Instance.new("Folder")
 local hud=Hud.new(gui)
 local view={minimal=true,dot=true,device="keyboard",food=.63,foodGentle=false,
@@ -66,6 +86,13 @@ local function frames(n) for _=1,n do frame(1/60) end end
 local player=game:GetService("Players").LocalPlayer
 local ready=false;for _=1,5000 do if driver.fresh("free",false,nil) then ready=true;break end;frames(1) end
 check(ready,"real preserve client starts a fresh life")
+frames(1)
+check(driver.hud.moultProgress.Visible and driver.hud.moultProgress.Text=="0/7 meals · until next moult","real client wires the counter into minimal HUD")
+driver.life.growth.stage=1;frames(1)
+check(driver.hud.moultProgress.Text=="0/10 meals · until next moult","real HUD follows second stage")
+driver.life.growth.stage=3;frames(1)
+check(not driver.hud.moultProgress.Visible,"real HUD clears counter at adulthood")
+driver.life.growth.stage=0
 check(player:GetAttribute("Captions")==nil and driver.setting("Captions")=="off","untouched real client uses preserve caption default")
 driver.place(Vector3.new(2,.31,6));driver.life.clock.day=3;driver.life.clock.hour=12;driver.prey.feeding.mealsFinished=1
 workspace:SetAttribute("WaspForce","floor_middle");frames(30)

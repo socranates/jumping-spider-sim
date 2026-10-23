@@ -2012,6 +2012,7 @@ local function updateHud(frameDt: number)
 			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
 	end
 	view.minimal=M.World.world=="preserve" and not spiderPick.inspecting
+	view.moultProgress=if not spiderPick.inspecting and not modal() and not life.lifeOver then M.LifeText.moultCounter(life.growth) else nil
 	view.saveNoticePaused=modal() or M.title:holding() or not session.started or life.asleep or life.lifeOver or spiderPick.inspecting
 	view.dot=view.minimal and not modal() and not life.asleep and not life.lifeOver
 	view.helpRequested=helpUntil==math.huge

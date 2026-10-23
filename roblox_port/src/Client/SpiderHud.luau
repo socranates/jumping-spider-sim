@@ -235,6 +235,7 @@ function Hud.new(playerGui: Instance): any
 	dayList.Padding = UDim.new(0, 4)
 	dayList.Parent = dayBox
 	dayBox.Parent = top
+	local moultProgress = wrapLabel("MoultProgress", top, 14, -1)
 	local day = wrapLabel("Day", dayBox, 15, 1)
 	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
 	dayLine.TextXAlignment = Enum.TextXAlignment.Left
@@ -262,7 +263,7 @@ function Hud.new(playerGui: Instance): any
 	local self = setmetatable({
 		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, reticleStroke = stroke, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
-		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
+		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, moultProgress = moultProgress, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
 		toastLeft = 0, toastRank = 0, saveNoticeLabel = saveNotice, saveNoticeLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
@@ -340,7 +341,7 @@ function Hud.minimalView(view: any): any
 		if string.find(line,"^You can now run%.") or string.find(line,"^You can now lock on%.") then notice=line end
 	end
 	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
-		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
+		largeText=view.largeText,moultProgress=view.moultProgress,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
 		helpText=view.helpText,prompt=view.contextPrompt,status={},
 		caption=view.soundCaption,captionScale=view.captionScale,saveNoticePaused=view.saveNoticePaused}
 end
@@ -394,6 +395,8 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.notice, view.notice)
 	show(self.day, view.day)
 	show(self.dayLine, view.dayLine)
+	show(self.moultProgress, if minimal then view.moultProgress else nil)
+	self.moultProgress.TextSize = if view.largeText then 24 else 14
 	-- The day's words settle like the hunger line (still there, faint, for a glance).
 	local dayWords = (view.day or "") .. "\n" .. (view.dayLine or "")
 	if dayWords ~= self.dayWords then self.dayWords = dayWords; self.dayCalm = 0 else self.dayCalm += dt end

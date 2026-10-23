@@ -33,3 +33,8 @@ The installed Studio engine `0.744.0.7441077` also ran the exact current observe
 Production service/client/remotes/menu integration, real datastore recovery and full native rejoin remain open. Explicit retirement/New Life, later-slot archive reuse/lifetime, safe session replacement and current-backup recovery policy remain open. Post-entry proof-heavy saves can still exceed the ordinary ten-request window; this change does not qualify their latency. No published game or normal player save has been changed by this private milestone.
 
 API references: [budget observer](https://create.roblox.com/docs/reference/engine/classes/DataStoreService#GetRequestBudgetForRequestType), [datastore limits](https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits).
+
+
+## Subsequent retirement milestone
+
+Runtime/Writer/Loop now also implement the private durable retirement path in `RECOVERY-RETIREMENT.md`. Use `verify-recovery-retirement.py` for the current complete cohort and hashes (146100 checks). Startup attempt/type receipts above bind their historical source bytes; the unchanged observer retains its narrow component proof.

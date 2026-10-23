@@ -78,7 +78,7 @@ function Writer.capture(self:any,mode:string,serial:number,credential:string,lif
  if t.pkey~="P_"..t.user or t.key~="R_"..t.user.."_"..mode or not valid(self,t) then return nil,"continuation identity changed" end
  local handle=table.freeze({});captures[handle]={writer=self,ticket=t};return handle,nil
 end
-function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any):(any?,string?)
+local function prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any,retirement:string?):(any?,string?)
  local captured=captures[handle];local t=if captured and captured.writer==self then captured.ticket else nil
  if not t or t.started or not valid(self,t) then return nil,"current life changed before preparation" end
  local checked,why=Archive.check(originalArchive);if not checked then return nil,why end
@@ -99,10 +99,19 @@ function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,prior
   if not Format.matchesProposal(prior,anchor,self.codec,self.context) then return nil,"current provenance differs from immutable proposal" end
  end
  if not prior then return nil,errorText end
- local nextRest,problem=Format.advance(prior,record,self.context);if not nextRest then return nil,problem end
- if nextRest.save_life~=t.life then return nil,"checkpoint differs from granted life" end
+ if retirement and (not SaveRest.validLife(retirement) or retirement==t.life) then return nil,"distinct server retirement token required" end
+ local nextRest,problem
+ if retirement then nextRest,problem=Format.retire(prior,retirement,self.context) else nextRest,problem=Format.advance(prior,record,self.context) end
+ if not nextRest then return nil,problem end
+ if not retirement and nextRest.save_life~=t.life then return nil,"checkpoint differs from granted life" end
  local bad,details=Format.check(t.mode,nextRest,self.context);if bad then return nil,bad end
- local l=details.decoded.roots.life
+ local activeDetails:any=details
+ if retirement then
+  local priorProblem,priorDetails=Format.check(t.mode,prior,self.context)
+  if priorProblem then return nil,priorProblem end
+  activeDetails=priorDetails
+ end
+ local l=activeDetails.decoded.roots.life
  if not finite(l.rareSerial) or l.rareSerial<packet.binding.serial or l.rareGeneration~=(l.generation or 0) then return nil,"current rare generation is not bound" end
  local nextLogical=if same(opened.payload,nextRest) then logical else Envelope.make(Format.spec(t.mode,self.context),nextRest,math.max(t.created,logical.updatedAt),logical,{session=t.id})
  local candidate=priorRaw
@@ -111,12 +120,20 @@ function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,prior
   if not encoded then return nil,tostring(result) end
   candidate=result
  end -- preserve exact no-op bytes/backup
- local plan={anchor=Json.copy(anchor),archiveIndex={format=ArchiveStore.FORMAT,version=1,owner=t.user,complete=true,index=Json.copy(originalArchive.index)},
+ local plan={retirement=retirement,anchor=Json.copy(anchor),archiveIndex={format=ArchiveStore.FORMAT,version=1,owner=t.user,complete=true,index=Json.copy(originalArchive.index)},
   expected=Json.copy(priorRaw),candidate=Json.copy(candidate),logical=Json.copy(nextLogical),packetProgress=Json.copy(packet.progress),packetTime=packet.progressTime,
   rare={serial=l.rareSerial,visit=Json.copy(l.rareVisit)}}
  freeze(plan.anchor);freeze(plan.archiveIndex);freeze(plan.expected);freeze(plan.candidate);freeze(plan.logical);freeze(plan.packetProgress);freeze(plan.rare)
  if not valid(self,t) then return nil,"current life changed during preparation" end
  captures[handle]=nil;table.freeze(plan);prepared[plan]={writer=self,ticket=t};return plan,nil
+end
+function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,record:any):(any?,string?)
+ return prepare(self,handle,originalArchive,anchor,priorRaw,record,nil)
+end
+function Writer.prepareRetirement(self:any,handle:any,originalArchive:any,anchor:any,priorRaw:any,newLifeSerial:number):(any?,string?)
+ local capture=captures[handle];local t=if capture and capture.writer==self then capture.ticket else nil
+ if not t or not whole(newLifeSerial) or newLifeSerial<=t.serial then return nil,"later explicit New Life serial required" end
+ return prepare(self,handle,originalArchive,anchor,priorRaw,nil,`{t.id}:{t.mode}:{newLifeSerial}`)
 end
 function Writer.begin(self:any,plan:any):(any?,string?)
  local preparedScope=prepared[plan];local t=if preparedScope and preparedScope.writer==self then preparedScope.ticket else nil
@@ -219,8 +236,8 @@ local function stepInner(self:any,j:any):boolean
   if r.storedSerial>=t.restSerial then refuse(j,"current rest receipt superseded");return true end
   r.storedSerial,r.storedCredential=t.restSerial,t.credential
   j.state,j.problem="verified",nil;j.result={stored=true,restSerial=t.restSerial,credential=t.credential,life=t.life,
-   identity={checksum=j.plan.logical.checksum,updatedAt=j.plan.logical.updatedAt,life=t.life},gameplayAuthorized=false}
-  if s.cfg.onStored then pcall(s.cfg.onStored,t.mode,t.serial,t.credential,t.restSerial) end
+   identity={checksum=j.plan.logical.checksum,updatedAt=j.plan.logical.updatedAt,life=j.plan.logical.payload.save_life},retired=j.plan.retirement~=nil,gameplayAuthorized=false}
+  if not j.plan.retirement and s.cfg.onStored then pcall(s.cfg.onStored,t.mode,t.serial,t.credential,t.restSerial) end
  end
  return true
 end

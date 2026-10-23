@@ -44,7 +44,7 @@ function Loop.cancel(self:any)
  self.pending,self.plan=nil,nil;stopLease(self);self.state="stopped"
 end
 function Loop.submit(self:any,mode:any,serial:any,credential:any,life:any,restSerial:any,record:any):boolean
- if Work.pulse() or self.busy or self.session.busy or not scope(self) or self.runtime.intakeClosed or self.pending or self.restJob
+ if Work.pulse() or self.busy or self.session.busy or not scope(self) or self.runtime.intakeClosed or self.pending or self.restJob or self.retiring
   or mode~=self.mode or serial~=self.serial or credential~=self.credential or life~=self.life
   or type(record)~="table" or SaveRest.bounded(record,Rules.MAX_REST_NODES,Rules.MAX_DEPTH) then return false end
  local handle=self.writer:capture(mode,serial,credential,life,restSerial);if not handle then return false end
@@ -54,6 +54,16 @@ function Loop.submit(self:any,mode:any,serial:any,credential:any,life:any,restSe
  self.work=Work.new(function() return self.writer:prepare(handle,self.archive,self.anchor,self.rawRest,record) end,self.options.work)
  return true
 end
+function Loop.retire(self:any,mode:any,serial:any,credential:any,life:any,restSerial:any,newLifeSerial:any):boolean
+ if Work.pulse() or self.busy or self.session.busy or not scope(self) or self.runtime.intakeClosed or self.pending or self.restJob or self.retiring
+  or mode~=self.mode or serial~=self.serial or credential~=self.credential or life~=self.life
+  or type(newLifeSerial)~="number" or newLifeSerial~=newLifeSerial or newLifeSerial<=serial or newLifeSerial>Rules.MAX_LIFE_SERIAL or newLifeSerial%1~=0 then return false end
+ local handle=self.writer:capture(mode,serial,credential,life,restSerial);if not handle then return false end
+ self.retiring=true
+ self.pending={restSerial=restSerial,progressVersion=self.session.sched.items.progress.version,retirement=true}
+ self.work=Work.new(function() return self.writer:prepareRetirement(handle,self.archive,self.anchor,self.rawRest,newLifeSerial) end,self.options.work)
+ return true
+end
 function Loop.hasWork(self:any):boolean
  return self.pending~=nil or self.progressJob~=nil or self.restJob~=nil or self.session.sched:isDirty("progress")
 end
@@ -61,7 +71,7 @@ local function lost(self:any,why:any)
  self:cancel();self.state,self.problem="lost",tostring(why)
 end
 local function refusePending(self:any,why:any)
- local pending=self.pending;self.pending,self.plan,self.work=nil,nil,nil;self.lastRefusal=tostring(why)
+ local pending=self.pending;self.pending,self.plan,self.work=nil,nil,nil;self.retiring=false;self.lastRefusal=tostring(why)
  if pending and self.session.cfg.onRefused then pcall(self.session.cfg.onRefused,self.mode,self.serial,self.credential,pending.restSerial,self.lastRefusal) end
 end
 local function stepInner(self:any):boolean
@@ -81,6 +91,16 @@ local function stepInner(self:any):boolean
   if not scope(self) then return asked end
   if j.state=="verified" then
    local p=j.plan;local current=p.logical.payload
+   if p.retirement then
+    -- Install the terminal route before a decision callback can yield/reenter.
+    self.rawRest=p.candidate;self.runtime.result.rawRest=p.candidate;self.runtime.result.current=current
+    self.runtime.result.checkpoint=nil;self.runtime.result.entryKind=nil;self.runtime.result.gameplayAuthorized=false;self.runtime.result.retired=true
+    s.rests[self.mode]=nil;s.restLoaded[self.mode]=true;s.restBase[self.mode]=p.logical.updatedAt;s.restRevision[self.mode]=p.logical.checksum
+    s.lifeTokens[self.mode]=current.save_life
+    self.pending,self.plan,self.restJob=nil,nil,nil;self.state="retired";self.writer.current=nil;stopLease(self);self.runtime.phase="retired"
+    s.intents:changed(self.request,"life_retired")
+    return asked
+   end
    self.rawRest=p.candidate;self.runtime.result.rawRest=p.candidate;self.runtime.result.current=current
    self.runtime.result.checkpoint=current.checkpoint;self.runtime.result.entryKind=current.entryKind
    s.rests[self.mode]=current.checkpoint;s.restLoaded[self.mode]=true;s.restBase[self.mode]=p.logical.updatedAt;s.restRevision[self.mode]=p.logical.checksum

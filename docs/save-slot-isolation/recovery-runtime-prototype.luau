@@ -75,7 +75,7 @@ end
 local function startReadLease(self:any):boolean
  local component
  component=ReadLease.new(self.session,function():boolean
-  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required" or self.phase=="entering" or self.phase=="recovered")
+  return self.lease==component and not self.leaving and (self.phase=="discovering" or self.phase=="offered" or self.phase=="offer_refused" or self.phase=="entry_required" or self.phase=="entering" or self.phase=="recovered" or self.phase=="retired")
  end,self.session.backend.held)
  self.lease=component;local job,why=component:begin()
  if not job then lost(self,why or "read phase lease unavailable");return false end
@@ -192,6 +192,7 @@ local function stepInner(self:any):boolean
   if not self.leaving and not s.closed and self.saveLoop.state=="lost" then lost(self,self.saveLoop.problem or "recovered save loop lost") end
   return asked
  end
+ if self.phase=="retired" and self.lease==nil and not startReadLease(self) then return false end
  local lease,leaseJob=self.lease,self.leaseJob
  local asked=lease:step(leaseJob)
  if self.leaving or s.closed or self.lease~=lease or self.leaseJob~=leaseJob then return asked end
@@ -232,6 +233,11 @@ function Runtime.step(self:any):boolean
   return false
  end
  return asked
+end
+-- Explicit server-routed end-of-life/New Life barrier; no fresh-life grant.
+function Runtime.retireRecovered(self:any,mode:any,serial:any,credential:any,life:any,restSerial:any,newLifeSerial:any):boolean
+ if not available(self) or self.phase~="recovered" or not self.saveLoop then return false end
+ return self.saveLoop:retire(mode,serial,credential,life,restSerial,newLifeSerial)
 end
 function Runtime.depart(self:any,deadline:number?):(any?,string?)
  if Work.pulse() then return nil,"departure must run outside preparation" end

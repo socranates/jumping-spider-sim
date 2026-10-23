@@ -1,3 +1,13 @@
+# Current save audit: budget candidate verified privately
+
+Production remains f405359; Windows95443 and Linux39886240490 full gates are running, not completed. The previous goal turn made progress by adopting the exact native-tested freshness fix and adding111 regular regression checks. This turn reproduced a separate periodic-recovery admission defect: three/four calls in one step can exceed the session's configured10/minute cap.
+
+The private budget candidate now passes82 focused checks and1624 checks across seven unchanged save suites, plus compile/full strict. An earlier version failed an existing immediate merged-progress notification assertion; its source and raw failure are retained. The corrected version preserves prompt progress delivery and retained observations, with each replacement delivered only after fresh verification. Production is unchanged by this candidate; native yielding/transport and later full gates are still required. See docs/save-slot-isolation/SESSION-BUDGET.md.
+
+No publication, migration completion or whole-game problem-free claim. The complete progress-into-Preserve/archive policy and remaining lifecycle/streaming/device/memory/performance/release requirements stay open. Goal active.
+
+Earlier status below is historical.
+
 # Current: save freshness fix adopted; full gates running
 
 Runtime/tests f4053597d03b99a61cb97e2eef1ec64ed174f22a on codex/save-continue. Three rest observation reads now bypass the DataStore cache before save authority is granted. A retained baseline counterexample proves stale authority could previously be acknowledged, while the final write CAS still protected stored data. The exact native-tested SaveSession and DataStoreBackend modules are adopted, with 111 regression checks added to state.luau (1124/0 in the focused adopted run). No schemas or gameplay mechanics changed.
@@ -70,7 +80,7 @@ Only production change: Shared/Persistence/Json.canonical uses one private outpu
 
 Windows exec28618 and Linux39860574006 both closed successfully:76 suites/465380 checks/0 failures each; compile222/strict/runner5 pass. Root docs/save-continue/verify.py binds both full gates to exact committed inputs and verifies the native receipts. No jobs remain running in this stage.
 
-Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98–108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
+Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98â€“108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
 
 Both diagnostics are stopped/saved/closed/exited and their original XML hashes restored. Current-game archive C:/Users/natha/claude-xfer/Windowsill-encoder-game-068a878/Windowsill-encoder-game-review.rbxlx is diagnostic only; never publish it. Pre-existing stopped rig window94504044 remains untouched. Use explicit globalThis/scoped unique locals in future UI work.
 

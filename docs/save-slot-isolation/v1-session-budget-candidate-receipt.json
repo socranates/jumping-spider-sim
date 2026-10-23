@@ -1,0 +1,10 @@
+{
+  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "session_sha256": "0a68a578b04bf94d59f6ed9e8057d5403ac43afaa49dd69f8ad668f0a6a21578",
+  "test_sha256": "e7420ba7ee149b7abff03cc29ee789f4932b85354e778e1ee624717f3a8c52dd",
+  "bundle_sha256": "2672765f78141862a1cb257a9a5763fc81140accc4edb39df77bb12bd4323eee",
+  "exit_code": 0,
+  "output_sha256": "0c24071a3dcba24bdafe590fff966d39fa7ce284494a0b345ad0e3418472a59c",
+  "production_changed": false,
+  "scope": "Simulated request history; actual periodic SaveSession recovery; no service traffic"
+}

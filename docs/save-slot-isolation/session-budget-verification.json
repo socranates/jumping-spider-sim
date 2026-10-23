@@ -1,0 +1,13 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "candidate_sha256": "d217138209e3ea18838dcf0889d148c58dfcdb056a6792a6a0bfcb9e23bcc8ad",
+  "baseline_counterexample_assertions": 12,
+  "candidate_assertions": 82,
+  "regression_suites": 7,
+  "regression_assertions": 1624,
+  "strict_clean": true,
+  "production_changed": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

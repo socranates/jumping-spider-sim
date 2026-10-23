@@ -1,3 +1,13 @@
+# Current save audit: budget candidate verified privately
+
+Production remains f405359; Windows95443 and Linux39886240490 full gates are running, not completed. The previous goal turn made progress by adopting the exact native-tested freshness fix and adding111 regular regression checks. This turn reproduced a separate periodic-recovery admission defect: three/four calls in one step can exceed the session's configured10/minute cap.
+
+The private budget candidate now passes82 focused checks and1624 checks across seven unchanged save suites, plus compile/full strict. An earlier version failed an existing immediate merged-progress notification assertion; its source and raw failure are retained. The corrected version preserves prompt progress delivery and retained observations, with each replacement delivered only after fresh verification. Production is unchanged by this candidate; native yielding/transport and later full gates are still required. See docs/save-slot-isolation/SESSION-BUDGET.md.
+
+No publication, migration completion or whole-game problem-free claim. The complete progress-into-Preserve/archive policy and remaining lifecycle/streaming/device/memory/performance/release requirements stay open. Goal active.
+
+Earlier status below is historical.
+
 # Current: save freshness fix adopted; full gates running
 
 Runtime/tests f4053597d03b99a61cb97e2eef1ec64ed174f22a on codex/save-continue. Three rest observation reads now bypass the DataStore cache before save authority is granted. A retained baseline counterexample proves stale authority could previously be acknowledged, while the final write CAS still protected stored data. The exact native-tested SaveSession and DataStoreBackend modules are adopted, with 111 regression checks added to state.luau (1124/0 in the focused adopted run). No schemas or gameplay mechanics changed.
@@ -68,7 +78,7 @@ Earlier status below is historical.
 
 Current source068a87891770dbdf291ec3cab0e67480d14c0251 is on codex/save-continue. [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/json-encoding/README.md). One-buffer canonical encoding retains exact bytes/errors/checksums; only runtime Json.luau changed. Focused21420/0, compile222/strict/runner5 pass, native paired algorithm20738 assertions/224 fingerprints pass. A same-record isolated native comparison averages40.27percent lower encoder CPU; no whole-game FPS, heap-gain or hard-frame claim.
 
-Windows28618 and Linux39860574006 both completed76 suites/465380 checks/0 failures, compile222/strict/runner5 on source068a878. Root verifier binds exact current inputs and both terminal logs. The adopted-game native sequence1792707403197 passed32 save/return assertions with225 exact fingerprints, production Persistence disabled and zero CreatorErrors; closed/restored receipts verified. Continue choice1.830ms with zero synchronous encodes; capture98–108ms and long preparation remain limitations. No full native lifecycle, physical device, online or whole-game FPS claim.
+Windows28618 and Linux39860574006 both completed76 suites/465380 checks/0 failures, compile222/strict/runner5 on source068a878. Root verifier binds exact current inputs and both terminal logs. The adopted-game native sequence1792707403197 passed32 save/return assertions with225 exact fingerprints, production Persistence disabled and zero CreatorErrors; closed/restored receipts verified. Continue choice1.830ms with zero synchronous encodes; capture98â€“108ms and long preparation remain limitations. No full native lifecycle, physical device, online or whole-game FPS claim.
 
 Current-source/MAP.md and inventory.json now bind all222 current production files to that source; this remains lexical evidence only. Current CODE-REVIEW overlay separates historical findings such as already-implemented outdoor resets. The requirement registry preserves the broader28-item audit and incomplete native/device/online/legacy-world/release gates. Source XML/BuildInfo remain old, nothing new published, goal active.
 

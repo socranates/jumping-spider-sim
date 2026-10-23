@@ -1,0 +1,26 @@
+state: a rest is 17887 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+FAIL [a transient outage at load is retried: progress kept in memory meanwhile is merged with the stored record, nothing lost either way] and told the client what is stored, merged with this visit
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 7.9 s
+SESSION_ADAPTER_CASE main same
+SESSION_ADAPTER_CASE main changed
+SESSION_ADAPTER_CASE main missing
+SESSION_ADAPTER_CASE main corrupt
+SESSION_ADAPTER_CASE main newer
+SESSION_ADAPTER_CASE main unavailable
+SESSION_ADAPTER_CASE free same
+SESSION_ADAPTER_CASE free changed
+SESSION_ADAPTER_CASE free missing
+SESSION_ADAPTER_CASE free corrupt
+SESSION_ADAPTER_CASE free newer
+SESSION_ADAPTER_CASE free unavailable
+SESSION_ADAPTER_CASE easy same
+SESSION_ADAPTER_CASE easy changed
+SESSION_ADAPTER_CASE easy missing
+SESSION_ADAPTER_CASE easy corrupt
+SESSION_ADAPTER_CASE easy newer
+SESSION_ADAPTER_CASE easy unavailable
+STATE passed=1123 failed=1
+C:/Users/natha/AppData/Local/Temp/tmpix6di1pu.luau:47574: state checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpix6di1pu.luau:47574

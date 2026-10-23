@@ -1,0 +1,7 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "original_sha256": "e6ecd86cd0a89f7daeb6d08414260162e20e8ff706672726f81900ecc14338e2",
+  "candidate_sha256": "d217138209e3ea18838dcf0889d148c58dfcdb056a6792a6a0bfcb9e23bcc8ad",
+  "production_changed": false,
+  "scope": "One request per periodic recovery step; round-robin rest reads; immediate merged progress and freshly validated rest callbacks"
+}

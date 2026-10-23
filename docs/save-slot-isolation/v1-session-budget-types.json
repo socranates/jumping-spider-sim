@@ -1,0 +1,30 @@
+{
+  "candidates": {
+    "fresh-read-backend-candidate.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "session-budget-candidate.luau": "0a68a578b04bf94d59f6ed9e8057d5403ac43afaa49dd69f8ad668f0a6a21578"
+  },
+  "steps": [
+    {
+      "name": "compile-backend",
+      "exit_code": 0,
+      "output_sha256": "07fc56a4b0fe2802d24d2a29eabdaec4d280e54714d264c2aad2909f3f99f897"
+    },
+    {
+      "name": "compile-session",
+      "exit_code": 0,
+      "output_sha256": "025b08e7db3c799f544decdad607cf334beaf4a26fcc752e204698de2a2a38ee"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    }
+  ],
+  "production_changed": false,
+  "real_datastore_verified": false
+}

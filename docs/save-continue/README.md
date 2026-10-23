@@ -1,3 +1,13 @@
+# Current save audit: budget candidate verified privately
+
+Production remains f405359; Windows95443 and Linux39886240490 full gates are running, not completed. The previous goal turn made progress by adopting the exact native-tested freshness fix and adding111 regular regression checks. This turn reproduced a separate periodic-recovery admission defect: three/four calls in one step can exceed the session's configured10/minute cap.
+
+The private budget candidate now passes82 focused checks and1624 checks across seven unchanged save suites, plus compile/full strict. An earlier version failed an existing immediate merged-progress notification assertion; its source and raw failure are retained. The corrected version preserves prompt progress delivery and retained observations, with each replacement delivered only after fresh verification. Production is unchanged by this candidate; native yielding/transport and later full gates are still required. See docs/save-slot-isolation/SESSION-BUDGET.md.
+
+No publication, migration completion or whole-game problem-free claim. The complete progress-into-Preserve/archive policy and remaining lifecycle/streaming/device/memory/performance/release requirements stay open. Goal active.
+
+Earlier status below is historical.
+
 # Current: save freshness fix adopted; full gates running
 
 Runtime/tests f4053597d03b99a61cb97e2eef1ec64ed174f22a on codex/save-continue. Three rest observation reads now bypass the DataStore cache before save authority is granted. A retained baseline counterexample proves stale authority could previously be acknowledged, while the final write CAS still protected stored data. The exact native-tested SaveSession and DataStoreBackend modules are adopted, with 111 regression checks added to state.luau (1124/0 in the focused adopted run). No schemas or gameplay mechanics changed.

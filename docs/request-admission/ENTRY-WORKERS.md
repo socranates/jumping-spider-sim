@@ -1,5 +1,7 @@
 # Typed entry and read-lease workers
 
+The subsequent [archive candidate](ARCHIVE-WORKERS.md) adds collection/publication/controller admission and bounded history cleanup in `worker-v3.luau`. The entry milestone below remains bound to its preserved v2 inputs; normal activation remains closed.
+
 This extends [the discovery candidate](WORKERS.md) with explicit replacements for the actual schema3 entry worker and read-phase lease worker. All three can use the same physical-account gate and retained-operation bridge. The ordinary game and earlier Runtime factory remain unchanged. Archive/commit/save/New/departure paths, server-owned lane installation and the cooperative driver remain open. This is private CLI/memory verification, not native/online activation or a loading-speed claim.
 
 ## Entry

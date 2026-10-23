@@ -4,11 +4,12 @@ import hashlib,importlib.util,json,re,subprocess,sys,tempfile,time
 H=Path(__file__).resolve().parent;ROOT=H.parents[1]
 def load(name,path):
  spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
-def build():
+def build(workerPath=None):
  base=load('entry_worker_base',H/'run-workers.py');r=load('entry_worker_runner',ROOT/'roblox_port/tests/run.py')
- bundle,inputs=base.build(H/'worker-v2.luau')
+ workerPath=workerPath or H/'worker-v2.luau'
+ bundle,inputs=base.build(workerPath)
  facade='(function()\n'+(H/'worker-facade.luau').read_text()+'\nend)()'
- worker='(function()\n'+(H/'worker-v2.luau').read_text().replace('require("./worker-facade")',facade)+'\nend)()'
+ worker='(function()\n'+workerPath.read_text().replace('require("./worker-facade")',facade)+'\nend)()'
  def code(text):
   for name,var in {'RecoveryProgressPrototype':'__progressPrototype','RecoveryArchivePrototype':'__packetArchive','RecoveryArchiveStorePrototype':'__archiveStorePrototype','RecoveryPacketPrototype':'__packetPrototype','RecoveryRestFormatPrototype':'__restFormatPrototype'}.items():
    text=text.replace('require(Shared.Persistence.'+name+')',var).replace('require(script.Parent.'+name+')',var)

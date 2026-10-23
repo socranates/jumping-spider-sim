@@ -1,0 +1,1 @@
+POND_EQUIVALENCE passed=2532 failed=0 recipe_builds=2

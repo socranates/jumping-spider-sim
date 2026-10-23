@@ -1,0 +1,133 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "run": "1792714334005",
+  "scripts": 224,
+  "assertions": 985,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "place_sha256": "501af3b35da0f8ee4184cd2adda7c8f15b60dc5c6a079713c09bd2f7ea447fe5",
+  "output_sha256": "eae0341fd8ea2251667da57e4caf776aec8fc174022d93340cebd97edb871815",
+  "pairs": [
+    {
+      "tier": "full",
+      "pair": 1,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 54.0304,
+      "candidate_cpu_ms": 29.9673,
+      "reference_positive_heap_kb": 2340.0,
+      "candidate_positive_heap_kb": 1472.0,
+      "reference_worst_call_ms": 2.0004,
+      "candidate_worst_call_ms": 0.7872
+    },
+    {
+      "tier": "full",
+      "pair": 2,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 35.8148,
+      "candidate_cpu_ms": 42.9939,
+      "reference_positive_heap_kb": 2342.0,
+      "candidate_positive_heap_kb": 1461.0,
+      "reference_worst_call_ms": 0.7194,
+      "candidate_worst_call_ms": 1.0947
+    },
+    {
+      "tier": "full",
+      "pair": 3,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 46.1439,
+      "candidate_cpu_ms": 24.311,
+      "reference_positive_heap_kb": 2343.0,
+      "candidate_positive_heap_kb": 1464.0,
+      "reference_worst_call_ms": 0.7451,
+      "candidate_worst_call_ms": 0.4746
+    },
+    {
+      "tier": "full",
+      "pair": 4,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 29.384399,
+      "candidate_cpu_ms": 37.389199,
+      "reference_positive_heap_kb": 2338.0,
+      "candidate_positive_heap_kb": 1468.0,
+      "reference_worst_call_ms": 0.5498,
+      "candidate_worst_call_ms": 0.5438
+    },
+    {
+      "tier": "low",
+      "pair": 1,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 34.5861,
+      "candidate_cpu_ms": 15.8329,
+      "reference_positive_heap_kb": 2021.0,
+      "candidate_positive_heap_kb": 1350.0,
+      "reference_worst_call_ms": 0.6605,
+      "candidate_worst_call_ms": 0.3712
+    },
+    {
+      "tier": "low",
+      "pair": 2,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 18.4043,
+      "candidate_cpu_ms": 28.6729,
+      "reference_positive_heap_kb": 2021.0,
+      "candidate_positive_heap_kb": 1350.0,
+      "reference_worst_call_ms": 0.3594,
+      "candidate_worst_call_ms": 0.4215
+    },
+    {
+      "tier": "low",
+      "pair": 3,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 34.5505,
+      "candidate_cpu_ms": 16.1978,
+      "reference_positive_heap_kb": 2020.0,
+      "candidate_positive_heap_kb": 1356.0,
+      "reference_worst_call_ms": 0.676,
+      "candidate_worst_call_ms": 0.461
+    },
+    {
+      "tier": "low",
+      "pair": 4,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 18.437,
+      "candidate_cpu_ms": 28.617199,
+      "reference_positive_heap_kb": 2009.0,
+      "candidate_positive_heap_kb": 1355.0,
+      "reference_worst_call_ms": 0.3864,
+      "candidate_worst_call_ms": 0.6058
+    }
+  ],
+  "summaries": {
+    "full": {
+      "reference_cpu_ms": 165.373499,
+      "candidate_cpu_ms": 134.661399,
+      "component_cpu_reduction_percent": 18.571355256866163,
+      "reference_positive_heap_kb": 9363.0,
+      "candidate_positive_heap_kb": 5865.0,
+      "positive_heap_reduction_percent": 37.35982057033003,
+      "pairs_faster": 2
+    },
+    "low": {
+      "reference_cpu_ms": 105.9779,
+      "candidate_cpu_ms": 89.320799,
+      "component_cpu_reduction_percent": 15.717523181719972,
+      "reference_positive_heap_kb": 8071.0,
+      "candidate_positive_heap_kb": 5411.0,
+      "positive_heap_reduction_percent": 32.957502168256724,
+      "pairs_faster": 2
+    }
+  },
+  "scope": "Counterbalanced native component calls on identical poses; real parts/BulkMoveTo in full/low. Positive heap growth is not allocation rate or leak proof; no whole-game FPS claim.",
+  "adopted": false,
+  "published": false,
+  "adoption_criteria_met": false,
+  "candidate_faster_only_when_second": true
+}

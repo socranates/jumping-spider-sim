@@ -1,0 +1,10 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "reference_sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e",
+  "candidate_sha256": "b2fdc562b95f18fecaae755218c22fa0670ab3e70f3a7bb458b6500b34f698c6",
+  "test_sha256": "5a83337128c74e85a440150d816dc291af5b41a483f9e19c106443c5b0e189a4",
+  "output_sha256": "9974cd91aea6b840a0aab1c9bd2cb1e721f89dc4d863f42b9136ebbe580617fd",
+  "exit_code": 0,
+  "scope": "Exact part properties/transforms and ownership under CLI emulation, full/low tiers; no native rendering/performance proof",
+  "adopted": false
+}

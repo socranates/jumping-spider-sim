@@ -1,5 +1,7 @@
 # Animal/audio attribution results
 
+Historical attribution on59146e1 is below. A later exact-output pond reuse candidate met the declared native thresholds and was adopted inccc0abb; see [the adoption gates](../pond-drawing-reuse/README.md) and [the complete trial history](POND-TRIAL.md). The current full platform checks are running. No whole-game FPS gain or publication is claimed.
+
 Completed on current source59146e1, run1792712719676, all223 source fingerprints matched, zero CreatorErrors. No production presentation optimization adopted. The broad FrameProfile sound category also includes WaspBody, CrabBody, StationMouseBody, PondBodies, BirdBody and CatBody drawing; treating its roughly1ms sample as mixer cost would misattribute work.
 
 The private driver wraps nine non-overlapping top-level drawing/audio methods, records inclusive callback CPU and positive heap-growth observations, and samples two playing Free-mode scenes with the normal advancing clock and all predator systems enabled. It rejects focus loss, viewport changes, missing geometry or detachment. These are instrumented attribution samples, not a matched before/after speedup or heap-leak proof. Instrumentation itself adds overhead.

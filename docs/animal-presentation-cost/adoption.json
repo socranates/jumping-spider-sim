@@ -1,0 +1,11 @@
+{
+  "baseline_source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "candidate_sha256": "b2fdc562b95f18fecaae755218c22fa0670ab3e70f3a7bb458b6500b34f698c6",
+  "reference_sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e",
+  "native_equivalence_assertions": 985,
+  "batch_assertions": 41,
+  "default_regressions_added": 2702,
+  "adopted": true,
+  "current_full_gates_pending": true,
+  "published": false
+}

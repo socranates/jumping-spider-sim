@@ -18,6 +18,10 @@ Current-source animal/audio attribution completed two full-detail playing scenes
 Natural streaming/rearrival, full natural lifecycle, physical devices, online durability, broader memory/performance, release rebuilding/publication and laptop synchronization remain open. Nothing published; goal active.
 
 '''
+complete=(HERE/'verification.json').exists() and json.loads((HERE/'verification.json').read_text(encoding='utf8')).get('current_workspace_inputs_verified')==True
+if complete:
+ status=status.replace('Current immutable full Windows58767 is running; do not restart it or claim completion from a partial log.','Windows58767 also completed76 suites/465412 checks/0 failures. Root source-bound verification passes for both platforms, compile/strict/runner and native refusal checks. All jobs in this source cohort are terminal.')
+ status=status.replace('Root verification still refuses the pending current Windows gate.','Root verification confirms current59146e1 inputs and receipts; broader audit/release work remains open.')
 for rel in ['docs/audit/CURRENT.md','chet/save-continue.md','docs/save-continue/README.md']:
  p=ROOT/rel;text=p.read_text(encoding='utf8');marker='Earlier status below is historical.';assert marker in text
  p.write_text(status+text[text.index(marker):],encoding='utf8',newline='\n')
@@ -40,5 +44,14 @@ for row in r['requirements']:
 r['latest_readiness_milestone']['status']='historical-032-both-platforms-native-verified'
 r['latest_spatial_validation_milestone']=dict(source=r['source'],status='linux-native-verified-windows-running',evidence='docs/spatial-save-validation/README.md',goal_complete=False,published=False)
 r['latest_animal_attribution']=dict(source=r['source'],status='two-scenes-measured-no-optimization-adopted',evidence='docs/animal-presentation-cost/native-receipt.json',scenes=2,scripts=223,whole_game_fps_gain_proven=False,published=False)
+if complete:
+ for row in r['requirements']:
+  if row['id']=='cli-and-runner':
+   row.update(status='both-platforms-native-verified',evidence_boundary='Current59146e1 Windows58767 and Linux39872335932 both completed76 suites/465412/0. Source-bound root verification passes, all222 modules compile, strict clean, runner5; native20/all223/zero CreatorErrors. Earlier032/e51 results retain separate historical provenance.',references=['docs/spatial-save-validation/README.md','docs/spatial-save-validation/verification.json'])
+  if row['id']=='performance-A08':
+   row['evidence_boundary']=row['evidence_boundary'].replace('Current Linux76/465412/0 and native20 pass, Windows58767 running.','Current Windows/Linux76/465412/0 and native20 pass; no unverified FPS gain claim.')
+  if row['id']=='repo-and-handoff':
+   row['evidence_boundary']=row['evidence_boundary'].replace('Current Windows58767 running.','Current Windows58767 also completed76/465412/0; root source-bound verification passes.')
+ r['latest_spatial_validation_milestone']['status']='both-platforms-native-verified'
 p.write_text(json.dumps(r,indent=2)+'\n',encoding='utf8',newline='\n')
-print('Current59146e1 Linux/native verified, Windows58767 running; animal attribution measured.')
+print('Current59146e1 both full platforms/native verified; animal attribution measured.' if complete else 'Current59146e1 Linux/native verified, Windows58767 running; animal attribution measured.')

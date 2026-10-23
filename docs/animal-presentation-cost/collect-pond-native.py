@@ -35,4 +35,6 @@ r=dict(source=m['source'],run=run,scripts=224,assertions=985,creator_errors=0,pe
  place_sha256=m['place_sha256'],output_sha256=hashlib.sha256(text.encode()).hexdigest(),pairs=pairs,summaries=summaries,
  scope='Counterbalanced native component calls on identical poses; real parts/BulkMoveTo in full/low. Positive heap growth is not allocation rate or leak proof; no whole-game FPS claim.',
  adopted=False,published=False)
+r['adoption_criteria_met']=all(v['component_cpu_reduction_percent']>=10 and v['positive_heap_reduction_percent']>=15 and v['pairs_faster']>=3 for v in summaries.values())
+r['candidate_faster_only_when_second']=all((row['candidate_cpu_ms']<row['reference_cpu_ms'])==(row['order']=='AB') for row in pairs)
 (HERE/'pond-native-receipt.json').write_text(json.dumps(r,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(r,indent=2))

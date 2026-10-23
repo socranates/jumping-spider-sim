@@ -1,0 +1,133 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "run": "1792715775354",
+  "scripts": 224,
+  "assertions": 41,
+  "creator_errors": 0,
+  "persistence_disabled": true,
+  "place_sha256": "52a148a37db5c04aaa72e75edcae03649e93a58e6f823e6c4691d62523068040",
+  "output_sha256": "aba7a0013a9d490b66cf4ec68f38b71324148166ea22e887a397f6a40411fc6d",
+  "pairs": [
+    {
+      "tier": "full",
+      "pair": 1,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 47.4137,
+      "candidate_cpu_ms": 36.2959,
+      "reference_positive_heap_kb": 2346.0,
+      "candidate_positive_heap_kb": 260.0,
+      "reference_worst_call_ms": 1.0635,
+      "candidate_worst_call_ms": 0.8298
+    },
+    {
+      "tier": "full",
+      "pair": 2,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 40.9955,
+      "candidate_cpu_ms": 35.2106,
+      "reference_positive_heap_kb": 2342.0,
+      "candidate_positive_heap_kb": 270.0,
+      "reference_worst_call_ms": 0.6416,
+      "candidate_worst_call_ms": 0.697
+    },
+    {
+      "tier": "full",
+      "pair": 3,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 43.9141,
+      "candidate_cpu_ms": 35.6679,
+      "reference_positive_heap_kb": 2340.0,
+      "candidate_positive_heap_kb": 267.0,
+      "reference_worst_call_ms": 0.9543,
+      "candidate_worst_call_ms": 0.6735
+    },
+    {
+      "tier": "full",
+      "pair": 4,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 43.3942,
+      "candidate_cpu_ms": 36.6943,
+      "reference_positive_heap_kb": 2343.0,
+      "candidate_positive_heap_kb": 271.0,
+      "reference_worst_call_ms": 0.7374,
+      "candidate_worst_call_ms": 0.6719
+    },
+    {
+      "tier": "low",
+      "pair": 1,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 33.9518,
+      "candidate_cpu_ms": 27.1589,
+      "reference_positive_heap_kb": 2015.0,
+      "candidate_positive_heap_kb": 156.0,
+      "reference_worst_call_ms": 0.6547,
+      "candidate_worst_call_ms": 0.5743
+    },
+    {
+      "tier": "low",
+      "pair": 2,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 35.3848,
+      "candidate_cpu_ms": 27.5865,
+      "reference_positive_heap_kb": 2016.0,
+      "candidate_positive_heap_kb": 149.0,
+      "reference_worst_call_ms": 0.6191,
+      "candidate_worst_call_ms": 0.6646
+    },
+    {
+      "tier": "low",
+      "pair": 3,
+      "order": "AB",
+      "calls": 120,
+      "reference_cpu_ms": 36.9401,
+      "candidate_cpu_ms": 30.0933,
+      "reference_positive_heap_kb": 2017.0,
+      "candidate_positive_heap_kb": 153.0,
+      "reference_worst_call_ms": 0.5923,
+      "candidate_worst_call_ms": 0.4535
+    },
+    {
+      "tier": "low",
+      "pair": 4,
+      "order": "BA",
+      "calls": 120,
+      "reference_cpu_ms": 39.7847,
+      "candidate_cpu_ms": 30.0803,
+      "reference_positive_heap_kb": 2017.0,
+      "candidate_positive_heap_kb": 151.0,
+      "reference_worst_call_ms": 0.8549,
+      "candidate_worst_call_ms": 0.5174
+    }
+  ],
+  "summaries": {
+    "full": {
+      "reference_cpu_ms": 175.7175,
+      "candidate_cpu_ms": 143.8687,
+      "component_cpu_reduction_percent": 18.125001778422757,
+      "reference_positive_heap_kb": 9371.0,
+      "candidate_positive_heap_kb": 1068.0,
+      "positive_heap_reduction_percent": 88.6031373385978,
+      "pairs_faster": 4
+    },
+    "low": {
+      "reference_cpu_ms": 146.0614,
+      "candidate_cpu_ms": 114.919,
+      "component_cpu_reduction_percent": 21.321444269327827,
+      "reference_positive_heap_kb": 8065.0,
+      "candidate_positive_heap_kb": 609.0,
+      "positive_heap_reduction_percent": 92.44885306881588,
+      "pairs_faster": 4
+    }
+  },
+  "scope": "Counterbalanced contiguous120-frame batches, one controlled draw per timed frame on the same pose sequences, full/low; original985 native equivalence checks retained separately. Positive heap growth is not allocation rate or leak proof; no whole-game FPS claim.",
+  "adopted": false,
+  "published": false,
+  "adoption_criteria_met": true,
+  "candidate_faster_only_when_second": false
+}

@@ -1,0 +1,16 @@
+{
+  "source": "695e772d9d1ece490dd32132c655ac60c226c7b8",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-engine-stream-695e772-low-normal\\Windowsill-engine-stream-695e772-low-opportunistic-normal.rbxlx",
+  "model_sha256": "3866560790127900004d8915fbde5be5ad23e416739ff812da27184693985b80",
+  "manifest_sha256": "073f75051a23482595b9362e48c808b69daebeaa92216b0370d6003273035081",
+  "guard_sha256": "e8902940b39d5daae10702555050f9064fac75c1f422f2fb090814ea230ee898",
+  "probe_sha256": "63713cfd7a9d824f912ac62ef664aed48aa240a948f4b8911e39dfffaff341f9",
+  "scripts": 223,
+  "production_scripts_exact": 222,
+  "persistence_disabled": true,
+  "executed": false,
+  "native_verified": false,
+  "recovery_native_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

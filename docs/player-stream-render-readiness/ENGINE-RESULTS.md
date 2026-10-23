@@ -1,6 +1,6 @@
 # Actual engine stream-out and return
 
-Production source `695e772d9d1ece490dd32132c655ac60c226c7b8` is unchanged. `verify-engine-stream.py` binds the observations to both saved models, all 222 committed production script hashes plus the private probe, manifests, guards, editor copies and filtered output. Both fixtures are unbound, saving-disabled, full detail and Free play. Both use the actual client and production WorldFocus remote. Neither probe deletes or reparents collision.
+Historical engine experiments below bind production source `695e772d9d1ece490dd32132c655ac60c226c7b8`. Later client-pause source qualification is recorded separately in `../recovery-client-pause/`. `verify-engine-stream.py` binds the observations to both saved models, all 222 committed production script hashes plus the private probe, manifests, guards, editor copies and filtered output. Both fixtures are unbound, saving-disabled, full detail and Free play. Both use the actual client and production WorldFocus remote. Neither probe deletes or reparents collision.
 
 | Observation | Default | Opportunistic diagnostic |
 |---|---:|---:|
@@ -13,7 +13,7 @@ Production source `695e772d9d1ece490dd32132c655ac60c226c7b8` is unchanged. `veri
 
 The route starts on Atomic `garden_b4` (9 physical pieces), moves to distant Atomic `deck_n4` (25 pieces), and requests the garden again if the first model streams out. The settings are 96-stud minimum and 160-stud target radii in both models. The additional diagnostic changes only the stream-out policy to Opportunistic; it does not change production settings. The game reports its location through the existing remote; the probe observes the replicated server focus part rather than moving it locally.
 
-During the four missing-collision observations, position, velocity, mode and life/needs/prey clocks stayed unchanged. Complete collision return released the hold and the same simulation objects continued. Free play clock retention does not independently prove Normal-mode energy behavior. Low detail has not been run in this experiment yet.
+During the four missing-collision observations, position, velocity, mode and life/needs/prey clocks stayed unchanged. Complete collision return released the hold and the same simulation objects continued. Free play clock retention does not independently prove Normal-mode energy behavior; the separate low/Normal extension below now covers that boundary.
 
 The Opportunistic fixture then collected 120 RenderStepped intervals in the garden: mean **16.676 ms**, p95 **18.193 ms**, maximum **18.991 ms**, viewport **1105 x 433**. This is a short foreground sample in a controlled diagnostic/Free play scene. It is not a before/after optimization comparison, whole-game FPS result, phone benchmark, allocation rate or long-session proof. Arrival timings in the raw observations combine collision readiness and focus acknowledgement; do not label them network download latency.
 
@@ -26,4 +26,12 @@ Exact final runs:
 
 Both places were stopped and closed, original models unchanged, editor copies saved separately. Studio is closed. The verifier needs these laptop model files; a cloud checkout can inspect committed source/probes/receipts but cannot reproduce native execution merely by running the CLI suites.
 
-Next: repeat the native case at low detail, exercise the loading hold in Normal with an explicit energy assertion, then continue actual recovery menu/profile/model adoption and replacement-epoch work. Keep the current full production gates and native receipts; no production source changed, so those completed gates do not need repeating. Default-policy network/memory pressure, natural whole-life/input/audio/long-session/performance and online/release requirements remain open. Nothing published or merged to main; the broad goal remains active.
+Next: continue actual recovery menu/profile/model adoption and replacement-epoch work. The low/Normal extension is complete below. Keep the current full production gates and native receipts; no production source changed, so those completed gates do not need repeating. Default-policy network/memory pressure, natural whole-life/input/audio/long-session/performance and online/release requirements remain open. Nothing published or merged to main; the broad goal remains active.
+
+## Low detail and Normal energy extension
+
+A separate frozen `engine-stream-normal-probe.luau` on source695e772 passed **1631 checks** with223 script fingerprints and **zero CreatorErrors** during its running fixture. It uses real engine stream-out under a diagnostic Opportunistic policy. Deliberately suppressing production focus reports for two seconds sustains missing garden collision long enough to cross hunger update intervals; the original report method is restored. No collision part is reparented or deleted.
+
+Across **124 Heartbeats /2.047seconds**, position, velocity, mode, life/needs/prey clocks, energy/rest/starvation and pending drain remain unchanged. Normal hunger actually decreases before (.55 -> .549885312) and after (.549774432) the hold; complete collision return resumes the same life/motor. `normal-stream-verification.json` binds output, model, guard, fingerprints and editor copy. The experiment was stopped and closed; original model unchanged.
+
+The separate low/Normal120frame garden sample has16.807ms mean,18.176ms p95 and45.174ms maximum at1105x433. This is not paired with the full/Free sample and supports no optimization-gain claim. Default-policy network pressure, phone and long-session performance remain open. Nothing published.

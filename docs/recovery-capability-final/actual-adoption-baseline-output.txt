@@ -1,0 +1,5 @@
+ACTUAL_ADOPTION_COUNTEREXAMPLE	generation_before=1 generation_after=2 life_delta=1.0000000000000009 needs_delta=1.0000000000000009 moved=0 no_server_grant=true
+C:/Users/natha/AppData/Local/Temp/tmptfpin0mw.luau:59366: normal restore closure alone does not hold recovery simulation pending a server grant
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmptfpin0mw.luau:59366

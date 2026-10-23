@@ -1,0 +1,15 @@
+{
+  "current_production_source": "a97b0b54bfa7a49d8cec072cc4c0ebc1fd7ea8ff",
+  "component_execution_source": "257e1a43ae00076a6e59f284c0f2ca0ff09f72e9",
+  "executable_bundle_unchanged": true,
+  "all_explicit_inputs_unchanged": true,
+  "private_component_checks": 187257,
+  "private_component_failures": 0,
+  "current_overlay_candidates": 34,
+  "current_overlay_compile_and_strict_clean": true,
+  "component_rerun": false,
+  "whole_game_private_recovery_proof": false,
+  "native_recovery_verified": false,
+  "real_datastore_verified": false,
+  "published": false
+}

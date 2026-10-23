@@ -1,3 +1,17 @@
+# Latest checkpoint - owned client recovery pause qualified, 2026-10-23
+
+Production `a97b0b54bfa7a49d8cec072cc4c0ebc1fd7ea8ff` is pushed on `codex/save-continue`. Both full gates are terminal successes: Windows unified exec28256 (exit0, 1172.0seconds) and Linux push run39965521650; each **76 suites /468872 checks /0 failures**,222 compiles, clean strict analysis and5 runner regressions. LOCAL_RETURN33 includes six actual-adoption pause regressions. The immutable source/log proof is `docs/recovery-client-pause/full-verification.json`. Do not rerun these unchanged gates.
+
+The client now exposes an owned pause handle independent of menu visibility; an obsolete handle cannot release its replacement and the current handle releases once. It has no production recovery caller yet. Current-source unbound Studio fixture passes70/0 with223 checked script fingerprints and0 CreatorErrors: preceding60 presentation/collision cases plus10 actual Normal local-capture/adoption/hold cases. It verifies the intended generation+1/store replacement, frozen clocks/energy with menus hidden, stale-handle refusal and explicit resume. Saving disabled; this is not actual server-grant routing or a recovered schema3/profile/replacement lifecycle. Original model unchanged, editor copy saved separately; Studio stopped and closed. Private187257/0 component executable/all inputs remain byte-identical to their earlier execution,34 current overlay candidates strict-clean; component evidence reuse is not new whole-game recovery execution.
+
+Exact-source diagnostic-free candidate: `C:\Users\natha\claude-xfer\Windowsill-production-a97b0b5\TheWindowsill-production-candidate.rbxlx`;222 exact scripts, SHA256 `0711f2283e307d156254e9079db810759118d6e43e63c19f6568c7a1e6ad0f55`. Normal persistence configuration; not a verified online player session or published release. No main merge/publication/release synchronization.
+
+Historical source695e772 low/Normal actual-engine streaming proof is also complete:1631/0,223fingerprints,0CreatorErrors,124Heartbeats/2.047seconds missing collision under diagnostic Opportunistic policy with2second focus-report suppression; no collision parenting. Pose/clocks/energy/rest/starvation/pending drain retained, hunger active before/after and original method restored. Separate120frame low/Normal garden sample16.807ms mean/18.176ms p95/45.174ms max at1105x433 supports no paired optimization gain or phone claim. `docs/player-stream-render-readiness/normal-stream-verification.json` binds it to695e772; the historical verifier now reconstructs that immutable commit independently of current HEAD.
+
+Next follow `docs/recovery-client-pause/ADOPTION-NEXT.md`: actual recovery adoption callbacks, trusted mode profiles, choice/world-generation fences, matching authoritative grant and safe service/client replacement epochs. The pause is local control, not authorization. Actual online/rejoin/durability, natural whole life, physical controls, audio, sustained performance and release remain open. Broad goal active. No owned full/native job remains running. Preserve original OneDrive/frozen Godot, three unrelated save-cost outputs and untracked sourcemap.
+
+---
+
 # Current checkpoint - 2026-10-23
 
 The user resumed after the restart. The optimization/reliability goal is active, not complete. No main merge or production publication occurred during this verification cohort.

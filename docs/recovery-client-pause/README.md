@@ -1,0 +1,13 @@
+# Owned recovery pause in the actual client
+
+Production source `a97b0b54bfa7a49d8cec072cc4c0ebc1fd7ea8ff`. No recovery owner is installed in engine startup, and nothing is published.
+
+An ordinary restore should resume when its menus close. Recovery needs an additional hold while waiting for its matching server grant. `saveState.pauseRecovery()` returns a handle for that hold; creating a replacement invalidates the old handle. Only the current handle releases, exactly once. The handle is a local simulation gate, not server authorization.
+
+The six new actual-client tests use the real `restore.cfg.prepare` adoption closure. They preserve the intentional generation+1 and new local store, hide the menu, observe sixty frozen simulation frames, refuse obsolete releases and then resume with the current handle. `LOCAL_RETURN` is33/0. Earlier ordinary-return behavior is retained as a deliberate integration counterexample under `../recovery-capability-final/actual-adoption-baseline-*`; do not call it a broken normal Continue.
+
+The current unbound/saving-disabled Studio fixture passes70 checks with223 script fingerprints (222 exact committed production scripts plus one diagnostic) and zero CreatorErrors during the fixture. Its ten additional checks exercise actual Normal-mode local capture, adoption and the hold. It does not inject a recovered schema3 packet or prove server grant, complete recovery, physical inputs, natural life or online saving. `native-full-receipt.json` binds source/model/probe/guard/output and the separately saved editor copy. Studio is closed.
+
+Compilation222/222, strict analysis and five runner regressions are clean.34 overlay candidates are clean; `private-unchanged.json` proves exact private bundle/input reuse of187257 checks, not a whole-game reexecution. The Windows full process28256 and Linux push run39965521650 are terminal successful: each76 suites/468872 checks/0 failures. `full-verification.json` binds immutable snapshot inputs and logs; `verify-gates.py` passed. Do not restart these unchanged gates. `production-candidate.json` binds the exact222-script diagnostic-free candidate; it is not published or verified as an online player session.
+
+Read `../recovery-capability-final/ADOPTION-CALL-SITES.md` before installing anything. Actual adoption must use the real closure; direct checkpoint-table apply omits profile/mode/controls/camera/store side effects. Its own generation increment must be accepted without accepting a different choice or newer world. A server grant must match the current entry identity before releasing the hold. Profiles and safe service/client replacement epochs remain required. No main merge or publication.

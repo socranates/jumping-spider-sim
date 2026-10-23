@@ -1,6 +1,6 @@
 # Player collision hold and render cadence
 
-Current production source: `695e772d9d1ece490dd32132c655ac60c226c7b8` on `codex/save-continue`. Nothing published or merged to main.
+Historical qualified production source: `695e772d9d1ece490dd32132c655ac60c226c7b8` on `codex/save-continue`. Nothing published or merged to main.
 
 The actual-client baseline at `257e1a4` proved that removing already-arrived collision lets the supported player fall and advances life/needs clocks. The first fix, `bf94f9d`, adds fresh collision checks at the current point and each fixed tick's projected destination. It retains pose, velocity and simulation objects until complete authored collision returns; optional decoration and ordinary off-map falls are not gates.
 
@@ -27,6 +27,6 @@ Additional engine-streaming experiments are complete. Default policy passed 11 c
 
 ## Limits and next work
 
-The 60-check fixture deliberately removes local collision folders. Its projected airborne velocity is artificial and checks pause semantics, not jump feel or the whole swept path. The separate 25-check fixture observes real engine removal/rearrival under a diagnostic Opportunistic policy on a local Studio server, in Free play/full detail. Low-detail and Normal-mode energy coverage, default-policy real network pressure, physical devices, sustained frame-time measurements and ordinary whole-life gameplay remain separate work. These tests do not qualify recovery menu/profile/model adoption, replacement epochs, online DataStore/rejoin or release. Actual recovery remains uninstalled in the production engine/menu. The broad optimization and correctness goal stays active.
+The 60-check fixture deliberately removes local collision folders. Its projected airborne velocity is artificial and checks pause semantics, not jump feel or the whole swept path. The separate 25-check fixture observes real engine removal/rearrival under a diagnostic Opportunistic policy on a local Studio server, in Free play/full detail. A separate low-detail Normal-mode native extension now passes1631 checks with124 held Heartbeats, explicit energy/pending-drain retention and hunger active before/after; see `normal-stream-verification.json` and ENGINE-RESULTS.md. Default-policy real network pressure, physical devices, sustained frame-time measurements and ordinary whole-life gameplay remain separate work. These tests do not qualify recovery menu/profile/model adoption, replacement epochs, online DataStore/rejoin or release. Actual recovery remains uninstalled in the production engine/menu. The broad optimization and correctness goal stays active.
 
 Studio's tested model is unchanged. An editor copy was saved separately before closing Studio to free memory for the Windows gate. Do not load a diagnostic fixture into a published game.

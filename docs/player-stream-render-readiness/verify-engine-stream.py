@@ -3,9 +3,9 @@ from pathlib import Path
 import hashlib,io,json,subprocess,tarfile,xml.etree.ElementTree as ET
 H=Path(__file__).resolve().parent;ROOT=H.parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
-source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
-assert source=='695e772d9d1ece490dd32132c655ac60c226c7b8'
-assert subprocess.run(['git','diff','--quiet','HEAD','--','roblox_port/src','roblox_port/tests'],cwd=ROOT).returncode==0
+# Native receipts are immutable historical proof, independent of the current
+# checkout. Reconstruct their exact production sources from this commit.
+source='695e772d9d1ece490dd32132c655ac60c226c7b8'
 expected={};prefixes={'First':'ReplicatedFirst','Shared':'ReplicatedStorage.Shared','Server':'ServerScriptService.Server','Client':'StarterPlayer.StarterPlayerScripts.Client'}
 raw=subprocess.check_output(['git','archive','--format=tar',source,'roblox_port/src'],cwd=ROOT)
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:

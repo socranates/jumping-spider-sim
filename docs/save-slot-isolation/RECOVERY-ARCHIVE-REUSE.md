@@ -31,3 +31,8 @@ Final `archive-reuse-attempt-3-*` passes 19,110 new assertions plus 165,294 prec
 Trace assertions require zero A1 updates throughout successful later imports. The archive-controller trace also forbids reading unrelated current R keys. Each of the three successful reuse-controller traces uses eight requests and 63 simulated seconds. Printed request/timing figures cover that controller phase in the deterministic model, not player loading time or the full entry sequence.
 
 This remains private. Actual SaveService/client/remotes/menu adoption, engine-native full lifecycle/compression, online datastore/rejoin, physical devices and release verification remain open. No production source, published game or normal player save is changed by this milestone.
+
+
+## Later service-owner qualification
+
+The preceding evidence remains historical. Production SaveService changed in 927e816 and 2170f99, and the new private owner composes this archive-reuse cohort through the actual service/client test transport. Use `verify-recovery-service-owner.py`, `recovery-service-owner-verification.json` and `RECOVERY-SERVICE-OWNER.md` for current 187149-assertion source binding and remaining activation gates. Archive reuse and immutable-original policy are unchanged; engine adoption, native full lifecycle and online saves are still unverified.

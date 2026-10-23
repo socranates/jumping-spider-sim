@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-23T10:51:42.853852+00:00",
-  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "as_of_utc": "2026-10-23T11:38:38.505097+00:00",
+  "source": "2170f99e001c4c0a42e86454974f594820e86667",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -24,13 +24,15 @@
     {
       "id": "cli-and-runner",
       "status": "both-platforms-verified",
-      "evidence_boundary": "Current441eaca verified on Windows and Linux:76 suites/468487 passing/0 failures each,222 compiled modules, clean strict analysis and5 runner regressions. Windows13178 terminal exit0; Linux39912299139 terminal success. Immutable source/log verification retained. Interrupted98916 remains a separate intentionally cancelled partial run, never a full pass. CLI does not prove native gameplay or release.",
+      "evidence_boundary": "Current 2170f99 verified on Windows and Linux:76 suites/468506 passing/0 failures each, 222 compiled modules, clean strict analysis and 5 runner regressions. Windows 39314 terminal exit0; Linux 39945051568 terminal success. Immutable source/log verification retained in save-service-owner-final. CLI does not prove native gameplay or release.",
       "references": [
         "docs/recovery-verified-gates/verification.json",
         "docs/recovery-verified-gates/README.md",
         "docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md",
         "docs/world-animation-clock/full-verification.json",
-        "docs/world-animation-clock/README.md"
+        "docs/world-animation-clock/README.md",
+        "docs/save-service-owner-final/full-verification.json",
+        "docs/save-service-owner-final/README.md"
       ]
     },
     {
@@ -66,18 +68,19 @@
     {
       "id": "slot-protection-A04",
       "status": "implemented-with-limits",
-      "evidence_boundary": "Corrupt/newer rest slots retain bytes and independent healthy slots/notebook can persist. Actual old-world restoration is a separate open requirement. Private later-slot original reuse milestone: pipeline.reuseCompleteOriginal=true proves all5 complete A1 records under the owned lease, freshly matches only the selected current raw R/primary-backup identity, and reuses the original without reading unrelated current R slots. Commit independently rereads/proves all5 archive records without no-op updates. Initial absent-anchor admission reuses its probe for guarded insert-if-absent publication; partial index repair retains strict full-source comparison, while corrupt completed publications refuse. Shared ArchiveStore.checkPublished now serves discovery/controller/commit. Strict default refusal is retained as a counterexample. Main recovery -> fresh main normal checkpoint -> free/easy original imports preserves fresh main, other slots, immutable A1/existing M1, current choices and rare progress. 19110 new assertions +165294 preceding=184404 pass; entry compilation/full strict33 candidates clean. Actual production adapters over fault-injected memory facade; zero A1 updates throughout successful later imports, no unrelated R reads in reuse-controller traces. That phase uses8 requests/63 simulated seconds in three fixtures; not full/player loading time. Corrupt/missing parts/index, changed selected raw, future unrelated slot and consent revoked during yielded adapter read are covered. Final archive-reuse-attempt-3-*, archive-reuse-types-2-*, verify-recovery-archive-reuse.py. Prior fresh-life hash verifier is historical after Store/Controller/Commit/Pipeline/Reader changes. First immutable original is retained under fixed bounded keys across fresh life and later imports; genuinely different later incompatible sources still refuse pending a new archive-generation policy. Actual service/client/remotes/menu adoption, native whole-lifecycle/engine compression/real online datastore and release gates remain open. Production441eaca unchanged; nothing published; goal active.",
+      "evidence_boundary": "Corrupt/newer rest slots retain bytes and independent healthy slots/notebook can persist. Actual old-world restoration is a separate open requirement. Private later-slot original reuse milestone: pipeline.reuseCompleteOriginal=true proves all5 complete A1 records under the owned lease, freshly matches only the selected current raw R/primary-backup identity, and reuses the original without reading unrelated current R slots. Commit independently rereads/proves all5 archive records without no-op updates. Initial absent-anchor admission reuses its probe for guarded insert-if-absent publication; partial index repair retains strict full-source comparison, while corrupt completed publications refuse. Shared ArchiveStore.checkPublished now serves discovery/controller/commit. Strict default refusal is retained as a counterexample. Main recovery -> fresh main normal checkpoint -> free/easy original imports preserves fresh main, other slots, immutable A1/existing M1, current choices and rare progress. 19110 new assertions +165294 preceding=184404 pass; entry compilation/full strict33 candidates clean. Actual production adapters over fault-injected memory facade; zero A1 updates throughout successful later imports, no unrelated R reads in reuse-controller traces. That phase uses8 requests/63 simulated seconds in three fixtures; not full/player loading time. Corrupt/missing parts/index, changed selected raw, future unrelated slot and consent revoked during yielded adapter read are covered. Final archive-reuse-attempt-3-*, archive-reuse-types-2-*, verify-recovery-archive-reuse.py. Prior fresh-life hash verifier is historical after Store/Controller/Commit/Pipeline/Reader changes. First immutable original is retained under fixed bounded keys across fresh life and later imports; genuinely different later incompatible sources still refuse pending a new archive-generation policy. Actual service/client/remotes/menu adoption, native whole-lifecycle/engine compression/real online datastore and release gates remain open. Production441eaca unchanged; nothing published; goal active. Later private actual service/client transport qualification: 2745 new+184404 preceding = 187149 pass with 34 candidates compile/strict clean. Optional production owner hook and independent recovery-receipt rate limit are implemented; engine startup/menu recovery is not installed. No native/online recovery or complete migration claim.",
       "references": [
         "docs/save-slot-isolation/receipt.json",
         "docs/save-slot-isolation/legacy-world-follow-up.md",
         "docs/save-slot-isolation/RECOVERY-ARCHIVE-REUSE.md",
-        "docs/save-slot-isolation/recovery-archive-reuse-verification.json"
+        "docs/save-slot-isolation/recovery-archive-reuse-verification.json",
+        "docs/save-slot-isolation/RECOVERY-SERVICE-OWNER.md"
       ]
     },
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated. Current441eaca combined private recovery/departure cohort passes24648 checks, with23 candidates strict-clean. Recovery-only closed departure drains in-flight work, atomically three-way merges final local P progress/releases its own fresh lease, and requires uncached exact readback. R/M1/A1 unchanged; cap8 requests/24seconds. Production departure routing, terminal-idle/rejoin lifecycle and schema-3 entry remain unimplemented. Current private terminal-held lease maintenance passes38782 combined CLI checks with24 strict-clean candidates and22 isolated native server-memory assertions/245 fingerprints. Renews only fresh owned metadata under shared quota; ordinary writes stay blocked. Explicit retry/departure handoffs and slow acknowledgement regression are verified. Controlled terminal metadata is not a full native discovery/migration or real DataStore proof; production routing, safe session replacement and schema-3 entry remain open. A private factory/router now composes actual load/discovery/recovery/menu leases/entry hold/departure:50745 combined CLI checks and26 candidates strict-clean. Baseline binds before load; late close, changed-epoch direct flush and loading-time lease callbacks are fenced. Production SaveService/remotes/menu wiring and schema-3 entry remain unimplemented. Earlier native22 concerns the preceding private baseline; the new binding/coordinator has no current native/service proof. Continued schema3 format/readers/preparation now pass82 new checks plus50745 regressions (50827 total),27 candidates strict-clean. Stable original provenance survives repeated current/backup saves and current scene/generation changes; ended active records and retirement revival refuse. This is not an authenticated writer, native entry or completed lifecycle. Existing immutable archive reuse for later-slot imports and lifetime across fresh lives still require integration. Private authenticated continuation writer now passes1127 new assertions plus50827 regressions (51954 total),28 candidates strict-clean. It requires an actual writable intent, immutable proposal/index reads, owned lease/progress coverage, exact R CAS, uncached candidate readback and final ownership before one receipt. Tests explicitly grant the fixture intent only after read-only Runtime capture refuses; no schema3 scene-entry or production integration is implied. Lost acknowledgements, close/yields, changed scopes, quota/deadline and post-write takeover are covered. Writer cache adoption/retirement, native/service verification and integration remain open. Opt-in private Runtime schema3 entry now freshly proves all original A1 parts/M1/current R/P, prepares and applies the actual client checkpoint, then rechecks exact R and owned covered P before an actual intent grant. Main/Free/unlocked Easy rest/mating/hatching paths use that credential with the current writer and then idle/depart:10322 new assertions plus51954 regressions=62276 pass,30 candidates strict-clean. The tests no longer manually grant those entry cases. Cancellation/retry, long client wait, stale receipts, changed final state, cooperative client preparation and yielded read/decision close are covered. Client ACK is a solo-game protocol statement, not anti-cheat or native transport proof. Ordinary recovered progress/rest coordination, schema3 rejoin/retirement/cache wiring, actual service/native and production adoption remain open. Private single recovered save scheduler now composes debounced P, cooperative authenticated R, exclusive lease handoffs, per-slot cache adoption and deadline-bounded flush/departure:22489 new assertions plus62276 regressions=84765 pass,32 candidates strict-clean. Actual Mating/Rare generation progress is durable before R across all3 slots. A-B-A edits across ambiguous writes and departure replay the reserved local snapshot; newer edits remain dirty. Captured progress versions prevent continuous notebook updates starving a checkpoint. An unknown-envelope-field deletion counterexample was reproduced and fixed with callback-time refusal. This is private in-memory composition, not production/native/service proof. Continued schema3 fresh-session rejoin, retirement/lifetime/archive reuse/session replacement and production service/client/release still remain open. Private continued schema3 rejoin now binds the actual current observation and enters without running the original archive/commit target writer. All3 slots/plain-packed current rests/three separate factories preserve latest generation, elapsed, rare and choices, then save and rejoin again; originals unchanged and zero non-P updates during returning entry. Initial packet/current mating/hatching/backup-origin current-primary paths are covered. Retired/corrupt/missing provenance/explicit current backup/changed selection/header extras refuse. 42700 new assertions plus84765 regressions=127465 pass,32 candidates strict-clean. Server-only immutable archive reuse reduces six deterministic modeled visits from25 requests/126seconds to20/72; this is not measured Roblox latency and startup remains unqualified. Current envelope open guards prevent silent unknown outer-field loss. Production service/client wiring, new-life/retirement/archive reuse-lifetime/session replacement and native/real-service/release remain open. Private startup admission milestone: optional shared server owner observes native StandardRead/StandardWrite budgets, bounds startup to20 requests/session and40/server/minute within45seconds, and preserves the ordinary10-request budget and complete raw request history. Failed/expired startup retains ordinary debt; only verified entry closes successfully. Healthy returning-entry model19requests/17simulated seconds versus low/unknown20/72; not measured Roblox loading time. 1382 new assertions plus127465 preceding=128847 pass; entry compile/full strict33 candidates clean. Exact current observer passed6 native assertions in an unbound local Studio model, with no datastore record access; full native recovery/online service still unverified. Production source441eaca unchanged; no publication. Retirement/NewLife, later-slot archive reuse/lifetime, safe replacement, service/client/remotes/menu integration and post-entry save latency remain open. Current receipts: startup-attempt-2-*, startup-types-2-*, startup-native-observer-*, recovery-startup-budget-verification.json. Goal active. Private recovered-life retirement milestone: Runtime.retireRecovered queues a server-derived later-life boundary through the existing single save owner, preserves captured P progress, freshly verifies original M1/A1 index/owned P and exact current R, then CAS/readback/final-owner verifies a provenance marker. Terminal route clears active checkpoint and old authority before decision callback; later checkpoints refuse. Separate returning factories refuse the retired primary and its active backup. A1/M1 remain unchanged. Completed writer plan is released. 17253 new assertions +128847 preceding=146100 pass; entry compilation/full strict of33 candidates clean. All3 slots, initial/continued checkpoint, lost responses before/after write, changed R refusal, terminal idle/departure/later P edits and yielded callback/departure are covered. Final retirement-attempt-3-*, retirement-types-3-*, verify-recovery-retirement.py. Prior startup verifier is historical after Runtime/Writer/Loop changes; current cohort includes its complete regressions and unchanged observer proof. This is private in-memory composition, not native retirement or real datastore/service verification. Fresh-life creation/entry, later-slot archive reuse/lifetime, safe terminal replacement, actual service/client/remotes/menu and release remain open. Production441eaca unchanged; no publication; goal active. Private fresh-life and safe replacement milestone: an explicitly retired schema3 life can be bridged to a standard nonplayable schema2 retirement marker under original M1/A1-index/P proofs, exact raw CAS/readback and final lease verification. Old runtime drains/closes, preserves later local P changes and confirms lease release before constructing one distinct fresh normal session. Actual matching normal observations/requestLife then issue the real New Life credential; all3 slots save a new normal checkpoint and Continue it on another visit without recovered history. Original A1/M1 and other slots remain unchanged. Explicit discoverNewLife/acceptRetiredFresh supports a new visit interrupted at schema3 retirement; ordinary Continue still refuses retired records. 19194 new assertions +146100 preceding=165294 pass; entry compilation/full strict33 candidates clean. Tests now use production DataStoreBackend/RestCompression/raw adapters over a fault-injected datastore facade, not raw-memory decoded reads or online storage. Final fresh-life-attempt-3-*, fresh-life-types-2-*, verify-recovery-fresh-life.py. Lost bridge ACKs, changed R/marker refusal, failed release and single replacement are covered. Prior retirement hash verifier is historical after Runtime/Reader/Writer changes. Actual service/client/remotes/menu adoption, native full lifecycle/engine compression/real online datastore, later-slot original A1 reuse/lifetime and release remain open. Production441eaca unchanged; nothing published; goal active. Private later-slot original reuse milestone: pipeline.reuseCompleteOriginal=true proves all5 complete A1 records under the owned lease, freshly matches only the selected current raw R/primary-backup identity, and reuses the original without reading unrelated current R slots. Commit independently rereads/proves all5 archive records without no-op updates. Initial absent-anchor admission reuses its probe for guarded insert-if-absent publication; partial index repair retains strict full-source comparison, while corrupt completed publications refuse. Shared ArchiveStore.checkPublished now serves discovery/controller/commit. Strict default refusal is retained as a counterexample. Main recovery -> fresh main normal checkpoint -> free/easy original imports preserves fresh main, other slots, immutable A1/existing M1, current choices and rare progress. 19110 new assertions +165294 preceding=184404 pass; entry compilation/full strict33 candidates clean. Actual production adapters over fault-injected memory facade; zero A1 updates throughout successful later imports, no unrelated R reads in reuse-controller traces. That phase uses8 requests/63 simulated seconds in three fixtures; not full/player loading time. Corrupt/missing parts/index, changed selected raw, future unrelated slot and consent revoked during yielded adapter read are covered. Final archive-reuse-attempt-3-*, archive-reuse-types-2-*, verify-recovery-archive-reuse.py. Prior fresh-life hash verifier is historical after Store/Controller/Commit/Pipeline/Reader changes. First immutable original is retained under fixed bounded keys across fresh life and later imports; genuinely different later incompatible sources still refuse pending a new archive-generation policy. Actual service/client/remotes/menu adoption, native whole-lifecycle/engine compression/real online datastore and release gates remain open. Production441eaca unchanged; nothing published; goal active.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated. Current441eaca combined private recovery/departure cohort passes24648 checks, with23 candidates strict-clean. Recovery-only closed departure drains in-flight work, atomically three-way merges final local P progress/releases its own fresh lease, and requires uncached exact readback. R/M1/A1 unchanged; cap8 requests/24seconds. Production departure routing, terminal-idle/rejoin lifecycle and schema-3 entry remain unimplemented. Current private terminal-held lease maintenance passes38782 combined CLI checks with24 strict-clean candidates and22 isolated native server-memory assertions/245 fingerprints. Renews only fresh owned metadata under shared quota; ordinary writes stay blocked. Explicit retry/departure handoffs and slow acknowledgement regression are verified. Controlled terminal metadata is not a full native discovery/migration or real DataStore proof; production routing, safe session replacement and schema-3 entry remain open. A private factory/router now composes actual load/discovery/recovery/menu leases/entry hold/departure:50745 combined CLI checks and26 candidates strict-clean. Baseline binds before load; late close, changed-epoch direct flush and loading-time lease callbacks are fenced. Production SaveService/remotes/menu wiring and schema-3 entry remain unimplemented. Earlier native22 concerns the preceding private baseline; the new binding/coordinator has no current native/service proof. Continued schema3 format/readers/preparation now pass82 new checks plus50745 regressions (50827 total),27 candidates strict-clean. Stable original provenance survives repeated current/backup saves and current scene/generation changes; ended active records and retirement revival refuse. This is not an authenticated writer, native entry or completed lifecycle. Existing immutable archive reuse for later-slot imports and lifetime across fresh lives still require integration. Private authenticated continuation writer now passes1127 new assertions plus50827 regressions (51954 total),28 candidates strict-clean. It requires an actual writable intent, immutable proposal/index reads, owned lease/progress coverage, exact R CAS, uncached candidate readback and final ownership before one receipt. Tests explicitly grant the fixture intent only after read-only Runtime capture refuses; no schema3 scene-entry or production integration is implied. Lost acknowledgements, close/yields, changed scopes, quota/deadline and post-write takeover are covered. Writer cache adoption/retirement, native/service verification and integration remain open. Opt-in private Runtime schema3 entry now freshly proves all original A1 parts/M1/current R/P, prepares and applies the actual client checkpoint, then rechecks exact R and owned covered P before an actual intent grant. Main/Free/unlocked Easy rest/mating/hatching paths use that credential with the current writer and then idle/depart:10322 new assertions plus51954 regressions=62276 pass,30 candidates strict-clean. The tests no longer manually grant those entry cases. Cancellation/retry, long client wait, stale receipts, changed final state, cooperative client preparation and yielded read/decision close are covered. Client ACK is a solo-game protocol statement, not anti-cheat or native transport proof. Ordinary recovered progress/rest coordination, schema3 rejoin/retirement/cache wiring, actual service/native and production adoption remain open. Private single recovered save scheduler now composes debounced P, cooperative authenticated R, exclusive lease handoffs, per-slot cache adoption and deadline-bounded flush/departure:22489 new assertions plus62276 regressions=84765 pass,32 candidates strict-clean. Actual Mating/Rare generation progress is durable before R across all3 slots. A-B-A edits across ambiguous writes and departure replay the reserved local snapshot; newer edits remain dirty. Captured progress versions prevent continuous notebook updates starving a checkpoint. An unknown-envelope-field deletion counterexample was reproduced and fixed with callback-time refusal. This is private in-memory composition, not production/native/service proof. Continued schema3 fresh-session rejoin, retirement/lifetime/archive reuse/session replacement and production service/client/release still remain open. Private continued schema3 rejoin now binds the actual current observation and enters without running the original archive/commit target writer. All3 slots/plain-packed current rests/three separate factories preserve latest generation, elapsed, rare and choices, then save and rejoin again; originals unchanged and zero non-P updates during returning entry. Initial packet/current mating/hatching/backup-origin current-primary paths are covered. Retired/corrupt/missing provenance/explicit current backup/changed selection/header extras refuse. 42700 new assertions plus84765 regressions=127465 pass,32 candidates strict-clean. Server-only immutable archive reuse reduces six deterministic modeled visits from25 requests/126seconds to20/72; this is not measured Roblox latency and startup remains unqualified. Current envelope open guards prevent silent unknown outer-field loss. Production service/client wiring, new-life/retirement/archive reuse-lifetime/session replacement and native/real-service/release remain open. Private startup admission milestone: optional shared server owner observes native StandardRead/StandardWrite budgets, bounds startup to20 requests/session and40/server/minute within45seconds, and preserves the ordinary10-request budget and complete raw request history. Failed/expired startup retains ordinary debt; only verified entry closes successfully. Healthy returning-entry model19requests/17simulated seconds versus low/unknown20/72; not measured Roblox loading time. 1382 new assertions plus127465 preceding=128847 pass; entry compile/full strict33 candidates clean. Exact current observer passed6 native assertions in an unbound local Studio model, with no datastore record access; full native recovery/online service still unverified. Production source441eaca unchanged; no publication. Retirement/NewLife, later-slot archive reuse/lifetime, safe replacement, service/client/remotes/menu integration and post-entry save latency remain open. Current receipts: startup-attempt-2-*, startup-types-2-*, startup-native-observer-*, recovery-startup-budget-verification.json. Goal active. Private recovered-life retirement milestone: Runtime.retireRecovered queues a server-derived later-life boundary through the existing single save owner, preserves captured P progress, freshly verifies original M1/A1 index/owned P and exact current R, then CAS/readback/final-owner verifies a provenance marker. Terminal route clears active checkpoint and old authority before decision callback; later checkpoints refuse. Separate returning factories refuse the retired primary and its active backup. A1/M1 remain unchanged. Completed writer plan is released. 17253 new assertions +128847 preceding=146100 pass; entry compilation/full strict of33 candidates clean. All3 slots, initial/continued checkpoint, lost responses before/after write, changed R refusal, terminal idle/departure/later P edits and yielded callback/departure are covered. Final retirement-attempt-3-*, retirement-types-3-*, verify-recovery-retirement.py. Prior startup verifier is historical after Runtime/Writer/Loop changes; current cohort includes its complete regressions and unchanged observer proof. This is private in-memory composition, not native retirement or real datastore/service verification. Fresh-life creation/entry, later-slot archive reuse/lifetime, safe terminal replacement, actual service/client/remotes/menu and release remain open. Production441eaca unchanged; no publication; goal active. Private fresh-life and safe replacement milestone: an explicitly retired schema3 life can be bridged to a standard nonplayable schema2 retirement marker under original M1/A1-index/P proofs, exact raw CAS/readback and final lease verification. Old runtime drains/closes, preserves later local P changes and confirms lease release before constructing one distinct fresh normal session. Actual matching normal observations/requestLife then issue the real New Life credential; all3 slots save a new normal checkpoint and Continue it on another visit without recovered history. Original A1/M1 and other slots remain unchanged. Explicit discoverNewLife/acceptRetiredFresh supports a new visit interrupted at schema3 retirement; ordinary Continue still refuses retired records. 19194 new assertions +146100 preceding=165294 pass; entry compilation/full strict33 candidates clean. Tests now use production DataStoreBackend/RestCompression/raw adapters over a fault-injected datastore facade, not raw-memory decoded reads or online storage. Final fresh-life-attempt-3-*, fresh-life-types-2-*, verify-recovery-fresh-life.py. Lost bridge ACKs, changed R/marker refusal, failed release and single replacement are covered. Prior retirement hash verifier is historical after Runtime/Reader/Writer changes. Actual service/client/remotes/menu adoption, native full lifecycle/engine compression/real online datastore, later-slot original A1 reuse/lifetime and release remain open. Production441eaca unchanged; nothing published; goal active. Private later-slot original reuse milestone: pipeline.reuseCompleteOriginal=true proves all5 complete A1 records under the owned lease, freshly matches only the selected current raw R/primary-backup identity, and reuses the original without reading unrelated current R slots. Commit independently rereads/proves all5 archive records without no-op updates. Initial absent-anchor admission reuses its probe for guarded insert-if-absent publication; partial index repair retains strict full-source comparison, while corrupt completed publications refuse. Shared ArchiveStore.checkPublished now serves discovery/controller/commit. Strict default refusal is retained as a counterexample. Main recovery -> fresh main normal checkpoint -> free/easy original imports preserves fresh main, other slots, immutable A1/existing M1, current choices and rare progress. 19110 new assertions +165294 preceding=184404 pass; entry compilation/full strict33 candidates clean. Actual production adapters over fault-injected memory facade; zero A1 updates throughout successful later imports, no unrelated R reads in reuse-controller traces. That phase uses8 requests/63 simulated seconds in three fixtures; not full/player loading time. Corrupt/missing parts/index, changed selected raw, future unrelated slot and consent revoked during yielded adapter read are covered. Final archive-reuse-attempt-3-*, archive-reuse-types-2-*, verify-recovery-archive-reuse.py. Prior fresh-life hash verifier is historical after Store/Controller/Commit/Pipeline/Reader changes. First immutable original is retained under fixed bounded keys across fresh life and later imports; genuinely different later incompatible sources still refuse pending a new archive-generation policy. Actual service/client/remotes/menu adoption, native whole-lifecycle/engine compression/real online datastore and release gates remain open. Production441eaca unchanged; nothing published; goal active. Later private actual service/client transport qualification: 2745 new+184404 preceding = 187149 pass with 34 candidates compile/strict clean. Optional production owner hook and independent recovery-receipt rate limit are implemented; engine startup/menu recovery is not installed. No native/online recovery or complete migration claim.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
@@ -105,7 +108,8 @@
         "docs/save-slot-isolation/RECOVERY-FRESH-LIFE.md",
         "docs/save-slot-isolation/recovery-fresh-life-verification.json",
         "docs/save-slot-isolation/RECOVERY-ARCHIVE-REUSE.md",
-        "docs/save-slot-isolation/recovery-archive-reuse-verification.json"
+        "docs/save-slot-isolation/recovery-archive-reuse-verification.json",
+        "docs/save-slot-isolation/RECOVERY-SERVICE-OWNER.md"
       ]
     },
     {
@@ -125,22 +129,24 @@
     {
       "id": "foreign-lease-Continue-A06",
       "status": "partial",
-      "evidence_boundary": "Protocol3 explicit observed choices, read-only Continue, immutable selections and epoch/request/ticket receipts are implemented with focused/native injected-transport coverage. Actual online client rejoin remains unverified. Delayed owned offers and remote Continue prepare privately across frames. Current local rests also prepare privately without granting authority. No live DataStore proof is claimed.",
+      "evidence_boundary": "Protocol3 explicit observed choices, read-only Continue, immutable selections and epoch/request/ticket receipts are implemented with focused/native injected-transport coverage. Actual online client rejoin remains unverified. Delayed owned offers and remote Continue prepare privately across frames. Current local rests also prepare privately without granting authority. No live DataStore proof is claimed. Later private actual service/client transport qualification: 2745 new+184404 preceding = 187149 pass with 34 candidates compile/strict clean. Optional production owner hook and independent recovery-receipt rate limit are implemented; engine startup/menu recovery is not installed. No native/online recovery or complete migration claim.",
       "references": [
         "docs/save-lease-cleanup/README.md",
         "docs/observed-life-retirement/README.md",
         "docs/save-lease-cleanup/continue-contract.md",
-        "docs/save-continue/async-rest/README.md"
+        "docs/save-continue/async-rest/README.md",
+        "docs/save-slot-isolation/RECOVERY-SERVICE-OWNER.md"
       ]
     },
     {
       "id": "save-phases-and-faults",
       "status": "partial",
-      "evidence_boundary": "Synthetic boundary/refusal, corruption, throttling, shutdown and two-session tests exist. Must distinguish designed refusal of unsafe midair/feeding checkpoints from an accepted restore; actual teleport/rejoin and every historical fixture remain open. Current local return preparation is private/cancellable, source/world fenced, single-decoded and available offline. Focused27 local-return checks and native22 cover atomic visibility, cancellation/end-screen state and stale source refusal. Actual online/rejoin remains open.",
+      "evidence_boundary": "Synthetic boundary/refusal, corruption, throttling, shutdown and two-session tests exist. Must distinguish designed refusal of unsafe midair/feeding checkpoints from an accepted restore; actual teleport/rejoin and every historical fixture remain open. Current local return preparation is private/cancellable, source/world fenced, single-decoded and available offline. Focused27 local-return checks and native22 cover atomic visibility, cancellation/end-screen state and stale source refusal. Actual online/rejoin remains open. Later private actual service/client transport qualification: 2745 new+184404 preceding = 187149 pass with 34 candidates compile/strict clean. Optional production owner hook and independent recovery-receipt rate limit are implemented; engine startup/menu recovery is not installed. No native/online recovery or complete migration claim.",
       "references": [
         "docs/audit/TESTS.md",
         "docs/observed-life-retirement/integration.txt",
-        "docs/save-continue/local-return/README.md"
+        "docs/save-continue/local-return/README.md",
+        "docs/save-slot-isolation/RECOVERY-SERVICE-OWNER.md"
       ]
     },
     {
@@ -292,11 +298,13 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Current405e9df both full platforms76/468114/0 verified, compile222/strict/runner5; own branch codex/save-continue. Private archive/publication/raw-read components and source-bound evidence retained. No production migration, real DataStore durability, release/main integration/publication/laptop sync; broader audit remains open. Current441eaca exact-source production candidate built with222 matching script sources and no injected diagnostic; unpublished. Audit branch is separate from main; no main merge or release synchronization claimed.",
+      "evidence_boundary": "Current production2170f99 has both full platform gates76/468506/0,222 compile/clean strict/runner5. Source fixes and private service-owner evidence are on own branch codex/save-continue; handoff and immutable source/log receipts retained. Normal engine session remains default; actual menu/native/online recovery and publication remain open. Original OneDrive and unrelated local edits preserved.",
       "references": [
         "docs/pond-drawing-reuse/README.md",
         "chet/save-continue.md",
-        "docs/world-animation-clock/production-candidate.json"
+        "docs/world-animation-clock/production-candidate.json",
+        "docs/save-service-owner-final/README.md",
+        "docs/save-service-owner-final/CLIENT-INTEGRATION-PLAN.md"
       ]
     },
     {
@@ -839,7 +847,7 @@
     "complete_migration": false,
     "published": false
   },
-  "source_note": "The source field identifies the historical adopted audit cohort. Newer player-visible changes have separate receipts below and are not covered by its old full-run results.",
+  "source_note": "The source field is the latest production source with both full platform gates. Individual older milestone/native/candidate entries retain their historical exact sources and scopes; they are not current native or release proof.",
   "latest_runtime_changes": {
     "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
     "focused_assertions": 20611,
@@ -864,7 +872,8 @@
     "native_fixture_assertions": 17,
     "native_script_fingerprints": 223,
     "native_fixture_closed": true,
-    "real_service_rejoin_verified": false
+    "real_service_rejoin_verified": false,
+    "superseded_production_source": "2170f99e001c4c0a42e86454974f594820e86667"
   },
   "latest_wasp_pose_trial": {
     "source": "aaa6aeb862c9e87d0423b5859802ab9fc9edeba0",
@@ -879,16 +888,17 @@
     "reference": "docs/wasp-drawing-reuse/native-receipt.json"
   },
   "production_candidate": {
-    "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
-    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-441eaca\\TheWindowsill-production-candidate.rbxlx",
-    "place_sha256": "c581461e6616a4a3957fb6d178afc22c917085127b3b8abb94f44031e3af3bc7",
+    "source": "2170f99e001c4c0a42e86454974f594820e86667",
+    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-2170f99\\TheWindowsill-production-candidate.rbxlx",
+    "place_sha256": "59bb06d720169a727976e6a80be3eb11058569edc439bc245ea8563992eba0bd",
     "scripts": 222,
     "all_production_sources_exact": true,
     "injected_diagnostics": false,
     "persistence_disabled": false,
     "verified_platform_suites": 76,
-    "verified_platform_checks": 468487,
-    "native_ui_clock_assertions": 17,
+    "verified_platform_checks": 468506,
+    "native_current_source_verified": false,
+    "owner_factory_installed": false,
     "full_release_audit_complete": false,
     "published": false
   },
@@ -1283,5 +1293,74 @@
     "goal_complete": false,
     "published": false,
     "evidence": "docs/save-slot-isolation/recovery-archive-reuse-verification.json"
+  },
+  "historical_production_candidate_441eaca": {
+    "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+    "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-production-441eaca\\TheWindowsill-production-candidate.rbxlx",
+    "place_sha256": "c581461e6616a4a3957fb6d178afc22c917085127b3b8abb94f44031e3af3bc7",
+    "scripts": 222,
+    "all_production_sources_exact": true,
+    "injected_diagnostics": false,
+    "persistence_disabled": false,
+    "verified_platform_suites": 76,
+    "verified_platform_checks": 468487,
+    "native_ui_clock_assertions": 17,
+    "full_release_audit_complete": false,
+    "published": false,
+    "historical_candidate": true,
+    "covers_latest_production_source": false
+  },
+  "latest_production_service_owner_gate": {
+    "source": "2170f99e001c4c0a42e86454974f594820e86667",
+    "windows_suites": 76,
+    "windows_passed": 468506,
+    "windows_failed": 0,
+    "windows_output_sha256": "3e24274becc71fac32a76a9be0718047915e0b63a12812f8921d351cce01fc52",
+    "linux_run": 39945051568,
+    "linux_suites": 76,
+    "linux_passed": 468506,
+    "linux_failed": 0,
+    "compile": 222,
+    "strict_clean": true,
+    "runner_regressions": 5,
+    "immutable_windows_snapshot_verified": true,
+    "owner_factory_default_not_installed_in_engine": true,
+    "native_full_game_verified": false,
+    "real_service_rejoin_verified": false,
+    "goal_complete": false,
+    "published": false
+  },
+  "latest_private_recovery_service_owner": {
+    "source": "2170f99e001c4c0a42e86454974f594820e86667",
+    "service_owner_assertions": 2745,
+    "preceding_regression_assertions": 184404,
+    "total_assertions": 187149,
+    "private_candidates": 34,
+    "compile_entry_clean": true,
+    "strict_clean": true,
+    "actual_production_saveservice_owner_hook": true,
+    "real_saveclient_and_service_test_transport": true,
+    "all_three_modes_entry_apply_ack_grant_checkpoint_receipt_and_departure": true,
+    "resends_apply_current_checkpoint_once": true,
+    "reentrant_receipt_delivery_verified": true,
+    "invalid_and_late_receipts_do_not_touch_storage": true,
+    "real_owner_service_shutdown_verified": true,
+    "actual_server_life_metadata_stamped_on_wire_checkpoint": true,
+    "separate_receipt_bucket_prevents_continue_retry_starvation": true,
+    "original_archive_and_proposal_preserved": true,
+    "production_engine_owner_factory_installed": false,
+    "spiderclient_menu_recovery_callbacks_installed": false,
+    "client_profile_in_test_supplies_deferred_legacy_restore": true,
+    "one_recovery_slot_profile_per_owner": true,
+    "owner_replacement_epoch_transport_implemented": false,
+    "native_observer_verified": true,
+    "service_owner_native_verified": false,
+    "real_datastore_verified": false,
+    "production_connected": false,
+    "complete_migration": false,
+    "goal_complete": false,
+    "published": false,
+    "evidence": "docs/save-slot-isolation/recovery-service-owner-verification.json",
+    "production_gate": "docs/save-service-owner-final/full-verification.json"
   }
 }

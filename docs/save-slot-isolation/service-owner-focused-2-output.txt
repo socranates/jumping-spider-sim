@@ -1,0 +1,290 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+RECOVERY_PROPOSAL_STORE passed=79 failed=0
+RECOVERY_REST_WRITER passed=117 failed=0 suspensions=2616
+RECOVERY_PROGRESS_WRITER passed=182 failed=0
+RECOVERY_COMMIT_CONTROLLER completed_requests=31 simulated_seconds=186
+RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
+RECOVERY_SESSION_REBIND passed=1373 failed=0
+RECOVERY_PIPELINE cold_compressed=false requests=58 simulated_seconds=365
+RECOVERY_PIPELINE cold_compressed=true requests=58 simulated_seconds=365
+RECOVERY_PIPELINE passed=12362 failed=0
+RECOVERY_DEPARTURE passed=3407 failed=0
+RECOVERY_IDLE passed=14134 failed=0
+RECOVERY_RUNTIME passed=11963 failed=0
+SERVICE_APPLY_TRACE now=566 applied=1 serverProblem=nil
+SERVICE_ACK_TRACE before now=577 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=582 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=587 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=592 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=597 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=602 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=607 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=612 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=617 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=622 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=627 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=632 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=637 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=642 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=647 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=652 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=657 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=662 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=667 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=672 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=677 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=682 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=687 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=692 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=697 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=702 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=707 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=712 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=717 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=722 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=727 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=732 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=737 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=742 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=747 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_APPLY_TRACE now=758 applied=2 serverProblem=nil
+SERVICE_ACK_TRACE before now=758 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=763 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=768 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=773 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=778 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=783 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=788 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=793 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=798 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=803 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=808 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=813 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=818 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=823 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=828 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=833 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=838 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=843 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=848 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=853 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=858 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=863 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=868 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=873 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=878 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=883 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=888 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=893 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=898 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=903 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=908 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=913 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=918 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=923 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=928 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=933 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=938 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=943 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=948 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=953 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=958 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=963 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=968 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=973 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=978 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=983 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=988 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_APPLY_TRACE now=999 applied=3 serverProblem=nil
+SERVICE_ACK_TRACE before now=999 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1004 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1009 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1014 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1019 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1024 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1029 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1034 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1039 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1044 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1049 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1054 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1059 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1064 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1069 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1074 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1079 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1084 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1089 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1094 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1099 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1104 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1109 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1114 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1119 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1124 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1129 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1134 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1139 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1144 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1149 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1154 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1159 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1164 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1169 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1174 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1179 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1184 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1189 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1194 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1199 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1204 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1209 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1214 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1219 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1224 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_ACK_TRACE before now=1229 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=1 phase=entering entry=awaitApplied problem=nil
+SERVICE_APPLY_TRACE now=1240 applied=4 serverProblem=nil
+SERVICE_ACK_TRACE before now=1240 rb=false sb=false pb=false ob=true phase=entering entry=awaitApplied eb=false tokens=0.3999999999999999
+SERVICE_ACK_TRACE after dropped=0 limited=0 phase=entering entry=finalRest problem=nil
+C:/Users/natha/AppData/Local/Temp/tmprkf3yzsj.luau:54112: wire path did not apply exactly one current checkpoint: free applied=4 history=true
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmprkf3yzsj.luau:54112 function check
+C:/Users/natha/AppData/Local/Temp/tmprkf3yzsj.luau:54209 function runServiceOwnerChecks
+C:/Users/natha/AppData/Local/Temp/tmprkf3yzsj.luau:54225

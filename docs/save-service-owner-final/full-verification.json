@@ -1,0 +1,20 @@
+{
+  "source": "2170f99e001c4c0a42e86454974f594820e86667",
+  "windows_suites": 76,
+  "windows_passed": 468506,
+  "windows_failed": 0,
+  "windows_output_sha256": "3e24274becc71fac32a76a9be0718047915e0b63a12812f8921d351cce01fc52",
+  "linux_run": 39945051568,
+  "linux_suites": 76,
+  "linux_passed": 468506,
+  "linux_failed": 0,
+  "compile": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "immutable_windows_snapshot_verified": true,
+  "owner_factory_default_not_installed_in_engine": true,
+  "native_full_game_verified": false,
+  "real_service_rejoin_verified": false,
+  "goal_complete": false,
+  "published": false
+}

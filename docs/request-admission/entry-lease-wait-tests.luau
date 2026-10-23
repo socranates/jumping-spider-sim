@@ -1,0 +1,26 @@
+test("lease-renews-while-client-application-is-delayed",function()
+ local f=fixture();local g,scope,budget=install(f);local s=f.s
+ budget.read=80;budget.write=80;local j=assert(f.rt:enter())
+ driveTyped(f,function() return j.state~="pending" or j.phase=="awaitApplied" end)
+ check(j.state=="pending" and j.requests==8,"entry did not reach client application barrier")
+ local before=Json.copy(f.b.data);before.P_46001.lock=nil
+ for _=1,80 do f.clock.now+=1;f.rt:step() end
+ check(j.state=="pending" and j.phase=="awaitApplied" and j.requests==8 and f.decisions()==0,"menu/application delay advanced entry or granted authority")
+ check(f.rt.leaseJob.requests==3 and f.rt.leaseJob.state=="pending" and f.clock.now-s.sched.lastBeat<Rules.HEARTBEAT,"typed lease did not renew during application delay")
+ local after=Json.copy(f.b.data);after.P_46001.lock=nil
+ check(equal(before,after) and g:inspect().write==2,"renewal changed progress/archive or charged reads as writes")
+ local commit=assert(Client.prepare(j.offer,f.world,function() return f.current end));check(f.rt:entryApplied(assert(commit())),"delayed client application receipt refused")
+ driveTyped(f,function() return j.state~="pending" end)
+ check(j.state=="verified" and f.rt.phase=="recovered" and f.decisions()==1 and j.requests==10,"final reads did not accept an exact lease-only progress change")
+end)
+test("changed-final-rest-after-capacity-wait-refuses-grant",function()
+ local f=fixture();local g,scope,budget=install(f)
+ budget.read=80;budget.write=80;local j=assert(f.rt:enter())
+ driveTyped(f,function() return j.state~="pending" or j.phase=="awaitApplied" end)
+ local commit=assert(Client.prepare(j.offer,f.world,function() return f.current end));assert(f.rt:entryApplied(assert(commit())))
+ budget.read=0;f.rt:step();check(j.phase=="finalRest" and j.requests==8,"final read did not wait")
+ local original=Json.canonical(f.b.data[f.rkey]);f.b:poke(f.rkey,{changed=true})
+ budget.read=80;driveTyped(f,function() return j.state~="pending" end)
+ check(j.state=="refused" and j.io==nil and j.requests==9 and f.decisions()==0 and f.s.intents.requests.main.credential==nil,"changed final rest was authorized or skipped")
+ check(Json.canonical(f.b.data[f.rkey])~=original and f.b.data[f.rkey].changed and g:inspect().queued==0,"entry rewrote changed storage or leaked its operation")
+end)

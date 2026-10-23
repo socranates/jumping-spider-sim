@@ -1,5 +1,7 @@
 # Discovery worker admission candidate
 
+The subsequent [entry/read-lease candidate](ENTRY-WORKERS.md) converts two more actual workers and qualifies their shared gate through Runtime. Its evidence is separate from this preceding discovery milestone; normal activation remains closed.
+
 This continues the primitive qualification in [README.md](README.md). It adds an explicit override of the actual recovery offer reader, a provider-boundary bridge and a one-time import of existing request debt. **The ordinary game still uses the preceding adapters.** Other recovery workers, service-wide epoch ownership and a cooperative driver are not converted or installed. No native loading improvement, online save verification or publication is claimed.
 
 ## What changed

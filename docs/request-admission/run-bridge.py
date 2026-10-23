@@ -4,7 +4,7 @@ import importlib.util,sys
 H=Path(__file__).resolve().parent;ROOT=H.parents[1]
 def load():
  spec=importlib.util.spec_from_file_location('admission_base',H/'run.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
-def build():
+def build(workerPath=None):
  base=load();bundle,inputs,paths=base.build(H/'worker-admission.luau')
  original=(H/'facade.luau').read_text();updated=(H/'worker-facade.luau').read_text();assert bundle.count(original)==1
  bundle=bundle.replace(original,updated)
@@ -19,7 +19,7 @@ def build():
  bundle+=module('Rules',source/'Data/SaveRules.luau')
  bundle+=module('Memory',source/'Persistence/MemoryBackend.luau',{'require(script.Parent.Json)':'Json','require(script.Parent.Parent.Data.SaveRules)':'Rules'})
  bundle+=module('Scheduler',source/'Persistence/SaveScheduler.luau',{'require(script.Parent.Parent.Data.SaveRules)':'Rules'})
- bundle+=module('Worker',H/'worker.luau',{'require("./worker-facade")':'Facade'})
+ bundle+=module('Worker',workerPath or H/'worker.luau',{'require("./worker-facade")':'Facade'})
  tests=(H/'bridge-tests.luau').read_text().replace('__workerAdmission','Admission').replace('__workerBridge','Worker')
  tests=tests.replace('local Memory=require("../src/Shared/Persistence/MemoryBackend")','').replace('local Scheduler=require("../src/Shared/Persistence/SaveScheduler")','')
  bundle+=tests;extra+=[H/'worker-facade.luau',H/'bridge-tests.luau']

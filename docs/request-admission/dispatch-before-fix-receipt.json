@@ -1,0 +1,41 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "inputs": {
+    "docs/request-admission/worker-admission.luau": "8baa35a43481bd4a1f44751c7a244ec595bf8be220b0cc23263fcd022eb76257",
+    "docs/request-admission/facade.luau": "b7377be9950918711411330777a30dade8fbbfb20bae1015745b52a4f0553edf",
+    "docs/request-admission/tests.luau": "d5a8a7c400c8288673230f17cd4ad52963eebfa8653340fb9daac8aa87fc4cc0",
+    "docs/request-admission/provider-tests.luau": "559b9b1c25e56d6a06836a068becaa0a8d77245fd0f83a868e4e5cd255a27188",
+    "roblox_port/src/Server/DataStoreBackend.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38",
+    "roblox_port/src/Shared/Persistence/SaveWork.luau": "268cedc7bc81730d3f650b36fe9016e485928d4d7b1a957332a16093819f746e",
+    "roblox_port/src/Shared/Persistence/Json.luau": "9b6599b4c1476c5c5114bacb5106b2a869d799a78988d20688b572c6d0f31384",
+    "roblox_port/src/Shared/Data/SaveRules.luau": "bfb00a1828ee32298b9232ffc9f78b0bc637f08e10f34d1c589db335ee71d3b9",
+    "roblox_port/src/Shared/Persistence/MemoryBackend.luau": "4f27e644fdd2ba7a20a79e283f4ec27267d5c1d56685ab3f1f52f536aa15c1f5",
+    "roblox_port/src/Shared/Persistence/SaveScheduler.luau": "5d2c739936adc5f8fdc7e91c6105346db1c99c70b99aa6ec246c54d34dd144bb",
+    "docs/request-admission/worker.luau": "d080913dfa83eb204361cb3a123f1e49fd5ba3b645c0584f38e6f16a50bdc1a6",
+    "docs/request-admission/worker-facade.luau": "6d05797ad8546e7b90740e72bb0ffa43cb3b45cd2d8cf0c2d2d4d8d1709ec1a4",
+    "docs/request-admission/bridge-tests.luau": "ce5f8c3d67080e39d37eb4a5011ab629c96e2de643d9d7c47cce5bf8e9d40096",
+    "docs/request-admission/dispatch-guard-tests.luau": "1201a1b0f68bea575cff6ba508603a27e8d9e750d62b06081edeaeca5c623b36"
+  },
+  "bundle_sha256": "fd29597c8fee0f3347f9def9106214f33244bbb574e177bfdd6601dbdcc69f08",
+  "output_sha256": "ac3a19fa255f60ccf7fc5fdec9ff0fb2e0c4b5018f99fb89e99f54d4650be9af",
+  "exit_code": 1,
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "sha256": "bd2cb6f44aa14f1bd02f2038ca7bcb56341ca44985ac53ae48b5a3687d8e6e07"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "elapsed_seconds": 0.15090179443359375,
+  "policy_installed_in_production": false,
+  "backend_code_is_production": true,
+  "backend_provider_is_synthetic": true,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

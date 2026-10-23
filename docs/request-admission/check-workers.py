@@ -22,7 +22,7 @@ def main():
   folder=Path(tmp);shutil.copytree(ROOT/'roblox_port/src',folder/'src');shutil.copy2(ROOT/'roblox_port/default.project.json',folder/'default.project.json')
   for target,path in sources.items():
    code=path.read_text()
-   if path==H/'worker.luau':
+   if path in [H/'worker.luau',H/'worker-v2.luau']:
     assert code.count('require("./worker-facade")')==1;code=code.replace('require("./worker-facade")','require(script.Parent.RequestAdmissionFacade)')
    (folder/'src'/target).write_text(code,encoding='utf8',newline='\n');mounted[target]=sha(code.encode())
   errors=[]

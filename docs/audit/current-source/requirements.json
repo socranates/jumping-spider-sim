@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T08:19:11.165020+00:00",
+  "as_of_utc": "2026-10-23T08:35:55.189129+00:00",
   "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
   "goal_complete": false,
   "published": false,
@@ -75,7 +75,7 @@
     {
       "id": "legacy-world-restore",
       "status": "policy-chosen-implementation-pending",
-      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated. Current441eaca combined private recovery/departure cohort passes24648 checks, with23 candidates strict-clean. Recovery-only closed departure drains in-flight work, atomically three-way merges final local P progress/releases its own fresh lease, and requires uncached exact readback. R/M1/A1 unchanged; cap8 requests/24seconds. Production departure routing, terminal-idle/rejoin lifecycle and schema-3 entry remain unimplemented. Current private terminal-held lease maintenance passes38782 combined CLI checks with24 strict-clean candidates and22 isolated native server-memory assertions/245 fingerprints. Renews only fresh owned metadata under shared quota; ordinary writes stay blocked. Explicit retry/departure handoffs and slow acknowledgement regression are verified. Controlled terminal metadata is not a full native discovery/migration or real DataStore proof; production routing, safe session replacement and schema-3 entry remain open. A private factory/router now composes actual load/discovery/recovery/menu leases/entry hold/departure:50745 combined CLI checks and26 candidates strict-clean. Baseline binds before load; late close, changed-epoch direct flush and loading-time lease callbacks are fenced. Production SaveService/remotes/menu wiring and schema-3 entry remain unimplemented. Earlier native22 concerns the preceding private baseline; the new binding/coordinator has no current native/service proof. Continued schema3 format/readers/preparation now pass82 new checks plus50745 regressions (50827 total),27 candidates strict-clean. Stable original provenance survives repeated current/backup saves and current scene/generation changes; ended active records and retirement revival refuse. This is not an authenticated writer, native entry or completed lifecycle. Existing immutable archive reuse for later-slot imports and lifetime across fresh lives still require integration.",
+      "evidence_boundary": "User delegated choice; import portable progress into Preserve with untouched complete original archive. Private owned read-only map-view prototype167 checks plus compile/strict passes without changing production WorldMap. Full schema/archive/projection/native/durable migration remains unimplemented. Subsequent private recorded-map inspector passes33 checks/11 suspensions and compile/strict on a populated generated Test Garden fixture, without changing production or enabling incompatible Continue. Private raw archive preparation passes73 CLI/82 native, all224 native fingerprints, zero CreatorErrors and compile/strict, with frozen owned values/caps/cancellation. No raw production backend read, durable archive publisher or portable progress import is implemented. Additional private publication/raw-read components pass272+32 CLI/304 server-native with all226 fingerprints and strict; restart/cancellation/ambiguous-readback logic exists but actual server authority, raw collection, quotas, real DataStore and progress import remain unintegrated. Current441eaca combined private recovery/departure cohort passes24648 checks, with23 candidates strict-clean. Recovery-only closed departure drains in-flight work, atomically three-way merges final local P progress/releases its own fresh lease, and requires uncached exact readback. R/M1/A1 unchanged; cap8 requests/24seconds. Production departure routing, terminal-idle/rejoin lifecycle and schema-3 entry remain unimplemented. Current private terminal-held lease maintenance passes38782 combined CLI checks with24 strict-clean candidates and22 isolated native server-memory assertions/245 fingerprints. Renews only fresh owned metadata under shared quota; ordinary writes stay blocked. Explicit retry/departure handoffs and slow acknowledgement regression are verified. Controlled terminal metadata is not a full native discovery/migration or real DataStore proof; production routing, safe session replacement and schema-3 entry remain open. A private factory/router now composes actual load/discovery/recovery/menu leases/entry hold/departure:50745 combined CLI checks and26 candidates strict-clean. Baseline binds before load; late close, changed-epoch direct flush and loading-time lease callbacks are fenced. Production SaveService/remotes/menu wiring and schema-3 entry remain unimplemented. Earlier native22 concerns the preceding private baseline; the new binding/coordinator has no current native/service proof. Continued schema3 format/readers/preparation now pass82 new checks plus50745 regressions (50827 total),27 candidates strict-clean. Stable original provenance survives repeated current/backup saves and current scene/generation changes; ended active records and retirement revival refuse. This is not an authenticated writer, native entry or completed lifecycle. Existing immutable archive reuse for later-slot imports and lifetime across fresh lives still require integration. Private authenticated continuation writer now passes1127 new assertions plus50827 regressions (51954 total),28 candidates strict-clean. It requires an actual writable intent, immutable proposal/index reads, owned lease/progress coverage, exact R CAS, uncached candidate readback and final ownership before one receipt. Tests explicitly grant the fixture intent only after read-only Runtime capture refuses; no schema3 scene-entry or production integration is implied. Lost acknowledgements, close/yields, changed scopes, quota/deadline and post-write takeover are covered. Writer cache adoption/retirement, native/service verification and integration remain open.",
       "references": [
         "docs/save-slot-isolation/migration-design.md",
         "docs/save-slot-isolation/map-view-receipt.json",
@@ -86,7 +86,9 @@
         "docs/save-slot-isolation/RECOVERY-DEPARTURE.md",
         "docs/save-slot-isolation/RECOVERY-IDLE.md",
         "docs/save-slot-isolation/RECOVERY-RUNTIME.md",
-        "docs/save-slot-isolation/RECOVERY-REST-FORMAT.md"
+        "docs/save-slot-isolation/RECOVERY-REST-FORMAT.md",
+        "docs/save-slot-isolation/RECOVERY-CURRENT-WRITER.md",
+        "docs/save-slot-isolation/recovery-current-writer-verification.json"
       ]
     },
     {
@@ -980,6 +982,39 @@
     "format_validation_grants_authority": false,
     "production_connected": false,
     "schema3_format_implemented_privately": true,
+    "schema3_authenticated_writer_integrated": false,
+    "schema3_gameplay_entry_integrated": false,
+    "production_saveservice_and_remote_menu_wired": false,
+    "native_verified": false,
+    "real_datastore_verified": false,
+    "complete_migration": false,
+    "goal_complete": false,
+    "published": false
+  },
+  "latest_private_recovery_current_writer": {
+    "source": "441eacaec05d0e1164473f19764f7d56f12b8482",
+    "writer_assertions": 1127,
+    "preceding_regression_assertions": 50827,
+    "total_assertions": 51954,
+    "private_candidates": 28,
+    "compile_entry_clean": true,
+    "strict_clean": true,
+    "actual_factory_discovery_recovery_fixture": true,
+    "readonly_entry_refuses_writer_capture": true,
+    "test_only_intent_grant_explicit": true,
+    "frozen_single_use_owned_preparation": true,
+    "actual_continue_credential_and_exact_rest_cas": true,
+    "immutable_proposal_and_archive_index_rechecked": true,
+    "metadata_only_fresh_owned_lease": true,
+    "durable_rare_progress_coverage_required": true,
+    "uncached_rest_readback_and_final_ownership_required": true,
+    "subsequent_continuation_and_exact_noop_backup_preservation": true,
+    "ambiguous_write_and_read_failures_verified": true,
+    "changed_scope_deadline_quota_and_cap_checks": true,
+    "yielding_close_fences_verified": true,
+    "post_write_takeover_suppresses_receipt_without_rollback": true,
+    "production_connected": false,
+    "schema3_authenticated_writer_implemented_privately": true,
     "schema3_authenticated_writer_integrated": false,
     "schema3_gameplay_entry_integrated": false,
     "production_saveservice_and_remote_menu_wired": false,

@@ -1,0 +1,5 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=30 failed=0 wide_progress_chars=19363

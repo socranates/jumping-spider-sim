@@ -96,7 +96,7 @@ function Projection.prepare(raw:any,incoming:any,incomingTime:number,capsule:any
  if not Life.decode(bound) then return nil,"bound rare life is invalid" end
  local sourceLife=decoded.origin.save_life or ""
  local binding=`{#capsule.archive}:{capsule.archive}:{slot}:{#sourceLife}:{sourceLife}:{generation}`
- local out={progress=merged,life=bound,binding={key=binding,serial=serial,generation=generation,born=l.rareBorn},
+ local out={progress=merged,progressTime=math.max(sourceTime,incomingTime),life=bound,binding={key=binding,serial=serial,generation=generation,born=l.rareBorn},
   source={schema=raw.schema,checksum=raw.checksum,updatedAt=sourceTime},status="prepared-only",destinationCommitAuthorized=false}
  freeze(out);return out,nil
 end

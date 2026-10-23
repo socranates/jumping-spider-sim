@@ -1,3 +1,13 @@
+# Current: full freshness cohort green; recovery replacement awaits fresh native qualification
+
+Production is restored exactly to f405359. Windows95443 and Linux39886240490 both completed76 suites/468225 checks/0 failures, compile222, strict and runner5. Root source-bound verification passes. No full job is running and nothing published.
+
+The uncommitted20f59026 recovery adoption was withdrawn after regular STATE1250/2 exposed stale callbacks for unread slots. Smaller callback assertions had been swallowed by callback protection. The stronger persistent failure harness rejects that candidate. Corrected private8ad013b9 now passes83 callback-aware checks,44 yielding checks,1624 checks across seven unchanged save suites, the unchanged integration1250/0 and compile/strict. The earlier native126 is not adoption qualification; its old adoption script is disabled.
+
+See docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md. A distinct224-source native package with expected127 checks is built but unrun. Production remains on the previous fully verified cohort until fresh native/full qualification. No actual service/rejoin/full game transport or complete legacy migration claim. Progress-into-Preserve/complete archive, natural lifecycle/streaming/device/memory/performance and release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current: freshness cohort fully verified; recovery candidate ready for adoption
 
 Production f405359: Windows95443 and Linux39886240490 both terminal76 suites/468225 checks/0 failures, all222 modules compiled, strict clean and runner5. The root verifier confirms exact current runtime/test/workflow bytes. All full jobs in this cohort are terminal. Nothing published.
@@ -100,7 +110,7 @@ Only production change: Shared/Persistence/Json.canonical uses one private outpu
 
 Windows exec28618 and Linux39860574006 both closed successfully:76 suites/465380 checks/0 failures each; compile222/strict/runner5 pass. Root docs/save-continue/verify.py binds both full gates to exact committed inputs and verifies the native receipts. No jobs remain running in this stage.
 
-Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
+Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
 
 Both diagnostics are stopped/saved/closed/exited and their original XML hashes restored. Current-game archive C:/Users/natha/claude-xfer/Windowsill-encoder-game-068a878/Windowsill-encoder-game-review.rbxlx is diagnostic only; never publish it. Pre-existing stopped rig window94504044 remains untouched. Use explicit globalThis/scoped unique locals in future UI work.
 

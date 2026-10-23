@@ -1,0 +1,7 @@
+SESSION_BUDGET_YIELD read close fenced
+SESSION_BUDGET_YIELD read demote fenced
+SESSION_BUDGET_YIELD read supersede fenced
+SESSION_BUDGET_YIELD lock close fenced
+SESSION_BUDGET_YIELD lock demote fenced
+SESSION_BUDGET_YIELD lock supersede fenced
+SESSION_BUDGET_YIELD passed=44 failed=0

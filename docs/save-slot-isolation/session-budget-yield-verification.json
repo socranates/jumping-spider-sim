@@ -10,6 +10,8 @@
   "creator_errors": 0,
   "strict_clean": true,
   "production_changed": false,
+  "qualified_for_adoption": false,
+  "qualification_note": "Integrated callback audit supersedes the earlier callback assertion harness; native execution counts do not erase that failure",
   "real_datastore_verified": false,
   "full_game_transport_verified": false,
   "published": false

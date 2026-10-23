@@ -1,3 +1,13 @@
+# Current: full freshness cohort green; recovery replacement awaits fresh native qualification
+
+Production is restored exactly to f405359. Windows95443 and Linux39886240490 both completed76 suites/468225 checks/0 failures, compile222, strict and runner5. Root source-bound verification passes. No full job is running and nothing published.
+
+The uncommitted20f59026 recovery adoption was withdrawn after regular STATE1250/2 exposed stale callbacks for unread slots. Smaller callback assertions had been swallowed by callback protection. The stronger persistent failure harness rejects that candidate. Corrected private8ad013b9 now passes83 callback-aware checks,44 yielding checks,1624 checks across seven unchanged save suites, the unchanged integration1250/0 and compile/strict. The earlier native126 is not adoption qualification; its old adoption script is disabled.
+
+See docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md. A distinct224-source native package with expected127 checks is built but unrun. Production remains on the previous fully verified cohort until fresh native/full qualification. No actual service/rejoin/full game transport or complete legacy migration claim. Progress-into-Preserve/complete archive, natural lifecycle/streaming/device/memory/performance and release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current: freshness cohort fully verified; recovery candidate ready for adoption
 
 Production f405359: Windows95443 and Linux39886240490 both terminal76 suites/468225 checks/0 failures, all222 modules compiled, strict clean and runner5. The root verifier confirms exact current runtime/test/workflow bytes. All full jobs in this cohort are terminal. Nothing published.

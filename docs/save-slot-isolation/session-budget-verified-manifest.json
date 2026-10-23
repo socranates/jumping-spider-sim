@@ -1,0 +1,9 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "superseded_candidate_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+  "candidate_sha256": "8ad013b9f00326bdc686bb1c72be7717075ce55b5595ecf0347bc540f73e2aee",
+  "checked_test_sha256": "647d368ababbabbe6d9519f3698ecf2ac493f18a469afccadd25768de91f9a8d",
+  "production_changed": false,
+  "native_verified": false,
+  "scope": "Require actual restLoaded before callback; persistent failure count catches errors swallowed inside callback protection"
+}

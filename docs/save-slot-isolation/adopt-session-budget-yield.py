@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1];sha=lambda b:hashlib.sha256(b).hexdigest()
+assert not (ROOT/'docs/recovery-pacing-gates/initial-adoption-withdrawn.json').exists(), 'Candidate20f59026 withdrawn after integrated callback audit; do not adopt this superseded candidate'
 v=json.loads((HERE/'session-budget-yield-verification.json').read_text())
 gate=ROOT/'docs/session-freshness-gates/verification.json'
 assert gate.exists(),'Wait for the current Windows95443 cohort and root verification; do not overlap local full runs'

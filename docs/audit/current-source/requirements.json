@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T02:15:39.604329+00:00",
+  "as_of_utc": "2026-10-23T02:24:00.766819+00:00",
   "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
   "goal_complete": false,
   "published": false,
@@ -298,13 +298,14 @@
     },
     {
       "id": "save-request-budget",
-      "status": "private-cli-native-verified-adoption-pending",
-      "evidence_boundary": "Private20f59026 candidate supersedes pacing-only d217. It passes82 pacing/retention,44 actual coroutine-yield checks,1624 across7 unchanged save suites, compile/strict and126 native/224 fingerprints/zero errors. Late read callback after close was reproduced against d217; new load/demotion serials and post-yield fences reject closure/lost authority/superseding loads. Failed native missing-import fixture retained, corrected without candidate/criteria changes. Diagnostics closed/restored. Not adopted; actual service/rejoin/full transport and later full gates remain required.",
+      "status": "corrected-private-cli-verified-native-requalification-pending",
+      "evidence_boundary": "20f59026 was withdrawn before commit after ordinary integration1250/2 exposed unverified-slot delivery hidden by callback assertions swallowed inside pcall. Stronger persistent callback-failure harness rejects that source and passes83 with corrected8ad013b9, alongside44 yielding,1624 across7 unchanged save suites, the unchanged integration1250/0 and compile/strict. Production restored exactly to fully verified f405359. Earlier native126 is not adoption qualification. New224-source/expected127 native package is built but unrun; native/full/service/transport checks remain.",
       "references": [
-        "docs/save-slot-isolation/SESSION-BUDGET-YIELD.md",
-        "docs/save-slot-isolation/session-budget-yield-verification.json",
-        "docs/save-slot-isolation/session-budget-native-receipt.json",
-        "docs/save-slot-isolation/session-budget-yield-baseline-receipt.json"
+        "docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md",
+        "docs/save-slot-isolation/session-verified-qualification.json",
+        "docs/recovery-pacing-gates/initial-adoption-withdrawn.json",
+        "docs/recovery-pacing-gates/initial-integration-receipt.json",
+        "docs/recovery-pacing-gates/corrected-integration-receipt.json"
       ]
     }
   ],
@@ -430,6 +431,24 @@
     "production_changed": false,
     "real_datastore_verified": false,
     "full_game_transport_verified": false,
+    "published": false,
+    "qualified_for_adoption": false,
+    "qualification": "rejected-after-integrated-callback-audit"
+  },
+  "latest_callback_audit_candidate": {
+    "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+    "candidate_sha256": "8ad013b9f00326bdc686bb1c72be7717075ce55b5595ecf0347bc540f73e2aee",
+    "callback_aware_controls": 83,
+    "yielding_assertions": 44,
+    "regression_suites": 7,
+    "regression_assertions": 1624,
+    "unchanged_integration_assertions": 1250,
+    "integration_failed": 0,
+    "strict_clean": true,
+    "production_changed": false,
+    "native_verified": false,
+    "native_requalification_required": true,
+    "full_gates_for_candidate": false,
     "published": false
   }
 }

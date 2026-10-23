@@ -1,0 +1,10 @@
+{
+  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "candidate_sha256": "8ad013b9f00326bdc686bb1c72be7717075ce55b5595ecf0347bc540f73e2aee",
+  "test_sha256": "647d368ababbabbe6d9519f3698ecf2ac493f18a469afccadd25768de91f9a8d",
+  "bundle_sha256": "0bd597aa62587d1215c5185e1b85dcd9da30d0d9854bdf1f8f1c4a0c6eb8855d",
+  "exit_code": 0,
+  "output_sha256": "77d480191b357000967107cb47b103a719026ce8e65e343df0f13ca290e8cfb9",
+  "production_changed": false,
+  "native_verified": false
+}

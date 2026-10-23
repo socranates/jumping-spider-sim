@@ -1,0 +1,11 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "withdrawn_session_sha256": "20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1",
+  "reason": "Regular suite exposed unverified retained-slot callbacks; candidate and smaller callback harness need correction",
+  "production_changes_committed": false,
+  "published": false,
+  "restored": {
+    "roblox_port/src/Shared/Persistence/SaveSession.luau": "e6ecd86cd0a89f7daeb6d08414260162e20e8ff706672726f81900ecc14338e2",
+    "roblox_port/tests/state.luau": "1d12cd9f7ada725cd677ef30b933b85f287f29e42263c44995c43a1f17d54fbc"
+  }
+}

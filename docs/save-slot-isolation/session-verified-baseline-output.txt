@@ -1,0 +1,7 @@
+SESSION_BUDGET_CANDIDATE rest_retry bounded_and_complete
+SESSION_BUDGET_CANDIDATE lease_retry bounded_and_complete
+C:/Users/natha/AppData/Local/Temp/tmpibaiy_8t.luau:44914: callback failures were caught internally: 2
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpibaiy_8t.luau:44828 function verifyBudget
+C:/Users/natha/AppData/Local/Temp/tmpibaiy_8t.luau:44914

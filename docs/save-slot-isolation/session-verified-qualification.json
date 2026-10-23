@@ -1,0 +1,16 @@
+{
+  "base_source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "candidate_sha256": "8ad013b9f00326bdc686bb1c72be7717075ce55b5595ecf0347bc540f73e2aee",
+  "callback_aware_controls": 83,
+  "yielding_assertions": 44,
+  "regression_suites": 7,
+  "regression_assertions": 1624,
+  "unchanged_integration_assertions": 1250,
+  "integration_failed": 0,
+  "strict_clean": true,
+  "production_changed": false,
+  "native_verified": false,
+  "native_requalification_required": true,
+  "full_gates_for_candidate": false,
+  "published": false
+}

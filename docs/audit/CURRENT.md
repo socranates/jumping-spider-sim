@@ -1,3 +1,13 @@
+# Current: full freshness cohort green; recovery replacement awaits fresh native qualification
+
+Production is restored exactly to f405359. Windows95443 and Linux39886240490 both completed76 suites/468225 checks/0 failures, compile222, strict and runner5. Root source-bound verification passes. No full job is running and nothing published.
+
+The uncommitted20f59026 recovery adoption was withdrawn after regular STATE1250/2 exposed stale callbacks for unread slots. Smaller callback assertions had been swallowed by callback protection. The stronger persistent failure harness rejects that candidate. Corrected private8ad013b9 now passes83 callback-aware checks,44 yielding checks,1624 checks across seven unchanged save suites, the unchanged integration1250/0 and compile/strict. The earlier native126 is not adoption qualification; its old adoption script is disabled.
+
+See docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md. A distinct224-source native package with expected127 checks is built but unrun. Production remains on the previous fully verified cohort until fresh native/full qualification. No actual service/rejoin/full game transport or complete legacy migration claim. Progress-into-Preserve/complete archive, natural lifecycle/streaming/device/memory/performance and release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current: freshness cohort fully verified; recovery candidate ready for adoption
 
 Production f405359: Windows95443 and Linux39886240490 both terminal76 suites/468225 checks/0 failures, all222 modules compiled, strict clean and runner5. The root verifier confirms exact current runtime/test/workflow bytes. All full jobs in this cohort are terminal. Nothing published.
@@ -98,7 +108,7 @@ Earlier status below is historical.
 
 Current source068a87891770dbdf291ec3cab0e67480d14c0251 is on codex/save-continue. [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/json-encoding/README.md). One-buffer canonical encoding retains exact bytes/errors/checksums; only runtime Json.luau changed. Focused21420/0, compile222/strict/runner5 pass, native paired algorithm20738 assertions/224 fingerprints pass. A same-record isolated native comparison averages40.27percent lower encoder CPU; no whole-game FPS, heap-gain or hard-frame claim.
 
-Windows28618 and Linux39860574006 both completed76 suites/465380 checks/0 failures, compile222/strict/runner5 on source068a878. Root verifier binds exact current inputs and both terminal logs. The adopted-game native sequence1792707403197 passed32 save/return assertions with225 exact fingerprints, production Persistence disabled and zero CreatorErrors; closed/restored receipts verified. Continue choice1.830ms with zero synchronous encodes; capture98ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“108ms and long preparation remain limitations. No full native lifecycle, physical device, online or whole-game FPS claim.
+Windows28618 and Linux39860574006 both completed76 suites/465380 checks/0 failures, compile222/strict/runner5 on source068a878. Root verifier binds exact current inputs and both terminal logs. The adopted-game native sequence1792707403197 passed32 save/return assertions with225 exact fingerprints, production Persistence disabled and zero CreatorErrors; closed/restored receipts verified. Continue choice1.830ms with zero synchronous encodes; capture98ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ108ms and long preparation remain limitations. No full native lifecycle, physical device, online or whole-game FPS claim.
 
 Current-source/MAP.md and inventory.json now bind all222 current production files to that source; this remains lexical evidence only. Current CODE-REVIEW overlay separates historical findings such as already-implemented outdoor resets. The requirement registry preserves the broader28-item audit and incomplete native/device/online/legacy-world/release gates. Source XML/BuildInfo remain old, nothing new published, goal active.
 

@@ -1,4 +1,8 @@
-# Recovery pacing and suspended-operation fences
+# Superseded: recovery pacing and suspended-operation fences
+
+Integration rejected candidate20f59026: the normal state suite reported1250 passed/2 failed because callbacks could deliver retained values from slots not yet re-read. The smaller callback harness threw assertions inside a protected callback, allowing those errors to be swallowed. Its earlier126-check native pass is execution evidence under that incomplete harness, not qualification for adoption. The uncommitted adoption was withdrawn and production restored exactly to fully verified f405359. The adoption script now refuses this candidate. A replacement adds a restLoaded guard and persistent callback-failure accounting; its new native/full qualification is pending. See docs/recovery-pacing-gates/initial-adoption-withdrawn.json and the corrected candidate's receipts.
+
+Earlier status below is historical and superseded by this integration finding.
 
 Private candidate20f59026a57a11bcdde02845963d51d6fb1657d58b72ff0510794d6ee35a32f1 supersedes the pacing-only candidate. Production still uses f405359. Adoption waits for its current Windows95443 full run and root verification; the prepared adoption script refuses an absent gate. Linux39886240490 has completed76 suites/468225 checks/0 failures, compile222, strict clean and runner5. Those are freshness-cohort results, not full results for this private candidate.
 

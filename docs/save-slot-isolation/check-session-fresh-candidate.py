@@ -2,8 +2,8 @@ from pathlib import Path
 import argparse,hashlib,json,shutil,subprocess,tempfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 TOOLS=Path(r'C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools')
-p=argparse.ArgumentParser();p.add_argument('--budget',action='store_true');p.add_argument('--budget-yield',action='store_true');a=p.parse_args()
-stem='session-budget-yield' if a.budget_yield else 'session-budget' if a.budget else 'session-fresh'
+p=argparse.ArgumentParser();p.add_argument('--budget',action='store_true');p.add_argument('--budget-yield',action='store_true');p.add_argument('--budget-verified',action='store_true');a=p.parse_args()
+stem='session-budget-verified' if a.budget_verified else 'session-budget-yield' if a.budget_yield else 'session-budget' if a.budget else 'session-fresh'
 names={'Server/DataStoreBackend.luau':'fresh-read-backend-candidate.luau','Shared/Persistence/SaveSession.luau':stem+'-candidate.luau'};rows=[]
 assert not (HERE/(stem+'-types.json')).exists(),'Retain previous proof'
 with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,6 @@
+{
+  "receipt": "service-retry-timeout-before-1-receipt.json",
+  "counterexample_reproduced": false,
+  "interpretation": "The repeated polled-load expiry invariant passed on its first probe. loadOriginal retains session/canRetry until successful acquisition, so no additional fix was required. The original generic runner field issue_fixed is not evidence that a second defect existed.",
+  "included_in_full_check_total": false
+}

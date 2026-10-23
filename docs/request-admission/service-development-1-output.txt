@@ -1,0 +1,94 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+RECOVERY_PROPOSAL_STORE passed=79 failed=0
+RECOVERY_REST_WRITER passed=117 failed=0 suspensions=2616
+RECOVERY_PROGRESS_WRITER passed=182 failed=0
+RECOVERY_COMMIT_CONTROLLER completed_requests=31 simulated_seconds=186
+RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
+RECOVERY_SESSION_REBIND passed=1373 failed=0
+RECOVERY_PIPELINE cold_compressed=false requests=58 simulated_seconds=365
+RECOVERY_PIPELINE cold_compressed=true requests=58 simulated_seconds=365
+RECOVERY_PIPELINE passed=12362 failed=0
+RECOVERY_DEPARTURE passed=3407 failed=0
+RECOVERY_IDLE passed=14134 failed=0
+RECOVERY_RUNTIME passed=11963 failed=0
+WORKER_ADMISSION_CASE	actual-reader-zero-budget-retains-one-request	57
+WORKER_ADMISSION_CASE	actual-pending-reader-all-seven-fresh-reads	4
+WORKER_ADMISSION_CASE	actual-reader-retries-only-provider-failures	24
+WORKER_ADMISSION_CASE	actual-reader-cancel-deadline-and-visit-close	16
+WORKER_ADMISSION_CASE	route-change-during-budget-query-refuses-provider	3
+WORKER_ADMISSION_CASE	yielded-provider-cancel-and-visit-debt	7
+WORKER_ADMISSION_CASE	legacy-debt-validation-and-exact-rolling-boundary	12
+WORKER_ADMISSION_CASE	actual-reader-thrown-provider-keeps-backoff	4
+WORKER_ADMISSION passed=127 failed=0 groups=8
+BRIDGE_CASE	job-cap-and-backend-error-tuple	4
+BRIDGE_CASE	transform-retry-lifetime-fences	3
+BRIDGE_CASE	committed-write-cancelled-before-ack	5
+BRIDGE_CASE	pending-identity-and-method-capture	3
+BRIDGE_CASE	counter-replacement-and-invalid-account-scope	2
+BRIDGE_CASE	thrown-provider-is-a-counted-retryable-failure	3
+ADMISSION_BRIDGE passed=20 failed=0 groups=6
+DISPATCH_GUARD passed=9 failed=0 groups=2
+ARCHIVE_ADMISSION_CASE	cold-archive-retains-child-state-and-exact-accounting	264
+ARCHIVE_ADMISSION_CASE	collector-failure-backoff-and-budget-wait-are-distinct	139
+ARCHIVE_ADMISSION_CASE	changed-unselected-source-refuses-before-publication	50
+ARCHIVE_ADMISSION_CASE	parent-cap-closes-all-child-operations	20
+ARCHIVE_ADMISSION_CASE	committed-publication-cancellation-keeps-debt-and-drains	132
+ARCHIVE_ADMISSION_CASE	completed-original-reuse-is-read-only-except-lease	123
+ARCHIVE_ADMISSION_CASE	blocked-renewal-allows-cpu-and-independent-reads	100
+ARCHIVE_ADMISSION_CASE	repository-running-marker-blocks-reentrant-step	99
+ARCHIVE_ADMISSION passed=927 failed=0 groups=8
+OPERATION_CASE	waiting-then-atomic-parent-child-and-marker	25
+OPERATION_CASE	counter-cap-change-during-scheduler-bookkeeping	3
+OPERATION_CASE	explicit-raw-adapter-without-rebinding-session	3
+OPERATION_CASE	callback-retry-and-late-committed-result-fenced	2
+OPERATION_CASE	duplicate-rows-and-marker-counter-alias-refused	4
+NESTED_OPERATION passed=37 failed=0 groups=5
+TYPED_HISTORY passed=740 failed=0 groups=2
+COMMIT_ADMISSION cold_compressed=false read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=false read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION_CASE	cold-plain-compressed-and-archive-policies	1118
+COMMIT_ADMISSION_CASE	selected-rest-readback-wait-does-not-repeat-cas	266
+COMMIT_ADMISSION_CASE	ambiguous-m1-rest-and-progress-writes-require-readback	558
+COMMIT_ADMISSION_CASE	root-cap-and-deadline-close-nested-work	66
+COMMIT_ADMISSION_CASE	cancel-committed-raw-rest-drains-without-rebind	147
+COMMIT_ADMISSION_CASE	resume-reuses-exact-m1-and-immutable-originals	233
+COMMIT_ADMISSION_CASE	foreign-final-lease-cannot-verify-commit	167
+COMMIT_ADMISSION_CASE	deferred-rebind-witness-is-fresh-and-held-on-change	176
+COMMIT_ADMISSION_CASE	queued-final-lease-must-execute-and-ack-current-owner	249
+COMMIT_ADMISSION passed=2980 failed=0 groups=9
+ORDINARY_CASE	synchronous-load-waits-without-fake-attempts	11
+ORDINARY_CASE	polled-write-retains-newer-choice-and-logical-version	104
+ORDINARY_CASE	native-yield-is-not-resumed-by-polling	76
+ORDINARY_CASE	ordinary-preview-and-intent-validation-wait-without-grant	46
+ORDINARY_CASE	flush-cancels-admission-and-closes-with-exact-progress	5
+ORDINARY_CASE	expired-acquisition-ack-and-slow-rest-load-do-not-grant-active	4
+ORDINARY_CASE	retry-load-after-ambiguous-acquisition-uses-existing-step-context	82
+ORDINARY_CASE	credentialed-rest-wait-keeps-receipt-and-fences-expired-ownership	104
+ORDINARY_CASE	closed-load-during-capacity-wait-never-invents-a-record	2
+ORDINARY_CASE	late-native-load-result-is-discarded-after-close	3
+ORDINARY_CASE	shared-gate-allows-another-actors-read-while-write-is-blocked	5
+ORDINARY_CASE	reentrant-close-after-load-notification-does-not-deadlock	2
+ORDINARY_CASE	flush-drains-native-write-before-preserving-newer-choice	4
+ORDINARY_CASE	quiet-polling-does-not-allocate-driver-stacks	122
+ORDINARY_CASE	post-attachment-startup-wrapper-is-refused-before-provider	2
+ORDINARY_CASE	coarse-clock-wait-can-span-several-timer-quanta	11
+ORDINARY_SESSION passed=583 failed=0 groups=16
+ACCOUNT_SERVICE_CASE	initial-owner-and-normal-removal-use-one-account-lane	15
+ACCOUNT_SERVICE_CASE	cancel-capacity-wait-before-any-storage-start	5
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93300: closed initial cleanup did not verify release
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93300 function check
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93509
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93474 function test
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93501 function runAccountServiceChecks
+C:/Users/natha/AppData/Local/Temp/windowsill-account-service-yigipj83/run.luau:93515

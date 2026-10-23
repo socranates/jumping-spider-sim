@@ -1,0 +1,317 @@
+--!strict
+-- The server's persistence service (ROBLOX-39): one SaveSession per player, and the only place a client's message is turned into anything
+-- stored. It knows nothing of the engine: the players, the remotes, the clock, the sleep and the thread starter are handed in, so
+-- tests/state.luau runs it on the in-memory backend with scripted clients. Persistence.server.luau wires the real ones.
+--
+-- Trust: the simulation runs on the client, so what a client sends is not authority; it is only a candidate that must be whole and
+-- well-formed. Every message is checked before it touches a session (kind, size, depth, types, ranges, and for a rest the full checkpoint
+-- check in SaveRest), is rate limited, and a malformed one is dropped and counted, never raised. This is a boundary for corruption safety,
+-- not anti-cheat: it is a solo game with no economy, so a dishonest client can only change its own player's save.
+--
+-- Client to server (ToServer): { kind = "hello", v } | { kind = "progress", progress } | { kind = "rest", mode, record }
+-- New Life: {kind="begin_life",mode,serial}; rest messages carry the acknowledged `life` token.
+-- Server acknowledges {kind="life",mode,serial,token} only after the retirement marker is stored.
+-- Loaded replies include `lives` by slot; retired slots have no rest to offer.
+-- Server to client (ToClient): { kind = "loaded", v, status, reason, progress, rests = { main?, free?, easy? } }
+--                              | { kind = "status", status, reason } | { kind = "rest", mode, record }
+local SaveRules = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("SaveRules"))
+local SaveSession = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Persistence"):WaitForChild("SaveSession"))
+
+local SaveService = {}
+SaveService.__index = SaveService
+
+export type Player = { UserId: number, Name: string }
+export type Config = {
+	backend: any, now: () -> number, sleep: (number) -> (), spawn: ((...any) -> ...any, ...any) -> (),
+	send: (Player, { [string]: any }) -> (), jobId: string?, log: ((string) -> ())?,
+	ownerFactory: ((any, (any) -> ()) -> any)?, -- server-only opt-in single owner; never supplied by a client
+	keyOf: ((Player) -> string | number)?, -- the name a player's records are filed under (default: their UserId); the test place files each run under a fresh one
+}
+
+function SaveService.new(cfg: Config): any
+	return setmetatable({ cfg = cfg, entries = {} :: { [any]: any }, counter = 0, departing = 0, stats = { dropped = 0, limited = 0, handled = 0 }, closing = false }, SaveService)
+end
+
+local function log(self: any, text: string)
+	local l = self.cfg.log
+	if l then l(text) end
+end
+
+local function bucket(burst: number, perSecond: number, now: number): any
+	return { tokens = burst, last = now, burst = burst, rate = perSecond }
+end
+
+local function take(b: any, now: number): boolean
+	b.tokens = math.min(b.burst, b.tokens + (now - b.last) * b.rate)
+	b.last = now
+	if b.tokens >= 1 then
+		b.tokens -= 1
+		return true
+	end
+	return false
+end
+
+local function sendTo(self: any, player: Player, msg: { [string]: any })
+	local entry=self.entries[player]
+	if entry and entry.protocol==SaveRules.OFFER_PROTOCOL then
+		entry.sequence+=1;msg.sequence=entry.sequence;msg.epoch=entry.session.id
+	end
+	local ok, err = pcall(self.cfg.send, player, msg)
+	if not ok then log(self, "send failed: " .. tostring(err)) end
+end
+
+-- Queries use the actual session; all mutation/work goes through one owner.
+local function owner(entry:any):any
+ if entry.owner then assert(entry.owner.session==entry.session,"save owner session replacement requires an explicit transport handoff") end
+ return entry.owner or entry.session
+end
+local function loadedMessage(entry: any): { [string]: any }
+	local session=entry.session
+	local snap = session:snapshot()
+	if entry.protocol==SaveRules.OFFER_PROTOCOL then
+		local offers={};for _,mode in SaveRules.MODES do offers[mode]=session:offer(mode) end
+		return {kind="loaded",v=SaveRules.OFFER_PROTOCOL,recovery=entry.recovery,status=snap.status,reason=snap.reason,progress=snap.progress,protected=snap.protected,offers=offers,decisions=session.intents:snapshot()}
+	end
+	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives, protected = snap.protected }
+end
+
+-- A player arrived: start their session (the load runs in its own thread) and wait for their hello.
+function SaveService.addPlayer(self: any, player: Player)
+	if self.closing or self.entries[player] ~= nil then return end
+	self.counter += 1
+	local now = self.cfg.now()
+	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
+	local entry: any = { player = player, hello = false, loaded = false, leaving = false, sequence=0, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), recoveryBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
+	local sessionConfig = {
+		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
+		log = function(text: string) log(self, text) end,
+		onChange = function(status: string, reason: string?)
+			if entry.loaded and entry.hello and not entry.leaving then sendTo(self, player, { kind = "status", status = status, reason = reason, protected = entry.session:protectedSlots() }) end
+		end,
+		onLoaded = function(_snap: any)
+			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry)) end
+		end,
+		onLife = function(mode: string,serial: number,token: string)
+   if entry.hello and not entry.leaving and entry.protocol~=SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="life",mode=mode,serial=serial,token=token}) end
+  end,
+  onOffer=function(mode: string,offer: any)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="offer",mode=mode,offer=offer}) end
+  end,
+  onDecision=function(decision: any)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="decision",decision=decision}) end
+  end,
+  onStored=function(mode: string,serial: number,credential: string,restSerial: number)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="stored",mode=mode,serial=serial,credential=credential,restSerial=restSerial}) end
+  end,
+  onRefused=function(mode: string,serial: number,credential: string,restSerial: number,reason: string)
+   if entry.hello and not entry.leaving and entry.protocol==SaveRules.OFFER_PROTOCOL then sendTo(self,player,{kind="refused",mode=mode,serial=serial,credential=credential,restSerial=restSerial,reason=reason}) end
+  end,
+  onRest = function(mode: string, record: any)
+			if entry.hello and not entry.leaving then
+				if entry.protocol==SaveRules.OFFER_PROTOCOL then owner(entry):refreshOffer(mode)
+				else sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
+			end
+		end,
+ }
+ if self.cfg.ownerFactory then
+  local owned=self.cfg.ownerFactory(sessionConfig,function(msg:any)
+   if self.entries[player]~=entry or entry.leaving or not entry.loaded or not entry.hello or entry.protocol~=SaveRules.OFFER_PROTOCOL or entry.recovery~=SaveRules.RECOVERY_PROTOCOL then return end
+   if type(msg)~="table" or msg.kind~="recovery_entry" then return end
+   sendTo(self,player,msg)
+  end)
+  assert(type(owned)=="table" and type(owned.session)=="table" and owned.session.id==sessionId and owned.session.state=="loading"
+   and tostring(owned.session.cfg.userId)==tostring(sessionConfig.userId) and owned.session.counters.requests==0,"owner factory must return an unloaded bound session")
+  for _,method in {"load","step","flush","setProgress","beginLife","requestLife","refreshOffer","setRestForIntent","setRestForLife","enableOffers","demote"} do
+   assert(type(owned[method])=="function","save owner method missing: "..method)
+  end
+  entry.owner,entry.session=owned,owned.session
+ else entry.session=SaveSession.new(sessionConfig) end
+ self.entries[player] = entry
+	local launched,launchError=pcall(self.cfg.spawn,function()
+  entry.loadStarted=true
+		local ok, err = pcall(function() owner(entry):load() end)
+		if not ok then
+			log(self, "load raised: " .. tostring(err))
+			if not entry.leaving and not entry.session.closed then owner(entry):demote("load_failed", true) end
+		end
+		entry.loaded = true
+		if entry.unsupported then
+			if entry.session.state=="active" then owner(entry):demote("offline",false) else entry.session.canRetry=false end
+		end
+		if entry.leaving then
+			local flushed, flushError = pcall(function() owner(entry):flush() end)
+			-- (ROBLOX-91: only a departure that was counted is uncounted: shutdown also marks a still-loading entry as leaving, and the count went negative)
+			if entry.counted then
+				entry.counted = false
+				self.departing -= 1
+			end
+			if not flushed then log(self, "flush raised: " .. tostring(flushError)) end
+			return
+		end
+		if entry.hello then sendTo(self, player, loadedMessage(entry)) end
+	end)
+ if not launched then
+  log(self,"load task launch failed: "..tostring(launchError))
+  if not entry.loadStarted then
+   entry.leaving=true
+   local target=owner(entry)
+   if target.cancelLoading then target:cancelLoading();target:load() else entry.session.closed=true end
+   entry.loaded=true
+   if entry.counted then entry.counted=false;self.departing-=1 end
+   if self.entries[player]==entry then self.entries[player]=nil end
+  end
+  error(launchError,0)
+ end
+end
+
+local function handle(self: any, entry: any, msg: any)
+	local now = self.cfg.now()
+	local kind = msg.kind
+	if kind == "hello" then
+		if not take(entry.helloBucket, now) then self.stats.limited += 1; return end
+		local protocol=if msg.v==SaveRules.OFFER_PROTOCOL then SaveRules.OFFER_PROTOCOL elseif msg.v==1 or msg.v==SaveRules.PROTOCOL then SaveRules.PROTOCOL else nil
+		if protocol==nil or (entry.hello and entry.protocol~=protocol) then
+			self.stats.dropped+=1
+			if not entry.hello then
+				entry.unsupported=true
+				if entry.session.state=="active" or entry.session.state=="loading" then owner(entry):demote("offline",false) else entry.session.canRetry=false end
+			end
+			return
+		end
+		local wasUnsupported=entry.unsupported;entry.unsupported=false;entry.protocol=protocol
+		if not entry.hello then
+   entry.recovery=if protocol==SaveRules.OFFER_PROTOCOL and msg.recovery==SaveRules.RECOVERY_PROTOCOL
+    and entry.owner and type(entry.owner.enableRecovery)=="function" and type(entry.owner.applyRecovery)=="function" then SaveRules.RECOVERY_PROTOCOL else nil
+  end
+		if protocol==SaveRules.OFFER_PROTOCOL then owner(entry):enableOffers() end
+		if entry.session.state=="session" and (entry.session.reason=="offline" or (wasUnsupported and (entry.session.reason=="other_session" or entry.session.reason=="load_failed"))) then entry.session.canRetry=true;entry.session.retryAt=now end
+		local firstHello=not entry.hello;entry.hello = true
+  if firstHello and entry.recovery then entry.owner:enableRecovery() end
+		if entry.loaded then sendTo(self, entry.player, loadedMessage(entry)) end
+	elseif not entry.hello then
+		self.stats.dropped+=1 -- no candidates/permissions before compatible negotiation
+	elseif kind == "progress" then
+		if not take(entry.progressBucket, now) then self.stats.limited += 1; return end
+		if not owner(entry):setProgress(msg.progress) then self.stats.dropped += 1 end
+	elseif kind == "begin_life" then
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if type(msg.mode)~="string" or not owner(entry):beginLife(msg.mode,msg.serial) then
+   self.stats.dropped+=1
+   if type(msg.mode)=="string" and entry.session.restProtected[msg.mode] then
+    local status,reason=entry.session:status()
+    sendTo(self,entry.player,{kind="status",status=status,reason=reason,protected=entry.session:protectedSlots()})
+   end
+  end
+ elseif kind=="life_intent" or kind=="refresh_offer" then
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if entry.protocol~=SaveRules.OFFER_PROTOCOL then self.stats.dropped+=1;return end
+  local accepted=if kind=="life_intent" then owner(entry):requestLife(msg.intent,msg.mode,msg.serial,msg.offerId) else owner(entry):refreshOffer(msg.mode)
+  if not accepted then self.stats.dropped+=1 end
+ elseif kind=="recovery_applied" then
+  if entry.protocol~=SaveRules.OFFER_PROTOCOL or entry.recovery~=SaveRules.RECOVERY_PROTOCOL or not entry.owner or type(entry.owner.applyRecovery)~="function" then self.stats.dropped+=1;return end
+  if not take(entry.recoveryBucket,now) then self.stats.limited+=1;return end
+  if not entry.owner:applyRecovery(msg) then self.stats.dropped+=1 end
+ elseif kind == "rest" then
+		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
+		local mode = msg.mode
+		if type(mode)~="string" then self.stats.dropped+=1;return end
+		if entry.protocol==SaveRules.OFFER_PROTOCOL and (type(msg.restSerial)~="number" or msg.restSerial~=msg.restSerial or msg.restSerial<1 or msg.restSerial>SaveRules.MAX_LIFE_SERIAL or msg.restSerial~=math.floor(msg.restSerial)) then self.stats.dropped+=1;return end
+		local accepted=if entry.protocol==SaveRules.OFFER_PROTOCOL then owner(entry):setRestForIntent(mode,msg.record,msg.life,msg.serial,msg.credential,msg.restSerial) else owner(entry):setRestForLife(mode,msg.record,msg.life)
+		if not accepted then self.stats.dropped+=1 end
+	else
+		self.stats.dropped += 1
+	end
+end
+
+-- A message from a client. Never raises, whatever it holds.
+function SaveService.onMessage(self: any, player: Player, msg: any)
+	local entry = self.entries[player]
+	if entry == nil or entry.leaving then return end
+	if type(msg) ~= "table" or type(msg.kind) ~= "string" then
+		self.stats.dropped += 1
+		return
+	end
+	self.stats.handled += 1
+	local ok, err = pcall(function(): any
+		handle(self, entry, msg)
+		return nil
+	end)
+	if not ok then
+		self.stats.dropped += 1
+		log(self, "a message raised: " .. tostring(err))
+	end
+end
+
+-- The player left: write what is waiting, release the lock. Yields.
+function SaveService.removePlayer(self: any, player: Player)
+	local entry = self.entries[player]
+	if entry == nil then return end
+	self.entries[player] = nil
+	entry.leaving = true
+	entry.counted = true
+	self.departing += 1 -- BindToClose must also await a PlayerRemoving write already in flight.
+	if not entry.loaded then
+  local target=owner(entry)
+  if target.cancelLoading then target:cancelLoading() end
+  return -- the loading thread owns its provider drain and closed cleanup
+ end
+	local ok, err = pcall(function() owner(entry):flush() end)
+	entry.counted = false
+	self.departing -= 1
+	if not ok then log(self, "flush raised: " .. tostring(err)) end
+end
+
+-- About once a second: every session does its periodic work in its own thread (a slow store does not hold up the others).
+function SaveService.step(self: any)
+	for _, entry in self.entries do
+		if entry.loaded and not entry.leaving and not entry.working and not entry.session.busy then
+   entry.working=true
+			local launched,launchError=pcall(self.cfg.spawn,function()
+				local ok, err = pcall(function() owner(entry):step() end)
+    entry.working=false
+				if not ok then log(self, "step raised: " .. tostring(err)) end
+			end)
+   if not launched then entry.working=false;log(self,"step task launch failed: "..tostring(launchError)) end
+		end
+	end
+end
+
+-- The server is closing: every session writes what is waiting, all at once, within the deadline. Yields until they are done or time is up.
+function SaveService.shutdown(self: any)
+	self.closing = true
+	local deadline = self.cfg.now() + SaveRules.FLUSH_DEADLINE
+	local pending = 0
+	for player, entry in self.entries do
+		entry.leaving = true
+		if not entry.loaded and not entry.counted then
+			-- Still loading: its loading thread will flush it and uncount it, and the shutdown waits for that like for a player who is leaving.
+			entry.counted = true
+			self.departing += 1
+		end
+  if not entry.loaded then
+   local target=owner(entry)
+   if target.cancelLoading then target:cancelLoading(deadline) end
+  end
+		if entry.loaded then
+			pending += 1
+			self.cfg.spawn(function()
+				local ok, err = pcall(function() owner(entry):flush(deadline) end)
+				if not ok then log(self, "flush raised: " .. tostring(err)) end
+				pending -= 1
+			end)
+		end
+		self.entries[player] = nil
+	end
+	while (pending > 0 or self.departing > 0) and self.cfg.now() < deadline do
+		self.cfg.sleep(0.25)
+	end
+end
+
+function SaveService.statusOf(self: any, player: Player): (string?, string?)
+	local entry = self.entries[player]
+	if entry == nil then return nil, nil end
+	local pair = { entry.session:status() }
+	return pair[1], pair[2]
+end
+
+return SaveService

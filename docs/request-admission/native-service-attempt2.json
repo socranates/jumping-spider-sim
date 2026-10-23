@@ -1,0 +1,4199 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "run": "1792797359585",
+  "artifact": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-service-a1f042e-attempt2",
+  "place_sha256": "d19ef15e1f8698b32665f8823a032068132201ef1cc199a5226045ff7e5dd491",
+  "manifest_sha256": "c2ed8eb61e9e3b5ca1dc5f78aa12faa498bdddbb6cef18288a9eed356c9b8436",
+  "diagnostics": {
+    "docs/request-admission/native-service-client.luau": "c74c6ed71b1bf95a6857420a0bd3136e7b8228e26b55ee0b57184acf48e11f12",
+    "docs/request-admission/native-service-server.server.luau": "e21ce485bf7a82dfbd3b89bbad62c2d2dd18ed40bd267f9f4924ff4fbfc9f2a3"
+  },
+  "scripts": 273,
+  "production_untouched": 220,
+  "production_overrides": [
+    "Server/SaveService.luau",
+    "Shared/Persistence/Checkpoint.luau",
+    "Shared/Persistence/SaveSession.luau",
+    "Shared/World/WorldMap.luau"
+  ],
+  "terminal": "passed",
+  "output_sha256": "ad54af3fe2593835f881a2ec1fef3cac7623ea4e5f681a8c02da7c387cb670c5",
+  "clock_scale": 1,
+  "memory_store": true,
+  "engine_codec": true,
+  "real_remote_events": true,
+  "online_verified": false,
+  "published": false,
+  "normal_startup_installed": false,
+  "goal_complete": false,
+  "preflights": [
+    {
+      "active": 0,
+      "closed": true,
+      "deferred": false,
+      "scopes": 0,
+      "starts": 4
+    },
+    {
+      "active": 0,
+      "closed": true,
+      "deferred": true,
+      "scopes": 0,
+      "starts": 0
+    }
+  ],
+  "ledger": [
+    {
+      "active": 0,
+      "history": 127,
+      "read": 127,
+      "scopes": 0,
+      "starts": 287,
+      "write": 24
+    }
+  ],
+  "samples": {
+    "SERVER_PAYLOAD": [
+      {
+        "canonical_bytes": 177,
+        "copy_seconds": 3.2999960239976645e-06,
+        "count": 3,
+        "encode_seconds": 3.599999763537198e-05,
+        "key": "decision:free"
+      },
+      {
+        "canonical_bytes": 208,
+        "copy_seconds": 2.2000021999701858e-06,
+        "count": 6,
+        "encode_seconds": 2.2299995180219412e-05,
+        "key": "decision:main"
+      },
+      {
+        "canonical_bytes": 118,
+        "copy_seconds": 3.3000032999552786e-06,
+        "count": 6,
+        "encode_seconds": 1.479999627918005e-05,
+        "key": "session_replace_commit:none"
+      },
+      {
+        "canonical_bytes": 150,
+        "copy_seconds": 1.8999999156221747e-06,
+        "count": 6,
+        "encode_seconds": 2.0699997548945248e-05,
+        "key": "new_life_state:free"
+      },
+      {
+        "canonical_bytes": 40103,
+        "copy_seconds": 0.001506200002040714,
+        "count": 12,
+        "encode_seconds": 0.004434300004504621,
+        "key": "offer:free"
+      },
+      {
+        "canonical_bytes": 40103,
+        "copy_seconds": 0.0005630000014207326,
+        "count": 10,
+        "encode_seconds": 0.004485199999180622,
+        "key": "offer:easy"
+      },
+      {
+        "canonical_bytes": 149,
+        "copy_seconds": 2.2000021999701858e-06,
+        "count": 3,
+        "encode_seconds": 2.9300004825927317e-05,
+        "key": "new_life_state:main"
+      },
+      {
+        "canonical_bytes": 209,
+        "copy_seconds": 3.0000010156072676e-06,
+        "count": 4,
+        "encode_seconds": 2.2300002456177026e-05,
+        "key": "decision:easy"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 5.900001269765198e-06,
+        "count": 1,
+        "encode_seconds": 2.4000000848900527e-05,
+        "key": "stored:easy"
+      },
+      {
+        "canonical_bytes": 144,
+        "copy_seconds": 3.0000010156072676e-06,
+        "count": 16,
+        "encode_seconds": 1.889999839477241e-05,
+        "key": "status:none"
+      },
+      {
+        "canonical_bytes": 16358,
+        "copy_seconds": 0.00029229999927338213,
+        "count": 3,
+        "encode_seconds": 0.0023159999982453883,
+        "key": "recovery_entry:none"
+      },
+      {
+        "canonical_bytes": 149,
+        "copy_seconds": 1.7999991541728377e-06,
+        "count": 3,
+        "encode_seconds": 2.0499996026046574e-05,
+        "key": "new_life_state:easy"
+      },
+      {
+        "canonical_bytes": 117,
+        "copy_seconds": 3.9000005926936865e-06,
+        "count": 6,
+        "encode_seconds": 1.9899998733308166e-05,
+        "key": "session_replace_offer:none"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 5.399997462518513e-06,
+        "count": 1,
+        "encode_seconds": 1.9800005247816443e-05,
+        "key": "stored:free"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 5.299996701069176e-06,
+        "count": 1,
+        "encode_seconds": 2.0200001017656177e-05,
+        "key": "stored:main"
+      },
+      {
+        "canonical_bytes": 354,
+        "copy_seconds": 8.000002708286047e-06,
+        "count": 7,
+        "encode_seconds": 5.439999949885532e-05,
+        "key": "loaded:none"
+      },
+      {
+        "canonical_bytes": 40108,
+        "copy_seconds": 0.000737899994419422,
+        "count": 15,
+        "encode_seconds": 0.004634699995222036,
+        "key": "offer:main"
+      }
+    ],
+    "SERVER_PROVIDER": [
+      {
+        "calls": 48,
+        "key": "update",
+        "max_seconds": 0.028879500001494307,
+        "seconds": 0.8083259999984875
+      },
+      {
+        "calls": 239,
+        "key": "read",
+        "max_seconds": 0.04716339999868069,
+        "seconds": 4.050185399923066
+      }
+    ],
+    "SERVER_STEP": [
+      {
+        "budget_full_calls": 2,
+        "calls": 4,
+        "elapsed_seconds": 0.050621800000953954,
+        "key": "discovering:nil:nil:main",
+        "max_seconds": 0.0002458000017213635,
+        "request_starts": 3,
+        "seconds": 0.0006467000057455152
+      },
+      {
+        "budget_full_calls": 5,
+        "calls": 5,
+        "elapsed_seconds": 0.06999029999860795,
+        "key": "closed:nil:nil:nil",
+        "max_seconds": 1.3600001693703234e-05,
+        "request_starts": 0,
+        "seconds": 5.09000092279166e-05
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03319869998813374,
+        "key": "recovering:witnessM1:nil:prepare",
+        "max_seconds": 0.00023429999419022352,
+        "request_starts": 2,
+        "seconds": 0.0004659999904106371
+      },
+      {
+        "budget_full_calls": 35,
+        "calls": 35,
+        "elapsed_seconds": 0.582873200000904,
+        "key": "held:apply:awaitApplied:prepare",
+        "max_seconds": 5.7600002037361264e-05,
+        "request_starts": 0,
+        "seconds": 0.00043950000690529123
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03367890000663465,
+        "key": "recovering:witnessR:nil:prepare",
+        "max_seconds": 0.0002565000031609088,
+        "request_starts": 2,
+        "seconds": 0.00045280000631464645
+      },
+      {
+        "budget_full_calls": 4,
+        "calls": 4,
+        "elapsed_seconds": 0.07075299999996787,
+        "key": "closed:nil:nil:easy",
+        "max_seconds": 1.2700002116616815e-05,
+        "request_starts": 0,
+        "seconds": 4.600000102072954e-05
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 3,
+        "elapsed_seconds": 0.053553700003249105,
+        "key": "offer_refused:nil:nil:prepare",
+        "max_seconds": 0.0004693999944720417,
+        "request_starts": 2,
+        "seconds": 0.0008884999988367781
+      },
+      {
+        "budget_full_calls": 288,
+        "calls": 290,
+        "elapsed_seconds": 4.9828594000136945,
+        "key": "offered:nil:nil:prepare",
+        "max_seconds": 0.00048040000547189265,
+        "request_starts": 3,
+        "seconds": 0.02478239994525211
+      },
+      {
+        "budget_full_calls": 72,
+        "calls": 72,
+        "elapsed_seconds": 1.2003725999966264,
+        "key": "held:nil:nil:prepare",
+        "max_seconds": 6.469999789260328e-05,
+        "request_starts": 0,
+        "seconds": 0.000920499958738219
+      },
+      {
+        "budget_full_calls": 4,
+        "calls": 4,
+        "elapsed_seconds": 0.07046459999401122,
+        "key": "closed:apply:finalProgress:prepare",
+        "max_seconds": 1.2500000593718141e-05,
+        "request_starts": 0,
+        "seconds": 4.049999552080408e-05
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03295340000477154,
+        "key": "recovering:capture:nil:prepare",
+        "max_seconds": 6.160000339150429e-05,
+        "request_starts": 0,
+        "seconds": 0.00011829999857582152
+      },
+      {
+        "budget_full_calls": 364,
+        "calls": 364,
+        "elapsed_seconds": 6.065976400001091,
+        "key": "new_retirement:nil:nil:prepare",
+        "max_seconds": 0.0025531999999657273,
+        "request_starts": 21,
+        "seconds": 0.11107259988057194
+      },
+      {
+        "budget_full_calls": 13,
+        "calls": 13,
+        "elapsed_seconds": 0.2171426999993855,
+        "key": "recovered:apply:finalProgress:prepare",
+        "max_seconds": 0.00024619999749120325,
+        "request_starts": 2,
+        "seconds": 0.0013306999899214134
+      },
+      {
+        "budget_full_calls": 350,
+        "calls": 350,
+        "elapsed_seconds": 5.834081299995887,
+        "key": "entering:apply:awaitApplied:prepare",
+        "max_seconds": 0.0010261999996146187,
+        "request_starts": 0,
+        "seconds": 0.03322270001081051
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03406099999847356,
+        "key": "entering:apply:progress:prepare",
+        "max_seconds": 0.000283800000033807,
+        "request_starts": 2,
+        "seconds": 0.0005276999945635907
+      },
+      {
+        "budget_full_calls": 4,
+        "calls": 4,
+        "elapsed_seconds": 0.069983699999284,
+        "key": "closed:apply:awaitApplied:prepare",
+        "max_seconds": 1.5000005078036338e-05,
+        "request_starts": 0,
+        "seconds": 5.0000002374872565e-05
+      },
+      {
+        "budget_full_calls": 1291,
+        "calls": 1291,
+        "elapsed_seconds": 21.516106000002765,
+        "key": "new_retirement:nil:nil:nil",
+        "max_seconds": 0.002474900000379421,
+        "request_starts": 23,
+        "seconds": 0.5952487000467954
+      },
+      {
+        "budget_full_calls": 36,
+        "calls": 36,
+        "elapsed_seconds": 0.5989392000046792,
+        "key": "held:apply:finalProgress:prepare",
+        "max_seconds": 5.699999746866524e-05,
+        "request_starts": 0,
+        "seconds": 0.00046979998296592385
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 1,
+        "elapsed_seconds": 0.016733800002839416,
+        "key": "entry_required:apply:awaitApplied:prepare",
+        "max_seconds": 0.00028530000417958945,
+        "request_starts": 1,
+        "seconds": 0.00028530000417958945
+      },
+      {
+        "budget_full_calls": 318,
+        "calls": 318,
+        "elapsed_seconds": 5.299638099997537,
+        "key": "held:nil:nil:nil",
+        "max_seconds": 5.8099998568650335e-05,
+        "request_starts": 0,
+        "seconds": 0.00306429998454405
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03182419999939157,
+        "key": "entry_required:apply:nil:prepare",
+        "max_seconds": 0.00010679999832063913,
+        "request_starts": 0,
+        "seconds": 0.00019189999875379726
+      },
+      {
+        "budget_full_calls": 35,
+        "calls": 35,
+        "elapsed_seconds": 0.5830858999979682,
+        "key": "held:nil:nil:easy",
+        "max_seconds": 7.999999797903001e-05,
+        "request_starts": 0,
+        "seconds": 0.0004668000037781894
+      },
+      {
+        "budget_full_calls": 16,
+        "calls": 16,
+        "elapsed_seconds": 0.26654169999528676,
+        "key": "recovering:prepare:nil:prepare",
+        "max_seconds": 0.002858100000594277,
+        "request_starts": 0,
+        "seconds": 0.03409869999450166
+      },
+      {
+        "budget_full_calls": 69,
+        "calls": 69,
+        "elapsed_seconds": 1.1496182000046247,
+        "key": "entering:apply:prepare:prepare",
+        "max_seconds": 0.007747499999823049,
+        "request_starts": 0,
+        "seconds": 0.16315279998525511
+      },
+      {
+        "budget_full_calls": 4,
+        "calls": 4,
+        "elapsed_seconds": 0.06775550000020303,
+        "key": "entering:apply:proposal:prepare",
+        "max_seconds": 0.0003262000027461909,
+        "request_starts": 4,
+        "seconds": 0.0011500000036903657
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 3,
+        "elapsed_seconds": 0.050808399995730724,
+        "key": "discovering:nil:nil:free",
+        "max_seconds": 0.00021410000044852495,
+        "request_starts": 3,
+        "seconds": 0.0006066999994800426
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03347119999671122,
+        "key": "discovering:nil:nil:index",
+        "max_seconds": 0.0003141999986837618,
+        "request_starts": 2,
+        "seconds": 0.0005368999991333112
+      },
+      {
+        "budget_full_calls": 120,
+        "calls": 140,
+        "elapsed_seconds": 2.4449149999927613,
+        "key": "discovering:nil:nil:prepare",
+        "max_seconds": 0.007128899997042026,
+        "request_starts": 0,
+        "seconds": 0.3295544999928097
+      },
+      {
+        "budget_full_calls": 3,
+        "calls": 3,
+        "elapsed_seconds": 0.049858400008815806,
+        "key": "discovering:nil:nil:easy",
+        "max_seconds": 0.00031709999893791974,
+        "request_starts": 3,
+        "seconds": 0.0007832000046619214
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 1,
+        "elapsed_seconds": 0.016908399993553758,
+        "key": "entering:apply:finalRest:prepare",
+        "max_seconds": 0.00031289999606087804,
+        "request_starts": 1,
+        "seconds": 0.00031289999606087804
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 1,
+        "elapsed_seconds": 0.01635839999653399,
+        "key": "offer_refused:nil:nil:easy",
+        "max_seconds": 7.699999696342275e-05,
+        "request_starts": 0,
+        "seconds": 7.699999696342275e-05
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.033467000001110137,
+        "key": "recovering:apply:nil:prepare",
+        "max_seconds": 0.0001311999949393794,
+        "request_starts": 0,
+        "seconds": 0.0002549999990151264
+      },
+      {
+        "budget_full_calls": 45,
+        "calls": 45,
+        "elapsed_seconds": 0.7500288000010187,
+        "key": "recovering:archive:nil:prepare",
+        "max_seconds": 0.006644000000960659,
+        "request_starts": 27,
+        "seconds": 0.04028879998077173
+      },
+      {
+        "budget_full_calls": 10,
+        "calls": 10,
+        "elapsed_seconds": 0.16625650000059977,
+        "key": "entering:apply:archive:prepare",
+        "max_seconds": 0.0003008999992744066,
+        "request_starts": 10,
+        "seconds": 0.0025213999979314394
+      },
+      {
+        "budget_full_calls": 362,
+        "calls": 362,
+        "elapsed_seconds": 6.033489600005851,
+        "key": "new_retirement:nil:nil:easy",
+        "max_seconds": 0.002740500000072643,
+        "request_starts": 21,
+        "seconds": 0.10621509993507061
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03342060000431957,
+        "key": "recovering:witnessP:nil:prepare",
+        "max_seconds": 0.00035879999632015824,
+        "request_starts": 2,
+        "seconds": 0.0005517999961739406
+      },
+      {
+        "budget_full_calls": 8,
+        "calls": 8,
+        "elapsed_seconds": 0.14151829999900656,
+        "key": "closed:nil:nil:prepare",
+        "max_seconds": 1.340000017080456e-05,
+        "request_starts": 0,
+        "seconds": 9.200002386933193e-05
+      },
+      {
+        "budget_full_calls": 14,
+        "calls": 32,
+        "elapsed_seconds": 0.5770889000050374,
+        "key": "discovering:nil:nil:rest",
+        "max_seconds": 0.0004293999954825267,
+        "request_starts": 30,
+        "seconds": 0.007886300008976832
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 4,
+        "elapsed_seconds": 0.06604420000076061,
+        "key": "discovering:nil:nil:progress",
+        "max_seconds": 0.00020650000078603625,
+        "request_starts": 3,
+        "seconds": 0.0006178000039653853
+      },
+      {
+        "budget_full_calls": 7,
+        "calls": 17,
+        "elapsed_seconds": 0.3010431999791763,
+        "key": "discovering:nil:nil:proposal",
+        "max_seconds": 0.00040389999776380137,
+        "request_starts": 15,
+        "seconds": 0.0034620999940671027
+      },
+      {
+        "budget_full_calls": 1,
+        "calls": 1,
+        "elapsed_seconds": 0.01616910000302596,
+        "key": "entering:apply:finalProgress:prepare",
+        "max_seconds": 0.00026590000197757035,
+        "request_starts": 1,
+        "seconds": 0.00026590000197757035
+      },
+      {
+        "budget_full_calls": 2,
+        "calls": 2,
+        "elapsed_seconds": 0.03242080000200076,
+        "key": "entering:apply:rest:prepare",
+        "max_seconds": 0.0004650000046240166,
+        "request_starts": 2,
+        "seconds": 0.0007358000002568588
+      },
+      {
+        "budget_full_calls": 136,
+        "calls": 136,
+        "elapsed_seconds": 2.2655907000007574,
+        "key": "recovering:commit:nil:prepare",
+        "max_seconds": 0.017852400000265334,
+        "request_starts": 38,
+        "seconds": 0.25973569994675927
+      },
+      {
+        "budget_full_calls": 3042,
+        "calls": 3116,
+        "elapsed_seconds": 52.03018800000427,
+        "key": "normal:nil:nil:nil",
+        "max_seconds": 0.0007510999930673279,
+        "request_starts": 22,
+        "seconds": 0.3415488001628546
+      }
+    ],
+    "SERVER_PHASE": [
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797366.576628
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797366.721629
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797366.755447
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797366.772775
+      },
+      {
+        "budget_full": false,
+        "name": "offered:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797366.904958
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 7,
+        "t": 1792797366.921856
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 9,
+        "t": 1792797366.955739
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 10,
+        "t": 1792797366.974609
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 10,
+        "t": 1792797367.12488
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 10,
+        "t": 1792797367.139822
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 12,
+        "t": 1792797367.172493
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 13,
+        "t": 1792797367.189368
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 13,
+        "t": 1792797367.321158
+      },
+      {
+        "budget_full": true,
+        "name": "held:nil:nil:prepare",
+        "requests": 14,
+        "t": 1792797372.071491
+      },
+      {
+        "budget_full": true,
+        "name": "closed:nil:nil:prepare",
+        "requests": 16,
+        "t": 1792797372.671673
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797372.741597
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797372.871406
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797372.907591
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797372.921214
+      },
+      {
+        "budget_full": false,
+        "name": "offered:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797373.038218
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 7,
+        "t": 1792797373.054173
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 9,
+        "t": 1792797373.087635
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 10,
+        "t": 1792797373.105812
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 10,
+        "t": 1792797373.237941
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 10,
+        "t": 1792797373.254671
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 12,
+        "t": 1792797373.287879
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 13,
+        "t": 1792797373.305214
+      },
+      {
+        "budget_full": true,
+        "name": "offer_refused:nil:nil:prepare",
+        "requests": 13,
+        "t": 1792797373.354952
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 13,
+        "t": 1792797373.371848
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 15,
+        "t": 1792797373.404837
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 16,
+        "t": 1792797373.422941
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 16,
+        "t": 1792797373.539314
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:archive:nil:prepare",
+        "requests": 17,
+        "t": 1792797373.556571
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:commit:nil:prepare",
+        "requests": 37,
+        "t": 1792797374.123057
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:capture:nil:prepare",
+        "requests": 56,
+        "t": 1792797375.221806
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessM1:nil:prepare",
+        "requests": 56,
+        "t": 1792797375.238142
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessR:nil:prepare",
+        "requests": 57,
+        "t": 1792797375.255115
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessP:nil:prepare",
+        "requests": 58,
+        "t": 1792797375.271767
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:prepare:nil:prepare",
+        "requests": 59,
+        "t": 1792797375.288507
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:apply:nil:prepare",
+        "requests": 59,
+        "t": 1792797375.421485
+      },
+      {
+        "budget_full": true,
+        "name": "entry_required:apply:nil:prepare",
+        "requests": 59,
+        "t": 1792797375.439114
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:proposal:prepare",
+        "requests": 59,
+        "t": 1792797375.454626
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:archive:prepare",
+        "requests": 61,
+        "t": 1792797375.487981
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:rest:prepare",
+        "requests": 66,
+        "t": 1792797375.571503
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:progress:prepare",
+        "requests": 67,
+        "t": 1792797375.587882
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:prepare:prepare",
+        "requests": 68,
+        "t": 1792797375.604963
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:awaitApplied:prepare",
+        "requests": 68,
+        "t": 1792797376.120839
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:finalRest:prepare",
+        "requests": 68,
+        "t": 1792797381.304841
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:finalProgress:prepare",
+        "requests": 69,
+        "t": 1792797381.321746
+      },
+      {
+        "budget_full": true,
+        "name": "recovered:apply:finalProgress:prepare",
+        "requests": 70,
+        "t": 1792797381.337915
+      },
+      {
+        "budget_full": true,
+        "name": "held:apply:finalProgress:prepare",
+        "requests": 72,
+        "t": 1792797381.555058
+      },
+      {
+        "budget_full": true,
+        "name": "closed:apply:finalProgress:prepare",
+        "requests": 74,
+        "t": 1792797382.153997
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797382.224461
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797382.33723
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797382.387009
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:progress",
+        "requests": 7,
+        "t": 1792797382.403869
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:main",
+        "requests": 8,
+        "t": 1792797382.420886
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:free",
+        "requests": 9,
+        "t": 1792797382.437175
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:easy",
+        "requests": 10,
+        "t": 1792797382.453994
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:index",
+        "requests": 11,
+        "t": 1792797382.471603
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 12,
+        "t": 1792797382.48793
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 12,
+        "t": 1792797382.987323
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 12,
+        "t": 1792797383.004833
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 14,
+        "t": 1792797383.037985
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:progress",
+        "requests": 15,
+        "t": 1792797383.054959
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:main",
+        "requests": 16,
+        "t": 1792797383.08834
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:free",
+        "requests": 17,
+        "t": 1792797383.105347
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:easy",
+        "requests": 18,
+        "t": 1792797383.121767
+      },
+      {
+        "budget_full": true,
+        "name": "offer_refused:nil:nil:easy",
+        "requests": 19,
+        "t": 1792797383.138134
+      },
+      {
+        "budget_full": true,
+        "name": "new_retirement:nil:nil:easy",
+        "requests": 19,
+        "t": 1792797383.154495
+      },
+      {
+        "budget_full": true,
+        "name": "held:nil:nil:easy",
+        "requests": 40,
+        "t": 1792797389.187983
+      },
+      {
+        "budget_full": true,
+        "name": "closed:nil:nil:easy",
+        "requests": 42,
+        "t": 1792797389.771069
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797389.841821
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797389.95387
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797390.006015
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797390.020918
+      },
+      {
+        "budget_full": false,
+        "name": "offer_refused:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797390.071241
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 8,
+        "t": 1792797390.088747
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 15,
+        "t": 1792797405.320146
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 17,
+        "t": 1792797405.353359
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 18,
+        "t": 1792797405.370656
+      },
+      {
+        "budget_full": true,
+        "name": "normal:nil:nil:nil",
+        "requests": 18,
+        "t": 1792797405.519933
+      },
+      {
+        "budget_full": true,
+        "name": "new_retirement:nil:nil:nil",
+        "requests": 18,
+        "t": 1792797405.754172
+      },
+      {
+        "budget_full": true,
+        "name": "held:nil:nil:nil",
+        "requests": 41,
+        "t": 1792797427.270274
+      },
+      {
+        "budget_full": true,
+        "name": "closed:nil:nil:nil",
+        "requests": 43,
+        "t": 1792797432.569913
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 0,
+        "t": 1792797432.639902
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797432.853684
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797432.923994
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797432.971657
+      },
+      {
+        "budget_full": false,
+        "name": "offer_refused:nil:nil:prepare",
+        "requests": 7,
+        "t": 1792797433.122657
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 8,
+        "t": 1792797433.141805
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 15,
+        "t": 1792797448.351873
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 17,
+        "t": 1792797448.385615
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 18,
+        "t": 1792797448.402291
+      },
+      {
+        "budget_full": true,
+        "name": "normal:nil:nil:nil",
+        "requests": 18,
+        "t": 1792797448.5358
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:rest",
+        "requests": 19,
+        "t": 1792797458.384339
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 21,
+        "t": 1792797458.419121
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 22,
+        "t": 1792797458.435854
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 22,
+        "t": 1792797458.568425
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:archive:nil:prepare",
+        "requests": 23,
+        "t": 1792797458.585212
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:commit:nil:prepare",
+        "requests": 30,
+        "t": 1792797458.768755
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:capture:nil:prepare",
+        "requests": 49,
+        "t": 1792797459.935595
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessM1:nil:prepare",
+        "requests": 49,
+        "t": 1792797459.952215
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessR:nil:prepare",
+        "requests": 50,
+        "t": 1792797459.968436
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:witnessP:nil:prepare",
+        "requests": 51,
+        "t": 1792797459.985466
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:prepare:nil:prepare",
+        "requests": 52,
+        "t": 1792797460.002145
+      },
+      {
+        "budget_full": true,
+        "name": "recovering:apply:nil:prepare",
+        "requests": 52,
+        "t": 1792797460.135716
+      },
+      {
+        "budget_full": true,
+        "name": "entry_required:apply:nil:prepare",
+        "requests": 52,
+        "t": 1792797460.151554
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:proposal:prepare",
+        "requests": 52,
+        "t": 1792797460.167863
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:archive:prepare",
+        "requests": 54,
+        "t": 1792797460.202258
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:rest:prepare",
+        "requests": 59,
+        "t": 1792797460.284995
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:progress:prepare",
+        "requests": 60,
+        "t": 1792797460.301035
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:prepare:prepare",
+        "requests": 61,
+        "t": 1792797460.318016
+      },
+      {
+        "budget_full": true,
+        "name": "entering:apply:awaitApplied:prepare",
+        "requests": 61,
+        "t": 1792797460.951765
+      },
+      {
+        "budget_full": true,
+        "name": "entry_required:apply:awaitApplied:prepare",
+        "requests": 61,
+        "t": 1792797461.601842
+      },
+      {
+        "budget_full": true,
+        "name": "held:apply:awaitApplied:prepare",
+        "requests": 62,
+        "t": 1792797461.618574
+      },
+      {
+        "budget_full": true,
+        "name": "closed:apply:awaitApplied:prepare",
+        "requests": 64,
+        "t": 1792797462.201449
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797462.271431
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:rest",
+        "requests": 4,
+        "t": 1792797462.401533
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:proposal",
+        "requests": 6,
+        "t": 1792797462.435263
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:progress",
+        "requests": 7,
+        "t": 1792797462.468874
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:main",
+        "requests": 8,
+        "t": 1792797462.484519
+      },
+      {
+        "budget_full": false,
+        "name": "discovering:nil:nil:free",
+        "requests": 9,
+        "t": 1792797462.501847
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:easy",
+        "requests": 10,
+        "t": 1792797462.519419
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:index",
+        "requests": 11,
+        "t": 1792797462.535304
+      },
+      {
+        "budget_full": true,
+        "name": "discovering:nil:nil:prepare",
+        "requests": 12,
+        "t": 1792797462.552442
+      },
+      {
+        "budget_full": true,
+        "name": "offered:nil:nil:prepare",
+        "requests": 12,
+        "t": 1792797463.051831
+      },
+      {
+        "budget_full": true,
+        "name": "new_retirement:nil:nil:prepare",
+        "requests": 12,
+        "t": 1792797463.168273
+      },
+      {
+        "budget_full": true,
+        "name": "held:nil:nil:prepare",
+        "requests": 33,
+        "t": 1792797469.234247
+      },
+      {
+        "budget_full": true,
+        "name": "closed:nil:nil:prepare",
+        "requests": 35,
+        "t": 1792797469.834441
+      },
+      {
+        "budget_full": false,
+        "name": "normal:nil:nil:nil",
+        "requests": 1,
+        "t": 1792797469.906032
+      },
+      {
+        "budget_full": true,
+        "name": "closed:nil:nil:nil",
+        "requests": 13,
+        "t": 1792797480.56848
+      }
+    ],
+    "SERVER_TRACE": [
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797366.705973
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797366.892147
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 3,
+        "t": 1792797367.11512
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 4,
+        "t": 1792797367.307856
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797372.019571
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797372.05503
+      },
+      {
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797372.671493
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797372.856123
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797373.024548
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 3,
+        "t": 1792797373.224879
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 4,
+        "t": 1792797373.338768
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 5,
+        "t": 1792797373.526146
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 6,
+        "t": 1792797373.539381
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797376.105309
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 8,
+        "t": 1792797378.355064
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797381.121665
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 10,
+        "t": 1792797381.337801
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797381.537883
+      },
+      {
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797382.15392
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797382.324422
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797382.974148
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 4,
+        "t": 1792797383.137526
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 6,
+        "t": 1792797384.088902
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 7,
+        "t": 1792797389.10444
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797389.17062
+      },
+      {
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 10,
+        "t": 1792797389.770981
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797389.9416
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 2,
+        "t": 1792797389.941656
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 3,
+        "t": 1792797390.055201
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 4,
+        "t": 1792797390.070924
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797390.088661
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797390.104882
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 7,
+        "t": 1792797390.122887
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 8,
+        "t": 1792797390.12294
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797390.122972
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 10,
+        "t": 1792797390.137899
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 11,
+        "t": 1792797390.170515
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 12,
+        "t": 1792797390.204522
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797390.343605
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "stored",
+        "mode": "main",
+        "sequence": 14,
+        "t": 1792797400.167103
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 15,
+        "t": 1792797400.169002
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 16,
+        "t": 1792797400.31695
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 17,
+        "t": 1792797405.506041
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 20,
+        "t": 1792797405.73794
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 22,
+        "t": 1792797410.752828
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 23,
+        "t": 1792797415.753353
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 24,
+        "t": 1792797420.75343
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 25,
+        "t": 1792797425.753684
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 26,
+        "t": 1792797427.18646
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 29,
+        "t": 1792797427.252417
+      },
+      {
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 30,
+        "t": 1792797432.56983
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797432.845933
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797432.846882
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 3,
+        "t": 1792797432.847413
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 4,
+        "t": 1792797432.996762
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797433.121664
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797433.141649
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797433.160026
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 8,
+        "t": 1792797433.181425
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 9,
+        "t": 1792797433.181678
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 10,
+        "t": 1792797433.181743
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 11,
+        "t": 1792797433.223731
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 12,
+        "t": 1792797433.295058
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 13,
+        "t": 1792797433.343155
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 14,
+        "t": 1792797433.508448
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "stored",
+        "mode": "free",
+        "sequence": 15,
+        "t": 1792797443.211215
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 16,
+        "t": 1792797443.212299
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 17,
+        "t": 1792797443.213309
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 18,
+        "t": 1792797443.349797
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 19,
+        "t": 1792797448.521941
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 20,
+        "t": 1792797453.379257
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 21,
+        "t": 1792797458.368408
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 22,
+        "t": 1792797458.368452
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 23,
+        "t": 1792797458.55408
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 24,
+        "t": 1792797458.568499
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 25,
+        "t": 1792797460.936727
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 28,
+        "t": 1792797461.601595
+      },
+      {
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 29,
+        "t": 1792797462.201369
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797462.385801
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797462.387627
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 3,
+        "t": 1792797462.38991
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 4,
+        "t": 1792797463.036952
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 6,
+        "t": 1792797463.151529
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 8,
+        "t": 1792797464.134857
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 9,
+        "t": 1792797469.151931
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 11,
+        "t": 1792797469.216977
+      },
+      {
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797469.8343
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797470.018311
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797470.020493
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 3,
+        "t": 1792797470.021348
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 4,
+        "t": 1792797470.02251
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 5,
+        "t": 1792797470.062892
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 6,
+        "t": 1792797470.098163
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 7,
+        "t": 1792797470.118748
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 8,
+        "t": 1792797470.180097
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797470.190301
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 10,
+        "t": 1792797470.234535
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 11,
+        "t": 1792797470.234592
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797470.234626
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797470.455954
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "stored",
+        "mode": "easy",
+        "sequence": 14,
+        "t": 1792797480.260997
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 15,
+        "t": 1792797480.262311
+      },
+      {
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 16,
+        "t": 1792797480.26342
+      }
+    ],
+    "SERVER_END": [
+      {
+        "clock_scale": 1,
+        "online": false,
+        "packets": 103
+      }
+    ],
+    "CLIENT_PAYLOAD": [
+      {
+        "canonical_bytes": 102,
+        "copy_seconds": 6.70000008540228e-06,
+        "count": 7,
+        "encode_seconds": 4.489999992074445e-05,
+        "key": "out:session_replace_ack:none"
+      },
+      {
+        "canonical_bytes": 149,
+        "copy_seconds": 1.1499992979224771e-05,
+        "count": 3,
+        "encode_seconds": 2.9299997549969703e-05,
+        "key": "in:new_life_state:easy"
+      },
+      {
+        "canonical_bytes": 63,
+        "copy_seconds": 5.299996701069176e-06,
+        "count": 1,
+        "encode_seconds": 1.460000203223899e-05,
+        "key": "out:hello:none"
+      },
+      {
+        "canonical_bytes": 19622,
+        "copy_seconds": 0.0004773999971803278,
+        "count": 2,
+        "encode_seconds": 0.002053299998806324,
+        "key": "out:rest:easy"
+      },
+      {
+        "canonical_bytes": 118,
+        "copy_seconds": 1.0900002962443978e-05,
+        "count": 6,
+        "encode_seconds": 2.149999636458233e-05,
+        "key": "in:session_replace_commit:none"
+      },
+      {
+        "canonical_bytes": 19641,
+        "copy_seconds": 0.00045590000081574544,
+        "count": 2,
+        "encode_seconds": 0.0027116999990539625,
+        "key": "out:rest:free"
+      },
+      {
+        "canonical_bytes": 40103,
+        "copy_seconds": 0.0007069999992381781,
+        "count": 12,
+        "encode_seconds": 0.0048945000016829,
+        "key": "in:offer:free"
+      },
+      {
+        "canonical_bytes": 19610,
+        "copy_seconds": 0.00030699999479111284,
+        "count": 2,
+        "encode_seconds": 0.002218500005255919,
+        "key": "out:rest:main"
+      },
+      {
+        "canonical_bytes": 117,
+        "copy_seconds": 1.0000003385357559e-05,
+        "count": 6,
+        "encode_seconds": 2.0300001779105514e-05,
+        "key": "in:session_replace_offer:none"
+      },
+      {
+        "canonical_bytes": 323,
+        "copy_seconds": 1.4400000509340316e-05,
+        "count": 5,
+        "encode_seconds": 6.610000127693638e-05,
+        "key": "out:new_life_request:free"
+      },
+      {
+        "canonical_bytes": 40108,
+        "copy_seconds": 0.0009797000020626,
+        "count": 15,
+        "encode_seconds": 0.0044535000051837415,
+        "key": "in:offer:main"
+      },
+      {
+        "canonical_bytes": 69,
+        "copy_seconds": 3.3999967854470015e-06,
+        "count": 3,
+        "encode_seconds": 1.3199998647905886e-05,
+        "key": "out:refresh_offer:main"
+      },
+      {
+        "canonical_bytes": 150,
+        "copy_seconds": 9.2999980552122e-06,
+        "count": 6,
+        "encode_seconds": 1.889999839477241e-05,
+        "key": "in:new_life_state:free"
+      },
+      {
+        "canonical_bytes": 149,
+        "copy_seconds": 1.0000003385357559e-05,
+        "count": 3,
+        "encode_seconds": 1.4500001270789653e-05,
+        "key": "in:new_life_state:main"
+      },
+      {
+        "canonical_bytes": 208,
+        "copy_seconds": 1.1600001016631722e-05,
+        "count": 7,
+        "encode_seconds": 6.070000381441787e-05,
+        "key": "in:decision:main"
+      },
+      {
+        "canonical_bytes": 104,
+        "copy_seconds": 7.899994670879096e-06,
+        "count": 6,
+        "encode_seconds": 1.2099997547920793e-05,
+        "key": "out:session_replace_ready:none"
+      },
+      {
+        "canonical_bytes": 202,
+        "copy_seconds": 1.500004145782441e-06,
+        "count": 2,
+        "encode_seconds": 1.960000372491777e-05,
+        "key": "out:recovery_applied:main"
+      },
+      {
+        "canonical_bytes": 354,
+        "copy_seconds": 1.9099999917671084e-05,
+        "count": 7,
+        "encode_seconds": 3.9999998989515007e-05,
+        "key": "in:loaded:none"
+      },
+      {
+        "canonical_bytes": 129,
+        "copy_seconds": 2.9000002541579306e-06,
+        "count": 3,
+        "encode_seconds": 1.9700004486367106e-05,
+        "key": "out:life_intent:main"
+      },
+      {
+        "canonical_bytes": 323,
+        "copy_seconds": 1.2899996363557875e-05,
+        "count": 1,
+        "encode_seconds": 3.7699996028095484e-05,
+        "key": "out:new_life_request:easy"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 1.1699994502123445e-05,
+        "count": 1,
+        "encode_seconds": 1.6500001947861165e-05,
+        "key": "in:stored:main"
+      },
+      {
+        "canonical_bytes": 129,
+        "copy_seconds": 6.000002031214535e-06,
+        "count": 2,
+        "encode_seconds": 1.85999961104244e-05,
+        "key": "out:life_intent:easy"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 1.3299999409355223e-05,
+        "count": 1,
+        "encode_seconds": 2.2799998987466097e-05,
+        "key": "in:stored:easy"
+      },
+      {
+        "canonical_bytes": 16358,
+        "copy_seconds": 0.000287499999103602,
+        "count": 3,
+        "encode_seconds": 0.0019481999988784082,
+        "key": "in:recovery_entry:none"
+      },
+      {
+        "canonical_bytes": 266,
+        "copy_seconds": 1.0600000678095967e-05,
+        "count": 8,
+        "encode_seconds": 3.68999972124584e-05,
+        "key": "out:session_replace_request:none"
+      },
+      {
+        "canonical_bytes": 177,
+        "copy_seconds": 1.1100004485342652e-05,
+        "count": 3,
+        "encode_seconds": 2.5000001187436283e-05,
+        "key": "in:decision:free"
+      },
+      {
+        "canonical_bytes": 209,
+        "copy_seconds": 1.1299998732283711e-05,
+        "count": 4,
+        "encode_seconds": 1.8999999156221747e-05,
+        "key": "in:decision:easy"
+      },
+      {
+        "canonical_bytes": 69,
+        "copy_seconds": 4.0000013541430235e-06,
+        "count": 1,
+        "encode_seconds": 8.100003469735384e-06,
+        "key": "out:refresh_offer:easy"
+      },
+      {
+        "canonical_bytes": 143,
+        "copy_seconds": 1.0099996870849282e-05,
+        "count": 1,
+        "encode_seconds": 2.1200001356191933e-05,
+        "key": "in:stored:free"
+      },
+      {
+        "canonical_bytes": 144,
+        "copy_seconds": 1.290000363951549e-05,
+        "count": 16,
+        "encode_seconds": 1.5199999324977398e-05,
+        "key": "in:status:none"
+      },
+      {
+        "canonical_bytes": 234,
+        "copy_seconds": 8.39999847812578e-06,
+        "count": 5,
+        "encode_seconds": 3.6299999919719994e-05,
+        "key": "out:progress:none"
+      },
+      {
+        "canonical_bytes": 124,
+        "copy_seconds": 4.4000043999403715e-06,
+        "count": 1,
+        "encode_seconds": 1.3799995940644294e-05,
+        "key": "out:life_intent:free"
+      },
+      {
+        "canonical_bytes": 40103,
+        "copy_seconds": 0.0006229000064195134,
+        "count": 10,
+        "encode_seconds": 0.005114299994602334,
+        "key": "in:offer:easy"
+      },
+      {
+        "canonical_bytes": 69,
+        "copy_seconds": 4.099994839634746e-06,
+        "count": 2,
+        "encode_seconds": 1.3199998647905886e-05,
+        "key": "out:refresh_offer:free"
+      },
+      {
+        "canonical_bytes": 304,
+        "copy_seconds": 1.0700001439545304e-05,
+        "count": 1,
+        "encode_seconds": 5.409999721450731e-05,
+        "key": "out:new_life_request:main"
+      }
+    ],
+    "CLIENT_UPDATE": [
+      {
+        "calls": 940,
+        "key": "save_client:playing:held:main",
+        "max_seconds": 0.0037105000010342337,
+        "seconds": 0.05495790005807066
+      },
+      {
+        "calls": 26,
+        "key": "save_client:failed:held:easy",
+        "max_seconds": 6.370000483002514e-05,
+        "seconds": 0.0008287000164273195
+      },
+      {
+        "calls": 63,
+        "key": "application:new:held:easy",
+        "max_seconds": 0.0014254999987315387,
+        "seconds": 0.0022201999890967272
+      },
+      {
+        "calls": 405,
+        "key": "save_client:replacing:held:easy",
+        "max_seconds": 7.779999577905983e-05,
+        "seconds": 0.003268399908847641
+      },
+      {
+        "calls": 8,
+        "key": "save_client:entry:preparing:main",
+        "max_seconds": 1.750000228639692e-05,
+        "seconds": 0.00010560000373516232
+      },
+      {
+        "calls": 932,
+        "key": "application:playing:held:free",
+        "max_seconds": 0.0006384000007528812,
+        "seconds": 0.006872100013424642
+      },
+      {
+        "calls": 170,
+        "key": "save_client:entry:selected:main",
+        "max_seconds": 0.0021066000044811517,
+        "seconds": 0.009293399991292972
+      },
+      {
+        "calls": 633,
+        "key": "application:playing:held:easy",
+        "max_seconds": 4.5400003727991134e-05,
+        "seconds": 0.004406299900438171
+      },
+      {
+        "calls": 8,
+        "key": "application:playing:granted:main",
+        "max_seconds": 6.70000008540228e-06,
+        "seconds": 4.690000059781596e-05
+      },
+      {
+        "calls": 25,
+        "key": "application:failed:held:easy",
+        "max_seconds": 0.0016218000018852763,
+        "seconds": 0.002270099983434193
+      },
+      {
+        "calls": 172,
+        "key": "application:entry:selected:main",
+        "max_seconds": 4.510000144364312e-05,
+        "seconds": 0.005165799979295116
+      },
+      {
+        "calls": 633,
+        "key": "save_client:playing:held:easy",
+        "max_seconds": 0.003177099999447819,
+        "seconds": 0.04776889992353972
+      },
+      {
+        "calls": 405,
+        "key": "application:replacing:held:easy",
+        "max_seconds": 2.4599998141638935e-05,
+        "seconds": 0.0047408000464201905
+      },
+      {
+        "calls": 368,
+        "key": "save_client:idle:none:nil",
+        "max_seconds": 0.003566899998986628,
+        "seconds": 0.054903700001887046
+      },
+      {
+        "calls": 306,
+        "key": "application:entry:applied:main",
+        "max_seconds": 0.0015477999986615032,
+        "seconds": 0.012768899956427049
+      },
+      {
+        "calls": 339,
+        "key": "save_client:replacing:held:free",
+        "max_seconds": 6.500000017695129e-05,
+        "seconds": 0.002569199918070808
+      },
+      {
+        "calls": 940,
+        "key": "application:playing:held:main",
+        "max_seconds": 2.479999966453761e-05,
+        "seconds": 0.005883400117454585
+      },
+      {
+        "calls": 306,
+        "key": "save_client:entry:applied:main",
+        "max_seconds": 7.019999611657113e-05,
+        "seconds": 0.004687300075602252
+      },
+      {
+        "calls": 1291,
+        "key": "save_client:new:held:free",
+        "max_seconds": 0.00015020000137155876,
+        "seconds": 0.013336500036530197
+      },
+      {
+        "calls": 61,
+        "key": "application:new:held:main",
+        "max_seconds": 0.0015909000067040324,
+        "seconds": 0.0023785999946994707
+      },
+      {
+        "calls": 1,
+        "key": "application:entry:granted:main",
+        "max_seconds": 0.0003389999983482994,
+        "seconds": 0.0003389999983482994
+      },
+      {
+        "calls": 738,
+        "key": "save_client:entry:selected:easy",
+        "max_seconds": 9.869999485090375e-05,
+        "seconds": 0.012364700065518264
+      },
+      {
+        "calls": 741,
+        "key": "application:entry:selected:easy",
+        "max_seconds": 0.0002719000040087849,
+        "seconds": 0.02470570003060857
+      },
+      {
+        "calls": 11,
+        "key": "application:entry:preparing:easy",
+        "max_seconds": 0.0035425000023678876,
+        "seconds": 0.02659569999377709
+      },
+      {
+        "calls": 121,
+        "key": "application:menu:held:nil",
+        "max_seconds": 1.2500000593718141e-05,
+        "seconds": 0.0007567999346065335
+      },
+      {
+        "calls": 1291,
+        "key": "application:new:held:free",
+        "max_seconds": 0.0017074999996111728,
+        "seconds": 0.020301399868912995
+      },
+      {
+        "calls": 741,
+        "key": "entry:entry:selected:easy",
+        "max_seconds": 0.00022790000366512686,
+        "seconds": 0.012423100059095304
+      },
+      {
+        "calls": 63,
+        "key": "save_client:new:held:easy",
+        "max_seconds": 7.12000037310645e-05,
+        "seconds": 0.0006765999860363081
+      },
+      {
+        "calls": 1,
+        "key": "entry:entry:granted:main",
+        "max_seconds": 1.1999945854768157e-06,
+        "seconds": 1.1999945854768157e-06
+      },
+      {
+        "calls": 306,
+        "key": "entry:entry:applied:main",
+        "max_seconds": 9.480000153416768e-05,
+        "seconds": 0.0061447998668882065
+      },
+      {
+        "calls": 8,
+        "key": "save_client:playing:granted:main",
+        "max_seconds": 3.3299998904112726e-05,
+        "seconds": 0.00018889999046223238
+      },
+      {
+        "calls": 11,
+        "key": "entry:entry:preparing:easy",
+        "max_seconds": 0.0035175000011804514,
+        "seconds": 0.023983300001418684
+      },
+      {
+        "calls": 61,
+        "key": "save_client:new:held:main",
+        "max_seconds": 6.750000466126949e-05,
+        "seconds": 0.0006226000332389958
+      },
+      {
+        "calls": 9,
+        "key": "application:entry:preparing:main",
+        "max_seconds": 0.00220650000119349,
+        "seconds": 0.017878700004075654
+      },
+      {
+        "calls": 9,
+        "key": "entry:entry:preparing:main",
+        "max_seconds": 0.0021926000044913962,
+        "seconds": 0.017750799997884315
+      },
+      {
+        "calls": 932,
+        "key": "save_client:playing:held:free",
+        "max_seconds": 0.004361399995104875,
+        "seconds": 0.059460900112753734
+      },
+      {
+        "calls": 368,
+        "key": "application:idle:none:nil",
+        "max_seconds": 1.9699997210409492e-05,
+        "seconds": 0.0023757000381010585
+      },
+      {
+        "calls": 172,
+        "key": "entry:entry:selected:main",
+        "max_seconds": 2.3500004317611456e-05,
+        "seconds": 0.0025973000010708347
+      },
+      {
+        "calls": 339,
+        "key": "application:replacing:held:free",
+        "max_seconds": 2.7599999157246202e-05,
+        "seconds": 0.0038682000304106623
+      },
+      {
+        "calls": 454,
+        "key": "save_client:replacing:held:main",
+        "max_seconds": 6.609999400097877e-05,
+        "seconds": 0.003716899867868051
+      },
+      {
+        "calls": 454,
+        "key": "application:replacing:held:main",
+        "max_seconds": 2.2400003217626363e-05,
+        "seconds": 0.005287299951305613
+      },
+      {
+        "calls": 121,
+        "key": "save_client:menu:held:nil",
+        "max_seconds": 0.004697999997006264,
+        "seconds": 0.07308020002528792
+      },
+      {
+        "calls": 10,
+        "key": "save_client:entry:preparing:easy",
+        "max_seconds": 5.669999518431723e-05,
+        "seconds": 0.000355699987267144
+      }
+    ],
+    "CLIENT_GAP": [
+      {
+        "frames": 454,
+        "key": "replacing:held:main",
+        "max_seconds": 0.02210340090095997,
+        "over_50ms": 0,
+        "seconds": 7.563166314736009
+      },
+      {
+        "frames": 339,
+        "key": "replacing:held:free",
+        "max_seconds": 0.025119099766016006,
+        "over_50ms": 0,
+        "seconds": 5.651801748201251
+      },
+      {
+        "frames": 932,
+        "key": "playing:held:free",
+        "max_seconds": 0.12398461997509003,
+        "over_50ms": 1,
+        "seconds": 15.740747825242579
+      },
+      {
+        "frames": 8,
+        "key": "playing:granted:main",
+        "max_seconds": 0.020134899765253067,
+        "over_50ms": 0,
+        "seconds": 0.13254968728870153
+      },
+      {
+        "frames": 1291,
+        "key": "new:held:free",
+        "max_seconds": 0.02104851044714451,
+        "over_50ms": 0,
+        "seconds": 21.51390909869224
+      },
+      {
+        "frames": 9,
+        "key": "entry:preparing:main",
+        "max_seconds": 0.01758059486746788,
+        "over_50ms": 0,
+        "seconds": 0.1510318685323
+      },
+      {
+        "frames": 633,
+        "key": "playing:held:easy",
+        "max_seconds": 0.24045899510383606,
+        "over_50ms": 2,
+        "seconds": 10.853432551957667
+      },
+      {
+        "frames": 61,
+        "key": "new:held:main",
+        "max_seconds": 0.019366350024938583,
+        "over_50ms": 0,
+        "seconds": 1.015963445417583
+      },
+      {
+        "frames": 368,
+        "key": "idle:none:nil",
+        "max_seconds": 0.2665068805217743,
+        "over_50ms": 4,
+        "seconds": 6.913779032416642
+      },
+      {
+        "frames": 11,
+        "key": "entry:preparing:easy",
+        "max_seconds": 0.017963280901312828,
+        "over_50ms": 0,
+        "seconds": 0.18094342481344938
+      },
+      {
+        "frames": 25,
+        "key": "failed:held:easy",
+        "max_seconds": 0.019968964159488678,
+        "over_50ms": 0,
+        "seconds": 0.41927639953792095
+      },
+      {
+        "frames": 121,
+        "key": "menu:held:nil",
+        "max_seconds": 0.03576880693435669,
+        "over_50ms": 0,
+        "seconds": 2.0395343182608485
+      },
+      {
+        "frames": 405,
+        "key": "replacing:held:easy",
+        "max_seconds": 0.02100241556763649,
+        "over_50ms": 0,
+        "seconds": 6.753815283067524
+      },
+      {
+        "frames": 305,
+        "key": "entry:applied:main",
+        "max_seconds": 0.031068285927176476,
+        "over_50ms": 0,
+        "seconds": 5.082727409899235
+      },
+      {
+        "frames": 940,
+        "key": "playing:held:main",
+        "max_seconds": 0.029088390991091728,
+        "over_50ms": 0,
+        "seconds": 15.682134794071317
+      },
+      {
+        "frames": 63,
+        "key": "new:held:easy",
+        "max_seconds": 0.018943019211292267,
+        "over_50ms": 0,
+        "seconds": 1.0489618619903922
+      },
+      {
+        "frames": 170,
+        "key": "entry:selected:main",
+        "max_seconds": 0.019200528040528297,
+        "over_50ms": 0,
+        "seconds": 2.833001363091171
+      },
+      {
+        "frames": 738,
+        "key": "entry:selected:easy",
+        "max_seconds": 0.020043859258294106,
+        "over_50ms": 0,
+        "seconds": 12.299597681500018
+      }
+    ],
+    "CLIENT_TRACE": [
+      {
+        "direction": "out",
+        "kind": "hello",
+        "mode": "none",
+        "t": 1792797366.611859
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797366.743771
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797366.926826
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 3,
+        "t": 1792797367.144441
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 4,
+        "t": 1792797367.34353
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:206:1",
+        "kind": "progress",
+        "mode": "none",
+        "t": 1792797371.994
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797372.033184
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797372.040161
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797372.089029
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797372.090484
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797372.70577
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:206:1",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797372.706681
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797372.889451
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797373.056271
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 3,
+        "t": 1792797373.256765
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "life_intent",
+        "mode": "main",
+        "t": 1792797373.315385
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 4,
+        "t": 1792797373.372679
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 5,
+        "t": 1792797373.557286
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 6,
+        "t": 1792797373.558147
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797376.138912
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_applied",
+        "mode": "main",
+        "t": 1792797376.272189
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "life_intent",
+        "mode": "main",
+        "t": 1792797378.321433
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 8,
+        "t": 1792797378.386502
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797381.153966
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "recovery_applied",
+        "mode": "main",
+        "t": 1792797381.276215
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 10,
+        "t": 1792797381.37501
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797381.515854
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797381.573904
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797381.575303
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797382.190562
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:213:2",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797382.19221
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 1,
+        "t": 1792797382.357676
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "refresh_offer",
+        "mode": "main",
+        "t": 1792797382.410908
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 2,
+        "t": 1792797383.008422
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_request",
+        "mode": "main",
+        "t": 1792797383.120512
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 4,
+        "t": 1792797383.173972
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 6,
+        "t": 1792797384.125017
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797384.12782
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "new_life_state",
+        "mode": "main",
+        "sequence": 7,
+        "t": 1792797389.137983
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797389.13909
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797389.205828
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797389.207004
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 10,
+        "t": 1792797389.805336
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:222:3",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797389.806345
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797389.97173
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 2,
+        "t": 1792797389.971787
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "life_intent",
+        "mode": "main",
+        "t": 1792797390.031364
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "progress",
+        "mode": "none",
+        "t": 1792797390.044641
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 3,
+        "t": 1792797390.089426
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 4,
+        "t": 1792797390.089506
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797390.123329
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797390.123407
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 7,
+        "t": 1792797390.155207
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 8,
+        "t": 1792797390.155285
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797390.155311
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 10,
+        "t": 1792797390.155329
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 11,
+        "t": 1792797390.189669
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 12,
+        "t": 1792797390.22239
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "rest",
+        "mode": "main",
+        "t": 1792797390.308239
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797390.372352
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "progress",
+        "mode": "none",
+        "t": 1792797392.058848
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "rest",
+        "mode": "main",
+        "t": 1792797395.309679
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "stored",
+        "mode": "main",
+        "sequence": 14,
+        "t": 1792797400.204886
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 15,
+        "t": 1792797400.20605
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "refresh_offer",
+        "mode": "main",
+        "t": 1792797400.268093
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 16,
+        "t": 1792797400.356097
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "refresh_offer",
+        "mode": "free",
+        "t": 1792797405.270595
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 17,
+        "t": 1792797405.537021
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_request",
+        "mode": "free",
+        "t": 1792797405.712572
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 20,
+        "t": 1792797405.769287
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_request",
+        "mode": "free",
+        "t": 1792797410.726007
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 22,
+        "t": 1792797410.792226
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_request",
+        "mode": "free",
+        "t": 1792797415.738549
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 23,
+        "t": 1792797415.788383
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_request",
+        "mode": "free",
+        "t": 1792797420.755139
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 24,
+        "t": 1792797420.787098
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_request",
+        "mode": "free",
+        "t": 1792797425.770801
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 25,
+        "t": 1792797425.786917
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "new_life_state",
+        "mode": "free",
+        "sequence": 26,
+        "t": 1792797427.220091
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797427.222663
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 29,
+        "t": 1792797427.287057
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797427.287917
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797432.302462
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 30,
+        "t": 1792797432.600855
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:230:4",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797432.602531
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797432.868797
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797432.869398
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 3,
+        "t": 1792797432.870404
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "life_intent",
+        "mode": "free",
+        "t": 1792797432.954487
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "progress",
+        "mode": "none",
+        "t": 1792797432.987311
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 4,
+        "t": 1792797433.139869
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 5,
+        "t": 1792797433.13997
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 6,
+        "t": 1792797433.179302
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 7,
+        "t": 1792797433.17937
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 8,
+        "t": 1792797433.228538
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 9,
+        "t": 1792797433.228629
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 10,
+        "t": 1792797433.228661
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 11,
+        "t": 1792797433.270825
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 12,
+        "t": 1792797433.344162
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 13,
+        "t": 1792797433.344247
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "rest",
+        "mode": "free",
+        "t": 1792797433.473092
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 14,
+        "t": 1792797433.534519
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "rest",
+        "mode": "free",
+        "t": 1792797438.488223
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "stored",
+        "mode": "free",
+        "sequence": 15,
+        "t": 1792797443.239846
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 16,
+        "t": 1792797443.240764
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 17,
+        "t": 1792797443.241251
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "refresh_offer",
+        "mode": "free",
+        "t": 1792797443.296561
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 18,
+        "t": 1792797443.390307
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "refresh_offer",
+        "mode": "easy",
+        "t": 1792797448.306404
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 19,
+        "t": 1792797448.557334
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "refresh_offer",
+        "mode": "main",
+        "t": 1792797453.32433
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 20,
+        "t": 1792797453.406462
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "life_intent",
+        "mode": "easy",
+        "t": 1792797458.338053
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 21,
+        "t": 1792797458.404021
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "free",
+        "sequence": 22,
+        "t": 1792797458.404153
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 23,
+        "t": 1792797458.588258
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 24,
+        "t": 1792797458.603316
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "recovery_entry",
+        "mode": "none",
+        "sequence": 25,
+        "t": 1792797460.971629
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797461.575026
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 28,
+        "t": 1792797461.638247
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797461.639294
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 29,
+        "t": 1792797462.238885
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:273:5",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797462.239833
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797462.423626
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797462.42492
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 3,
+        "t": 1792797462.440539
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 4,
+        "t": 1792797463.072971
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_request",
+        "mode": "easy",
+        "t": 1792797463.133266
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 6,
+        "t": 1792797463.188161
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 8,
+        "t": 1792797464.173066
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797464.175958
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "new_life_state",
+        "mode": "easy",
+        "sequence": 9,
+        "t": 1792797469.188387
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_request",
+        "mode": "none",
+        "t": 1792797469.189663
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_offer",
+        "mode": "none",
+        "sequence": 11,
+        "t": 1792797469.254366
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_ack",
+        "mode": "none",
+        "t": 1792797469.255477
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_commit",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797469.870736
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:302:6",
+        "kind": "session_replace_ready",
+        "mode": "none",
+        "t": 1792797469.871851
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 1,
+        "t": 1792797470.055413
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 2,
+        "t": 1792797470.056768
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 3,
+        "t": 1792797470.057278
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "loaded",
+        "mode": "none",
+        "sequence": 4,
+        "t": 1792797470.058065
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "main",
+        "sequence": 5,
+        "t": 1792797470.105296
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "free",
+        "sequence": 6,
+        "t": 1792797470.138965
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 7,
+        "t": 1792797470.13954
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:310:7",
+        "kind": "life_intent",
+        "mode": "easy",
+        "t": 1792797470.150164
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:310:7",
+        "kind": "progress",
+        "mode": "none",
+        "t": 1792797470.177731
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 8,
+        "t": 1792797470.205904
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 9,
+        "t": 1792797470.205967
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "decision",
+        "mode": "easy",
+        "sequence": 10,
+        "t": 1792797470.271685
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 11,
+        "t": 1792797470.271782
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 12,
+        "t": 1792797470.271833
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:310:7",
+        "kind": "rest",
+        "mode": "easy",
+        "t": 1792797470.424608
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 13,
+        "t": 1792797470.487316
+      },
+      {
+        "direction": "out",
+        "epoch": "native-new-app:310:7",
+        "kind": "rest",
+        "mode": "easy",
+        "t": 1792797475.437133
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "stored",
+        "mode": "easy",
+        "sequence": 14,
+        "t": 1792797480.284822
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "offer",
+        "mode": "easy",
+        "sequence": 15,
+        "t": 1792797480.285981
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:310:7",
+        "kind": "status",
+        "mode": "none",
+        "sequence": 16,
+        "t": 1792797480.286391
+      },
+      {
+        "direction": "in",
+        "epoch": "native-new-app:213:2",
+        "kind": "decision",
+        "mode": "main",
+        "sequence": 10,
+        "t": 1792797480.385363
+      }
+    ],
+    "CLIENT_PHASE": [
+      {
+        "name": "idle:none:nil",
+        "t": 1792797365.38165
+      },
+      {
+        "name": "replacing:held:main",
+        "t": 1792797372.039431
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797372.893827
+      },
+      {
+        "name": "entry:selected:main",
+        "t": 1792797373.312655
+      },
+      {
+        "name": "entry:preparing:main",
+        "t": 1792797376.139986
+      },
+      {
+        "name": "entry:applied:main",
+        "t": 1792797376.288532
+      },
+      {
+        "name": "playing:granted:main",
+        "t": 1792797381.375922
+      },
+      {
+        "name": "replacing:held:main",
+        "t": 1792797381.51441
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797382.36163
+      },
+      {
+        "name": "new:held:main",
+        "t": 1792797383.118214
+      },
+      {
+        "name": "replacing:held:main",
+        "t": 1792797384.12702
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797389.975715
+      },
+      {
+        "name": "playing:held:main",
+        "t": 1792797390.030806
+      },
+      {
+        "name": "new:held:free",
+        "t": 1792797405.71006
+      },
+      {
+        "name": "replacing:held:free",
+        "t": 1792797427.221822
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797432.879094
+      },
+      {
+        "name": "playing:held:free",
+        "t": 1792797432.932323
+      },
+      {
+        "name": "entry:selected:easy",
+        "t": 1792797448.681927
+      },
+      {
+        "name": "entry:preparing:easy",
+        "t": 1792797460.973239
+      },
+      {
+        "name": "failed:held:easy",
+        "t": 1792797461.154358
+      },
+      {
+        "name": "replacing:held:easy",
+        "t": 1792797461.574464
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797462.444793
+      },
+      {
+        "name": "new:held:easy",
+        "t": 1792797463.131103
+      },
+      {
+        "name": "replacing:held:easy",
+        "t": 1792797464.175142
+      },
+      {
+        "name": "menu:held:nil",
+        "t": 1792797470.062355
+      },
+      {
+        "name": "playing:held:easy",
+        "t": 1792797470.146132
+      }
+    ],
+    "CLIENT_MARK": [
+      {
+        "name": "main_continue_choice",
+        "t": 1792797373.309949
+      },
+      {
+        "name": "main_adoption_applied",
+        "t": 1792797376.288307
+      },
+      {
+        "name": "main_release_ack",
+        "t": 1792797376.654876
+      },
+      {
+        "name": "main_recovered_playing",
+        "t": 1792797381.375864
+      },
+      {
+        "name": "main_checkpoint_begin",
+        "t": 1792797390.156136
+      },
+      {
+        "name": "main_checkpoint_prepared",
+        "t": 1792797390.322779
+      },
+      {
+        "name": "main_checkpoint_stored",
+        "t": 1792797400.207039
+      },
+      {
+        "name": "free_checkpoint_begin",
+        "t": 1792797433.229043
+      },
+      {
+        "name": "free_checkpoint_prepared",
+        "t": 1792797433.485684
+      },
+      {
+        "name": "free_checkpoint_stored",
+        "t": 1792797443.241585
+      },
+      {
+        "name": "easy_checkpoint_begin",
+        "t": 1792797470.272368
+      },
+      {
+        "name": "easy_checkpoint_prepared",
+        "t": 1792797470.437957
+      },
+      {
+        "name": "easy_checkpoint_stored",
+        "t": 1792797480.287128
+      }
+    ],
+    "CLIENT_END": [
+      {
+        "clock_scale": 1,
+        "copy_seconds": 0.004093399991688784,
+        "online": false,
+        "packets": 158
+      }
+    ]
+  },
+  "canonical_bytes_are_not_wire_bytes": true,
+  "observer_overhead_included": true,
+  "old_aggregate_budget_flag_is_not_typed_admission_wait": true,
+  "native_verified": true,
+  "client_checks": 70,
+  "server_checks": 23,
+  "client_summary": {
+    "clock_scale": 1,
+    "engine_codec": true,
+    "memory_store": true,
+    "online": false,
+    "options": 239,
+    "real_remote_events": true,
+    "server_checks": 23
+  },
+  "server_summary_complete": false,
+  "server_summary_available_fields": {
+    "accountGate": {
+      "actors": 1,
+      "history": 127,
+      "queued": 0,
+      "read": 127,
+      "reserved": 0,
+      "scopes": 0,
+      "started": 0,
+      "write": 24
+    },
+    "archiveComplete": true,
+    "archives": {
+      "A1_46001_easy": "0b00f0f34a21d283",
+      "A1_46001_free": "b7958a62c8beb550",
+      "A1_46001_index": "564664b09150d0c4",
+      "A1_46001_main": "300883ebfb75b45d",
+      "A1_46001_progress": "691a85675621e56d",
+      "M1_46001_easy": "a250517ab0870892",
+      "M1_46001_main": "cebf4b8a074793c8"
+    },
+    "checks": 23,
+    "epoch": "native-new-app:310:7",
+    "errors": 0,
+    "lockReleased": true,
+    "nativeStarts": 287,
+    "optionsCreated": 239,
+    "optionsDestroyed": 239,
+    "originalExact": {
+      "easy": true,
+      "free": true,
+      "main": true
+    }
+  },
+  "marks": {
+    "main_continue_choice": 1792797373.309949,
+    "main_adoption_applied": 1792797376.288307,
+    "main_release_ack": 1792797376.654876,
+    "main_recovered_playing": 1792797381.375864,
+    "main_checkpoint_begin": 1792797390.156136,
+    "main_checkpoint_prepared": 1792797390.322779,
+    "main_checkpoint_stored": 1792797400.207039,
+    "free_checkpoint_begin": 1792797433.229043,
+    "free_checkpoint_prepared": 1792797433.485684,
+    "free_checkpoint_stored": 1792797443.241585,
+    "easy_checkpoint_begin": 1792797470.272368,
+    "easy_checkpoint_prepared": 1792797470.437957,
+    "easy_checkpoint_stored": 1792797480.287128
+  },
+  "main_continue_real_seconds": 8.06591510772705,
+  "main_checkpoint_real_seconds": 10.050903081893921,
+  "free_checkpoint_real_seconds": 10.012542009353638,
+  "easy_checkpoint_real_seconds": 10.01476001739502,
+  "client_observed_update_seconds": 0.5539481997548137,
+  "server_observed_update_seconds": 2.069231799840054
+}

@@ -1,0 +1,28 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-native-service-a1f042e-attempt2\\Windowsill-native-service.rbxlx",
+  "place_sha256": "d19ef15e1f8698b32665f8823a032068132201ef1cc199a5226045ff7e5dd491",
+  "manifest_sha256": "c2ed8eb61e9e3b5ca1dc5f78aa12faa498bdddbb6cef18288a9eed356c9b8436",
+  "guard_sha256": "8e0f606802ca1ddff05d064d91e0370dcf7a9220cfcdcbd218f4d4cc37d9debd",
+  "scripts": 273,
+  "production_untouched": 220,
+  "private_targets": 51,
+  "production_overrides": [
+    "Server/SaveService.luau",
+    "Shared/Persistence/Checkpoint.luau",
+    "Shared/Persistence/SaveSession.luau",
+    "Shared/World/WorldMap.luau"
+  ],
+  "diagnostics": {
+    "docs/request-admission/native-service-client.luau": "c74c6ed71b1bf95a6857420a0bd3136e7b8228e26b55ee0b57184acf48e11f12",
+    "docs/request-admission/native-service-server.server.luau": "e21ce485bf7a82dfbd3b89bbad62c2d2dd18ed40bd267f9f4924ff4fbfc9f2a3"
+  },
+  "production_persistence_disabled": true,
+  "memory_store": true,
+  "engine_codec": true,
+  "clock_scale": 1,
+  "executed": false,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

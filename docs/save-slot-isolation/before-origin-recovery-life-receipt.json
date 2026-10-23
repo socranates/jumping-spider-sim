@@ -1,0 +1,18 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 0,
+  "inputs": {
+    "recorded-map-candidate.luau": "3c837573a934a13c36c34d5373d7db5bdc66882b8d861e1d69a4d91722d9b536",
+    "recorded-checkpoint-candidate.luau": "2dd37a47d1c148ad7882978598b4ea64376b4a1832869ee5d73ffa8be06bbce0",
+    "recovery-meals-prototype.luau": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
+    "recovery-meals-tests.luau": "69ccbc33d086b1ac21f92c251879b92e254050b9d97b9d0993c6a2ea3f180f8b",
+    "recovery-life-prototype.luau": "c5e6c6514b8bf10219bdc5127d6249813ccc6a40e9b742b799764781318ec53d",
+    "recovery-life-tests.luau": "3e9e65435894a12a13b828bd884a7853ec3529024a11f5d9ad3d2274db6c3fcf"
+  },
+  "bundle_sha256": "d2b2ccce99b34a794958330426cd6f693060cf106dae1edbaedb6561dd7d1af1",
+  "output_sha256": "66e3b411db5ba1d3ddbe46d96e24dcf594137e0263955eb866404e712fa1c5e9",
+  "production_connected": false,
+  "real_datastore_verified": false,
+  "native_verified": false,
+  "complete_projection": false
+}

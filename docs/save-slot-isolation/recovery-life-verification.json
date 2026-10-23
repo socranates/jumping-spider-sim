@@ -1,0 +1,21 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "life_assertions": 360,
+  "meal_regression_assertions": 49,
+  "cooperative_suspensions": 130,
+  "current_runtime_bundle_verified": true,
+  "strict_clean": true,
+  "modes": 3,
+  "mating_stages": 6,
+  "moult_continuation_tested": true,
+  "generation_grace_preserved": true,
+  "rare_identity_data_preserved": true,
+  "old_actors_and_skins_history_only": true,
+  "frozen_subcapsule_failure_reproduced": true,
+  "production_connected": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "complete_projection": false,
+  "destination_commit_authorized": false,
+  "published": false
+}

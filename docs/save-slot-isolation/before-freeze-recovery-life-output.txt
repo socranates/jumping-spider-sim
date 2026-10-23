@@ -1,0 +1,13 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45193: invalid argument #1 to 'freeze' (table is already frozen)
+stacktrace:
+[C] function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45193 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45192 function freeze
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45249 function prepare
+C:/Users/natha/AppData/Local/Temp/tmphj68yrjg.luau:45282

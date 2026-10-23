@@ -1,3 +1,15 @@
+Current full cohort: Windows44363 is live and Linux39890016962 is in progress for 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c. Expected76/468352/0 remains unproven until both terminal receipts are verified. Do not duplicate either run. The preceding Windows95443 is terminal/historical. Current source changes are committed; further production edits should wait for this cohort to close. Private historical progress/archive preparation can continue meanwhile. Goal active; nothing published.
+
+# Current: corrected recovery adopted; new full gates pending
+
+Runtime/tests 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c on codex/save-continue adopts the exact native-tested8ad013b9 SaveSession. Periodic recovery is bounded, only freshly loaded slots are delivered, progress notification remains prompt, and closure/demotion/superseding loads fence late results.127 regression assertions were added; adopted STATE passes1251/0. Schemas and gameplay mechanics are unchanged.
+
+New native qualification passed127 checks with224 source fingerprints/zero CreatorErrors, including persistent callback failure accounting. Both module compiles/full strict,83 focused/44 yielding,1624 prior save regressions and unchanged integration1250/0 pass. The earlier20f59026 adoption was withdrawn before commit after1250/2; its raw failure is retained and old adoption/runner disabled. The corrected diagnostic was stopped/saved/closed/exited and original bytes restored; prior Studio window untouched.
+
+New full Windows/Linux gates are pending; expected76/468352/0 is not a result. Earlierf405359 both-platform76/468225/0 is historical. Nothing published. See docs/recovery-verified-gates/README.md. Actual service/rejoin/full game transport, complete historical progress/archive migration, natural lifecycle/streaming/device/memory/performance/main/laptop/release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current: full freshness cohort green; recovery replacement awaits fresh native qualification
 
 Production is restored exactly to f405359. Windows95443 and Linux39886240490 both completed76 suites/468225 checks/0 failures, compile222, strict and runner5. Root source-bound verification passes. No full job is running and nothing published.
@@ -110,7 +122,7 @@ Only production change: Shared/Persistence/Json.canonical uses one private outpu
 
 Windows exec28618 and Linux39860574006 both closed successfully:76 suites/465380 checks/0 failures each; compile222/strict/runner5 pass. Root docs/save-continue/verify.py binds both full gates to exact committed inputs and verifies the native receipts. No jobs remain running in this stage.
 
-Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
+Private paired native test20738 assertions/224 fingerprints passes:40.27percent lower encoder CPU on the same1.503M-character record across four alternating pairs. Separate current-game sequence1792707403197 passes all32 unchanged save/return checks with225 fingerprints, production Persistence disabled and zero CreatorErrors. Continue queues in1.830ms with no synchronous canonical encoding; local/end-screen returns take3.7s across frames. Save capture remains98ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ108ms synchronous; replacement preparation14.34s elapsed in this bounded case. Records differ between experiments, so no causal end-to-end percentage, FPS, heap or hard-budget claim.
 
 Both diagnostics are stopped/saved/closed/exited and their original XML hashes restored. Current-game archive C:/Users/natha/claude-xfer/Windowsill-encoder-game-068a878/Windowsill-encoder-game-review.rbxlx is diagnostic only; never publish it. Pre-existing stopped rig window94504044 remains untouched. Use explicit globalThis/scoped unique locals in future UI work.
 

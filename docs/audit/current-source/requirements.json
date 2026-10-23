@@ -1,6 +1,6 @@
 {
-  "as_of_utc": "2026-10-23T02:24:00.766819+00:00",
-  "source": "f4053597d03b99a61cb97e2eef1ec64ed174f22a",
+  "as_of_utc": "2026-10-23T02:32:58.500198+00:00",
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -23,12 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "both-platforms-verified",
-      "evidence_boundary": "f405359 immutable Windows95443 and Linux39886240490 both terminal76/468225/0, compile222, strict and runner5 clean. Current root verifier confirms all runtime/test/workflow input bytes. Native freshness component111/224 fingerprints/zero errors binds exact adopted modules, not full-game or real DataStore coverage.",
+      "status": "current-full-gates-running",
+      "evidence_boundary": "Current corrected recovery source 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c has focused STATE1251/0 and private/native127/224 sources/zero errors. New full Windows/Linux results are pending; expected76/468352/0 is not a completed gate. Earlierf405359 both platforms76/468225/0, compile222, strict and runner5 remain historical. Immutable Windows44363 and exact-source Linux39890016962 are confirmed live; no duplicate runs dispatched.",
       "references": [
-        "docs/session-freshness-gates/verification.json",
-        "docs/session-freshness-gates/README.md",
-        "docs/save-slot-isolation/SESSION-CACHE.md"
+        "docs/recovery-verified-gates/README.md",
+        "docs/recovery-verified-gates/cohort-source.json",
+        "docs/session-freshness-gates/verification.json"
       ]
     },
     {
@@ -298,14 +298,12 @@
     },
     {
       "id": "save-request-budget",
-      "status": "corrected-private-cli-verified-native-requalification-pending",
-      "evidence_boundary": "20f59026 was withdrawn before commit after ordinary integration1250/2 exposed unverified-slot delivery hidden by callback assertions swallowed inside pcall. Stronger persistent callback-failure harness rejects that source and passes83 with corrected8ad013b9, alongside44 yielding,1624 across7 unchanged save suites, the unchanged integration1250/0 and compile/strict. Production restored exactly to fully verified f405359. Earlier native126 is not adoption qualification. New224-source/expected127 native package is built but unrun; native/full/service/transport checks remain.",
+      "status": "corrected-adopted-native-verified-full-gates-pending",
+      "evidence_boundary": "Exact8ad013b9 session adopted in 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c, with127 regular assertions added. Strong callback-aware83/yield44,1624 existing save regressions, unchanged integration1250/0, compile/strict and new native127/224 sources/zero errors pass. Focused adopted STATE1251/0. Prior20f59026 withdrawn before commit; failed state1250/2 and stronger-harness negative retained. Native diagnostics closed/restored. Full candidate Windows/Linux, actual service/rejoin/full transport remain open.",
       "references": [
-        "docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md",
-        "docs/save-slot-isolation/session-verified-qualification.json",
-        "docs/recovery-pacing-gates/initial-adoption-withdrawn.json",
-        "docs/recovery-pacing-gates/initial-integration-receipt.json",
-        "docs/recovery-pacing-gates/corrected-integration-receipt.json"
+        "docs/recovery-verified-gates/README.md",
+        "docs/save-slot-isolation/session-verified-native-qualification.json",
+        "docs/save-slot-isolation/session-verified-adoption.json"
       ]
     }
   ],
@@ -450,5 +448,15 @@
     "native_requalification_required": true,
     "full_gates_for_candidate": false,
     "published": false
+  },
+  "latest_corrected_recovery_adoption": {
+    "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+    "status": "adopted-native-verified-full-gates-running",
+    "evidence": "docs/recovery-verified-gates/README.md",
+    "published": false,
+    "real_datastore_verified": false,
+    "progress_import_implemented": false,
+    "windows_handle": 44363,
+    "linux_run": 39890016962
   }
 }

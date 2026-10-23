@@ -1,3 +1,5 @@
+Current full cohort: Windows44363 is live and Linux39890016962 is in progress for 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c. Expected76/468352/0 remains unproven until both terminal receipts are verified. Do not duplicate either run. The preceding Windows95443 is terminal/historical. Current source changes are committed; further production edits should wait for this cohort to close. Private historical progress/archive preparation can continue meanwhile. Goal active; nothing published.
+
 # Corrected recovery adoption gates
 
 The exact native-tested SaveSession8ad013b9 module is adopted on codex/save-continue with127 added regression assertions. It bounds periodic recovery requests, retries slots fairly, keeps prompt progress delivery, emits only freshly loaded rest slots and fences late results after close, demotion or a newer load. Schemas and gameplay mechanics are unchanged.

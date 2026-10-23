@@ -1,3 +1,15 @@
+Current full cohort: Windows44363 is live and Linux39890016962 is in progress for 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c. Expected76/468352/0 remains unproven until both terminal receipts are verified. Do not duplicate either run. The preceding Windows95443 is terminal/historical. Current source changes are committed; further production edits should wait for this cohort to close. Private historical progress/archive preparation can continue meanwhile. Goal active; nothing published.
+
+# Current: corrected recovery adopted; new full gates pending
+
+Runtime/tests 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c on codex/save-continue adopts the exact native-tested8ad013b9 SaveSession. Periodic recovery is bounded, only freshly loaded slots are delivered, progress notification remains prompt, and closure/demotion/superseding loads fence late results.127 regression assertions were added; adopted STATE passes1251/0. Schemas and gameplay mechanics are unchanged.
+
+New native qualification passed127 checks with224 source fingerprints/zero CreatorErrors, including persistent callback failure accounting. Both module compiles/full strict,83 focused/44 yielding,1624 prior save regressions and unchanged integration1250/0 pass. The earlier20f59026 adoption was withdrawn before commit after1250/2; its raw failure is retained and old adoption/runner disabled. The corrected diagnostic was stopped/saved/closed/exited and original bytes restored; prior Studio window untouched.
+
+New full Windows/Linux gates are pending; expected76/468352/0 is not a result. Earlierf405359 both-platform76/468225/0 is historical. Nothing published. See docs/recovery-verified-gates/README.md. Actual service/rejoin/full game transport, complete historical progress/archive migration, natural lifecycle/streaming/device/memory/performance/main/laptop/release work remain open. Goal active.
+
+Earlier status below is historical.
+
 # Current: full freshness cohort green; recovery replacement awaits fresh native qualification
 
 Production is restored exactly to f405359. Windows95443 and Linux39886240490 both completed76 suites/468225 checks/0 failures, compile222, strict and runner5. Root source-bound verification passes. No full job is running and nothing published.

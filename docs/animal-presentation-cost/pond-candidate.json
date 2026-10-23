@@ -1,0 +1,11 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "path": "roblox_port/src/Client/PondBodies.luau",
+  "reference_sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e",
+  "candidate_sha256": "1771189b0331cff1aeee565fddc4420de1a69af89a2a8e815a2ee748c3f25309",
+  "changes": "Owned per-rig bulk-move buffers, one darner recipe per presentation instance, immutable empty hidden recipe",
+  "production_changed": false,
+  "simulation_changed": false,
+  "animation_rates_changed": false,
+  "adopted": false
+}

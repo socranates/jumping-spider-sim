@@ -1,0 +1,9 @@
+{
+  "source": "59146e1005c083330455379766ab8c9dd2de2705",
+  "reference_sha256": "b32620358ea2e67cd98aa8d78c1cb322dfd549dfa3c706514d1d9bc139f2e77e",
+  "candidate_sha256": "1771189b0331cff1aeee565fddc4420de1a69af89a2a8e815a2ee748c3f25309",
+  "exit_code": 0,
+  "output_sha256": "a6756654928b7cbc05047efef93b9d3a71f2c4ba39d2f678a164729cfcebb70a",
+  "scope": "Existing bodies.luau suite under CLI, with only private candidate substitution; production files untouched",
+  "adopted": false
+}

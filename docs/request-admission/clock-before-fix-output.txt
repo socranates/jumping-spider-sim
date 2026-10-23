@@ -1,0 +1,19 @@
+ADMISSION_CASE	zero-and-changing-allowance	10
+ADMISSION_CASE	operation-types-and-headroom	11
+ADMISSION_CASE	per-actor-and-server-rolling-caps	12
+ADMISSION_CASE	write-cap-does-not-block-independent-reads	6
+ADMISSION_CASE	fair-queue-and-abandoned-poller	11
+ADMISSION_CASE	reservation-and-pending-capacity	12
+ADMISSION_CASE	reservation-expiry-is-terminal	6
+ADMISSION_CASE	closed-visits-carry-debt	10
+ADMISSION_CASE	provider-yield-close-and-drain	10
+ADMISSION_CASE	in-flight-capacity-is-reserved	9
+ADMISSION_CASE	cancel-during-yielding-budget-query	4
+ADMISSION_CASE	reentrant-budget-query-cannot-admit-stale-state	7
+C:/Users/natha/AppData/Local/Temp/windowsill-admission-6b4_vlh4/run.luau:255: admission assertion
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-admission-6b4_vlh4/run.luau:255 function check
+C:/Users/natha/AppData/Local/Temp/windowsill-admission-6b4_vlh4/run.luau:377
+C:/Users/natha/AppData/Local/Temp/windowsill-admission-6b4_vlh4/run.luau:257 function group
+C:/Users/natha/AppData/Local/Temp/windowsill-admission-6b4_vlh4/run.luau:368

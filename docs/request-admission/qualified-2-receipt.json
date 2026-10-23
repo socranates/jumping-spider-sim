@@ -1,0 +1,32 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "inputs": {
+    "docs/request-admission/admission.luau": "44bd7700c9b492e3a2dd123c8ae4eec9529053b35c8d45461499482b9ee0056f",
+    "docs/request-admission/facade.luau": "b7377be9950918711411330777a30dade8fbbfb20bae1015745b52a4f0553edf",
+    "docs/request-admission/tests.luau": "2354cffbedae82c91ff9ae766a5f7ca8a07dc3b4a04d0a9cabb4a8f03f946c94",
+    "docs/request-admission/provider-tests.luau": "559b9b1c25e56d6a06836a068becaa0a8d77245fd0f83a868e4e5cd255a27188",
+    "roblox_port/src/Server/DataStoreBackend.luau": "a31455c89abe9c3fc823333f1b186183d2d5e559c47cd06b75bc03fd9ee29d38"
+  },
+  "bundle_sha256": "adfa15b276b2b60983c08ebb3aa84fc443c1c13944ca1462741fed0394392f2a",
+  "output_sha256": "fef4e94bd4139643d81ca6cc1c2eec578e2cde38bb9e3e114a4d338419612cdc",
+  "exit_code": 0,
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "sha256": "203730b06001ff066c9ae73a5b10d1db5ebc9acc27e813e9afcc3a8a8eef4324"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "elapsed_seconds": 0.13489365577697754,
+  "policy_installed_in_production": false,
+  "backend_code_is_production": true,
+  "backend_provider_is_synthetic": true,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false
+}

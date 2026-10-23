@@ -1,0 +1,30 @@
+ADMISSION_CASE	zero-and-changing-allowance	10
+ADMISSION_CASE	operation-types-and-headroom	11
+ADMISSION_CASE	per-actor-and-server-rolling-caps	12
+ADMISSION_CASE	write-cap-does-not-block-independent-reads	6
+ADMISSION_CASE	fair-queue-and-abandoned-poller	11
+ADMISSION_CASE	reservation-and-pending-capacity	12
+ADMISSION_CASE	reservation-expiry-is-terminal	6
+ADMISSION_CASE	closed-visits-carry-debt	10
+ADMISSION_CASE	provider-yield-close-and-drain	10
+ADMISSION_CASE	in-flight-capacity-is-reserved	9
+ADMISSION_CASE	cancel-during-yielding-budget-query	4
+ADMISSION_CASE	reentrant-budget-query-cannot-admit-stale-state	7
+ADMISSION_CASE	closed-scope-during-budget-query	2
+ADMISSION_CASE	provider-failure-is-charged	4
+ADMISSION_CASE	invalid-allowance-and-clock-refuse-without-start	21
+ADMISSION_CASE	bounded-memory-and-physical-actor-retention	1509
+ADMISSION_CASE	opaque-handles-and-immutable-configuration	8
+ADMISSION_CASE	independent-rolling-oracle	3032
+ADMISSION_SYNTHETIC_MIX	30	read_units=30 write_units=6 legacy_wait=120 candidate_wait=0
+ADMISSION_CASE	mixed-workload-does-not-spend-write-budget-on-reads	68
+REQUEST_ADMISSION passed=4752 failed=0 groups=19
+ADMISSION_BACKEND_CASE	zero-budget-is-pending-not-provider-failure	44
+ADMISSION_BACKEND_CASE	fresh-read-and-typed-update-boundaries	8
+ADMISSION_BACKEND_CASE	cancelled-queued-operation-never-starts	4
+ADMISSION_BACKEND_CASE	yielding-read-cannot-return-an-obsolete-result	6
+ADMISSION_BACKEND_CASE	repeated-update-callback-rechecks-cancellation	5
+ADMISSION_BACKEND_CASE	scope-end-inside-transform-cancels-candidate	4
+ADMISSION_BACKEND_CASE	ambiguous-ack-does-not-refund-or-report-success	7
+ADMISSION_BACKEND_CASE	actual-backend-errors-retain-provider-result	3
+ADMISSION_BACKEND passed=82 failed=0 groups=8 options=5

@@ -1,0 +1,2 @@
+SESSION_BOUNDARY late-lock state=active now=221 stored_beat=221 scheduler_beat=221 baseline_ack=true
+SESSION_BOUNDARY case=late-lock fixed=true

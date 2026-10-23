@@ -1,0 +1,9 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-zs2u5ump\src\Shared\Persistence\SaveSession.luau [game/ReplicatedStorage/Shared/Persistence/SaveSession](933,4): TypeError: Type boolean cannot be compared with { ordinaryRequestEnded: boolean }
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-zs2u5ump\src\Shared\Persistence\SaveSession.luau [game/ReplicatedStorage/Shared/Persistence/SaveSession](933,4): TypeError: Type boolean cannot be compared with { ordinaryRequestEnded: boolean }
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-zs2u5ump\src\Shared\Persistence\SaveSession.luau [game/ReplicatedStorage/Shared/Persistence/SaveSession](933,4): TypeError: Type boolean cannot be compared with { ordinaryRequestEnded: boolean }
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-zs2u5ump\src\Shared\Persistence\SaveSession.luau [game/ReplicatedStorage/Shared/Persistence/SaveSession](933,4): TypeError: Type boolean cannot be compared with { ordinaryRequestEnded: boolean }
+c:\Users\natha\AppData\Local\Temp\windowsill-worker-types-zs2u5ump\src\Shared\Persistence\SaveSession.luau [game/ReplicatedStorage/Shared/Persistence/SaveSession](933,4): TypeError: Type boolean cannot be compared with { ordinaryRequestEnded: boolean }
+src/Shared/Persistence/SaveSession.luau(258,8): LocalUnused: Variable 'now' is never used; prefix with '_' to silence
+src/Shared/Persistence/SaveSession.luau(572,8): LocalUnused: Variable 'now' is never used; prefix with '_' to silence

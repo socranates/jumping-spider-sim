@@ -1,0 +1,2 @@
+SESSION_BOUNDARY read-account provider=2 session=2 history=2
+SESSION_BOUNDARY case=read-account fixed=true

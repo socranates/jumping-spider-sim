@@ -1,0 +1,7 @@
+{
+  "reason": "Stopped the verified live qualification child before edits after confirming production uses os.time; replace single-quantum clock-advance rejection with valid coarse-clock waiting.",
+  "runner_session": 15380,
+  "child_pid": 24764,
+  "receipt": "ordinary-qualified-1-receipt.json",
+  "qualification_complete": false
+}

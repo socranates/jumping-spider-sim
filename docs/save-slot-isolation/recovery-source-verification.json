@@ -1,0 +1,18 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "candidate_sha256": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
+  "collector_assertions": 3571,
+  "integration_assertions": 311,
+  "aggregate_candidate_assertions": 2,
+  "baseline_aggregate_overrun_reproduced": true,
+  "strict_clean": true,
+  "simulated_pipeline_requests": 20,
+  "simulated_heartbeat_writes": 2,
+  "simulated_elapsed_seconds": 135,
+  "production_changed": false,
+  "native_verified": false,
+  "real_datastore_verified": false,
+  "real_session_authority_integrated": false,
+  "progress_import_implemented": false,
+  "published": false
+}

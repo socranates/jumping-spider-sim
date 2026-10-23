@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-23T02:32:58.500198+00:00",
+  "as_of_utc": "2026-10-23T03:01:22.129835+00:00",
   "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
   "goal_complete": false,
   "published": false,
@@ -23,12 +23,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "current-full-gates-running",
-      "evidence_boundary": "Current corrected recovery source 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c has focused STATE1251/0 and private/native127/224 sources/zero errors. New full Windows/Linux results are pending; expected76/468352/0 is not a completed gate. Earlierf405359 both platforms76/468225/0, compile222, strict and runner5 remain historical. Immutable Windows44363 and exact-source Linux39890016962 are confirmed live; no duplicate runs dispatched.",
+      "status": "both-platforms-verified",
+      "evidence_boundary": "Current4220d0c Windows44363 and Linux39890016962 both terminal76/468352/0, compile222, strict and runner5 clean. Root verifier binds exact current runtime/test/workflow bytes, corrected adopted session and native127/224 source fingerprints. Earlier failures remain preserved. Native scope is isolated protocol/MemoryBackend, not service/rejoin/full transport.",
       "references": [
+        "docs/recovery-verified-gates/verification.json",
         "docs/recovery-verified-gates/README.md",
-        "docs/recovery-verified-gates/cohort-source.json",
-        "docs/session-freshness-gates/verification.json"
+        "docs/save-slot-isolation/SESSION-CALLBACK-AUDIT.md"
       ]
     },
     {
@@ -298,8 +298,8 @@
     },
     {
       "id": "save-request-budget",
-      "status": "corrected-adopted-native-verified-full-gates-pending",
-      "evidence_boundary": "Exact8ad013b9 session adopted in 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c, with127 regular assertions added. Strong callback-aware83/yield44,1624 existing save regressions, unchanged integration1250/0, compile/strict and new native127/224 sources/zero errors pass. Focused adopted STATE1251/0. Prior20f59026 withdrawn before commit; failed state1250/2 and stronger-harness negative retained. Native diagnostics closed/restored. Full candidate Windows/Linux, actual service/rejoin/full transport remain open.",
+      "status": "corrected-adopted-both-platforms-and-isolated-native-verified",
+      "evidence_boundary": "Exact8ad013b9 session adopted in4220d0c, with127 regular checks and STATE1251/0. Both full platforms76/468352/0, compile222, strict and runner5 pass, plus native127/224 fingerprints/zero errors under strengthened callback accounting. Prior20f59026 failed integration1250/2 and was withdrawn before commit. Actual service/rejoin/full transport remain unverified.",
       "references": [
         "docs/recovery-verified-gates/README.md",
         "docs/save-slot-isolation/session-verified-native-qualification.json",
@@ -451,12 +451,30 @@
   },
   "latest_corrected_recovery_adoption": {
     "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
-    "status": "adopted-native-verified-full-gates-running",
-    "evidence": "docs/recovery-verified-gates/README.md",
+    "status": "both-platforms-verified",
+    "evidence": "docs/recovery-verified-gates/verification.json",
     "published": false,
     "real_datastore_verified": false,
     "progress_import_implemented": false,
     "windows_handle": 44363,
     "linux_run": 39890016962
+  },
+  "latest_raw_source_collection_prototype": {
+    "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+    "candidate_sha256": "99a63251b225789d05c191d5b78ba9a9223b7a6359e49f1e946ab9c91fcd9541",
+    "collector_assertions": 3571,
+    "integration_assertions": 311,
+    "aggregate_candidate_assertions": 2,
+    "baseline_aggregate_overrun_reproduced": true,
+    "strict_clean": true,
+    "simulated_pipeline_requests": 20,
+    "simulated_heartbeat_writes": 2,
+    "simulated_elapsed_seconds": 135,
+    "production_changed": false,
+    "native_verified": false,
+    "real_datastore_verified": false,
+    "real_session_authority_integrated": false,
+    "progress_import_implemented": false,
+    "published": false
   }
 }

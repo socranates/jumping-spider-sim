@@ -1,3 +1,11 @@
+# Corrected recovery cohort completed
+
+Source4220d0c43142cee91b83bdbd99fffcee8dfd6c5c is verified on both platforms:76 suites/468352 checks/0 failures. Windows44363 exited0 after1191.33 seconds; Linux39890016962 completed with222 compilations, strict clean and5 runner regressions. Root verify.py binds exact current runtime/test/workflow inputs and raw terminal logs. All jobs in this cohort are terminal; do not restart them. Nothing published.
+
+Native127/224 fingerprints/zero errors supports the exact adopted session under MemoryBackend/coroutine/callback tests with all production scripts disabled. It is not actual service/rejoin/full-game transport or migration proof. The raw-source collector has separate private CLI evidence and remains outside production.
+
+Original planning/status below is historical.
+
 Current full cohort: Windows44363 is live and Linux39890016962 is in progress for 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c. Expected76/468352/0 remains unproven until both terminal receipts are verified. Do not duplicate either run. The preceding Windows95443 is terminal/historical. Current source changes are committed; further production edits should wait for this cohort to close. Private historical progress/archive preparation can continue meanwhile. Goal active; nothing published.
 
 # Corrected recovery adoption gates

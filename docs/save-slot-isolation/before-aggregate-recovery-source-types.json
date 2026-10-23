@@ -1,0 +1,25 @@
+{
+  "candidates": {
+    "recovery-archive-prototype.luau": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+    "recovery-source-collector-prototype.luau": "3cc3c373e6c2760079b5838056cebb1725e614e4c445205d790f06087fb9b136",
+    "recovery-archive-store-prototype.luau": "80440f94430eea417e9d65736c7a259b92a6235016732fab9bcae36e8dddacb0"
+  },
+  "steps": [
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "d19185abfdf528f768c2ceddce4f41e776edd34509011729c44ce0547d6877a5"
+    },
+    {
+      "name": "sourcemap",
+      "exit_code": 0,
+      "output_sha256": "44505acf8600c1f3fd255beae9700aa173c3a4f6907804758a99109e14b4c213"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    }
+  ],
+  "production_changed": false
+}

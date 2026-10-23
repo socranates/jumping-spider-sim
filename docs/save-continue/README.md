@@ -1,3 +1,13 @@
+# Current: corrected recovery full cohort green; raw collection composed privately
+
+Production4220d0c: Windows44363 and Linux39890016962 both terminal76 suites/468352 checks/0 failures, all222 modules compile, strict and runner5 clean. Current root verification binds exact runtime/test/workflow bytes and the corrected native127/224-source evidence. Both full jobs are terminal. Nothing published.
+
+The next historical-save dependency is implemented privately: raw four-slot collection, second-pass source verification, owned frozen copies, missing/unavailable separation, explicit same-session heartbeat handling and cancellable cooperative preparation.3571 collector/311 composition/2 corrected aggregate-bound checks pass, along with compile/full strict. The actual adapter, archive publisher and scheduler compose over a fake cached store under the per-minute allowance, including heartbeat drift and a lost acknowledgement;20 requests/2 heartbeats/135 simulated seconds. A retained counterexample proves646 copied nodes could accumulate under a500-node cap; the fix refuses earlier with323. Original values are preserved. This is not a native heap/performance or real DataStore claim.
+
+See docs/save-slot-isolation/RECOVERY-SOURCE-COLLECTION.md. This collector is outside production and has no real SaveSession authority/intent integration, native or service/rejoin proof, portable progress projection or destination commit. The progress-into-Preserve/complete-original-archive policy remains; migration is not yet playable. Natural lifecycle/streaming/device/memory/performance/main/laptop/release and other audit requirements remain open. Goal active.
+
+Earlier status below is historical.
+
 Current full cohort: Windows44363 is live and Linux39890016962 is in progress for 4220d0c43142cee91b83bdbd99fffcee8dfd6c5c. Expected76/468352/0 remains unproven until both terminal receipts are verified. Do not duplicate either run. The preceding Windows95443 is terminal/historical. Current source changes are committed; further production edits should wait for this cohort to close. Private historical progress/archive preparation can continue meanwhile. Goal active; nothing published.
 
 # Current: corrected recovery adopted; new full gates pending

@@ -1,0 +1,814 @@
+2026-10-23T02:31:28.5637271Z ##[group]Run python3 tests/run.py $HOME/luau/luau
+2026-10-23T02:31:28.5637740Z [36;1mpython3 tests/run.py $HOME/luau/luau[0m
+2026-10-23T02:31:28.5701298Z shell: /usr/bin/bash -e {0}
+2026-10-23T02:31:28.5701595Z ##[endgroup]
+2026-10-23T02:31:29.3601361Z JSON_ENCODING passed=20716 failed=0
+2026-10-23T02:31:31.3552072Z LOCAL_RETURN passed=27 failed=0
+2026-10-23T02:31:33.1217584Z LOCAL_REST_CLIENT passed=17 failed=0
+2026-10-23T02:31:33.3554095Z LOCAL_REST passed=33 failed=0
+2026-10-23T02:31:33.6031117Z SAVE_OFFERS passed=99 failed=0
+2026-10-23T02:31:33.8308936Z SAVE_RESTORE passed=24 failed=0
+2026-10-23T02:31:34.2659374Z SAVE_WORK passed=39 failed=0
+2026-10-23T02:31:49.9446310Z CONTINUATION_MENU passed=41 failed=0
+2026-10-23T02:31:50.1694480Z SAVE_CONTINUATION passed=125 failed=0
+2026-10-23T02:31:50.3891479Z SAVE_INTENT passed=57 failed=0
+2026-10-23T02:31:50.6123018Z SAVE_OBSERVATION passed=50 failed=0
+2026-10-23T02:31:54.0727348Z [Windowsill] navigation startup: /tmp/tmpy0w4k5aj.luau:59287: synthetic controller navigation failure
+2026-10-23T02:31:54.0728777Z NAVIGATION_STARTUP passed=15 failed=0
+2026-10-23T02:31:59.4534827Z SAVE_NOTICE passed=53 failed=0
+2026-10-23T02:32:04.1850924Z OUTDOOR_RESET passed=45 failed=0
+2026-10-23T02:32:04.4144921Z REST_COMPRESSION passed=57 failed=0
+2026-10-23T02:32:11.6184451Z REST_STORAGE full_world_chars=2277087 regions=233
+2026-10-23T02:32:11.8376666Z REST_STORAGE passed=14 failed=0
+2026-10-23T02:32:11.8377549Z FOUNDATION passed=4 failed=0 avoided_scans=2000
+2026-10-23T02:32:15.0895195Z RARE passed=265 failed=0
+2026-10-23T02:32:15.3363836Z SPAWN passed=20 failed=0
+2026-10-23T02:32:15.8982683Z MEALS passed=88 failed=0
+2026-10-23T02:32:16.1466389Z fuzz: 402 body hairs, 80 leg hairs, 32 white
+2026-10-23T02:32:16.4714993Z SUMMARY passed=196 failed=0
+2026-10-23T02:32:16.4715627Z PERCEPTION passed=4669 failed=0
+2026-10-23T02:32:17.0253499Z SENSOR passed=507 failed=0
+2026-10-23T02:32:17.4333692Z PREY feel: fruit fly idle 1.68 s, 2 taps/s won 60/60, 4 taps/s 1.00 s; house fly idle 1.15 s, 4 taps/s 4.61 s
+2026-10-23T02:32:17.4334725Z PREY feel (ROBLOX-96): gnat idle 1.94 s, aphid idle 2.34 s
+2026-10-23T02:32:17.4335611Z PREY feel (ROBLOX-101): crane fly idle 0.99 s, won 33/60 at 4 taps/s and 60/60 at 6; house fly 60/60 at 4
+2026-10-23T02:32:17.4336371Z PREY passed=1668 failed=0
+2026-10-23T02:32:17.7330869Z LIFE passed=20922 failed=0
+2026-10-23T02:32:22.9381229Z checkpoint: 17947 characters, 87 tables
+2026-10-23T02:32:22.9381799Z CHECKPOINT passed=594 failed=0
+2026-10-23T02:32:27.8391354Z WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+2026-10-23T02:32:27.8392300Z WASP passed=16884 failed=0
+2026-10-23T02:32:28.0994347Z GAZE passed=74 failed=0
+2026-10-23T02:32:28.3493593Z PRESENTATION passed=11 failed=0
+2026-10-23T02:32:29.6982348Z   1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+2026-10-23T02:32:29.6983265Z   2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+2026-10-23T02:32:29.6984097Z   3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+2026-10-23T02:32:29.6984968Z   4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+2026-10-23T02:32:29.6985763Z   5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+2026-10-23T02:32:29.6986538Z   6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+2026-10-23T02:32:29.6987631Z   7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+2026-10-23T02:32:29.6988520Z   8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+2026-10-23T02:32:29.6989479Z   9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+2026-10-23T02:32:29.6990414Z   10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+2026-10-23T02:32:29.6991494Z   the let-down past the wall: skin 0.310 from Studio's place, 0.310 with the engine's miss, on the soil after 118.9 s
+2026-10-23T02:32:29.6993348Z   the tangent touch: 0.753 studs a second exact, 0.753 with a touch on every sweep (360 let pass), 0.000 without the rule (360 stops, 4.111 taken off)
+2026-10-23T02:32:29.6994320Z BOXWORLD passed=21 failed=0
+2026-10-23T02:32:52.2962417Z CLIENT passed=27 failed=0
+2026-10-23T02:32:53.4580751Z PERCEPTION_CLIENT passed=1 failed=0
+2026-10-23T02:33:00.7054106Z CLIENT_ANT passed=3 failed=0
+2026-10-23T02:33:24.3295949Z CLIENT_RIVAL passed=9 failed=0
+2026-10-23T02:34:09.4980848Z CLIENT_MATING passed=29 failed=0
+2026-10-23T02:34:42.4101055Z look: full 707 parts (504 hairs, 8 shells, 195 other), low 265 (134 hairs, 2 shells, 129 other)
+2026-10-23T02:34:42.4102260Z look: peacock spider full 119 parts, low 80
+2026-10-23T02:34:42.4102957Z look: ant-mimicking spider full 79 parts, low 69
+2026-10-23T02:34:42.4103946Z look: Mexican redknee full 146 parts, low 84; Greenbottle blue full 148 parts (36 bristles), low 84
+2026-10-23T02:34:42.4105749Z look: tolerance, first spider, full: hairs within 6.68e-04 studs, 9.99e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 91.6 percent of the parts moved
+2026-10-23T02:34:42.4108860Z look: tolerance, first spider, low (as the mate is drawn): hairs within 6.68e-04 studs, 9.62e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 94.8 percent of the parts moved
+2026-10-23T02:34:42.4110858Z look: tolerance, redknee, full: hairs within 1.80e-04 studs, 9.92e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 90.8 percent of the parts moved
+2026-10-23T02:34:42.4111904Z look: rival full 622 parts, low 211
+2026-10-23T02:34:42.4112349Z look: the male mate, low (living) 270 parts
+2026-10-23T02:34:42.4112802Z LOOK passed=1442 failed=0
+2026-10-23T02:35:04.5662005Z IDLE passed=5719 failed=0
+2026-10-23T02:35:05.2939779Z world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+2026-10-23T02:35:05.2941048Z world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+2026-10-23T02:35:05.2942132Z world: decor 1261 parts at full detail, 363 at low (view 45 items at full), dust 7 -> 2.8 per second
+2026-10-23T02:35:05.2944507Z world: the looks outside the window (full/low): outer_sill 116/39, house_wall 127/69, bed_a 466/113, wall_west 93/59, wall_west_upper 73/66, wall_upper 49/28, eaves_west 46/31, eaves 149/42, shrub_west_a 260/80, shrub_west_b 260/80, shrub_west_c 260/80, shrub_west_d 260/80, shrub_west_e 260/80, shrub_west_f 260/80, shrub_west_g 260/80, shrub_west_h 260/80, shrub_west_i 260/80, shrub_west_j 260/80, kitchen_counter 83/19, kitchen_floor 34/10
+2026-10-23T02:35:05.2946652Z WORLD passed=355 failed=0
+2026-10-23T02:35:05.7365639Z FLIES passed=283 failed=0
+2026-10-23T02:35:08.0866388Z EYES passed=231 failed=0
+2026-10-23T02:35:08.4008614Z HUD passed=103 failed=0
+2026-10-23T02:35:08.6781108Z PEACOCK card lines (the longest of every display key and pad style): keyboard 10, gamepad 10, touch 10
+2026-10-23T02:35:08.6782207Z PEACOCK passed=272 failed=0
+2026-10-23T02:35:08.9217958Z ANTMIMIC passed=89 failed=0
+2026-10-23T02:35:09.1880771Z TARANTULA passed=86 failed=0
+2026-10-23T02:35:09.4101649Z CONTINUING passed=87 failed=0
+2026-10-23T02:35:09.8879915Z GROWTH passed=571 failed=0
+2026-10-23T02:35:17.0088242Z NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+2026-10-23T02:35:17.0089730Z NOTEBOOK passed=1517 failed=0
+2026-10-23T02:35:35.9439982Z state: a rest is 17886 characters early and 21595 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+2026-10-23T02:35:35.9442332Z slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 5.2 s
+2026-10-23T02:35:35.9443897Z SESSION_ADAPTER_CASE main same
+2026-10-23T02:35:35.9444413Z SESSION_ADAPTER_CASE main changed
+2026-10-23T02:35:35.9444955Z SESSION_ADAPTER_CASE main missing
+2026-10-23T02:35:35.9445454Z SESSION_ADAPTER_CASE main corrupt
+2026-10-23T02:35:35.9446445Z SESSION_ADAPTER_CASE main newer
+2026-10-23T02:35:35.9447197Z SESSION_ADAPTER_CASE main unavailable
+2026-10-23T02:35:35.9447649Z SESSION_ADAPTER_CASE free same
+2026-10-23T02:35:35.9448043Z SESSION_ADAPTER_CASE free changed
+2026-10-23T02:35:35.9448450Z SESSION_ADAPTER_CASE free missing
+2026-10-23T02:35:35.9448849Z SESSION_ADAPTER_CASE free corrupt
+2026-10-23T02:35:35.9449244Z SESSION_ADAPTER_CASE free newer
+2026-10-23T02:35:35.9449676Z SESSION_ADAPTER_CASE free unavailable
+2026-10-23T02:35:35.9450106Z SESSION_ADAPTER_CASE easy same
+2026-10-23T02:35:35.9450497Z SESSION_ADAPTER_CASE easy changed
+2026-10-23T02:35:35.9450901Z SESSION_ADAPTER_CASE easy missing
+2026-10-23T02:35:35.9451299Z SESSION_ADAPTER_CASE easy corrupt
+2026-10-23T02:35:35.9451696Z SESSION_ADAPTER_CASE easy newer
+2026-10-23T02:35:35.9452092Z SESSION_ADAPTER_CASE easy unavailable
+2026-10-23T02:35:35.9452598Z SESSION_BUDGET_CANDIDATE rest_retry bounded_and_complete
+2026-10-23T02:35:35.9453216Z SESSION_BUDGET_CANDIDATE lease_retry bounded_and_complete
+2026-10-23T02:35:35.9453786Z SESSION_BUDGET_YIELD read close fenced
+2026-10-23T02:35:35.9454299Z SESSION_BUDGET_YIELD read demote fenced
+2026-10-23T02:35:35.9454621Z SESSION_BUDGET_YIELD read supersede fenced
+2026-10-23T02:35:35.9454939Z SESSION_BUDGET_YIELD lock close fenced
+2026-10-23T02:35:35.9455242Z SESSION_BUDGET_YIELD lock demote fenced
+2026-10-23T02:35:35.9455555Z SESSION_BUDGET_YIELD lock supersede fenced
+2026-10-23T02:35:35.9455863Z STATE passed=1251 failed=0
+2026-10-23T02:36:08.1786131Z STATE_CLIENT passed=161 failed=0
+2026-10-23T02:36:08.5711973Z STATE_OFFLINE passed=8 failed=0
+2026-10-23T02:36:12.3370432Z SETTINGS passed=1163 failed=0
+2026-10-23T02:36:13.0160872Z RIVAL contest rates over 6000 strikes: caught 0.400, sprang clear 0.322, counter-bite 0.278
+2026-10-23T02:36:13.0163729Z RIVAL feel: no taps tears free in 1.65 s; 2, 3, 3.5 a second tear free; 4 a second tears free (59 of 60 in 40 s); 5 a second wins in 5.6 to 9.8 s (mean 7.6); 5.5 in 4.6; 6 in 3.2; gentle idle 1.14 s, gentle 4 in 5.5 s, automatic grip alone 11.3 s, a 1 s lapse at 3 s costs 6.3 s
+2026-10-23T02:36:13.0165501Z RIVAL passed=2843 failed=0
+2026-10-23T02:36:30.6273983Z RIVALNAV perf: 5400 ticks, 2.00 rays/tick, 900 thinks, 4 plans, 0 replans, 0 resets, 9808 ticks/s of CPU shim time
+2026-10-23T02:36:30.6275478Z RIVALNAV places to patrol to: sill 105, outer_sill 18, house_wall 13, bed_a 79
+2026-10-23T02:36:30.6277981Z RIVALNAV the preserve: the rival in 15 minutes crossed 3 seams and walked 4 of its roam's regions (the garden's 16 cells, ROBLOX-119: and the path, the bench patch and the meadow's edge); 8 places reached
+2026-10-23T02:36:30.6279725Z RIVALNAV the meadow's edge: in 10 minutes the rival walked 3 regions (2 crossings), 77 studs from where it began, in pad_c3, its record good true
+2026-10-23T02:36:30.6280633Z RIVALNAV passed=581 failed=0
+2026-10-23T02:36:32.0501407Z MATING passed=725 failed=0
+2026-10-23T02:37:06.6364428Z INSPECT passed=37 failed=0
+2026-10-23T02:37:18.2009908Z worldmap: from the parked focus, the sill's farthest box corner is 57.8 studs, the outer sill's 55.5 (always sent: 96)
+2026-10-23T02:37:18.2011457Z worldmap: sill: from anywhere on it, its farthest box is 61.8 studs away (nearest point or centre, the farther), 69.8 from a focus 8 behind
+2026-10-23T02:37:18.2013105Z worldmap: outer_sill: from anywhere on it, its farthest box is 44.1 studs away (nearest point or centre, the farther), 52.1 from a focus 8 behind
+2026-10-23T02:37:18.2014712Z worldmap: house_wall: from anywhere on it, its farthest box is 112.7 studs away (nearest point or centre, the farther), 120.7 from a focus 8 behind
+2026-10-23T02:37:18.2016264Z worldmap: bed_a: from anywhere on it, its farthest box is 59.1 studs away (nearest point or centre, the farther), 67.1 from a focus 8 behind
+2026-10-23T02:37:18.2017986Z worldmap: wall_west: from anywhere on it, its farthest box is 88.5 studs away (nearest point or centre, the farther), 96.5 from a focus 8 behind
+2026-10-23T02:37:18.2019545Z worldmap: wall_west_upper: from anywhere on it, its farthest box is 93.1 studs away (nearest point or centre, the farther), 101.1 from a focus 8 behind
+2026-10-23T02:37:18.2021738Z worldmap: wall_upper: from anywhere on it, its farthest box is 120.2 studs away (nearest point or centre, the farther), 128.2 from a focus 8 behind
+2026-10-23T02:37:18.2023303Z worldmap: eaves_west: from anywhere on it, its farthest box is 96.4 studs away (nearest point or centre, the farther), 104.4 from a focus 8 behind
+2026-10-23T02:37:18.2024799Z worldmap: eaves: from anywhere on it, its farthest box is 136.5 studs away (nearest point or centre, the farther), 144.5 from a focus 8 behind
+2026-10-23T02:37:18.2026325Z worldmap: shrub_west_a: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+2026-10-23T02:37:18.2028082Z worldmap: shrub_west_b: from anywhere on it, its farthest box is 101.2 studs away (nearest point or centre, the farther), 109.2 from a focus 8 behind
+2026-10-23T02:37:18.2029632Z worldmap: shrub_west_c: from anywhere on it, its farthest box is 98.3 studs away (nearest point or centre, the farther), 106.3 from a focus 8 behind
+2026-10-23T02:37:18.2031464Z worldmap: shrub_west_d: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+2026-10-23T02:37:18.2033013Z worldmap: shrub_west_e: from anywhere on it, its farthest box is 98.1 studs away (nearest point or centre, the farther), 106.1 from a focus 8 behind
+2026-10-23T02:37:18.2034550Z worldmap: shrub_west_f: from anywhere on it, its farthest box is 98.8 studs away (nearest point or centre, the farther), 106.8 from a focus 8 behind
+2026-10-23T02:37:18.2036090Z worldmap: shrub_west_g: from anywhere on it, its farthest box is 111.6 studs away (nearest point or centre, the farther), 119.6 from a focus 8 behind
+2026-10-23T02:37:18.2037816Z worldmap: shrub_west_h: from anywhere on it, its farthest box is 100.6 studs away (nearest point or centre, the farther), 108.6 from a focus 8 behind
+2026-10-23T02:37:18.2039380Z worldmap: shrub_west_i: from anywhere on it, its farthest box is 97.2 studs away (nearest point or centre, the farther), 105.2 from a focus 8 behind
+2026-10-23T02:37:18.2040937Z worldmap: shrub_west_j: from anywhere on it, its farthest box is 100.1 studs away (nearest point or centre, the farther), 108.1 from a focus 8 behind
+2026-10-23T02:37:18.2042601Z worldmap: kitchen_counter: from anywhere on it, its farthest box is 128.7 studs away (nearest point or centre, the farther), 136.7 from a focus 8 behind
+2026-10-23T02:37:18.2044186Z worldmap: kitchen_floor: from anywhere on it, its farthest box is 143.0 studs away (nearest point or centre, the farther), 151.0 from a focus 8 behind
+2026-10-23T02:37:18.2045734Z worldmap: sill to outer_sill: within 10 studs of the seam (330 places), the 1 boxes of outer_sill on the seam are at most 19.2 studs away, the rest 34.6
+2026-10-23T02:37:18.2047404Z worldmap: sill to wall_upper: within 10 studs of the seam (679 places), the 3 boxes of wall_upper on the seam are at most 85.2 studs away, the rest 92.9
+2026-10-23T02:37:18.2049056Z worldmap: sill to kitchen_counter: within 10 studs of the seam (744 places), the 3 boxes of kitchen_counter on the seam are at most 77.3 studs away, the rest 88.1
+2026-10-23T02:37:18.2050649Z worldmap: outer_sill to sill: within 10 studs of the seam (159 places), the 3 boxes of sill on the seam are at most 36.8 studs away, the rest 50.7
+2026-10-23T02:37:18.2052185Z worldmap: outer_sill to house_wall: within 10 studs of the seam (371 places), the 3 boxes of house_wall on the seam are at most 61.7 studs away, the rest 0.0
+2026-10-23T02:37:18.6960034Z worldmap: house_wall to outer_sill: within 10 studs of the seam (59 places), the 1 boxes of outer_sill on the seam are at most 39.2 studs away, the rest 56.3
+2026-10-23T02:37:18.6961723Z worldmap: house_wall to bed_a: within 10 studs of the seam (7 places), the 1 boxes of bed_a on the seam are at most 36.6 studs away, the rest 60.2
+2026-10-23T02:37:18.6963759Z worldmap: house_wall to wall_upper: within 10 studs of the seam (57 places), the 1 boxes of wall_upper on the seam are at most 65.2 studs away, the rest 110.4
+2026-10-23T02:37:18.6965358Z worldmap: house_wall to wall_west: within 10 studs of the seam (34 places), the 1 boxes of wall_west on the seam are at most 66.4 studs away, the rest 49.9
+2026-10-23T02:37:18.6967188Z worldmap: house_wall to shrub_west_a: within 10 studs of the seam (3 places), the 1 boxes of shrub_west_a on the seam are at most 70.4 studs away, the rest 110.5
+2026-10-23T02:37:18.6968703Z worldmap: bed_a to house_wall: within 10 studs of the seam (300 places), the 1 boxes of house_wall on the seam are at most 53.4 studs away, the rest 109.3
+2026-10-23T02:37:18.6970186Z worldmap: bed_a to shrub_west_a: within 10 studs of the seam (133 places), the 1 boxes of shrub_west_a on the seam are at most 69.4 studs away, the rest 111.1
+2026-10-23T02:37:18.6971683Z worldmap: wall_west to house_wall: within 10 studs of the seam (276 places), the 2 boxes of house_wall on the seam are at most 85.0 studs away, the rest 118.6
+2026-10-23T02:37:18.6973437Z worldmap: wall_west to wall_west_upper: within 10 studs of the seam (43 places), the 1 boxes of wall_west_upper on the seam are at most 73.7 studs away, the rest 100.2
+2026-10-23T02:37:18.6974976Z worldmap: wall_west to shrub_west_a: within 10 studs of the seam (44 places), the 1 boxes of shrub_west_a on the seam are at most 71.3 studs away, the rest 106.3
+2026-10-23T02:37:18.6976496Z worldmap: wall_west_upper to wall_upper: within 10 studs of the seam (216 places), the 1 boxes of wall_upper on the seam are at most 52.5 studs away, the rest 110.7
+2026-10-23T02:37:18.6978243Z worldmap: wall_west_upper to wall_west: within 10 studs of the seam (43 places), the 1 boxes of wall_west on the seam are at most 65.7 studs away, the rest 88.1
+2026-10-23T02:37:18.6979738Z worldmap: wall_west_upper to eaves_west: within 10 studs of the seam (43 places), the 1 boxes of eaves_west on the seam are at most 47.8 studs away, the rest 100.1
+2026-10-23T02:37:18.6981235Z worldmap: wall_upper to house_wall: within 10 studs of the seam (23 places), the 1 boxes of house_wall on the seam are at most 10.6 studs away, the rest 75.9
+2026-10-23T02:37:18.6982751Z worldmap: wall_upper to wall_west_upper: within 10 studs of the seam (65 places), the 1 boxes of wall_west_upper on the seam are at most 70.2 studs away, the rest 59.5
+2026-10-23T02:37:18.6984190Z worldmap: wall_upper to sill: within 10 studs of the seam (48 places), the 6 boxes of sill on the seam are at most 65.8 studs away, the rest 67.3
+2026-10-23T02:37:18.6985532Z worldmap: wall_upper to eaves: within 10 studs of the seam (23 places), the 1 boxes of eaves on the seam are at most 47.8 studs away, the rest 107.7
+2026-10-23T02:37:18.6987212Z worldmap: wall_upper to kitchen_counter: within 10 studs of the seam (12 places), the 1 boxes of kitchen_counter on the seam are at most 21.6 studs away, the rest 119.8
+2026-10-23T02:37:18.6988792Z worldmap: eaves_west to wall_west_upper: within 10 studs of the seam (167 places), the 1 boxes of wall_west_upper on the seam are at most 74.7 studs away, the rest 95.2
+2026-10-23T02:37:18.6990271Z worldmap: eaves_west to eaves: within 10 studs of the seam (149 places), the 2 boxes of eaves on the seam are at most 65.7 studs away, the rest 107.8
+2026-10-23T02:37:18.6991657Z worldmap: eaves to wall_upper: within 10 studs of the seam (20 places), the 1 boxes of wall_upper on the seam are at most 63.6 studs away, the rest 109.5
+2026-10-23T02:37:18.6993080Z worldmap: eaves to eaves_west: within 10 studs of the seam (11 places), the 1 boxes of eaves_west on the seam are at most 48.9 studs away, the rest 104.0
+2026-10-23T02:37:18.6994490Z worldmap: shrub_west_a to bed_a: within 10 studs of the seam (51 places), the 1 boxes of bed_a on the seam are at most 45.1 studs away, the rest 70.6
+2026-10-23T02:37:18.6995924Z worldmap: shrub_west_a to house_wall: within 10 studs of the seam (4 places), the 1 boxes of house_wall on the seam are at most 62.2 studs away, the rest 118.9
+2026-10-23T02:37:18.6997813Z worldmap: shrub_west_a to wall_west: within 10 studs of the seam (15 places), the 1 boxes of wall_west on the seam are at most 62.0 studs away, the rest 86.6
+2026-10-23T02:37:18.6999298Z worldmap: shrub_west_a to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 64.6 studs away, the rest 108.5
+2026-10-23T02:37:20.2552917Z worldmap: shrub_west_a to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 107.5
+2026-10-23T02:37:20.2554724Z worldmap: shrub_west_b to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 64.6 studs away, the rest 95.0
+2026-10-23T02:37:20.2556462Z worldmap: shrub_west_b to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 102.9
+2026-10-23T02:37:20.2558337Z worldmap: shrub_west_c to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 65.8 studs away, the rest 103.1
+2026-10-23T02:37:20.2560447Z worldmap: shrub_west_c to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 64.6 studs away, the rest 105.6
+2026-10-23T02:37:20.2562055Z worldmap: shrub_west_c to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 65.8 studs away, the rest 107.2
+2026-10-23T02:37:20.2563723Z worldmap: shrub_west_d to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 65.8 studs away, the rest 108.6
+2026-10-23T02:37:20.2565376Z worldmap: shrub_west_d to shrub_west_c: within 10 studs of the seam (143 places), the 1 boxes of shrub_west_c on the seam are at most 64.6 studs away, the rest 104.7
+2026-10-23T02:37:20.2567166Z worldmap: shrub_west_d to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 107.8
+2026-10-23T02:37:20.2568716Z worldmap: shrub_west_e to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 102.6
+2026-10-23T02:37:20.2570239Z worldmap: shrub_west_e to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 64.6 studs away, the rest 104.4
+2026-10-23T02:37:20.2571770Z worldmap: shrub_west_e to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 120.0
+2026-10-23T02:37:20.2573280Z worldmap: shrub_west_f to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 107.5
+2026-10-23T02:37:20.2574774Z worldmap: shrub_west_f to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 64.6 studs away, the rest 92.6
+2026-10-23T02:37:20.2576299Z worldmap: shrub_west_f to shrub_west_h: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 101.4
+2026-10-23T02:37:20.2578028Z worldmap: shrub_west_g to shrub_west_e: within 10 studs of the seam (103 places), the 1 boxes of shrub_west_e on the seam are at most 68.5 studs away, the rest 95.0
+2026-10-23T02:37:20.2579561Z worldmap: shrub_west_g to shrub_west_h: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_h on the seam are at most 64.6 studs away, the rest 107.3
+2026-10-23T02:37:20.2581086Z worldmap: shrub_west_g to shrub_west_i: within 10 studs of the seam (117 places), the 1 boxes of shrub_west_i on the seam are at most 69.4 studs away, the rest 108.8
+2026-10-23T02:37:20.2582586Z worldmap: shrub_west_h to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 105.8
+2026-10-23T02:37:20.2584339Z worldmap: shrub_west_h to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 64.6 studs away, the rest 118.8
+2026-10-23T02:37:20.2585854Z worldmap: shrub_west_h to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 65.8 studs away, the rest 92.1
+2026-10-23T02:37:20.2587558Z worldmap: shrub_west_i to shrub_west_g: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 118.6
+2026-10-23T02:37:20.2589058Z worldmap: shrub_west_i to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 64.6 studs away, the rest 99.5
+2026-10-23T02:37:20.2590551Z worldmap: shrub_west_j to shrub_west_h: within 10 studs of the seam (58 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 108.8
+2026-10-23T02:37:20.2592067Z worldmap: shrub_west_j to shrub_west_i: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_i on the seam are at most 64.6 studs away, the rest 97.7
+2026-10-23T02:37:20.5485169Z worldmap: kitchen_counter to sill: within 10 studs of the seam (578 places), the 1 boxes of sill on the seam are at most 41.2 studs away, the rest 71.5
+2026-10-23T02:37:20.5486752Z worldmap: kitchen_counter to wall_upper: within 10 studs of the seam (248 places), the 1 boxes of wall_upper on the seam are at most 68.2 studs away, the rest 126.7
+2026-10-23T02:37:20.5488657Z worldmap: kitchen_counter to kitchen_floor: within 10 studs of the seam (227 places), the 1 boxes of kitchen_floor on the seam are at most 46.3 studs away, the rest 104.7
+2026-10-23T02:37:20.5490241Z worldmap: kitchen_floor to kitchen_counter: within 10 studs of the seam (6 places), the 1 boxes of kitchen_counter on the seam are at most 15.7 studs away, the rest 94.7
+2026-10-23T02:37:20.5491734Z worldmap: on the wall's face over the bed, the soil below is at most 81.9 studs down (89.9 from a lagging focus); the whole bed is in everywhere below y -17.8
+2026-10-23T02:37:20.5493078Z worldmap: from the stone's front edge, the soil below is 90.7 studs from the spider or from its focus 8 studs back over the stone
+2026-10-23T02:37:20.5493997Z worldmap: the looks at the sill's spawn: 1469 parts at full, 497 at low
+2026-10-23T02:37:20.5494643Z worldmap: the looks at the outer sill: 1469 parts at full, 497 at low
+2026-10-23T02:37:20.5495299Z worldmap: the looks at halfway down the wall: 1475 parts at full, 497 at low
+2026-10-23T02:37:20.5495962Z worldmap: the looks at the wall's foot: 1475 parts at full, 497 at low
+2026-10-23T02:37:20.5496591Z worldmap: the looks at the bed's stone: 1483 parts at full, 487 at low
+2026-10-23T02:37:20.5497353Z worldmap: the looks at the gutter: 1496 parts at full, 466 at low
+2026-10-23T02:37:20.5498024Z worldmap: the looks at the window's glass, outside: 1496 parts at full, 476 at low
+2026-10-23T02:37:20.5498815Z worldmap: the looks at the kitchen's counter, by the toaster: 1469 parts at full, 497 at low
+2026-10-23T02:37:20.5499584Z worldmap: the looks at the kitchen's floor: 1475 parts at full, 497 at low
+2026-10-23T02:37:20.5500235Z worldmap: the looks at the wall west: 1498 parts at full, 493 at low
+2026-10-23T02:37:20.5500914Z worldmap: the looks at the drainpipe's swan neck: 1496 parts at full, 476 at low
+2026-10-23T02:37:20.5501586Z worldmap: the looks at the bushes by the bed and the house: 1483 parts at full, 487 at low
+2026-10-23T02:37:20.5502116Z worldmap: the looks at where four chunks meet: 1494 parts at full, 499 at low
+2026-10-23T02:37:20.5502613Z worldmap: the looks at the bushes' middle: 1493 parts at full, 423 at low
+2026-10-23T02:37:20.5503102Z worldmap: the looks at the far corner of the bushes: 1403 parts at full, 343 at low
+2026-10-23T02:37:20.5503557Z worldmap: the walk at full: at most 1496 parts, 56 changes
+2026-10-23T02:37:20.5503937Z worldmap: the walk at low: at most 499 parts, 35 changes
+2026-10-23T02:37:20.5504257Z WORLDMAP passed=2077 failed=0
+2026-10-23T02:38:47.2323347Z world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+2026-10-23T02:38:47.2324707Z world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+2026-10-23T02:38:47.2325604Z world_client: at sill the client holds 1469 parts of looks
+2026-10-23T02:38:47.2326332Z world_client: at outer_sill the client holds 1469 parts of looks
+2026-10-23T02:38:47.2327381Z world_client: at bed_a the client holds 1483 parts of looks
+2026-10-23T02:38:47.2328032Z world_client: at eaves the client holds 1496 parts of looks
+2026-10-23T02:38:47.2328875Z world_client: at shrub_west_a the client holds 1494 parts of looks
+2026-10-23T02:38:47.2329733Z world_client: at shrub_west_j the client holds 1483 parts of looks
+2026-10-23T02:38:47.2330645Z world_client: at kitchen_counter the client holds 1469 parts of looks
+2026-10-23T02:38:47.2331861Z world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+2026-10-23T02:38:47.2333407Z world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+2026-10-23T02:38:47.2334812Z WORLD_CLIENT passed=36 failed=0
+2026-10-23T02:38:56.3946500Z GARDEN_LIFE passed=256706 failed=0
+2026-10-23T02:39:12.3378555Z [SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+2026-10-23T02:39:12.3380971Z [SELFTEST] INFO world: test_garden (revision world-3)
+2026-10-23T02:39:12.3381572Z [SELFTEST] PASS new life
+2026-10-23T02:39:12.3381967Z [SELFTEST] PASS intro
+2026-10-23T02:39:12.3382350Z [SELFTEST] PASS world folders
+2026-10-23T02:39:12.3382772Z [SELFTEST] PASS region sill
+2026-10-23T02:39:12.3383181Z [SELFTEST] ... region outer_sill (6 s in)
+2026-10-23T02:39:12.3383687Z [SELFTEST] PASS region outer_sill
+2026-10-23T02:39:12.3384139Z [SELFTEST] PASS region house_wall
+2026-10-23T02:39:12.3384607Z [SELFTEST] PASS region bed_a
+2026-10-23T02:39:12.3384996Z [SELFTEST] PASS region wall_west
+2026-10-23T02:39:12.3385454Z [SELFTEST] PASS region wall_west_upper
+2026-10-23T02:39:12.3385924Z [SELFTEST] ... region wall_upper (11 s in)
+2026-10-23T02:39:12.3386381Z [SELFTEST] PASS region wall_upper
+2026-10-23T02:39:12.3387059Z [SELFTEST] PASS region eaves_west
+2026-10-23T02:39:12.3387509Z [SELFTEST] PASS region eaves
+2026-10-23T02:39:12.3387916Z [SELFTEST] PASS region shrub_west_a
+2026-10-23T02:39:12.3388410Z [SELFTEST] ... region shrub_west_b (17 s in)
+2026-10-23T02:39:12.3388890Z [SELFTEST] PASS region shrub_west_b
+2026-10-23T02:39:12.3389345Z [SELFTEST] PASS region shrub_west_c
+2026-10-23T02:39:12.3389802Z [SELFTEST] PASS region shrub_west_d
+2026-10-23T02:39:12.3390244Z [SELFTEST] PASS region shrub_west_e
+2026-10-23T02:39:12.3390679Z [SELFTEST] PASS region shrub_west_f
+2026-10-23T02:39:12.3391111Z [SELFTEST] ... region shrub_west_g (22 s in)
+2026-10-23T02:39:12.3391571Z [SELFTEST] PASS region shrub_west_g
+2026-10-23T02:39:12.3391992Z [SELFTEST] PASS region shrub_west_h
+2026-10-23T02:39:12.3392414Z [SELFTEST] PASS region shrub_west_i
+2026-10-23T02:39:12.3392919Z [SELFTEST] PASS region shrub_west_j
+2026-10-23T02:39:12.3393377Z [SELFTEST] ... region kitchen_counter (28 s in)
+2026-10-23T02:39:12.3393848Z [SELFTEST] PASS region kitchen_counter
+2026-10-23T02:39:12.3394283Z [SELFTEST] PASS region kitchen_floor
+2026-10-23T02:39:12.3394776Z [SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+2026-10-23T02:39:12.3395283Z [SELFTEST] PASS walk on the sill
+2026-10-23T02:39:12.3395669Z [SELFTEST] ... the line (33 s in)
+2026-10-23T02:39:12.3396055Z [SELFTEST] ... the line (38 s in)
+2026-10-23T02:39:12.3399301Z [SELFTEST] INFO profile on the line: 368 frames, the render step 5.12 ms a frame (worst 16.9): spider rig 3.35/12.3, camera 0.73/4.9, fly bodies 0.46/4.7, prey 0.17/0.6, senses 0.09/1.3, motor 0.07/0.2, hud 0.07/0.2, small 0.18 (mean/worst ms); a frame: spider parts placed 707, fly parts placed 49, bug parts placed 3, camera casts 10, camera overlaps 2, camera rays 0, framing searches 0; allocated 2047 KB a frame (percepts 3, senses 26, prey 34, motor 13, nature 1, rival 1, life 4, camera 274, poses 2, spider rig 1463, hud 5, lock button 4, fly bodies 207, sound 1, lines 4, perception hud 2)
+2026-10-23T02:39:12.3403240Z [SELFTEST] INFO line: let down at 0.753 studs a second of the game's time (the game's 0.75), 0.753 by the clock
+2026-10-23T02:39:12.3405021Z [SELFTEST] INFO line ticks: 368 ticks (6.13 s of the game) in 6.13 s by the clock; line let out 4.600, the body fell 4.618 (100.4% of it); sweeps stopped the body 0 times (0.000 taken off), 0 tangent touches let pass, 184 push-outs (0.052 out, 0.000 of it up)
+2026-10-23T02:39:12.3406435Z [SELFTEST] PASS the line
+2026-10-23T02:39:12.3407123Z [SELFTEST] INFO prey on the sill: 4 flies drawn
+2026-10-23T02:39:12.3407615Z [SELFTEST] PASS prey on the sill
+2026-10-23T02:39:12.3408008Z [SELFTEST] ... lock (44 s in)
+2026-10-23T02:39:12.3408648Z [SELFTEST] INFO lock: 3.0 studs away, facing it within 1 degrees, a sidestep of 0.67 studs in 1 s
+2026-10-23T02:39:12.3409528Z [SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+2026-10-23T02:39:12.3410382Z [SELFTEST] PASS lock
+2026-10-23T02:39:12.3410942Z [SELFTEST] INFO prey in the bed: 3 gnats, 3 aphids, 4 springtails, 2 leafhoppers, all drawn
+2026-10-23T02:39:12.3411593Z [SELFTEST] PASS prey in the bed
+2026-10-23T02:39:12.3411995Z [SELFTEST] INFO woodlice: 4 made and drawn
+2026-10-23T02:39:12.3412416Z [SELFTEST] PASS woodlice
+2026-10-23T02:39:12.3413091Z [SELFTEST] INFO frame time in the bed: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:39:12.3416536Z [SELFTEST] INFO profile in the bed: 300 frames, the render step 8.79 ms a frame (worst 25.1): spider rig 3.43/13.1, bug bodies 2.64/17.2, fly bodies 1.69/10.8, prey 0.36/0.9, senses 0.21/2.5, camera 0.10/0.3, hud 0.09/0.2, life 0.05/0.1, small 0.23 (mean/worst ms); a frame: spider parts placed 653, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3333 KB a frame (percepts 7, senses 50, prey 58, motor 3, nature 1, rival 1, life 7, camera 20, poses 2, spider rig 1329, hud 5, lock button 5, fly bodies 772, bug bodies 1066, sound 2, perception hud 5)
+2026-10-23T02:39:12.3420237Z [SELFTEST] INFO engine in the bed: memory ? MB, Lua heap 52.4 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:39:12.3422178Z [SELFTEST] INFO census in the bed: 3567 parts, 633 see-through, 211 casting shadows, 1150 meshed (parts/see-through/shadow/meshed: Bugs 438/0/0/130, Flies 352/27/0/138, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1475/92/125/788, the rest 10/0/0/0)
+2026-10-23T02:39:12.3423774Z [SELFTEST] PASS frame time in the bed
+2026-10-23T02:39:25.0123952Z [SELFTEST] INFO looks settled in the bed: yes, 0.03 s after the spider came, 1475 parts held of 1475 planned, 34 plans, 7539 made and 6064 destroyed this session
+2026-10-23T02:39:25.0125672Z [SELFTEST] INFO frame time in the bed, settled: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:39:25.0130424Z [SELFTEST] INFO profile in the bed, settled: 300 frames, the render step 9.28 ms a frame (worst 26.3): spider rig 3.62/17.1, bug bodies 2.74/18.4, fly bodies 1.74/14.6, prey 0.40/1.2, senses 0.27/2.5, camera 0.11/0.3, hud 0.10/0.2, life 0.06/0.1, small 0.25 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3332 KB a frame (percepts 7, senses 58, prey 61, motor 3, nature 1, rival 1, life 6, camera 20, poses 2, spider rig 1340, hud 5, lock button 5, fly bodies 754, bug bodies 1060, sound 2, perception hud 5)
+2026-10-23T02:39:25.0134246Z [SELFTEST] INFO engine in the bed, settled: memory ? MB, Lua heap 34.9 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:39:25.0135239Z [SELFTEST] INFO looks while settled: 0 plans and 0 parts made in the sample
+2026-10-23T02:39:25.0136189Z [SELFTEST] INFO frame time in the bed without the looks: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:39:25.0143954Z [SELFTEST] INFO profile in the bed without the looks: 180 frames, the render step 9.35 ms a frame (worst 26.3): spider rig 3.64/14.3, bug bodies 2.76/17.9, fly bodies 1.81/13.6, prey 0.40/1.3, senses 0.22/1.1, camera 0.10/0.3, hud 0.10/0.2, life 0.06/0.2, small 0.26 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3294 KB a frame (percepts 7, senses 54, prey 60, motor 3, nature 1, rival 1, life 6, camera 20, poses 2, spider rig 1325, hud 5, lock button 5, fly bodies 721, bug bodies 1075, sound 2, perception hud 6)
+2026-10-23T02:39:25.0148258Z [SELFTEST] INFO engine in the bed without the looks: memory ? MB, Lua heap 33.3 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:39:25.0149645Z [SELFTEST] INFO frame time in the bed without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:39:25.0154032Z [SELFTEST] INFO profile in the bed without shadows: 180 frames, the render step 9.29 ms a frame (worst 26.4): spider rig 3.54/12.9, bug bodies 2.63/18.5, fly bodies 2.01/14.3, prey 0.40/1.2, senses 0.21/2.4, camera 0.10/0.3, hud 0.10/0.2, life 0.06/0.1, small 0.24 (mean/worst ms); a frame: spider parts placed 654, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3367 KB a frame (percepts 7, senses 47, prey 64, motor 3, nature 1, rival 1, life 7, camera 21, poses 2, spider rig 1338, hud 5, lock button 4, fly bodies 771, bug bodies 1089, sound 2, perception hud 4)
+2026-10-23T02:39:25.0158236Z [SELFTEST] INFO engine in the bed without shadows: memory ? MB, Lua heap 40.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:39:25.0159205Z [SELFTEST] PASS frame time in the bed, settled
+2026-10-23T02:39:25.0159736Z [SELFTEST] ... moths on the wall (63 s in)
+2026-10-23T02:39:25.0160274Z [SELFTEST] INFO moths on the wall: 2 made and drawn
+2026-10-23T02:39:25.0160807Z [SELFTEST] PASS moths on the wall
+2026-10-23T02:39:25.0161260Z [SELFTEST] ... dusk: the moths fly (68 s in)
+2026-10-23T02:39:25.0161753Z [SELFTEST] ... dusk: the moths fly (73 s in)
+2026-10-23T02:39:25.0162223Z [SELFTEST] PASS dusk: the moths fly
+2026-10-23T02:39:25.0162652Z [SELFTEST] PASS notebook
+2026-10-23T02:39:25.0163058Z [SELFTEST] ... rest and checkpoint (78 s in)
+2026-10-23T02:39:25.0163538Z [SELFTEST] PASS rest and checkpoint
+2026-10-23T02:39:25.0164045Z [SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+2026-10-23T02:39:25.0164564Z [SELFTEST] PASS sound
+2026-10-23T02:39:25.0165300Z [SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:39:25.0169040Z [SELFTEST] INFO profile on the sill: 300 frames, the render step 4.60 ms a frame (worst 14.6): spider rig 2.93/10.4, fly bodies 1.00/4.9, camera 0.18/0.6, senses 0.15/1.3, prey 0.10/0.4, hud 0.07/0.2, small 0.18 (mean/worst ms); a frame: spider parts placed 650, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 1961 KB a frame (percepts 2, senses 39, prey 18, motor 4, nature 2, rival 1, life 2, camera 58, poses 2, spider rig 1330, hud 5, lock button 5, fly bodies 489, sound 1, perception hud 5)
+2026-10-23T02:39:26.9738809Z [SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 62.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:39:26.9741172Z [SELFTEST] INFO census on the sill: 2950 parts, 673 see-through, 159 casting shadows, 856 meshed (parts/see-through/shadow/meshed: Flies 156/52/0/68, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1496/107/73/694, the rest 6/0/0/0)
+2026-10-23T02:39:26.9743052Z [SELFTEST] INFO shadows on the sill: 23 of 23 visible walkable boxes cast, 0 too small to see at their distance cast none (25 passes, 0 writes)
+2026-10-23T02:39:26.9744171Z [SELFTEST] PASS frame time on the sill
+2026-10-23T02:39:26.9744945Z [SELFTEST] INFO parts at the full tier: 2950 in the workspace (Flies 156, FlyClearanceProbe 1, JumpArc 32, Spider 707, WindowsillAudio 5, World 553, WorldDecor 1496)
+2026-10-23T02:39:26.9746074Z [SELFTEST] INFO looks outside the window: 1496 parts held of 1496 planned at the full tier, 7734 made and 6238 destroyed this session, 40 plans
+2026-10-23T02:39:26.9747060Z [SELFTEST] PASS part counts
+2026-10-23T02:39:26.9747479Z [SELFTEST] ... visible meal and contextual controls (88 s in)
+2026-10-23T02:39:26.9747862Z [SELFTEST] PASS visible meal and contextual controls
+2026-10-23T02:39:26.9748286Z [SELFTEST] ... Normal starvation reaches the life-ending handler (93 s in)
+2026-10-23T02:39:26.9748767Z [SELFTEST] PASS Normal starvation reaches the life-ending handler
+2026-10-23T02:39:26.9749122Z [SELFTEST] INFO took 94 s
+2026-10-23T02:39:26.9749374Z [SELFTEST] END pass=41 fail=0 skip=0
+2026-10-23T02:39:26.9749689Z selftest: the run took 93.6 s of play (5615 frames)
+2026-10-23T02:39:26.9750021Z SELFTEST passed=5 failed=0
+2026-10-23T02:39:31.2499672Z NATURE passed=28890 failed=0
+2026-10-23T02:39:42.4033484Z NATURE_CLIENT passed=6 failed=0
+2026-10-23T02:39:48.7915748Z TITLE passed=21 failed=0
+2026-10-23T02:40:04.6051707Z LOCK sidestep on the floor: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+2026-10-23T02:40:04.6052946Z LOCK sidestep on the wall: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+2026-10-23T02:40:04.6054090Z LOCK sidestep on the underside: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+2026-10-23T02:40:04.6055086Z LOCK camera: 5.28 degrees from the middle 1.5 s after a lock taken 70 degrees away
+2026-10-23T02:40:04.6055926Z LOCK client sidestep: 0.968 in 1.5 s, distance 2.400 to 2.401, facing 0.01 degrees off
+2026-10-23T02:40:04.6056598Z LOCK lost: ended (forgotten) after 0.57 s
+2026-10-23T02:40:04.6057430Z LOCK passed=138 failed=0
+2026-10-23T02:40:09.8410239Z   quiet: 53 kinds, 25 needed, 24 on the first day only, 4 in the gentle modes only; 11 notice lines classified
+2026-10-23T02:40:09.8411291Z QUIET passed=10 failed=0
+2026-10-23T02:40:50.2448185Z preserve: the backdrop's records: 1150 at full, 496 at low; the far look 492 at full, 382 at low
+2026-10-23T02:40:50.2450768Z preserve: from the sill at full: 1484 parts
+2026-10-23T02:40:50.2451640Z preserve: the walk at full: at most 1500 parts, 571 changes
+2026-10-23T02:40:50.2453708Z preserve: from the sill at low: 494 parts
+2026-10-23T02:40:50.2454510Z preserve: the walk at low: at most 500 parts, 339 changes
+2026-10-23T02:40:50.2455525Z preserve: the sill's Decor: 721 parts (the test garden's 1258)
+2026-10-23T02:40:50.2457190Z preserve: the hut's looks: 1376 records at full, 150 at low; (ROBLOX-119) the meadow's and the bench patch's 3322 at full, 102 at low
+2026-10-23T02:40:50.2458919Z preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: 1106 at full, 98 at low
+2026-10-23T02:40:50.2459951Z preserve: the hut's regions: from anywhere on one, its farthest box at most 151.1 studs
+2026-10-23T02:40:50.2460645Z preserve: the hut's regions at full: at most 1500 parts
+2026-10-23T02:40:50.2461153Z preserve: the hut's regions at low: at most 500 parts
+2026-10-23T02:40:50.2461715Z preserve: the patches: 1135, at most 90 records at full and 10 at low
+2026-10-23T02:40:50.2480184Z preserve: in the mulch at full: 16 patches, 697 parts of them, 1500 in all
+2026-10-23T02:40:50.2480947Z preserve: in the mulch at low: 5 patches, 38 parts of them, 497 in all
+2026-10-23T02:40:50.2481772Z preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second 4, 60, 60 of 60; at 5 a second 7.6 s, 6.8 kicks
+2026-10-23T02:40:50.2482506Z preserve: ballooning: of 200 families the hut garden 115, the meadow's edge 47, the pond's edge 38
+2026-10-23T02:40:50.2483239Z preserve: the water: of 60 slips by a pad 2 cm off, 38 got out and 22 drowned in Normal; 60 pulled out in the gentle rules
+2026-10-23T02:40:50.2484103Z PRESERVE passed=1154 failed=0
+2026-10-23T02:41:40.7549038Z [SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+2026-10-23T02:41:40.7549909Z [SELFTEST] INFO world: preserve (revision preserve-3)
+2026-10-23T02:41:40.7550596Z [SELFTEST] PASS new life
+2026-10-23T02:41:40.7550975Z [SELFTEST] PASS intro
+2026-10-23T02:41:40.7551304Z [SELFTEST] PASS world folders
+2026-10-23T02:41:40.7551809Z [SELFTEST] PASS region sill
+2026-10-23T02:41:40.7552202Z [SELFTEST] ... region hut_window (6 s in)
+2026-10-23T02:41:40.7552615Z [SELFTEST] PASS region hut_window
+2026-10-23T02:41:40.7552990Z [SELFTEST] PASS region hut_outer_sill
+2026-10-23T02:41:40.7553373Z [SELFTEST] PASS region hut_desk
+2026-10-23T02:41:40.7553742Z [SELFTEST] PASS region hut_board
+2026-10-23T02:41:40.7554104Z [SELFTEST] PASS region hut_shelf
+2026-10-23T02:41:40.7554479Z [SELFTEST] ... region hut_chair (11 s in)
+2026-10-23T02:41:40.7554875Z [SELFTEST] PASS region hut_chair
+2026-10-23T02:41:40.7555230Z [SELFTEST] PASS region hut_door
+2026-10-23T02:41:40.7555616Z [SELFTEST] PASS region hut_door_up
+2026-10-23T02:41:40.7556417Z [SELFTEST] PASS region hut_doorway
+2026-10-23T02:41:40.7557108Z [SELFTEST] ... region hut_doorway_up (17 s in)
+2026-10-23T02:41:40.7557679Z [SELFTEST] PASS region hut_doorway_up
+2026-10-23T02:41:40.7558068Z [SELFTEST] PASS region room_window
+2026-10-23T02:41:40.7558433Z [SELFTEST] PASS region room_exit
+2026-10-23T02:41:40.7558793Z [SELFTEST] PASS region room_tv
+2026-10-23T02:41:40.7559145Z [SELFTEST] PASS region room_games
+2026-10-23T02:41:40.7559519Z [SELFTEST] ... region room_sofa_w (22 s in)
+2026-10-23T02:41:40.7559920Z [SELFTEST] PASS region room_sofa_w
+2026-10-23T02:41:40.7560285Z [SELFTEST] PASS region room_sofa_e
+2026-10-23T02:41:40.7560675Z [SELFTEST] PASS region hut_floor_a
+2026-10-23T02:41:40.7561042Z [SELFTEST] PASS region hut_floor_b
+2026-10-23T02:41:40.7561333Z [SELFTEST] ... region hut_floor_c (28 s in)
+2026-10-23T02:41:40.7561619Z [SELFTEST] PASS region hut_floor_c
+2026-10-23T02:41:40.7561895Z [SELFTEST] PASS region hut_floor_d
+2026-10-23T02:41:40.7562156Z [SELFTEST] PASS region hut_floor_e
+2026-10-23T02:41:40.7562429Z [SELFTEST] PASS region hut_floor_f
+2026-10-23T02:41:40.7562693Z [SELFTEST] PASS region hut_floor_g
+2026-10-23T02:41:40.7562967Z [SELFTEST] ... region hut_floor_h (33 s in)
+2026-10-23T02:41:40.7563266Z [SELFTEST] PASS region hut_floor_h
+2026-10-23T02:41:40.7563533Z [SELFTEST] PASS region hut_floor_i
+2026-10-23T02:41:40.7563800Z [SELFTEST] PASS region room_floor_a
+2026-10-23T02:41:40.7564074Z [SELFTEST] PASS region room_floor_b
+2026-10-23T02:41:40.7564364Z [SELFTEST] ... region room_floor_c (39 s in)
+2026-10-23T02:41:40.7564658Z [SELFTEST] PASS region room_floor_c
+2026-10-23T02:41:40.7564932Z [SELFTEST] PASS region room_floor_d
+2026-10-23T02:41:40.7565202Z [SELFTEST] PASS region room_floor_e
+2026-10-23T02:41:40.7565470Z [SELFTEST] PASS region room_floor_f
+2026-10-23T02:41:40.7565736Z [SELFTEST] PASS region room_floor_g
+2026-10-23T02:41:40.7566017Z [SELFTEST] ... region room_floor_h (44 s in)
+2026-10-23T02:41:40.7566322Z [SELFTEST] PASS region room_floor_h
+2026-10-23T02:41:40.7566592Z [SELFTEST] PASS region room_floor_i
+2026-10-23T02:41:40.7567081Z [SELFTEST] PASS region hut_up_a
+2026-10-23T02:41:40.7567344Z [SELFTEST] PASS region hut_up_b
+2026-10-23T02:41:40.7567605Z [SELFTEST] ... region hut_up_c (50 s in)
+2026-10-23T02:41:40.7567887Z [SELFTEST] PASS region hut_up_c
+2026-10-23T02:41:40.7568134Z [SELFTEST] PASS region hut_up_d
+2026-10-23T02:41:40.7568387Z [SELFTEST] PASS region hut_up_e
+2026-10-23T02:41:40.7568633Z [SELFTEST] PASS region hut_up_f
+2026-10-23T02:41:40.7568882Z [SELFTEST] PASS region hut_up_g
+2026-10-23T02:41:40.7569141Z [SELFTEST] ... region hut_up_h (55 s in)
+2026-10-23T02:41:40.7569418Z [SELFTEST] PASS region hut_up_h
+2026-10-23T02:41:40.7569666Z [SELFTEST] PASS region hut_up_i
+2026-10-23T02:41:40.7569918Z [SELFTEST] PASS region room_up_a
+2026-10-23T02:41:40.7570179Z [SELFTEST] PASS region room_up_b
+2026-10-23T02:41:40.7570444Z [SELFTEST] ... region room_up_c (61 s in)
+2026-10-23T02:41:40.7570985Z [SELFTEST] PASS region room_up_c
+2026-10-23T02:41:40.7571242Z [SELFTEST] PASS region room_up_d
+2026-10-23T02:41:40.7571496Z [SELFTEST] PASS region room_up_e
+2026-10-23T02:41:40.7571771Z [SELFTEST] PASS region room_up_f
+2026-10-23T02:41:40.7572133Z [SELFTEST] PASS region room_up_g
+2026-10-23T02:41:40.7572394Z [SELFTEST] ... region room_up_h (66 s in)
+2026-10-23T02:41:40.7572668Z [SELFTEST] PASS region room_up_h
+2026-10-23T02:41:40.7572908Z [SELFTEST] PASS region room_up_i
+2026-10-23T02:41:40.7573155Z [SELFTEST] PASS region hut_wall_mid
+2026-10-23T02:41:40.7573413Z [SELFTEST] PASS region hut_wall_w
+2026-10-23T02:41:40.7573670Z [SELFTEST] ... region hut_wall_e (72 s in)
+2026-10-23T02:41:40.7573940Z [SELFTEST] PASS region hut_wall_e
+2026-10-23T02:41:40.7574194Z [SELFTEST] PASS region hut_wall_x1
+2026-10-23T02:41:40.7574444Z [SELFTEST] PASS region hut_wall_x2
+2026-10-23T02:41:40.7574692Z [SELFTEST] PASS region hut_wall_x3
+2026-10-23T02:41:40.7574940Z [SELFTEST] PASS region hut_eave_w2
+2026-10-23T02:41:40.7575205Z [SELFTEST] ... region hut_eave_w1 (77 s in)
+2026-10-23T02:41:40.7575653Z [SELFTEST] PASS region hut_eave_w1
+2026-10-23T02:41:40.7575978Z [SELFTEST] PASS region hut_eave_mid
+2026-10-23T02:41:40.7576235Z [SELFTEST] PASS region hut_eave_e1
+2026-10-23T02:41:40.7576484Z [SELFTEST] PASS region hut_eave_e2
+2026-10-23T02:41:40.7576740Z [SELFTEST] ... region hut_eave_x1 (83 s in)
+2026-10-23T02:41:40.7577263Z [SELFTEST] PASS region hut_eave_x1
+2026-10-23T02:41:40.7577520Z [SELFTEST] PASS region hut_eave_x2
+2026-10-23T02:41:40.7577765Z [SELFTEST] PASS region hut_eave_x3
+2026-10-23T02:41:40.7578008Z [SELFTEST] PASS region hut_eave_x4
+2026-10-23T02:41:40.7578254Z [SELFTEST] PASS region hut_bench
+2026-10-23T02:41:40.7578506Z [SELFTEST] ... region hut_butt (88 s in)
+2026-10-23T02:41:40.7578775Z [SELFTEST] PASS region hut_butt
+2026-10-23T02:41:40.7579026Z [SELFTEST] PASS region garden_feeder
+2026-10-23T02:41:40.7579288Z [SELFTEST] PASS region garden_pole
+2026-10-23T02:41:40.7579540Z [SELFTEST] PASS region garden_a1
+2026-10-23T02:41:40.7579800Z [SELFTEST] ... region garden_a2 (94 s in)
+2026-10-23T02:41:40.7580083Z [SELFTEST] PASS region garden_a2
+2026-10-23T02:41:40.7580324Z [SELFTEST] PASS region garden_a3
+2026-10-23T02:41:40.7580564Z [SELFTEST] PASS region garden_a4
+2026-10-23T02:41:40.7580808Z [SELFTEST] PASS region garden_b1
+2026-10-23T02:41:40.7581048Z [SELFTEST] PASS region garden_b2
+2026-10-23T02:41:40.7581295Z [SELFTEST] ... region garden_b3 (99 s in)
+2026-10-23T02:41:40.7581558Z [SELFTEST] PASS region garden_b3
+2026-10-23T02:41:40.7581798Z [SELFTEST] PASS region garden_b4
+2026-10-23T02:41:40.7582037Z [SELFTEST] PASS region garden_c1
+2026-10-23T02:41:40.7582276Z [SELFTEST] PASS region garden_c2
+2026-10-23T02:41:40.7582532Z [SELFTEST] ... region garden_c3 (105 s in)
+2026-10-23T02:41:40.7582814Z [SELFTEST] PASS region garden_c3
+2026-10-23T02:41:40.7583056Z [SELFTEST] PASS region garden_c4
+2026-10-23T02:41:40.7583294Z [SELFTEST] PASS region garden_d1
+2026-10-23T02:41:40.7583532Z [SELFTEST] PASS region garden_d2
+2026-10-23T02:41:40.7583777Z [SELFTEST] PASS region garden_d3
+2026-10-23T02:41:40.7584032Z [SELFTEST] ... region garden_d4 (111 s in)
+2026-10-23T02:41:40.7584300Z [SELFTEST] PASS region garden_d4
+2026-10-23T02:41:40.7584542Z [SELFTEST] PASS region path_s1
+2026-10-23T02:42:26.2408549Z [SELFTEST] PASS region path_s2
+2026-10-23T02:42:26.2409358Z [SELFTEST] PASS region path_s3
+2026-10-23T02:42:26.2409987Z [SELFTEST] ... region path_s4 (117 s in)
+2026-10-23T02:42:26.2410751Z [SELFTEST] PASS region path_s4
+2026-10-23T02:42:26.2411460Z [SELFTEST] PASS region path_s5
+2026-10-23T02:42:26.2412034Z [SELFTEST] PASS region path_e1
+2026-10-23T02:42:26.2412590Z [SELFTEST] PASS region path_e2
+2026-10-23T02:42:26.2413171Z [SELFTEST] PASS region path_e3
+2026-10-23T02:42:26.2413749Z [SELFTEST] ... region path_e4 (122 s in)
+2026-10-23T02:42:26.2414374Z [SELFTEST] PASS region path_e4
+2026-10-23T02:42:26.2414944Z [SELFTEST] PASS region path_e5
+2026-10-23T02:42:26.2415499Z [SELFTEST] PASS region path_n3
+2026-10-23T02:42:26.2416569Z [SELFTEST] PASS region path_n2
+2026-10-23T02:42:26.2417279Z [SELFTEST] ... region path_n1 (128 s in)
+2026-10-23T02:42:26.2417678Z [SELFTEST] PASS region path_n1
+2026-10-23T02:42:26.2418024Z [SELFTEST] PASS region path_e6
+2026-10-23T02:42:26.2418363Z [SELFTEST] PASS region path_m1
+2026-10-23T02:42:26.2418701Z [SELFTEST] PASS region path_m2
+2026-10-23T02:42:26.2419039Z [SELFTEST] PASS region path_m3
+2026-10-23T02:42:26.2419389Z [SELFTEST] ... region path_m4 (133 s in)
+2026-10-23T02:42:26.2419769Z [SELFTEST] PASS region path_m4
+2026-10-23T02:42:26.2420113Z [SELFTEST] PASS region bench_w
+2026-10-23T02:42:26.2420458Z [SELFTEST] PASS region bench_e
+2026-10-23T02:42:26.2420794Z [SELFTEST] PASS region bin
+2026-10-23T02:42:26.2421134Z [SELFTEST] ... region lamp_1 (138 s in)
+2026-10-23T02:42:26.2421526Z [SELFTEST] PASS region lamp_1
+2026-10-23T02:42:26.2421886Z [SELFTEST] PASS region lamp_2
+2026-10-23T02:42:26.2422228Z [SELFTEST] PASS region lamp_3
+2026-10-23T02:42:26.2422499Z [SELFTEST] PASS region lamp_4
+2026-10-23T02:42:26.2422741Z [SELFTEST] PASS region pad_a1
+2026-10-23T02:42:26.2423197Z [SELFTEST] ... region pad_a2 (143 s in)
+2026-10-23T02:42:26.2423469Z [SELFTEST] PASS region pad_a2
+2026-10-23T02:42:26.2423720Z [SELFTEST] PASS region pad_a3
+2026-10-23T02:42:26.2423955Z [SELFTEST] PASS region pad_b1
+2026-10-23T02:42:26.2424188Z [SELFTEST] PASS region pad_b2
+2026-10-23T02:42:26.2424427Z [SELFTEST] ... region pad_b3 (149 s in)
+2026-10-23T02:42:26.2424688Z [SELFTEST] PASS region pad_b3
+2026-10-23T02:42:26.2424922Z [SELFTEST] PASS region pad_c1
+2026-10-23T02:42:26.2425154Z [SELFTEST] PASS region pad_c2
+2026-10-23T02:42:26.2425385Z [SELFTEST] PASS region pad_c3
+2026-10-23T02:42:26.2425624Z [SELFTEST] PASS region meadow_a1
+2026-10-23T02:42:26.2425886Z [SELFTEST] ... region meadow_a2 (154 s in)
+2026-10-23T02:42:26.2426160Z [SELFTEST] PASS region meadow_a2
+2026-10-23T02:42:26.2426407Z [SELFTEST] PASS region meadow_a3
+2026-10-23T02:42:26.2426647Z [SELFTEST] PASS region meadow_a4
+2026-10-23T02:42:26.2427139Z [SELFTEST] PASS region meadow_a5
+2026-10-23T02:42:26.2427392Z [SELFTEST] ... region meadow_b1 (160 s in)
+2026-10-23T02:42:26.2427666Z [SELFTEST] PASS region meadow_b1
+2026-10-23T02:42:26.2427906Z [SELFTEST] PASS region meadow_b2
+2026-10-23T02:42:26.2428147Z [SELFTEST] PASS region meadow_b3
+2026-10-23T02:42:26.2428382Z [SELFTEST] PASS region meadow_b4
+2026-10-23T02:42:26.2428619Z [SELFTEST] PASS region meadow_b5
+2026-10-23T02:42:26.2428894Z [SELFTEST] ... region meadow_c1 (165 s in)
+2026-10-23T02:42:26.2429164Z [SELFTEST] PASS region meadow_c1
+2026-10-23T02:42:26.2429409Z [SELFTEST] PASS region meadow_c2
+2026-10-23T02:42:26.2429649Z [SELFTEST] PASS region meadow_c3
+2026-10-23T02:42:26.2429888Z [SELFTEST] PASS region meadow_c4
+2026-10-23T02:42:26.2430131Z [SELFTEST] ... region meadow_c5 (171 s in)
+2026-10-23T02:42:26.2430403Z [SELFTEST] PASS region meadow_c5
+2026-10-23T02:42:26.2430647Z [SELFTEST] PASS region meadow_d1
+2026-10-23T02:42:26.2430883Z [SELFTEST] PASS region meadow_d2
+2026-10-23T02:42:26.2431127Z [SELFTEST] PASS region meadow_d3
+2026-10-23T02:42:26.2431364Z [SELFTEST] PASS region meadow_d4
+2026-10-23T02:42:26.2431620Z [SELFTEST] ... region meadow_d5 (176 s in)
+2026-10-23T02:42:26.2431898Z [SELFTEST] PASS region meadow_d5
+2026-10-23T02:42:26.2432136Z [SELFTEST] PASS region meadow_e1
+2026-10-23T02:42:26.2432373Z [SELFTEST] PASS region meadow_e2
+2026-10-23T02:42:26.2432611Z [SELFTEST] PASS region meadow_e3
+2026-10-23T02:42:26.2432858Z [SELFTEST] ... region meadow_e4 (182 s in)
+2026-10-23T02:42:26.2433121Z [SELFTEST] PASS region meadow_e4
+2026-10-23T02:42:26.2433359Z [SELFTEST] PASS region meadow_e5
+2026-10-23T02:42:26.2433604Z [SELFTEST] PASS region cattail_1a
+2026-10-23T02:42:26.2433854Z [SELFTEST] PASS region cattail_1b
+2026-10-23T02:42:26.2434099Z [SELFTEST] PASS region cattail_2a
+2026-10-23T02:42:26.2434353Z [SELFTEST] ... region cattail_2b (187 s in)
+2026-10-23T02:42:26.2434632Z [SELFTEST] PASS region cattail_2b
+2026-10-23T02:42:26.2434879Z [SELFTEST] PASS region walk_s1
+2026-10-23T02:42:26.2435265Z [SELFTEST] PASS region walk_n1
+2026-10-23T02:42:26.2435497Z [SELFTEST] PASS region walk_s2
+2026-10-23T02:42:26.2435742Z [SELFTEST] ... region walk_n2 (192 s in)
+2026-10-23T02:42:26.2436004Z [SELFTEST] PASS region walk_n2
+2026-10-23T02:42:26.2436243Z [SELFTEST] PASS region walk_s3
+2026-10-23T02:42:26.2436486Z [SELFTEST] PASS region walk_n3
+2026-10-23T02:42:26.2436718Z [SELFTEST] PASS region walk_s4
+2026-10-23T02:42:26.2437223Z [SELFTEST] PASS region walk_n4
+2026-10-23T02:42:26.2437465Z [SELFTEST] ... region deck_s1 (197 s in)
+2026-10-23T02:42:26.2437722Z [SELFTEST] PASS region deck_s1
+2026-10-23T02:42:26.2437954Z [SELFTEST] PASS region deck_n1
+2026-10-23T02:42:26.2438182Z [SELFTEST] PASS region deck_s2
+2026-10-23T02:42:26.2438410Z [SELFTEST] PASS region deck_n2
+2026-10-23T02:42:26.2438648Z [SELFTEST] ... region deck_s3 (203 s in)
+2026-10-23T02:42:26.2438911Z [SELFTEST] PASS region deck_s3
+2026-10-23T02:42:26.2439148Z [SELFTEST] PASS region deck_n3
+2026-10-23T02:42:26.2439386Z [SELFTEST] PASS region deck_s4
+2026-10-23T02:42:26.2439624Z [SELFTEST] PASS region deck_n4
+2026-10-23T02:42:26.2439986Z [SELFTEST] PASS region pond_a1
+2026-10-23T02:42:26.2440227Z [SELFTEST] ... region pond_a2 (208 s in)
+2026-10-23T02:42:26.2440488Z [SELFTEST] PASS region pond_a2
+2026-10-23T02:42:26.2440722Z [SELFTEST] PASS region pond_a3
+2026-10-23T02:42:26.2440951Z [SELFTEST] PASS region pond_a4
+2026-10-23T02:42:26.2441182Z [SELFTEST] PASS region pond_b1
+2026-10-23T02:42:26.2441419Z [SELFTEST] ... region pond_b2 (214 s in)
+2026-10-23T02:42:26.2441677Z [SELFTEST] PASS region pond_b2
+2026-10-23T02:42:26.2441923Z [SELFTEST] PASS region pond_b3
+2026-10-23T02:42:26.2442153Z [SELFTEST] PASS region pond_b4
+2026-10-23T02:42:26.2442386Z [SELFTEST] PASS region pond_c1
+2026-10-23T02:42:26.2442623Z [SELFTEST] PASS region pond_c2
+2026-10-23T02:42:26.2442865Z [SELFTEST] ... region pond_c3 (219 s in)
+2026-10-23T02:42:26.2443120Z [SELFTEST] PASS region pond_c3
+2026-10-23T02:42:26.2443353Z [SELFTEST] PASS region pond_c4
+2026-10-23T02:42:26.2443583Z [SELFTEST] PASS region mown_e1
+2026-10-23T02:42:26.2443820Z [SELFTEST] PASS region mown_e2
+2026-10-23T02:42:26.2444064Z [SELFTEST] ... region mown_n1 (225 s in)
+2026-10-23T02:42:26.2444320Z [SELFTEST] PASS region mown_n1
+2026-10-23T02:42:26.2444571Z [SELFTEST] PASS region verge_-400_-1416
+2026-10-23T02:42:26.2444845Z [SELFTEST] PASS region verge_-400_-1316
+2026-10-23T02:42:26.2445105Z [SELFTEST] PASS region verge_-400_-1216
+2026-10-23T02:42:26.2445368Z [SELFTEST] PASS region verge_-400_-1116
+2026-10-23T02:42:26.2445650Z [SELFTEST] ... region verge_-400_-1016 (230 s in)
+2026-10-23T02:42:26.2445943Z [SELFTEST] PASS region verge_-400_-1016
+2026-10-23T02:42:26.2446206Z [SELFTEST] PASS region verge_-400_-916
+2026-10-23T02:43:11.5461408Z [SELFTEST] PASS region verge_-400_-816
+2026-10-23T02:43:11.5464373Z [SELFTEST] PASS region verge_-400_-716
+2026-10-23T02:43:11.5465297Z [SELFTEST] ... region verge_-400_-616 (236 s in)
+2026-10-23T02:43:11.5466159Z [SELFTEST] PASS region verge_-400_-616
+2026-10-23T02:43:11.5466685Z [SELFTEST] PASS region verge_-400_-516
+2026-10-23T02:43:11.5467875Z [SELFTEST] PASS region verge_-400_-416
+2026-10-23T02:43:11.5468406Z [SELFTEST] PASS region verge_-400_-316
+2026-10-23T02:43:11.5468897Z [SELFTEST] PASS region verge_-400_-216
+2026-10-23T02:43:11.5469399Z [SELFTEST] ... region verge_-400_-116 (241 s in)
+2026-10-23T02:43:11.5469848Z [SELFTEST] PASS region verge_-400_-116
+2026-10-23T02:43:11.5470234Z [SELFTEST] PASS region verge_-300_-1416
+2026-10-23T02:43:11.5470625Z [SELFTEST] PASS region verge_-300_-816
+2026-10-23T02:43:11.5471004Z [SELFTEST] PASS region verge_-300_-716
+2026-10-23T02:43:11.5471400Z [SELFTEST] ... region verge_-300_-616 (246 s in)
+2026-10-23T02:43:11.5471816Z [SELFTEST] PASS region verge_-300_-616
+2026-10-23T02:43:11.5472193Z [SELFTEST] PASS region verge_-300_-516
+2026-10-23T02:43:11.5472566Z [SELFTEST] PASS region verge_-300_-416
+2026-10-23T02:43:11.5472937Z [SELFTEST] PASS region verge_-300_-316
+2026-10-23T02:43:11.5473312Z [SELFTEST] PASS region verge_-300_-216
+2026-10-23T02:43:11.5474125Z [SELFTEST] ... region verge_-300_-116 (251 s in)
+2026-10-23T02:43:11.5474542Z [SELFTEST] PASS region verge_-300_-116
+2026-10-23T02:43:11.5474920Z [SELFTEST] PASS region verge_-200_-1416
+2026-10-23T02:43:11.5475303Z [SELFTEST] PASS region verge_-200_-516
+2026-10-23T02:43:11.5475679Z [SELFTEST] PASS region verge_-100_-1416
+2026-10-23T02:43:11.5476075Z [SELFTEST] ... region verge_-100_-516 (257 s in)
+2026-10-23T02:43:11.5476491Z [SELFTEST] PASS region verge_-100_-516
+2026-10-23T02:43:11.5477168Z [SELFTEST] PASS region verge_0_-1416
+2026-10-23T02:43:11.5477579Z [SELFTEST] PASS region verge_0_-816
+2026-10-23T02:43:11.5477959Z [SELFTEST] PASS region verge_0_-716
+2026-10-23T02:43:11.5478328Z [SELFTEST] PASS region verge_0_-616
+2026-10-23T02:43:11.5478711Z [SELFTEST] ... region verge_0_-516 (262 s in)
+2026-10-23T02:43:11.5479120Z [SELFTEST] PASS region verge_0_-516
+2026-10-23T02:43:11.5479526Z [SELFTEST] PASS region verge_100_-1416
+2026-10-23T02:43:11.5479919Z [SELFTEST] PASS region verge_100_-816
+2026-10-23T02:43:11.5480205Z [SELFTEST] PASS region verge_100_-716
+2026-10-23T02:43:11.5480687Z [SELFTEST] ... region verge_100_-616 (268 s in)
+2026-10-23T02:43:11.5480995Z [SELFTEST] PASS region verge_100_-616
+2026-10-23T02:43:11.5481281Z [SELFTEST] PASS region verge_100_-516
+2026-10-23T02:43:11.5481551Z [SELFTEST] PASS region verge_190_-666
+2026-10-23T02:43:11.5481821Z [SELFTEST] PASS region verge_190_-566
+2026-10-23T02:43:11.5482096Z [SELFTEST] PASS region verge_290_-866
+2026-10-23T02:43:11.5482380Z [SELFTEST] ... region verge_290_-766 (274 s in)
+2026-10-23T02:43:11.5482678Z [SELFTEST] PASS region verge_290_-766
+2026-10-23T02:43:11.5482950Z [SELFTEST] PASS region verge_290_-666
+2026-10-23T02:43:11.5483220Z [SELFTEST] PASS region verge_290_-566
+2026-10-23T02:43:11.5483490Z [SELFTEST] PASS region verge_390_-866
+2026-10-23T02:43:11.5483776Z [SELFTEST] ... region verge_390_-766 (279 s in)
+2026-10-23T02:43:11.5484077Z [SELFTEST] PASS region verge_390_-766
+2026-10-23T02:43:11.5484350Z [SELFTEST] PASS region verge_390_-666
+2026-10-23T02:43:11.5484628Z [SELFTEST] PASS region verge_390_-566
+2026-10-23T02:43:11.5484912Z [SELFTEST] PASS region verge_490_-866
+2026-10-23T02:43:11.5485182Z [SELFTEST] PASS region verge_490_-766
+2026-10-23T02:43:11.5485463Z [SELFTEST] ... region verge_490_-666 (285 s in)
+2026-10-23T02:43:11.5485760Z [SELFTEST] PASS region verge_490_-666
+2026-10-23T02:43:11.5486030Z [SELFTEST] PASS region verge_490_-566
+2026-10-23T02:43:11.5486311Z [SELFTEST] ... walk on the sill (290 s in)
+2026-10-23T02:43:11.5486660Z [SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+2026-10-23T02:43:11.5487267Z [SELFTEST] PASS walk on the sill
+2026-10-23T02:43:11.5487552Z [SELFTEST] INFO prey on the sill: 4 flies drawn
+2026-10-23T02:43:11.5487867Z [SELFTEST] PASS prey on the sill
+2026-10-23T02:43:11.5488305Z [SELFTEST] INFO lock: 3.0 studs away, facing it within 2 degrees, a sidestep of 0.62 studs in 1 s
+2026-10-23T02:43:11.5488910Z [SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+2026-10-23T02:43:11.5489336Z [SELFTEST] PASS lock
+2026-10-23T02:43:11.5489812Z [SELFTEST] INFO the hut's sill: 156 parts of the hut at the full tier; 1493 parts of the backdrop held of 1493 planned
+2026-10-23T02:43:11.5490358Z [SELFTEST] PASS the hut's sill
+2026-10-23T02:43:11.5491092Z [SELFTEST] INFO backdrop: at the sill the hut full and the railway far; at the railway's crest the railway full (Base+Full) and the hut far (Far), 563 parts; back at the sill the hut full (Base+Full)
+2026-10-23T02:43:11.5491881Z [SELFTEST] PASS the backdrop near and far
+2026-10-23T02:43:11.5492453Z [SELFTEST] INFO trains: the pass a commuter of 5 cars at 403 to 416 s; mid-pass 5 cars (15 parts) drawn; the clock at 295 s, the next at 403 s
+2026-10-23T02:43:11.5493018Z [SELFTEST] PASS the trains
+2026-10-23T02:43:11.5493289Z [SELFTEST] ... the nursery: the window shut (295 s in)
+2026-10-23T02:43:11.5493855Z [SELFTEST] INFO the nursery: a walk at the shut sash came to z -12.19 (the sash's outer face is -13.5); regions sill
+2026-10-23T02:43:11.5496718Z [SELFTEST] PASS the nursery: the window shut
+2026-10-23T02:43:11.5497569Z [SELFTEST] ... the nursery: the ranger props the window (300 s in)
+2026-10-23T02:43:11.5498333Z [SELFTEST] INFO the nursery: the ranger's moment took 5.8 s; the wedge at x 6.2..8.0
+2026-10-23T02:43:11.5499071Z [SELFTEST] PASS the nursery: the ranger props the window
+2026-10-23T02:43:11.5499600Z [SELFTEST] ... the hut's inside (305 s in)
+2026-10-23T02:43:11.5500048Z [SELFTEST] ... the hut's inside (310 s in)
+2026-10-23T02:43:11.5500505Z [SELFTEST] ... the hut's inside (315 s in)
+2026-10-23T02:43:11.5500954Z [SELFTEST] ... the hut's inside (320 s in)
+2026-10-23T02:43:11.5501390Z [SELFTEST] ... the hut's inside (325 s in)
+2026-10-23T02:43:11.5501814Z [SELFTEST] ... the hut's inside (330 s in)
+2026-10-23T02:43:11.5502558Z [SELFTEST] INFO the hut's inside: from the sill's front edge to hut_floor_b at (0.00, -69.61, 14.31); regions hut_floor_b, sill
+2026-10-23T02:43:11.5503112Z [SELFTEST] ... the hut's inside (335 s in)
+2026-10-23T02:43:11.5503404Z [SELFTEST] PASS the hut's inside
+2026-10-23T02:44:04.7374491Z [SELFTEST] INFO the way out: through the sash to hut_outer_sill at (-3.00, 0.31, -16.06); regions hut_outer_sill, sill
+2026-10-23T02:44:04.7375608Z [SELFTEST] ... the way out (340 s in)
+2026-10-23T02:44:04.7376124Z [SELFTEST] ... the way out (345 s in)
+2026-10-23T02:44:04.7376642Z [SELFTEST] ... the way out (350 s in)
+2026-10-23T02:44:04.7377488Z [SELFTEST] ... the way out (355 s in)
+2026-10-23T02:44:04.7377905Z [SELFTEST] ... the way out (360 s in)
+2026-10-23T02:44:04.7378796Z [SELFTEST] INFO the way out: from the outer sill's edge to hut_bench at (-3.00, -39.69, -24.06); regions hut_bench, hut_outer_sill, hut_wall_mid
+2026-10-23T02:44:04.7379686Z [SELFTEST] ... the way out (365 s in)
+2026-10-23T02:44:04.7380094Z [SELFTEST] ... the way out (370 s in)
+2026-10-23T02:44:04.7380524Z [SELFTEST] ... the way out (375 s in)
+2026-10-23T02:44:04.7380976Z [SELFTEST] ... the way out (380 s in)
+2026-10-23T02:44:04.7381778Z [SELFTEST] INFO the way out: down the bench's leg to garden_a2 at (-77.00, -84.29, -61.06); regions garden_a2, hut_bench
+2026-10-23T02:44:04.7382683Z [SELFTEST] PASS the way out
+2026-10-23T02:44:04.7383092Z [SELFTEST] ... the hut garden (386 s in)
+2026-10-23T02:44:04.7384309Z [SELFTEST] INFO the hut garden: 1 gnats and 3 aphids on the milkweed with a ladybird, 1 leafhoppers on the goldenrod, 4 springtails in the mulch, 3 woodlice by the trough, all drawn
+2026-10-23T02:44:04.7385542Z [SELFTEST] PASS the hut garden
+2026-10-23T02:44:04.7385994Z [SELFTEST] ... the garden's near detail (391 s in)
+2026-10-23T02:44:04.7387044Z [SELFTEST] INFO the garden's near detail: 16 patches, 697 parts of them, 1500 parts of looks at full; dew at dawn on 13 of 13 drops
+2026-10-23T02:44:04.7387873Z [SELFTEST] PASS the garden's near detail
+2026-10-23T02:44:04.7388364Z [SELFTEST] ... the station's rival and garden's mate (396 s in)
+2026-10-23T02:44:04.7389407Z [SELFTEST] INFO the station's rival and garden's mate: the rival came in at hut_floor_b and walked 3.1 studs, in hut_floor_b; the mate came in at garden_b4, in garden_b4
+2026-10-23T02:44:04.7390466Z [SELFTEST] PASS the station's rival and garden's mate
+2026-10-23T02:44:04.7390958Z [SELFTEST] ... the hut's homes (402 s in)
+2026-10-23T02:44:04.7391774Z [SELFTEST] INFO the hut's homes: hut_desk_drawer, hut_board_gap, garden_a1_trough, garden_a3_stone, garden_d3_mulch
+2026-10-23T02:44:04.7392602Z [SELFTEST] PASS the hut's homes
+2026-10-23T02:44:04.7393007Z [SELFTEST] PASS the hut by night: the lamp
+2026-10-23T02:44:04.7393533Z [SELFTEST] ... the ceiling and the upper walls (407 s in)
+2026-10-23T02:44:04.7394437Z [SELFTEST] INFO the ceiling: up the west wall past WALL_TOP to hut_up_d at (-146.19, 66.04, 134.00); regions hut_floor_d, hut_up_d
+2026-10-23T02:44:04.7395347Z [SELFTEST] ... the ceiling and the upper walls (412 s in)
+2026-10-23T02:44:04.7396061Z [SELFTEST] INFO the ceiling: head down under the boards at (-146.19, 149.69, 134.00) in hut_up_d
+2026-10-23T02:44:04.7397021Z [SELFTEST] PASS the ceiling and the upper walls
+2026-10-23T02:44:04.7398081Z [SELFTEST] ... the back room (417 s in)
+2026-10-23T02:44:04.7398548Z [SELFTEST] ... the back room (422 s in)
+2026-10-23T02:44:04.7398958Z [SELFTEST] ... the back room (427 s in)
+2026-10-23T02:44:04.7399334Z [SELFTEST] ... the back room (432 s in)
+2026-10-23T02:44:04.7399753Z [SELFTEST] ... the back room (437 s in)
+2026-10-23T02:44:04.7400699Z [SELFTEST] INFO the back room: through the doorway to room_floor_g at (180.04, -69.69, 215.00); regions hut_doorway, hut_floor_i, room_floor_g
+2026-10-23T02:44:04.7401604Z [SELFTEST] PASS the back room
+2026-10-23T02:44:04.7401996Z [SELFTEST] ... the eaves (442 s in)
+2026-10-23T02:44:04.7402399Z [SELFTEST] ... the eaves (447 s in)
+2026-10-23T02:44:04.7402813Z [SELFTEST] ... the eaves (452 s in)
+2026-10-23T02:44:04.7403218Z [SELFTEST] ... the eaves (457 s in)
+2026-10-23T02:44:04.7404108Z [SELFTEST] INFO the eaves: along the gutter to hut_eave_e1 at (37.04, 122.81, -54.00) (208 cm over the ground); regions hut_eave_e1, hut_eave_mid
+2026-10-23T02:44:04.7404967Z [SELFTEST] PASS the eaves
+2026-10-23T02:44:04.7405989Z [SELFTEST] INFO the cat: walking from the bowls to the window (walk), moved 59.9 studs in a second; the bell 0.66 at 176 studs
+2026-10-23T02:44:04.7407804Z [SELFTEST] INFO the cat: at its bowls it noticed a spider moving in front of it (true), crouched to pat (true), gave up once it was up on the desk (true); notices 1, pats 0, swats 0
+2026-10-23T02:44:04.7408885Z [SELFTEST] PASS the cat
+2026-10-23T02:44:04.7409227Z [SELFTEST] ... the bench patch (462 s in)
+2026-10-23T02:44:04.7409691Z [SELFTEST] ... the bench patch (467 s in)
+2026-10-23T02:44:04.7410933Z [SELFTEST] INFO the bench patch: walked path_m4 to pad_a2, pad_a2 to pad_b2, pad_c2 to meadow_a3; homes bench_slats, bin_lip, meadow_b2_leaf; the lamppost lit at night (true) and out by day (true)
+2026-10-23T02:44:04.7412237Z [SELFTEST] PASS the bench patch
+2026-10-23T02:44:04.7412649Z [SELFTEST] ... the meadow's edge (473 s in)
+2026-10-23T02:44:04.7413575Z [SELFTEST] INFO the meadow's edge: on the coneflower's cone 74 cm over the ground; 1 leafhoppers on the bluestem, 6 ants at the hill (6 drawn)
+2026-10-23T02:44:04.7414547Z [SELFTEST] PASS the meadow's edge
+2026-10-23T02:44:04.7415437Z [SELFTEST] INFO the crab spiders: a yellow one on meadow_e3 and a white one on meadow_d4, 2 drawn; the close look opened its page
+2026-10-23T02:44:04.7416316Z [SELFTEST] PASS the crab spiders
+2026-10-23T02:44:04.7416675Z [SELFTEST] ... the robin (478 s in)
+2026-10-23T02:44:04.7417835Z [SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
+2026-10-23T02:44:04.7418835Z [SELFTEST] PASS the robin
+2026-10-23T02:44:04.7419240Z [SELFTEST] ... the field crickets (483 s in)
+2026-10-23T02:44:35.7475713Z [SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+2026-10-23T02:44:35.7476585Z [SELFTEST] PASS the field crickets
+2026-10-23T02:44:35.7477300Z [SELFTEST] ... ballooning's landings (488 s in)
+2026-10-23T02:44:35.7478585Z [SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+2026-10-23T02:44:35.7479724Z [SELFTEST] PASS ballooning's landings
+2026-10-23T02:44:35.7480254Z [SELFTEST] ... the mown path and the boardwalk (493 s in)
+2026-10-23T02:44:35.7480830Z [SELFTEST] ... the mown path and the boardwalk (498 s in)
+2026-10-23T02:44:35.7481356Z [SELFTEST] ... the mown path and the boardwalk (503 s in)
+2026-10-23T02:44:35.7481863Z [SELFTEST] ... the mown path and the boardwalk (508 s in)
+2026-10-23T02:44:35.7482381Z [SELFTEST] ... the mown path and the boardwalk (513 s in)
+2026-10-23T02:44:35.7482891Z [SELFTEST] ... the mown path and the boardwalk (518 s in)
+2026-10-23T02:44:35.7483413Z [SELFTEST] ... the mown path and the boardwalk (523 s in)
+2026-10-23T02:44:35.7484387Z [SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n1 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+2026-10-23T02:44:35.7485841Z [SELFTEST] PASS the mown path and the boardwalk
+2026-10-23T02:44:35.7487097Z [SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+2026-10-23T02:44:35.7488137Z [SELFTEST] PASS the water
+2026-10-23T02:44:35.7488506Z [SELFTEST] ... the pond's life (528 s in)
+2026-10-23T02:44:35.7489269Z [SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+2026-10-23T02:44:35.7490058Z [SELFTEST] PASS the pond's life
+2026-10-23T02:44:35.7490964Z [SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+2026-10-23T02:44:35.7491914Z [SELFTEST] PASS the green frog
+2026-10-23T02:44:35.7492320Z [SELFTEST] PASS the nursery: the window put back
+2026-10-23T02:44:35.7492976Z [SELFTEST] PASS notebook
+2026-10-23T02:44:35.7493341Z [SELFTEST] ... rest and checkpoint (533 s in)
+2026-10-23T02:44:35.7493806Z [SELFTEST] ... rest and checkpoint (538 s in)
+2026-10-23T02:44:35.7494252Z [SELFTEST] ... rest and checkpoint (543 s in)
+2026-10-23T02:44:35.7494685Z [SELFTEST] ... rest and checkpoint (548 s in)
+2026-10-23T02:44:35.7495097Z [SELFTEST] PASS rest and checkpoint
+2026-10-23T02:44:35.7495538Z [SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+2026-10-23T02:44:35.7495985Z [SELFTEST] PASS sound
+2026-10-23T02:44:35.7496621Z [SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:44:35.7500366Z [SELFTEST] INFO profile on the sill: 300 frames, the render step 6.65 ms a frame (worst 23.2): spider rig 3.08/11.5, fly bodies 0.98/5.0, sound 0.44/2.8, wasp 0.43/0.9, senses 0.36/2.1, light 0.36/1.9, camera 0.30/0.9, other rigs 0.23/4.1, prey 0.13/0.8, hud 0.08/0.2, rival 0.08/0.2, life 0.05/0.1, small 0.12 (mean/worst ms); a frame: spider parts placed 644, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2441 KB a frame (percepts 2, senses 76, prey 22, motor 4, nature 3, wasp 34, rival 12, life 3, camera 97, light 144, poses 2, spider rig 1312, other rigs 84, hud 6, lock button 4, fly bodies 472, sound 162)
+2026-10-23T02:44:35.7503890Z [SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 231.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:44:35.7506242Z [SELFTEST] INFO census on the sill: 6218 parts, 899 see-through, 494 casting shadows, 1201 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 721/149/42/388, Flies 156/52/0/68, JumpArc 34/0/0/0, LivingHabitat 231/32/3/95, PondAnimals 43/4/0/43, RivalSpider 211/112/60/44, Robin 24/0/0/20, Spider 707/514/86/94, World 2466/1/207/0, WorldDecor 1493/35/64/359, the rest 24/0/0/16)
+2026-10-23T02:44:35.7508897Z [SELFTEST] INFO shadows on the sill: 1491 of 2430 visible walkable boxes cast, 939 too small to see at their distance cast none (305 passes, 32157 writes)
+2026-10-23T02:44:35.7510227Z [SELFTEST] INFO frame time on the sill without the far preserve: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:44:42.3265956Z [SELFTEST] INFO profile on the sill without the far preserve: 180 frames, the render step 6.29 ms a frame (worst 23.6): spider rig 2.97/10.9, fly bodies 1.01/6.2, light 0.43/2.5, sound 0.41/1.5, senses 0.31/5.0, camera 0.26/1.1, other rigs 0.22/3.3, wasp 0.21/0.5, prey 0.14/1.2, hud 0.08/0.2, rival 0.07/0.3, life 0.05/0.1, small 0.11 (mean/worst ms); a frame: spider parts placed 660, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2588 KB a frame (percepts 2, senses 74, prey 23, motor 4, nature 2, wasp 33, rival 11, life 3, camera 97, light 197, poses 2, spider rig 1387, other rigs 82, hud 6, lock button 5, fly bodies 493, sound 167)
+2026-10-23T02:44:42.3271317Z [SELFTEST] INFO engine on the sill without the far preserve: memory ? MB, Lua heap 238.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:44:42.3272697Z [SELFTEST] INFO frame time on the sill without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+2026-10-23T02:44:42.3275230Z [SELFTEST] INFO profile on the sill without shadows: 180 frames, the render step 7.80 ms a frame (worst 217.2): spider rig 2.79/11.4, rival 1.25/208.6, fly bodies 0.83/3.7, other rigs 0.57/3.8, wasp 0.45/0.9, light 0.41/2.5, sound 0.41/2.6, senses 0.39/12.8, camera 0.27/0.7, prey 0.15/0.5, hud 0.09/0.2, life 0.06/0.2, small 0.13 (mean/worst ms); a frame: spider parts placed 656, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2862 KB a frame (percepts 2, senses 86, prey 28, motor 5, nature 3, wasp 37, rival 12, life 3, camera 103, light 203, poses 2, spider rig 1426, other rigs 290, hud 6, lock button 5, fly bodies 476, sound 173)
+2026-10-23T02:44:42.3278272Z [SELFTEST] INFO engine on the sill without shadows: memory ? MB, Lua heap 322.7 MB, instances ?, primitives ? (moving ?), awake parts ?
+2026-10-23T02:44:42.3279154Z [SELFTEST] INFO the far preserve on the sill: mean ? ms as it is, ? ms without the far preserve (181 folders, 2334 parts out), ? ms without shadows
+2026-10-23T02:44:42.3279747Z [SELFTEST] PASS frame time on the sill
+2026-10-23T02:44:42.3280843Z [SELFTEST] INFO parts at the full tier: 6218 in the workspace (Cat 62, CrabSpiders 46, Decor 721, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, LivingHabitat 231, PondAnimals 43, RivalSpider 211, Robin 24, Spider 707, StationMouse 16, StreetLamp 1, WindowsillAudio 5, World 2466, WorldDecor 1493)
+2026-10-23T02:44:42.3282267Z [SELFTEST] INFO looks outside the window: 1493 parts held of 1493 planned at the full tier, 149135 made and 147618 destroyed this session, 526 plans
+2026-10-23T02:44:42.3282918Z [SELFTEST] PASS part counts
+2026-10-23T02:44:42.3283272Z [SELFTEST] ... fallbacks clear the shelf books and station boots (562 s in)
+2026-10-23T02:44:42.3283734Z [SELFTEST] PASS fallbacks clear the shelf books and station boots
+2026-10-23T02:44:42.3284141Z [SELFTEST] ... visible meal and contextual controls (568 s in)
+2026-10-23T02:44:42.3284515Z [SELFTEST] PASS visible meal and contextual controls
+2026-10-23T02:44:42.3284898Z [SELFTEST] PASS Normal starvation reaches the life-ending handler
+2026-10-23T02:44:42.3285248Z [SELFTEST] INFO took 569 s
+2026-10-23T02:44:42.3285493Z [SELFTEST] END pass=274 fail=0 skip=0
+2026-10-23T02:44:42.3285824Z selftest_preserve: the run took 569.9 s of play (34164 frames)
+2026-10-23T02:44:42.3286166Z SELFTEST_PRESERVE passed=7 failed=0
+2026-10-23T02:44:42.7566104Z SHADOWS: the test garden from the sill, 0 of 23 visible boxes cast none
+2026-10-23T02:44:42.7567382Z SHADOWS passed=319 failed=0
+2026-10-23T02:44:49.8334564Z BODIES passed=3610 failed=0
+2026-10-23T02:44:53.1907972Z LIVING_WORLD passed=3978 failed=0
+2026-10-23T02:44:57.8310615Z STATION physical parts=391 regions=51
+2026-10-23T02:44:57.8311340Z STATION wasp circuit visited=14/16
+2026-10-23T02:44:57.8312100Z STATION passed=32883 failed=0
+2026-10-23T02:45:01.5448401Z MINIMAL passed=63 failed=0
+2026-10-23T02:45:01.9218701Z COMPACT passed=295 failed=0 regions=233
+2026-10-23T02:45:02.3887089Z VERGE_LITTER passed=11258 failed=0 shelters=98 colliders=388
+2026-10-23T02:45:05.0617449Z ROUTE_PREPARATION passed=11971 failed=0 slices=5899
+2026-10-23T02:45:05.3485929Z DOG_GAIT passed=29959 failed=0 planted=2604 swing=1918
+2026-10-23T02:45:05.7811304Z STATION DEBUG passed=38 failed=0

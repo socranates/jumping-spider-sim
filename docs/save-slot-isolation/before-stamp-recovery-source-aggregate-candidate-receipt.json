@@ -1,0 +1,12 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "exit_code": 0,
+  "candidate_sha256": "781c953a1996d27c4c4cc9a322ee14d2bad88aac75200805b92dd530d8a5e9a4",
+  "archive_sha256": "c5b1a55b66b865e142ad5157443e978cb8464f0fbd273f646036fef1e9cd0c77",
+  "test_sha256": "165ea6b7effa14767a886062bb935f8ab1303cba4a931c5062537bc4a3b91af1",
+  "bundle_sha256": "dbb64623d81d54f7abe93331547c4c5cc6688dae8bd0e745d906bf9886f6b539",
+  "output_sha256": "0a46ce9c29df530fdd3e7412a02a2e81533994abccf93dfb525c7f5803d8b758",
+  "production_changed": false,
+  "real_datastore_verified": false,
+  "progress_import_implemented": false
+}

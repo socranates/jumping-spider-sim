@@ -1,0 +1,2 @@
+RECOVERY_SOURCE_PIPELINE requests=20 heartbeat_writes=2 simulated_seconds=135
+RECOVERY_SOURCE_INTEGRATION passed=311 failed=0

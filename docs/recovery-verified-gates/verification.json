@@ -1,0 +1,20 @@
+{
+  "source": "4220d0c43142cee91b83bdbd99fffcee8dfd6c5c",
+  "current_workspace_inputs_verified": true,
+  "windows_suites": 76,
+  "windows_passed": 468352,
+  "linux_suites": 76,
+  "linux_passed": 468352,
+  "failed": 0,
+  "modules_compiled": 222,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_recovery_assertions": 127,
+  "native_scope": "Exact adopted session; MemoryBackend; actual coroutine yielding/cancellation; all production scripts disabled",
+  "real_datastore_verified": false,
+  "full_game_transport_verified": false,
+  "progress_import_implemented": false,
+  "whole_game_fps_gain_proven": false,
+  "goal_complete": false,
+  "published": false
+}

@@ -95,6 +95,33 @@ check(d.currentStore()==source and d.session.mode=="main" and not d.needs.gentle
 d.openMenu();assert(d.menu:choose("Free"));assert(finish().ok)
 check(d.currentStore()==freeStore and d.session.mode=="free" and d.needs.gentle and d.needs.energy<.4,"local Free play restores independent reserves/rules")
 d.openMenu();assert(d.menu:choose("Continue"));assert(finish().ok)
+-- Before Easy had its own key, gentle main lives were stored under Main. The
+-- selected store/intent keeps that physical slot; the recorded rules stay gentle.
+d.session.finishedMain=true;assert(d.fresh("main",true,nil))
+for _=1,6 do frame(1/60) end;d.life.clock.hour=12
+local gentleRecord=save();local easyStore=d.currentStore();local easyBytes=assert(Json.canonical(easyStore.store.data))
+local mainStore=d.stores.main;assert(mainStore:save(gentleRecord).ok)
+d.openMenu();assert(d.menu:choose("Continue"))
+check(d.currentStore()==easyStore and d.saveClient.activeSlot=="easy","legacy Main preparation leaves current Easy ownership unchanged")
+assert(finish().ok)
+check(d.currentStore()==mainStore and d.saveClient.activeSlot=="main" and d.session.rules=="gentle" and d.needs.gentle,"legacy gentle Main return preserves selected slot and rules")
+d.life.clock.hour=13;save()
+check(d.currentStore()==d.stores.main and d.currentStore()~=mainStore and d.currentStore():loadBest().record.life_rules.rules=="gentle","next gentle Main rest keeps its owning store")
+check(Json.canonical(easyStore.store.data)==easyBytes and d.stores.easy==easyStore,"gentle Main return/rest leaves Easy bytes unchanged")
+local offerInfo=d.saveClient.offerInfo;local askedSlots={}
+d.saveClient.offerInfo=function(_,slot) table.insert(askedSlots,slot);return {id="ending-"..slot} end
+d.endLife("starved")
+check(not d.session.ended and #askedSlots==0,"gentle Main rules still refuse starvation death")
+-- The presentation lookup is exercised independently of gentle survival.
+local endLife=d.session.endLife;d.session.endLife=function(self) self.ended=true;return true end
+d.endLife("starved");d.session.endLife=endLife
+check(table.find(askedSlots,"main")~=nil and d.saveState.endOfferId=="ending-main","gentle Main ending uses the owning slot offer")
+d.saveClient.offerInfo=offerInfo
+assert(d.fresh("main",true,nil))
+check(d.currentStore()==d.stores.easy and d.saveClient.activeSlot=="easy" and d.needs.gentle,"explicit new Easy life keeps the Easy slot")
+fresh();save()
+check(d.currentStore()==d.stores.main and d.saveClient.activeSlot=="main" and not d.needs.gentle,"explicit new Normal life keeps the Main slot")
+print("LEGACY_MAIN_GENTLE selected_slot_kept=true next_rest_same_slot=true easy_bytes_retained=true ending_offer_same_slot=true new_lives_select_own_slots=true")
 -- Local returns remain useful when persistent saving has failed for this visit.
 local previousWarn=warn;getfenv().warn=function() end;d.saveState.fail("synthetic transport failure");getfenv().warn=previousWarn
 d.place(point);d.openMenu();assert(d.menu:choose("Continue"));assert(finish().ok)

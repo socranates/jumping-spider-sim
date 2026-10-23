@@ -792,7 +792,7 @@ function spiderPick.touchFrame()
 end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
-local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?): boolean
+local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?, selectedSlot: string?): boolean
  if offered==nil and next(checkpoints.store.data)~=nil then
   return saveState.beginLocalReturn(nil,"reset")
  end
@@ -817,7 +817,9 @@ local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {str
 	end
  if M.rareBody then M.rareBody:clear();M.rareVisitor=nil end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
-	if saveClient then saveClient.activeSlot=M.SaveRules.slotOf(session.mode,session.rules) end
+	-- Older Easy records may live in Main. Difficulty does not change which
+	-- physical slot/Continue intent owns this restored life.
+	if saveClient then saveClient.activeSlot=selectedSlot or M.SaveRules.slotOf(session.mode,session.rules) end
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
@@ -923,7 +925,9 @@ local function presentEnd(immediate: boolean)
  local rec=lastEnd
  if not rec then return end
  local cause=rec.cause
- local endingOffer=if saveClient then saveClient:offerInfo(M.SaveRules.slotOf(session.mode,session.rules)) else nil
+ local endingSlot=M.SaveRules.slotOf(session.mode,session.rules)
+ for name,st in stores :: {[string]:any} do if st==checkpoints then endingSlot=name end end
+ local endingOffer=if saveClient then saveClient:offerInfo(endingSlot) else nil
  saveState.endOfferId=if endingOffer then endingOffer.id else nil
  local choices: {CaughtPanel.Choice}={}
  local hasRest=checkpoints:hasKnownRest()
@@ -1503,7 +1507,7 @@ saveState.localRestore=require(script.Parent.SaveRestore).new({
   if not best.ok or not prepared then return nil,best.message end
   local commit=prepared
   return function():boolean
-   if not returnToCheckpoint(best.record,commit) then return false end
+   if not returnToCheckpoint(best.record,commit,stamp.mode) then return false end
    checkpoints=stamp.source;checkpoints.knownRest=true
    saveState.restoreError=nil
    return true
@@ -1533,7 +1537,7 @@ saveState.restore=require(script.Parent.SaveRestore).new({
   local commit,problems=Checkpoint.prepare(record,checkpointWorld)
   if not commit then return nil,table.concat(problems,"; ") end
   return function(): (boolean, string?)
-   if not returnToCheckpoint(record,commit) then return false,"The rest could not be restored" end
+   if not returnToCheckpoint(record,commit,stamp.mode) then return false,"The rest could not be restored" end
    stores[stamp.mode]=nextStore;checkpoints=nextStore;saveState.restoreError=nil
    return true,nil
   end

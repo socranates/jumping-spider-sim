@@ -88,7 +88,7 @@ function Writer.prepare(self:any,handle:any,originalArchive:any,anchor:any,prior
  if SaveRest.bounded(priorRaw,Rules.MAX_REST_NODES*2+1024,Rules.MAX_DEPTH+6) then return nil,"current stored rest exceeds bound" end
  local decoded,logical=pcall(self.codec.decode,self.codec,priorRaw)
  if not decoded then return nil,tostring(logical) end
- local opened=Envelope.open(Format.spec(t.mode,self.context),logical,false)
+ local opened=Format.open(t.mode,logical,self.context)
  if opened.status~="ok" or not opened.payload or opened.payload.save_retired then return nil,"active schema3 current rest required" end
  local prior
  if opened.payload.format==Packet.FORMAT then

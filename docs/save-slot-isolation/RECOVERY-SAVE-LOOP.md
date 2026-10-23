@@ -1,3 +1,5 @@
+Current private returning-session discovery/entry is documented in `RECOVERY-REJOIN.md`. Its latest combined cohort binds the updated private reader/runtime/entry/format/writer; this preceding save-loop evidence is historical. Production, startup/native/service and release qualification remain open.
+
 # Private recovered progress and checkpoint scheduling
 
 `RecoverySaveLoopPrototype`, installed as the server-owned `recovery.saveFactory`, takes over the private Runtime's `recovered` phase. The default healthy worker and the opt-in entry-only tests retain their earlier behavior. Production SaveService, SaveClient, remotes and menus still do not install this factory.

@@ -52,19 +52,27 @@ local function scope(self:any,j:any):boolean
   and s._loadSerial==j.load and s.id==j.id and tostring(s.cfg.userId)==j.user and s.pkey==j.pkey and s.rkey[j.mode]==j.rkey
   and s.sched==j.scheduler and s.intents==j.intents and s.intents.requests[j.mode]==r and r.revision==j.revision
   and r.kind=="continue" and r.serial==j.serial and r.state=="readonly" and r.credential==nil
+  and (j.selection==nil or rt.continuedSelection==j.selection and s.observations.choices[j.mode]==j.selection.choice and j.selection.choice.offer.id==j.selection.offerId
+   and j.selection.choice.serial==j.serial and j.selection.request==r and j.selection.revision==r.revision)
   and self.codec==rt.recovery.codec and self.context==rt.recovery.context
 end
 function Entry.begin(self:any):(any?,string?)
  local rt=self.runtime;local s=self.session;local now=s.now()
- if Work.pulse() or self.busy or s.busy or rt.busy or rt.phase~="entry_required" or self.current~=nil or not rt.job or not rt.result
+ if Work.pulse() or self.busy or s.busy or rt.busy or rt.phase~="entry_required" or self.current~=nil or not (rt.continuedSelection or rt.job) or not rt.result
   or (s.backend.activeUpdates or 0)>0 or not finite(now) or not finite(s.sched.lastBeat) or now<s.sched.lastBeat or now-s.sched.lastBeat>=Rules.LOCK_STALE then return nil,"entry routing unavailable" end
- local mode=rt.job.ticket.mode;local r=s.intents.requests[mode]
- if not r or r.serial~=rt.job.ticket.serial or r.offerId~=rt.job.ticket.offerId or rt.result.gameplayAuthorized~=false or not rt.result.requiresSchema3Entry then return nil,"rebound selection required" end
+ local selected=rt.continuedSelection or rt.job.ticket;local mode=selected.mode;local r=s.intents.requests[mode]
+ if not r or r.serial~=selected.serial or r.offerId~=selected.offerId or rt.result.gameplayAuthorized~=false or not rt.result.requiresSchema3Entry then return nil,"rebound/continued selection required" end
  local n=(rt.entrySerial or 0)+1;if n>Rules.MAX_LIFE_SERIAL then return nil,"entry serial exhausted" end
  local j={state="pending",phase="proposal",backend=s.backend,source=s.backend.source,held=s.backend.held,owner=s.recoveryOwner,load=s._loadSerial,id=s.id,user=tostring(s.cfg.userId),
   pkey=s.pkey,rkey=s.rkey[mode],scheduler=s.sched,intents=s.intents,mode=mode,serial=r.serial,request=r,revision=r.revision,
-  nonce=Json.checksum(s.id)..":"..n,started=now,lastNow=now,deadline=now+self.timeout,requests=0,nextAt=now,failures=0,parts={}}
+  selection=rt.continuedSelection,nonce=Json.checksum(s.id)..":"..n,started=now,lastNow=now,deadline=now+self.timeout,requests=0,nextAt=now,failures=0,parts={}}
  if j.held==nil or j.pkey~="P_"..j.user or j.rkey~="R_"..j.user.."_"..mode or not scope(self,j) then return nil,"entry identity unavailable" end
+ if j.selection then
+  local a=j.selection.archive
+  if type(a)~="table" or not table.isfrozen(a) then return nil,"verified continued archive required" end
+  j.cachedArchive=a
+  j.parts={progress={format=ArchiveStore.FORMAT,version=1,owner=j.user,index=a.index,progress=a.entries.progress},main=a.entries.main,free=a.entries.free,easy=a.entries.easy}
+ end
  rt.entrySerial=n;self.current=j;return j,nil
 end
 local function live(self:any,j:any):boolean
@@ -75,7 +83,7 @@ local function live(self:any,j:any):boolean
 end
 local function refuse(j:any,why:string)
  if j.work then j.work:cancel();j.work=nil end
- j.prepared,j.parts,j.anchor,j.rawRest,j.rawProgress=nil,nil,nil,nil,nil
+ j.prepared,j.parts,j.anchor,j.rawRest,j.rawProgress,j.cachedArchive=nil,nil,nil,nil,nil,nil
  j.offer=nil;if j.state~="cancelled" then j.state,j.problem="refused",why end
 end
 function Entry.cancel(self:any,j:any):boolean
@@ -108,10 +116,14 @@ local function prepare(self:any,j:any):(any?,string?)
  local archive,problem=Archive.prepare(j.user,a.index.observation,sources);if not archive then return nil,problem end
  if not same(a.index,archive.index) or not same(a.progress,archive.entries.progress) then return nil,"entry archive anchor changed" end
  for _,slot in {"main","free","easy"} do if not same(j.parts[slot],archive.entries[slot]) then return nil,"entry archive part changed" end end
+ if j.cachedArchive then
+  local valid,archiveWhy=Archive.check(j.cachedArchive);if not valid or not same(j.cachedArchive.index,archive.index) then return nil,archiveWhy or "continued archive cache changed" end
+  archive=j.cachedArchive -- retain one owned original snapshot, not a second copy
+ end
  if not same(j.parts.index,{format=ArchiveStore.FORMAT,version=1,owner=j.user,complete=true,index=archive.index})
   or j.anchor.archive~=archive.index.checksum or j.anchor.source~=archive.entries[j.mode].checksum or p.archive.progress~=archive.entries.progress.checksum then return nil,"entry complete archive differs from proposal" end
  local called,logical=pcall(self.codec.decode,self.codec,j.rawRest);if not called then return nil,tostring(logical) end
- local op=Envelope.open(Format.spec(j.mode,self.context),logical,false)
+ local op=Format.open(j.mode,logical,self.context)
  if op.status~="ok" or not op.payload or op.payload.save_retired then return nil,"active schema3 entry required" end
  local current
  if op.payload.format==Packet.FORMAT then
@@ -119,6 +131,10 @@ local function prepare(self:any,j:any):(any?,string?)
   current,why=Format.fromProposal(j.anchor,self.codec,self.context)
  else current=op.payload;if not Format.matchesProposal(current,j.anchor,self.codec,self.context) then return nil,"entry provenance differs" end end
  if not current then return nil,why end
+ if j.selection then
+  local id=j.selection.identity
+  if id.kind~="primary" or id.checksum~=logical.checksum or id.updatedAt~=logical.updatedAt or id.life~=current.save_life then return nil,"continued rest differs from selected observation" end
+ end
  local bad,details=Format.check(j.mode,current,self.context);if bad then return nil,bad end
  local life=details.decoded.roots.life
  if not finite(life.rareSerial) or life.rareSerial<p.binding.serial or life.rareGeneration~=(life.generation or 0) then return nil,"entry rare generation differs" end
@@ -147,7 +163,7 @@ local function stepInner(self:any,j:any):boolean
   if j.work.state=="pending" then return false end
   local result=j.work:take();j.work=nil
   if not result or not result[1] then refuse(j,if result then tostring(result[2]) else "entry preparation failed");return false end
-  j.prepared=result[1];j.offer=j.prepared.offer;j.parts,j.anchor,j.rawRest,j.rawProgress=nil,nil,nil,nil;j.phase="awaitApplied";return false
+  j.prepared=result[1];j.offer=j.prepared.offer;j.parts,j.anchor,j.rawRest,j.rawProgress,j.cachedArchive=nil,nil,nil,nil,nil;j.phase="awaitApplied";return false
  end
  local now=s.now();if now<j.nextAt or not s.sched:budgetOk(now) then return false end
  if j.requests>=self.maxRequests then refuse(j,"entry request cap reached");return false end
@@ -160,7 +176,7 @@ local function stepInner(self:any,j:any):boolean
  j.failures,j.nextAt=0,s.now()
  if j.phase=="proposal" then
   if SaveRest.bounded(value,256,8) then refuse(j,"entry proposal exceeds bound");return true end
-  j.anchor=value;j.phase,j.part="archive","progress"
+  j.anchor=value;j.phase,j.part="archive",if j.cachedArchive then "index" else "progress"
  elseif j.phase=="archive" then
   if SaveRest.bounded(value,Archive.MAX_NODES,Archive.MAX_DEPTH+8) then refuse(j,"entry archive exceeds bound");return true end
   j.parts[j.part]=value

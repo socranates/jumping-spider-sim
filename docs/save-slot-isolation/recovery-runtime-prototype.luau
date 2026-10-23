@@ -13,6 +13,9 @@ local Departure=require(script.Parent.RecoveryDeparturePrototype)
 local ReadLease=require(script.Parent.RecoveryReadLeasePrototype)
 local Runtime={};Runtime.__index=Runtime
 local function finite(n:any):boolean return type(n)=="number" and n==n and math.abs(n)<math.huge end
+local function sameIdentity(a:any,b:any):boolean
+ return type(a)=="table" and type(b)=="table" and a.kind==b.kind and a.life==b.life and a.checksum==b.checksum and a.updatedAt==b.updatedAt
+end
 local function routeMatches(self:any):boolean
  local s=self.session;local r=self.route
  return r~=nil and s.backend==r.backend and s.backend.source==r.provider and s.backend.source==s.backend.boundSource
@@ -80,7 +83,7 @@ function Runtime.discover(self:any,mode:string,kind:string?):(any?,string?)
  for _,slot in Rules.MODES do
   if self.session.restPending[slot]~=nil or self.session.lifeRequests[slot] and not self.session.lifeRequests[slot].done then return nil,"finish existing rest/life work before discovery" end
  end
- local reader=Reader.new(self.session,self.recovery.codec,self.recovery.context,self.recovery.reader)
+ local reader=Reader.new(self.session,self.recovery.codec,self.recovery.context,self.recovery.reader,self.recovery.currentFormat)
  local job,why=reader:begin(mode,kind);if not job then return nil,why end
  if self.phase=="normal" then
   local s=self.session
@@ -95,6 +98,21 @@ function Runtime.accept(self:any,mode:string,serial:number,offerId:string):(any?
  local d=self.discovery
  if not d or d.state~="offered" or d.mode~=mode or not d.offer or d.offer.id~=offerId then return nil,"current server discovery required" end
  if not self.session:requestLife("continue",mode,serial,offerId) then return nil,"selected Continue refused" end
+ if d.continued then
+  -- A returning schema3 checkpoint already has a durable original archive and
+  -- proposal. Bind the real selected observation; never recommit M1.target.
+  local s=self.session;local r=s.intents.requests[mode];local choice=s.observations.choices[mode];local id=d.identity
+  if not available(self) or self.discovery~=d or self.phase~="offered" or not r or r.kind~="continue" or r.state~="readonly" or r.credential~=nil
+   or r.serial~=serial or r.offerId~=offerId or not r.protected or not choice or choice.serial~=serial or not choice.offer or choice.offer.id~=offerId
+   or not choice.offer.protected or not sameIdentity(choice.offer.identity,id) or not sameIdentity(r.base,id) or id.kind~="primary" then return nil,"continued selection changed" end
+  local held,why=hold(self);if not held then return nil,why end
+  local archive=self.reader:takeContinuedArchive(d);if not archive then return nil,"continued archive proof unavailable" end
+  self.continuedSelection=table.freeze({mode=mode,serial=serial,offerId=offerId,identity=id,choice=choice,request=r,revision=r.revision,archive=archive})
+  stopLease(self);self.accepted=true;self.phase,self.problem="entry_required",nil
+  self.result={requiresSchema3Entry=true,gameplayAuthorized=false,continued=true}
+  if not startReadLease(self) then return nil,self.problem end
+  return self.continuedSelection,nil
+ end
  local j,why=self.pipeline:begin(mode,serial,offerId,d);if not j then return nil,why end
  stopLease(self);self.accepted=true;self.phase,self.problem="recovering",nil;self.job=j
  return j,nil

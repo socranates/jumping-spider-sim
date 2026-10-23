@@ -7,6 +7,7 @@ local Json=require(Shared.Persistence.Json)
 local SaveRest=require(Shared.Persistence.SaveRest)
 local Checkpoint=require(Shared.Persistence.Checkpoint)
 local Work=require(Shared.Persistence.SaveWork)
+local Envelope=require(Shared.Persistence.SaveEnvelope)
 local Packet=require(script.Parent.RecoveryPacketPrototype)
 local Rest={FORMAT="the-windowsill continued recovery",VERSION=1,SCHEMA=3}
 local ROOT={format=true,version=true,slot=true,provenance=true,checkpoint=true,entryKind=true,save_life=true,save_retired=true}
@@ -98,6 +99,17 @@ function Rest.spec(slot:string,context:any?):any
   end
   return initial.validate(p)
  end}
+end
+-- Persisted current headers must be understood before a later write rotates
+-- their backup. SaveEnvelope validates bodies but intentionally ignores extras.
+function Rest.open(slot:string,logical:any,context:any?):any
+ if SaveRest.bounded(logical,Rules.MAX_REST_NODES*2+1024,Rules.MAX_DEPTH+6)
+  or not known(logical,{format=true,kind=true,schema=true,updatedAt=true,payload=true,checksum=true,backup=true,lock=true,session=true})
+  or logical.session~=nil and type(logical.session)~="string"
+  or logical.lock~=nil and (not known(logical.lock,{session=true,beat=true}) or type(logical.lock.session)~="string" or not finite(logical.lock.beat)) then
+  return {status="invalid",reasons={"unsupported current rest envelope metadata"}}
+ end
+ return Envelope.open(Rest.spec(slot,context),logical,false)
 end
 function Rest.fromProposal(anchor:any,codec:any,context:any):(any?,string?)
  local p,why=Packet.open(anchor,codec,context);if not p then return nil,why end

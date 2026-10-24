@@ -1,0 +1,2 @@
+2026-10-24T16:06:55.2283503Z FAIL [the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, the standard rest is untouched, and the menu offers it] standard: visible growth line uses the seven-meal goal
+2026-10-24T16:06:55.2284656Z STATE_CLIENT passed=160 failed=1

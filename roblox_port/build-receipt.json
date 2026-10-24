@@ -1,5 +1,5 @@
 {
-  "evidence_id": "88c68c98a0324e8a",
+  "evidence_id": "7c0bede90b301ac2",
   "source_count": 273,
   "sources": {
     "StarterPlayer.StarterPlayerScripts.Client.BirdBody": "e290e574c9064832dd822ab008e9dc247bbb44512b5a381c13b1ea6674b801c7",
@@ -28,13 +28,13 @@
     "StarterPlayer.StarterPlayerScripts.Client.SaveClient": "b220b06c9ab1b28afb4de59d7d7fbc0524843bc1cfa1f40c8c63b64589b3f444",
     "StarterPlayer.StarterPlayerScripts.Client.SaveContinuation": "842f0c01ced625d7cffc46cd86d360f57b40442bbcbacf7f1a52c3fe44e275bc",
     "StarterPlayer.StarterPlayerScripts.Client.SaveRestore": "212f718139db58a4b7aab4d6bdb3ea94096e7b6583c6eeb3ef8338c2ac9c72e7",
-    "StarterPlayer.StarterPlayerScripts.Client.SelfTest": "cfb858a819dc67826e428cd4c70e55582fe03b8a67a14a2d607b20db85d40b9b",
+    "StarterPlayer.StarterPlayerScripts.Client.SelfTest": "f626f1ee9161fea90448da76a4d76a988defa34ec85624525a0163d98a73ddf4",
     "StarterPlayer.StarterPlayerScripts.Client.SettingsPanel": "0a14c23718aba1f9e0dda835df7dd57aa6fd4609db75ba39f36bd3d284413b1b",
     "StarterPlayer.StarterPlayerScripts.Client.Soundscape": "ac199914b97b81a722037aae56ad228807ecf0fefcdb1ff5a1aa241be42ad561",
     "StarterPlayer.StarterPlayerScripts.Client.SpiderCamera": "c1687081680b80e51a2f5cc12085fd369a80c27a5ace577e85f9ccf9ef4990c1",
-    "StarterPlayer.StarterPlayerScripts.Client.SpiderClient": "8422ced888f90bb7543593a176cbba6f73d3b97b9b0ad7479ae91ded446af4cf",
+    "StarterPlayer.StarterPlayerScripts.Client.SpiderClient": "e35f6d0c49d662725be1e4a4fd2b9a8b4299e4c400a11a48b3a5add0d0272c30",
     "StarterPlayer.StarterPlayerScripts.Client.SpiderEyes": "3dc323eda15ddf9b79c1991029209b96cb14f89b6ce20df278e4bdcebd047689",
-    "StarterPlayer.StarterPlayerScripts.Client.SpiderHud": "b827243c25596c48fa8632344984fe692e7a50bd0022e10fa946fa0d9a995c46",
+    "StarterPlayer.StarterPlayerScripts.Client.SpiderHud": "c2b58a9d5e199aefc380e2929ec6f74297a57acd4f7929e047fd593448b36b79",
     "StarterPlayer.StarterPlayerScripts.Client.SpiderInput": "55ceaeac7357a19d67ef9454111e6de0bb210c9a18c79edb8f1e9664e57408dc",
     "StarterPlayer.StarterPlayerScripts.Client.StationMouseBody": "8098b4e62f9448efc904da1258f700320e436b99d013900615bfc32d37f54a49",
     "StarterPlayer.StarterPlayerScripts.Client.TitleCard": "1d2610a86aceda23f08d8c97ddb319ccc6d70318e3b37872f92ca6a48d37922b",
@@ -84,7 +84,7 @@
     "ServerScriptService.Server.SaveService": "4a0d471edfcfa45b79e83164786d459583f8cd766421492aab5234137b1bbbcf",
     "ServerScriptService.Server.WorldFocus": "aa0b9347a9fa859f36be3adf5193c1a38c8a5cb9239ea7d6ce307160cb357255",
     "ReplicatedStorage.Shared.Data.AntMimic": "d489dbb7e3dd71ad7beede937f11f40d0f4e202ca5e75e234d5118b8b0aee979",
-    "ReplicatedStorage.Shared.Data.Appearances": "b5b3b0558a65bf0ba9d5b7fdd82f56c5fdc53e21f06d476522c92b132c179d9a",
+    "ReplicatedStorage.Shared.Data.Appearances": "21847f91daa3fffed7ceb466d0bfc365b3d70b932bcc6d73d80ae2f48f12c94a",
     "ReplicatedStorage.Shared.Data.Catch": "7529fd215d25512b86a5248f517c30fb1db94be106deb43cd34d0f0b22d910e7",
     "ReplicatedStorage.Shared.Data.Detail": "379018f2217e184a31a92dfb598be346db74ed6895a977d7f752c80a86b363be",
     "ReplicatedStorage.Shared.Data.Eyes": "bbb919497f5818b9040d6f25959d91bd9584165b6699b2082f9afa50770f94e4",
@@ -93,12 +93,12 @@
     "ReplicatedStorage.Shared.Data.Graphics": "9e0389258bc72c2122e94272cf95d4695dbfbfec714bea0610e4f218f8be899b",
     "ReplicatedStorage.Shared.Data.MatingRules": "18cb89d1fb01cda7b13b09184730708543ce262dc61531c03ce256a4c94c15f7",
     "ReplicatedStorage.Shared.Data.Meshes": "5205ad7d10f3df7b5dd98884491f8cee8e3212262081e35f24081f00e713934b",
-    "ReplicatedStorage.Shared.Data.NotebookPages": "769fae7ba0aad863073e72b3d3b5067b2a79c542ffccc63a576b9f045733946e",
+    "ReplicatedStorage.Shared.Data.NotebookPages": "9acda138f40c736318593cc1b065ae7c64b2a4742b9b7ba3554fd6843381df59",
     "ReplicatedStorage.Shared.Data.Peacock": "414137eafb2036a0b31aed37ae7c102f2fd9ecde72d66ed5e1ea5d8b84ff2292",
     "ReplicatedStorage.Shared.Data.RareSightings": "9c9ecae3407a6cd386b73d03033063275f5856b5a7cefebd74e64c4bab302b78",
     "ReplicatedStorage.Shared.Data.RivalRules": "d8e65efb2ae3390a127cc4ec748a7b37f5f97166ec4f8674f535ee6d6cc95349",
     "ReplicatedStorage.Shared.Data.SaveRules": "bfb00a1828ee32298b9232ffc9f78b0bc637f08e10f34d1c589db335ee71d3b9",
-    "ReplicatedStorage.Shared.Data.SettingsSpec": "cc65643f67d93badc92daa7e40c9a0bdbdf91716ea5ab838f56ea82b82023b90",
+    "ReplicatedStorage.Shared.Data.SettingsSpec": "24cc59bf6d1995634709e50aca8cc65ce27894284b08bab8a14a9e854b27f611",
     "ReplicatedStorage.Shared.Data.Species": "d1d0aeab2c11c5396346ad5bc75a04bf3773000e672409347548996c9f5c10a8",
     "ReplicatedStorage.Shared.Data.Surfaces": "5a7acd8fb49ce6e3ef329d2764926d328676fc0252e2ab8712dc598328b2fb24",
     "ReplicatedStorage.Shared.Data.Tarantula": "5c4cbf233df1eec332420e5b9fdc8dd3ed1f872a85eb25d66081e1049988e728",
@@ -118,13 +118,13 @@
     "ReplicatedStorage.Shared.Habitat.TestTarget": "518287f2411ca068df4b21ad8323f22b0c28a0c5c89a4ab2579a992760249df8",
     "ReplicatedStorage.Shared.Habitat.WindowsillLayout": "2e2de156471e13853d2d3511af3186d74708dcce7becdad4c72c3b921f1dd831",
     "ReplicatedStorage.Shared.Learning.FieldNotebook": "263ef25afc6e4960d1fff78c4cec933f79dd830de64b38bf80cffa0d52caa6c1",
-    "ReplicatedStorage.Shared.Learning.NotebookWatch": "88a81f8402a63d167ebc3065d6633149841aebdcc38ec6e5cf8bb5c8410e7679",
+    "ReplicatedStorage.Shared.Learning.NotebookWatch": "48a91583a065fad38519de0d3b79467c67dd76ac78d107e30bffdb5dc96e0037",
     "ReplicatedStorage.Shared.Life.Ballooning": "a840cb3031c2c0188a4ecefaa710b31a98ffcf0687885d41e9737749a6a58311",
-    "ReplicatedStorage.Shared.Life.Growth": "6fe4f70de302921d84fb05ac5e02b0a738e8b81f63630bb9fb7c27e64928728d",
+    "ReplicatedStorage.Shared.Life.Growth": "12909a3e2cc4d2e398ad80fa1ce11f4784458b3815bef4c3b5d1f5f71b7580ce",
     "ReplicatedStorage.Shared.Life.LifeClock": "87c5d5518af1def9da1f0c911bdee53a2852547370732196baaf2867edf1586e",
     "ReplicatedStorage.Shared.Life.LifeLoop": "e4d4c31e207a7dfa60bf757cba0f081172da4c385cf71a922ed5d70bac941e48",
-    "ReplicatedStorage.Shared.Life.LifeSession": "8287cda8db8785a2f5d65665c6a38447df28cd6ec32958a5e71cdf39826104fa",
-    "ReplicatedStorage.Shared.Life.Mating": "230560e9ba093ccf1d3a0eb89a85c94f681ade59e019b25cf44a5f2c89cfc2d0",
+    "ReplicatedStorage.Shared.Life.LifeSession": "35c3c729b91596b097d97c39ed215ebe61de8624ee59116f853d9298f299b292",
+    "ReplicatedStorage.Shared.Life.Mating": "1aced2f95ceba0b5317001e8d7a7f2f92b36beda31cf821a6ee6f6fb116e28d1",
     "ReplicatedStorage.Shared.Life.MatingScene": "1d75aea13afcd25ad39f9a6c7b4256c39cf220b241659827b315563ac761c96b",
     "ReplicatedStorage.Shared.Life.Nature": "6343684e766da7f95fe8984b6bd06c1f1044b69fe2bc6906a6efeaf9ca46ad8c",
     "ReplicatedStorage.Shared.Life.NeedsModel": "04a0c694dadc9e86c1d30d78d203debd2694bc9dc8c74798ad90759367e87add",
@@ -164,7 +164,7 @@
     "ReplicatedStorage.Shared.Persistence.RecoveryControllerPrototype": "b5e7d8f7621d9339db426c333541a62da4c139e9d66301639e2e030fb20deda8",
     "ReplicatedStorage.Shared.Persistence.RecoveryDestinationPrototype": "209fcd0234ed27edf3487f95db2d707c4664c9a08bc29f5f68b20a0c1f90b51a",
     "ReplicatedStorage.Shared.Persistence.RecoveryEntryClientPrototype": "09c43b50c3238a86085a291600d97f416863c5e6f3b0de026742816305314c53",
-    "ReplicatedStorage.Shared.Persistence.RecoveryLifePrototype": "81b73f110d18b9af6dd9fa9e980af4f30ffcf89719279fb855dacee76dc7493a",
+    "ReplicatedStorage.Shared.Persistence.RecoveryLifePrototype": "e56e054e142b0ca9ca11f8fb6336910ae8e04b0755397e6129c96a247151c6b4",
     "ReplicatedStorage.Shared.Persistence.RecoveryMealsPrototype": "b43055851a456b4fa80216a2d8d44c8d3b01e44bffedec8f1e69ac3229cd3892",
     "ReplicatedStorage.Shared.Persistence.RecoveryOperationAdmission": "c8f472f8ec3484f626acdbfb1bd052506240ea57d5f6a1f3f2c869ef519c448d",
     "ReplicatedStorage.Shared.Persistence.RecoveryProgressPrototype": "4c1c933f96c774809987482331f19ca8bd7364ea7ccd6a7db2149d8341bd1102",
@@ -223,7 +223,7 @@
     "ReplicatedStorage.Shared.Rig.PeacockDance": "8f79ee569bd0efe31c7b12476fa0fd08cb1b8f72c311881f292a1b896a594375",
     "ReplicatedStorage.Shared.Rig.Setae": "638606450f52eaa87110ee2a1c1d61c3003f67e026c95c797f97ccec38917504",
     "ReplicatedStorage.Shared.Rig.SpiderChoice": "68ffa8369927f98e5e063742401c71c971c63070b73d487c1cc002c59e4bb2c4",
-    "ReplicatedStorage.Shared.Rig.SpiderRig": "780c65eb7849254f5c0401eb0111aeae8caf7f2c1d8eca97ae864feed0355008",
+    "ReplicatedStorage.Shared.Rig.SpiderRig": "a9f7a034d01a7ba8c22e16f7cd79215035adf1cddd7d544a560e638d517d5a0d",
     "ReplicatedStorage.Shared.Rig.TarantulaPose": "0b8c8dc963aac985d827b9f75325bc45b30baaae1f3d6308c8513ce10f2f630f",
     "ReplicatedStorage.Shared.UI.AntMimicText": "553985d3f08813f557e1030cc9b64934e17e062ef92b09b8d2aa903f5170fcbe",
     "ReplicatedStorage.Shared.UI.BirdText": "74340b8a0867d490c9f9069e39f389773bcd5cf4cd40f6dd23ac71467ca5d2ed",
@@ -279,7 +279,7 @@
   "outputs": [
     {
       "file": "TheWindowsill.rbxlx",
-      "sha256": "164e9efe3751e3b565000ff72db87d2cb7703e031823f2935cd3da628c4f3b7d",
+      "sha256": "879c7df280aa7575be9ba837a25904fedf5c96677c1c2c69b754959f3a1660db",
       "selftest": false,
       "source_count": 273,
       "attributes": {
@@ -287,12 +287,12 @@
         "SelfTest": false,
         "TestTarget": false,
         "SaveWait": true,
-        "PortEvidence": "88c68c98a0324e8a"
+        "PortEvidence": "7c0bede90b301ac2"
       }
     },
     {
       "file": "TheWindowsillTests.rbxlx",
-      "sha256": "699529e24a72b58f1fae4c08f0346fe6ff4c3eccef66c94b5eb1aa7dd10c3c00",
+      "sha256": "522a4abce95819d8d794c58489fe9b50e13389603829f38ed5dcd3a77b63483b",
       "selftest": true,
       "source_count": 273,
       "attributes": {
@@ -301,7 +301,7 @@
         "TestTarget": false,
         "SaveWait": true,
         "SaveStore": "WindowsillTest_studio_integrated",
-        "PortEvidence": "88c68c98a0324e8a"
+        "PortEvidence": "7c0bede90b301ac2"
       }
     }
   ],

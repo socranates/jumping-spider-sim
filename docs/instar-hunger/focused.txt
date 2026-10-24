@@ -1,0 +1,5 @@
+INSTARS early=1527/10000 passed=10806 failed=0
+HUNGER_VEIL passed=230 failed=0
+GROWTH passed=574 failed=0
+checkpoint: 17947 characters, 87 tables
+CHECKPOINT passed=607 failed=0

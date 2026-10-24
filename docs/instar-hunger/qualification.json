@@ -1,0 +1,31 @@
+{
+  "qualified_at": "2026-10-24T16:25:41.002714+00:00",
+  "source_test_commit": "7841306564588933888f87e7040702968814db97",
+  "game_source_commit": "455dd28ffcc2c96e21297b8dacb2c1389c064a3b",
+  "native_source_commit": "2a2af3705aced1f262312d3a7e37db3022eb7219",
+  "evidence_id": "7c0bede90b301ac2",
+  "ordinary_sources": 273,
+  "native_sources": 276,
+  "native_run": "1792858219060",
+  "native_moults": 17,
+  "restored_moults": 3,
+  "native_adults": 3,
+  "native_creator_errors": 0,
+  "native_creator_warnings": 6,
+  "source_guards": 2,
+  "studio_exited": true,
+  "model_unchanged": true,
+  "native_model_sha256": "c2d413313b1120aa3bc1011601689fa40b3200648c9cd3c9a0bcde66d4630c44",
+  "native_log_sha256": "290a2689c1d7c9747123c07cb8445be11edfe74d81504a2af77f47e35501e7e6",
+  "full_ci_run": 40110260962,
+  "full_ci_conclusion": "success",
+  "full_ci_suites": 82,
+  "published": false,
+  "remaining_biology": [
+    "stage-sized prey/currency",
+    "retreat hazards",
+    "measured survival tuning",
+    "carapace-size calibration"
+  ],
+  "limits": "Synthetic seed and swallowed-food/reserve credits, scripted safe placement and accelerated moult clock. Ordinary growth, rest, local return and presentation. Unbound Studio/memory; not hunting, natural difficulty, online persistence, FPS or physical-device comfort."
+}

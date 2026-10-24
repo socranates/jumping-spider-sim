@@ -1,3 +1,5 @@
+> Current new gameplay candidate: evidence **7c0bede90b301ac2**, 273 sources, unpublished. See [instar/hunger plan](../docs/instar-hunger/PLAN.md) and its native/CLI receipts. Run is after moult 2; lock-on after moult 5. Full 82-suite CI 40110260962 SUCCEEDED on 78413065. The remaining biological features and broad audit are open. Older growth holds below have been superseded by Nathan's approved plan.
+
 Latest mating-fix supplement, 2026-10-24: game source fdf88814 after 79dd87f2,
 test correction 75ff806d (legacy male-egg expectation); evidence 88c68c98a0324e8a, 273 ordinary sources. docs/mating-fixes/ records
 sex-bound reproduction (males never enter sac/guarding), female-rest identity,

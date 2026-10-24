@@ -1,0 +1,12 @@
+{
+  "passed": false,
+  "stopped": true,
+  "reason": "Synthetic food credit did not refuel the reserve. Normal starved after fourth moult; stopped rather than waiting for the pending checkpoint deadline. Diagnostic fixture only corrected next run.",
+  "model_unchanged": true,
+  "model_sha256": "e27f55161765dc2c3b33c3413cc7ea3d41660335eb5531c32959553ecbe0ff4a",
+  "log_sha256": "c4fdf023049f99a8944fce46ddb2e410593bb51d20c6636845d187e83624a65b",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T160015Z_Studio_1B283_last.log",
+  "pid": 25636,
+  "published": false,
+  "studio_exited": true
+}

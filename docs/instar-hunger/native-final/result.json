@@ -1,0 +1,477 @@
+{
+  "passed": true,
+  "source_commit": "2a2af3705aced1f262312d3a7e37db3022eb7219",
+  "run": "1792858219060",
+  "events": [
+    {
+      "kind": "RESTORED",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:29.627Z",
+      "data": {
+        "seed": 100,
+        "moulting": 11.999976666666667,
+        "mode": "main",
+        "adult": 8,
+        "stage": 0
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:30.548Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 3,
+        "stage": 1,
+        "goal": 4,
+        "can_run": false,
+        "skins": 1,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.075
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:31.937Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 4,
+        "stage": 2,
+        "goal": 6,
+        "can_run": true,
+        "skins": 2,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.15
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:33.400Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 5,
+        "stage": 3,
+        "goal": 8,
+        "can_run": true,
+        "skins": 3,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.2349999999999999
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:34.899Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 6,
+        "stage": 4,
+        "goal": 11,
+        "can_run": true,
+        "skins": 4,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.32
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:36.440Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": true,
+        "instar": 7,
+        "stage": 5,
+        "goal": 15,
+        "can_run": true,
+        "skins": 5,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.4100000000000001
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:37.938Z",
+      "data": {
+        "adult_now": true,
+        "can_lock": true,
+        "instar": 8,
+        "stage": 6,
+        "goal": 20,
+        "can_run": true,
+        "skins": 6,
+        "mode": "main",
+        "adult": 8,
+        "size": 1.5
+      }
+    },
+    {
+      "kind": "ADULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:38.019Z",
+      "data": {
+        "skins": 6,
+        "mode": "main",
+        "adult": 8,
+        "seed": 100
+      }
+    },
+    {
+      "kind": "RESTORED",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:38.324Z",
+      "data": {
+        "seed": 92,
+        "moulting": 11.999976666666667,
+        "mode": "main",
+        "adult": 7,
+        "stage": 0
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:39.261Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 3,
+        "stage": 1,
+        "goal": 4,
+        "can_run": false,
+        "skins": 1,
+        "mode": "main",
+        "adult": 7,
+        "size": 1.0899999999999999
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:40.641Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 4,
+        "stage": 2,
+        "goal": 6,
+        "can_run": true,
+        "skins": 2,
+        "mode": "main",
+        "adult": 7,
+        "size": 1.184
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:42.194Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 5,
+        "stage": 3,
+        "goal": 8,
+        "can_run": true,
+        "skins": 3,
+        "mode": "main",
+        "adult": 7,
+        "size": 1.286
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:44.007Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 6,
+        "stage": 4,
+        "goal": 15,
+        "can_run": true,
+        "skins": 4,
+        "mode": "main",
+        "adult": 7,
+        "size": 1.3920000000000001
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:45.479Z",
+      "data": {
+        "adult_now": true,
+        "can_lock": true,
+        "instar": 7,
+        "stage": 5,
+        "goal": 20,
+        "can_run": true,
+        "skins": 5,
+        "mode": "main",
+        "adult": 7,
+        "size": 1.5
+      }
+    },
+    {
+      "kind": "ADULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:45.622Z",
+      "data": {
+        "skins": 5,
+        "mode": "main",
+        "adult": 7,
+        "seed": 92
+      }
+    },
+    {
+      "kind": "RESTORED",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:45.940Z",
+      "data": {
+        "seed": 100,
+        "moulting": 11.999976666666667,
+        "mode": "free",
+        "adult": 8,
+        "stage": 0
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:46.873Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 3,
+        "stage": 1,
+        "goal": 2,
+        "can_run": false,
+        "skins": 1,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.075
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:48.265Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 4,
+        "stage": 2,
+        "goal": 3,
+        "can_run": true,
+        "skins": 2,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.15
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:49.665Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 5,
+        "stage": 3,
+        "goal": 4,
+        "can_run": true,
+        "skins": 3,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.2349999999999999
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:51.225Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": false,
+        "instar": 6,
+        "stage": 4,
+        "goal": 6,
+        "can_run": true,
+        "skins": 4,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.32
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:52.657Z",
+      "data": {
+        "adult_now": false,
+        "can_lock": true,
+        "instar": 7,
+        "stage": 5,
+        "goal": 8,
+        "can_run": true,
+        "skins": 5,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.4100000000000001
+      }
+    },
+    {
+      "kind": "MOULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:54.540Z",
+      "data": {
+        "adult_now": true,
+        "can_lock": true,
+        "instar": 8,
+        "stage": 6,
+        "goal": 10,
+        "can_run": true,
+        "skins": 6,
+        "mode": "free",
+        "adult": 8,
+        "size": 1.5
+      }
+    },
+    {
+      "kind": "ADULT",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:54.623Z",
+      "data": {
+        "skins": 6,
+        "mode": "free",
+        "adult": 8,
+        "seed": 100
+      }
+    },
+    {
+      "kind": "VEIL",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:10:57.623Z",
+      "data": {
+        "shown": false,
+        "opacity": 0,
+        "extent": 0.029999999329447746,
+        "food": 1
+      }
+    },
+    {
+      "kind": "VEIL",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:00.633Z",
+      "data": {
+        "shown": true,
+        "opacity": 0.1138690710067749,
+        "extent": 0.11255507916212082,
+        "food": 0.55
+      }
+    },
+    {
+      "kind": "VEIL",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:03.646Z",
+      "data": {
+        "shown": true,
+        "opacity": 0.38436806201934814,
+        "extent": 0.30866682529449463,
+        "food": 0.1
+      }
+    },
+    {
+      "kind": "SCREENSHOT_READY",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:03.646Z",
+      "data": {
+        "food": 0.1
+      }
+    },
+    {
+      "kind": "BAR",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:24.159Z",
+      "data": {
+        "fill": 0.10000000149011612,
+        "reserve": 0.1
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:24.259Z",
+      "data": {
+        "lockReleased": true,
+        "active": 0,
+        "requests": 20,
+        "gate": {
+          "actors": 1,
+          "history": 13,
+          "reserved": 0,
+          "started": 0,
+          "read": 13,
+          "write": 8,
+          "queued": 0,
+          "scopes": 0
+        },
+        "archives": 0,
+        "starts": 20,
+        "owners": [
+          {
+            "epoch": ":1792858215:1",
+            "closed": false
+          }
+        ],
+        "rests": {
+          "R_qa_normal_startup_main": "62697d23aee544fd",
+          "R_qa_normal_startup_free": "0be7edc415599b4c"
+        },
+        "optionsCreated": 11,
+        "optionsDestroyed": 11,
+        "ready": true
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792858219060",
+      "utc": "2026-10-24T16:11:24.260Z",
+      "data": []
+    }
+  ],
+  "moults": 17,
+  "restored_moults": 3,
+  "adults": 3,
+  "source_guards": 2,
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T16:08:58.055Z,109.055222,3a88,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:08:58.055Z,109.055222,3a88,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:08:58.055Z,109.055222,3a88,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:08:58.055Z,109.055222,3a88,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:09:08.682Z,119.682838,6d14,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T16:10:21.493Z,192.493988,43f0,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "model_sha256": "c2d413313b1120aa3bc1011601689fa40b3200648c9cd3c9a0bcde66d4630c44",
+  "model_unchanged": true,
+  "log_sha256": "290a2689c1d7c9747123c07cb8445be11edfe74d81504a2af77f47e35501e7e6",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T160709Z_Studio_BEA3E_last.log",
+  "studio_pid": 16320,
+  "studio_exited": true,
+  "published": false,
+  "limits": "Synthetic seed and swallowed-food/reserve credits, scripted safe placement and accelerated moult clock. Ordinary growth, rest, local return and presentation. Unbound Studio/memory; not hunting, natural difficulty, online persistence, FPS or physical-device comfort."
+}

@@ -1204,6 +1204,25 @@ ant.hang = first.hang
 
 local Appearances = { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle, first_spider_male = male } }
 
+-- Separate per-instar drawing tables. Preserve the approved costume endpoints
+-- and interpolate their old growth silhouette over five or six playable moults.
+-- These are visual tuning, not measured carapace dimensions for every instar.
+Appearances.instars = {} :: {[string]: {[number]: {number}}}
+for id,look in Appearances.profiles :: {[string]: any} do
+ local tables:{[number]: {number}}={}
+ local old=look.growth or {1,1.15,1.32,1.5}
+ for _,adult in {7,8} do
+  local scales={}
+  for stage=0,adult-2 do
+   local t=stage/(adult-2)*3
+   local i=math.min(3,math.floor(t))
+   table.insert(scales,old[i+1]+((old[math.min(4,i+2)] or old[4])-old[i+1])*(t-i))
+  end
+  tables[adult]=scales
+ end
+ Appearances.instars[id]=tables
+end
+
 -- (ROBLOX-127) The look a mate of `sex` ("male" or "female") is drawn with when `played` is the played spider's: the first spider's male mate has his own build
 -- (first_spider_male); every other mate is the played spider's own look, as before (ROBLOX-80).
 function Appearances.mateLook(played: string, sex: string?): string
@@ -2666,7 +2685,7 @@ NotebookPages.pages = {
 		trigger = "start",
 		title = "The bold jumping spider",
 		text = "The first spider is inspired by the bold jumping spider, Phidippus audax. It lives across much of North America, often on walls, fences and windowsills. Adults are about 6 to 19 millimetres long, not including legs, and females are usually bigger than males. Look for its shining green-blue mouthparts, called chelicerae, and the pale spots on its black abdomen.",
-		game = "The first spider is inspired by the bold jumper. The peacock spider, the ant mimic and the two tarantulas are costumes on the same body: other species, the same game rules. Our models and four growth stages (three moults) are stylised; one stud represents a centimetre.",
+		game = "The first spider is inspired by the bold jumper. The peacock spider, the ant mimic and the two tarantulas are costumes on the same body: other species, the same game rules. The game starts at instar 2 and draws adulthood at instar 7 or 8: five or six playable moults. All costumes share this bold-jumper growth model; drawn proportions and meal goals are game tuning. One stud represents a centimetre.",
 		godotGame = "This windowsill is built at true scale: one game unit is one centimetre, about the length of the spider.",
 		godotText = "The first spider is inspired by the bold jumping spider, Phidippus audax. It lives across much of North America, often on walls, fences and windowsills. Adults are about 6 to 15 millimetres long, and females are usually bigger than males. Look for its shining green-blue fangs and the pale spots on its black abdomen.",
 		sources = {
@@ -2871,7 +2890,7 @@ NotebookPages.pages = {
 		trigger = "adult",
 		title = "Grown up",
 		text = "Jumping spiders moult several times before they are adults. In the lab, males of the related Phidippus johnsoni matured after 5 to 7 moults and females after 6 to 8. Bold jumping spiders spend the winter as juveniles and become adults in spring.",
-		game = "The game compresses growth into three moults. Adulthood in a Standard main life opens Easy for this session. The male peacock look and dance are cosmetic choices at every gameplay stage.",
+		game = "The game follows a five- or six-moult playable ladder, with its maturity draw kept in the save. Meal goals and time are game tuning. Adulthood in a Standard main life opens Easy for this session. The male peacock look and dance are cosmetic choices at every gameplay stage.",
 		godotGame = "Your spider is an adult: you have finished the main life. The game shows only its last three moults.",
 		godotText = "Jumping spiders moult several times before they are adults. In the field, males of the related Phidippus johnsoni became adult after about six to eight moults and females after about seven to nine. Bold jumping spiders spend the winter as juveniles and become adults in spring.",
 		sources = {
@@ -3547,6 +3566,9 @@ SettingsSpec.LIST = {
 		note = "The view may turn to show the line while the spider hangs on it." },
 	-- ---------------------------------------------------------------- comfort and accessibility
 	{ id = "ReducedMotion", section = "comfort", label = "Reduced motion (a calmer spider body)", kind = "toggle", default = false },
+	{ id = "HungerDisplay", section = "comfort", label = "Hunger display", kind = "choice", default = "veil",
+		options = { { id = "veil", label = "Closing red edges" }, { id = "bar", label = "Small bar" } },
+		note = "The red edges slowly draw inward as food runs low. Choose the bar for a clear screen." },
 	{ id = "LargeText", section = "comfort", label = "Large text", kind = "toggle", default = false, note = "Menus, panels and the notebook." },
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
 	{ id = "AutomaticGrip", section = "comfort", label = "Hold prey and eat automatically", kind = "toggle", default = false,
@@ -7173,7 +7195,7 @@ function NotebookWatch.onCategory(self: any, category: string)
 end
 
 -- A life loop event ({kind, day}); `stage` is the growth stage after it.
-function NotebookWatch.onLife(self: any, kind: string, stage: number)
+function NotebookWatch.onLife(self: any, kind: string, stage: number, adult: boolean?)
 	if kind == "rest_started" then
 		self.book:notice("rest")
 	elseif kind == "woke" then
@@ -7182,7 +7204,7 @@ function NotebookWatch.onLife(self: any, kind: string, stage: number)
 		self.book:notice("moult_ready")
 	elseif kind == "moulted" then
 		self.book:notice("moulted")
-		if stage >= ADULT_STAGE then
+		if (if adult~=nil then adult else stage >= ADULT_STAGE) then
 			self.book:notice("adult")
 		end
 	end
@@ -7489,6 +7511,7 @@ return table.freeze(Ballooning)
             <string name="Source"><![CDATA[--!strict
 -- Frozen Godot scripts/life/growth.gd, LIFE-10..12. Durations and scales are game tuning, not measured instars.
 local Species = require(script.Parent.Parent.Data.Species)
+local Random = require(script.Parent.Parent.Prey.PreyRandom)
 local Growth = {}
 Growth.__index = Growth
 Growth.STAGES = { "young juvenile", "juvenile", "subadult", "adult" }
@@ -7499,9 +7522,17 @@ Growth.READY_FOOD = 0.9
 Growth.FLY_FOOD = 0.3
 -- The game's own rules (ROBLOX-88), opt-in like NeedsModel.game and Data/Catch.game: the housefly-equivalents a moult asks for. Godot's is 3 (READY_FOOD,
 -- pinned by tests/growth_reference.json); a Growth never given these replays it. Growth:useGameRules() applies them.
--- First and second game moults require seven and ten flies in every mode.
--- The later adult moult retains five in Normal and three in the gentle modes.
+-- Legacy Roblox rules, retained for old fixtures/tools. The live client opts
+-- into `instars` through useInstarRules instead.
 Growth.game = { firstMoultFlies = 7, secondMoultFlies = 10, moultFlies = 5, gentleMoultFlies = 3 }
+-- Live ladder, separate from the frozen four-stage reference above. Bailey's
+-- lab sample is the basis for this draw, not a population-wide survival claim.
+Growth.game.instars = {
+ first = 2, earlyAdult = 7, lateAdult = 8, earlyChance = .15,
+ meals = {4,6,8,11,15,20}, gentleMeals = {2,3,4,6,8,10},
+ -- A seven-instar life omits the middle (11-meal) requirement.
+ earlyGoals = {1,2,3,5,6}, runMoult = 2, lockMoult = 5,
+}
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
@@ -7518,6 +7549,48 @@ end
 function Growth.useGameRules(self: any,gentle: boolean?)
  self.readyFood=(if gentle==true then Growth.game.gentleMoultFlies else Growth.game.moultFlies)*Growth.FLY_FOOD;self.gameRules=true
 end
+function Growth.nextSeed(seed: number, serial: number): number
+ return Random.mixed(seed,serial,73019).state
+end
+function Growth.drawMaturity(seed: number): number
+ return if Random.mixed(seed, 8163):next()<Growth.game.instars.earlyChance then 7 else 8
+end
+-- Applying this to an old life is a one-time, deterministic migration. Stage 1
+-- maps to instar 4; stage 2 to instar 6; adults stay adults. Historical abilities
+-- remain earned even if the new unlock is later. Never change consumed credit,
+-- a sticky ready flag, a running moult, softness, or the old skins.
+function Growth.useInstarRules(self: any, gentle: boolean?, seed: number?, fresh: boolean?)
+ if self.instarVersion==nil then
+  local old=self.stage
+  self.lifeSeed=math.floor(seed or 914)%2147483647
+  self.matureInstar=Growth.drawMaturity(self.lifeSeed)
+  self.instarVersion=1
+  if fresh~=true then
+   self.stage=if old>=3 then self.matureInstar-2 else old*2
+   self.earnedRun=old>=1;self.earnedLock=old>=2
+  end
+ end
+ self.gameRules=true;self.gentleRules=gentle==true
+ if not self:isAdult() then self.ready=self.ready or self.fedSinceMoult>=self:readyAt()-1e-9 end
+end
+function Growth.adultStage(self: any): number
+ return if self.instarVersion==1 then self.matureInstar-2 else Growth.ADULT
+end
+function Growth.instar(self: any): number return self.stage+2 end
+function Growth.visualStage(self: any): number
+ return self.stage/self:adultStage()*Growth.ADULT
+end
+function Growth.unlockedRun(self: any): boolean
+ return self.earnedRun==true or self.stage>=(if self.instarVersion==1 then Growth.game.instars.runMoult else 1)
+end
+function Growth.unlockedLock(self: any): boolean
+ return self.earnedLock==true or self.stage>=(if self.instarVersion==1 then Growth.game.instars.lockMoult else 2)
+end
+function Growth.unlockAt(self: any, ability: string): boolean
+ local threshold=if ability=="run" then Growth.game.instars.runMoult else Growth.game.instars.lockMoult
+ local earned=if ability=="run" then self.earnedRun else self.earnedLock
+ return self.instarVersion==1 and self.stage==threshold and earned~=true
+end
 -- What swallowing `energy` (of the reserves, in the units a housefly's meal is 0.35 of) credits toward a moult, in `fedSinceMoult`'s units: a housefly credits
 -- FLY_FOOD (0.3) whatever the moult asks for. One formula for the prey and the rival (a whole rival, Rival.FOOD 0.7, is two houseflies); it was written out twice in the client.
 function Growth.rivalCredit(energy: number): number
@@ -7529,6 +7602,12 @@ function Growth.mealsOf(energy: number): number
 end
 -- The food a moult asks for, in the units of `fedSinceMoult`, and in housefly-equivalents (3 by Godot's rule, 5 in the game).
 function Growth.readyAt(self: any): number
+ if self.instarVersion==1 then
+  local config=Growth.game.instars
+  local index=math.min(self.stage+1,self:adultStage())
+  if self.matureInstar==7 then index=config.earlyGoals[index] end
+  return (if self.gentleRules then config.gentleMeals[index] else config.meals[index])*Growth.FLY_FOOD
+ end
  if self.gameRules then
   if self.stage==0 then return Growth.game.firstMoultFlies*Growth.FLY_FOOD end
   if self.stage==1 then return Growth.game.secondMoultFlies*Growth.FLY_FOOD end
@@ -7536,14 +7615,16 @@ function Growth.readyAt(self: any): number
  return self.readyFood or Growth.READY_FOOD
 end
 function Growth.mealGoal(self: any): number return math.floor(self:readyAt()/Growth.FLY_FOOD+.5) end
-function Growth.isAdult(self: any): boolean return self.stage>=Growth.ADULT end
+function Growth.isAdult(self: any): boolean return self.stage>=self:adultStage() end
 function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 end
--- Discovered through movement after the first completed moult. Derive this from
--- the saved instar so old saves and a new generation need no extra unlock flag.
-function Growth.canRun(self: any): boolean return self.stage>=1 and not self:isMoulting() end
-function Growth.canLock(self: any): boolean return self.stage>=2 and not self:isMoulting() end
+-- New lives unlock after the second/fifth completed moult. Migration also keeps
+-- historical abilities already earned under the old three-moult rules.
+function Growth.canRun(self: any): boolean return self:unlockedRun() and not self:isMoulting() end
+function Growth.canLock(self: any): boolean return self:unlockedLock() and not self:isMoulting() end
 function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
-function Growth.stageName(self: any): string return Growth.STAGES[self.stage+1] end
+function Growth.stageName(self: any): string
+ return if self.instarVersion==1 then (if self:isAdult() then "adult" else `juvenile (instar {self:instar()})`) else Growth.STAGES[self.stage+1]
+end
 function Growth.reachFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_REACH else 1 end
 function Growth.speedFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_SPEED else 1 end
 function Growth.softness(self: any): number return if self:isMoulting() then 1 else math.clamp(self.softHoursLeft/Growth.SOFT_HOURS,0,1) end
@@ -7564,7 +7645,7 @@ function Growth.passHours(self: any, hours: number, at: Vector3): string
  if self:isMoulting() then
   self.moultingHoursLeft=math.max(0,self.moultingHoursLeft-hours)
   if self.moultingHoursLeft==0 then
-   self.stage=math.min(self.stage+1,Growth.ADULT)
+   self.stage=math.min(self.stage+1,self:adultStage())
    self.ready=false;self.fedSinceMoult=0;self.softHoursLeft=Growth.SOFT_HOURS
    table.insert(self.exuviae,at)
    return "moulted"
@@ -7578,18 +7659,31 @@ end
 function Growth.toRecord(self: any): any
  local skins={}
  for _,p in self.exuviae do table.insert(skins,{p.X,p.Y,p.Z}) end
- return {stage=self.stage,fed_since_moult=self.fedSinceMoult,ready=self.ready,
+ local record:any={stage=self.stage,fed_since_moult=self.fedSinceMoult,ready=self.ready,
   moulting_hours_left=self.moultingHoursLeft,soft_hours_left=self.softHoursLeft,exuviae=skins}
+ record.instar_version=self.instarVersion;record.mature_instar=self.matureInstar;record.life_seed=self.lifeSeed
+ record.gentle_rules=self.gentleRules;record.earned_run=self.earnedRun;record.earned_lock=self.earnedLock
+ return record
 end
 function Growth.problems(r: any): {string}
  if type(r)~="table" then return {"growth: not a record"} end
  local e={}
- if not finite(r.stage) or r.stage%1~=0 or r.stage<0 or r.stage>3 then table.insert(e,"growth: invalid stage") end
+ local adult=3
+ if r.instar_version~=nil then
+  if r.instar_version~=1 or (r.mature_instar~=7 and r.mature_instar~=8)
+   or not finite(r.life_seed) or r.life_seed%1~=0 or r.life_seed<0 or r.life_seed>=2147483647
+   or type(r.gentle_rules)~="boolean" then table.insert(e,"growth: invalid instar ladder")
+  else adult=r.mature_instar-2 end
+  for _,k in {"earned_run","earned_lock"} do if r[k]~=nil and type(r[k])~="boolean" then table.insert(e,"growth: invalid earned ability") end end
+ elseif r.mature_instar~=nil or r.life_seed~=nil or r.gentle_rules~=nil or r.earned_run~=nil or r.earned_lock~=nil then
+  table.insert(e,"growth: incomplete instar ladder")
+ end
+ if not finite(r.stage) or r.stage%1~=0 or r.stage<0 or r.stage>adult then table.insert(e,"growth: invalid stage") end
  for _,k in {"fed_since_moult","moulting_hours_left","soft_hours_left"} do
   if not finite(r[k]) or r[k]<0 then table.insert(e,"growth: invalid "..k) end
  end
  if type(r.ready)~="boolean" then table.insert(e,"growth: invalid ready") end
- if type(r.exuviae)~="table" or #r.exuviae>3 then table.insert(e,"growth: invalid old skins")
+ if type(r.exuviae)~="table" or #r.exuviae>adult then table.insert(e,"growth: invalid old skins")
  else for _,p in r.exuviae do
   if type(p)~="table" or #p~=3 or not finite(p[1]) or not finite(p[2]) or not finite(p[3]) then table.insert(e,"growth: invalid skin position") end
  end end
@@ -7599,6 +7693,9 @@ function Growth.load(self: any,r: any): boolean
  if #Growth.problems(r)>0 then return false end
  self.stage=r.stage;self.fedSinceMoult=r.fed_since_moult;self.ready=r.ready
  self.moultingHoursLeft=r.moulting_hours_left;self.softHoursLeft=r.soft_hours_left;self.exuviae={}
+ self.instarVersion=r.instar_version;self.matureInstar=r.mature_instar;self.lifeSeed=r.life_seed
+ self.gentleRules=r.gentle_rules;self.earnedRun=r.earned_run;self.earnedLock=r.earned_lock
+ if self.instarVersion==1 then self.gameRules=true end
  for _,p in r.exuviae do table.insert(self.exuviae,Vector3.new(p[1],p[2],p[3])) end
  return true
 end
@@ -8140,8 +8237,9 @@ function Session.begin(self: any, mode: string, easy: boolean): boolean
 	self.ended, self.summary, self.started = false, nil, true
 	return true
 end
-function Session.finishAdult(self: any, stage: number): boolean
-	if stage ~= 3 or self.mode ~= "main" or self.rules ~= "standard" or self.finishedMain then return false end
+function Session.finishAdult(self: any, stage: any): boolean
+ local adult=if type(stage)=="table" then stage:isAdult() else stage==3
+	if not adult or self.mode ~= "main" or self.rules ~= "standard" or self.finishedMain then return false end
 	self.finishedMain = true
 	return true
 end
@@ -8466,7 +8564,11 @@ function Mating.carryOn(life: any, needs: any, mealsFinished: number?): (number,
 	life.generation = generation
 	life.born = math.max(0, day - 1)
 	life.mealsBase = math.max(0, mealsFinished or 0)
+	local previous=life.growth
 	life.growth = Growth.new()
+	if previous.instarVersion==1 then
+	 life.growth:useInstarRules(needs.gentle,Growth.nextSeed(previous.lifeSeed,generation),true)
+	end
 	life.grantedSeen = needs.grantedTotal
 	life.mealFood = nil
 	life.lifeOver = false
@@ -16815,7 +16917,7 @@ local function freeze(t:any)
  if not table.isfrozen(t) then table.freeze(t) end
 end
 local CLOCK={day=true,hour=true,sleeping=true}
-local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true}
+local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true,instarVersion=true,matureInstar=true,lifeSeed=true,gentleRules=true,earnedRun=true,earnedLock=true}
 local MATING={player_sex=true,stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
  away_day=true,drive_offs=true,courts=true,rejections=true,cut_ins=true}
 local VISIT={id=true,serial=true,day=true,hour=true}
@@ -29996,6 +30098,14 @@ function SpiderRig.growthScale(self: Rig, stage: number): number
  local index=math.clamp(math.floor(stage),0,3)
  local scales=self._appearance.growth or Growth.SCALES
  return scales[index+1]
+end
+-- Live growth has its own instar ladder. The four art stages remain the style
+-- landmarks (including juvenile markings); scale advances at every moult.
+function SpiderRig.setLifeGrowth(self: Rig, growth: any)
+ if growth.instarVersion~=1 then self:setGrowthStage(growth.stage);return end
+ local art=math.clamp(math.floor(growth:visualStage()),0,3)
+ if art~=self._stage then self:setGrowthStage(art) end
+ self:setScale(Appearances.instars[self._appearance.id][growth.matureInstar][growth.stage+1])
 end
 -- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.
 function SpiderRig.setScale(self: Rig, g: number)
@@ -58886,7 +58996,7 @@ local function checks(): { Check }
 		-- Acquiring an adult fixture during the ranger's morning must not open
 		-- the nursery window behind the subsequent nursery checks.
 		ctx.life.clock.hour = 12
-		ctx.life.growth.stage = math.max(stage, 2)
+		ctx.life.growth.stage = math.max(stage, if ctx.life.growth.instarVersion==1 then 5 else 2)
 		local ok, err = pcall(function()
 		local motor, lock, lockOn, memory = ctx.motor, ctx.lock, ctx.lockOn, ctx.memory
 		need(lock ~= nil and lockOn ~= nil, "no lock in the hooks")
@@ -62117,7 +62227,7 @@ M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)
 M.rareHistory=M.RareLedger.new()
 if M.World.world=="preserve" then M.rareBody=M.RareBody.new(M.World.root) end
 M.World.life = life -- (ROBLOX-116: the preserve's nursery rule reads it, Client/HutLife)
-life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
+life.growth:useInstarRules(needs.gentle,math.floor(os.time()+os.clock()*1e6+(player.UserId or 0)),true)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
 -- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
@@ -62654,9 +62764,9 @@ local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {str
  M.birdSeen=nil;M.frogAt=nil
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
- life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
+ life.growth:useInstarRules(needs.gentle) -- One-time legacy migration; saved ladders keep their seed and draw.
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
- session:finishAdult(life.growth.stage)
+ session:finishAdult(life.growth)
 	session.summary = nil
 	controls:clear()
 	focusState:clear()
@@ -62682,7 +62792,7 @@ local function applyRules()
  needs:useGameRules()
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules()
- life.growth:useGameRules(needs.gentle)
+ life.growth:useInstarRules(needs.gentle)
 end
 local function closeScreens()
  if saveState.localRestore then saveState.localRestore:cancel() end
@@ -62704,6 +62814,8 @@ local function fresh(mode: string, easy: boolean, position: Vector3?, displayedO
  if not ok then return false end
  if M.rareBody then M.rareBody:clear();M.rareVisitor=nil;M.RareDirector.beginLife(M.rareHistory,life) end
  mateLegs.reset()
+ life.growth=Growth.new()
+ life.growth:useInstarRules(easy or mode=="free",Growth.nextSeed(math.floor(os.time()+os.clock()*1e6+(player.UserId or 0)),life.generation or 0),true)
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
@@ -63783,7 +63895,7 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance), life.growth.stage >= 1, life.growth.stage >= 2), -- (ROBLOX-92: one string, the one the Studio spec measures)
+		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance), life.growth:unlockedRun(), life.growth:unlockedLock()), -- (ROBLOX-92: one string, the one the Studio spec measures)
 		caption = if Q("eye_caption") then eyes:captionView(device) else nil,
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
@@ -63880,6 +63992,7 @@ local function updateHud(frameDt: number)
 	view.day = M.LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.day ..= mateLegs.Text.dayTag(mateLegs.Mating.generation(life))
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
+ view.hungerStyle=setting("HungerDisplay");view.hungerPaused=modal() or life.lifeOver or spiderPick.inspecting
 	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition, if prey.feeding.held then prey.feeding.held.profile.body.prey_kind else nil)
 	view.dayLine = M.LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
 	do -- (ROBLOX-113: which of LifeText.line's lines it is: the weak starving line is needed; the bar says hunger and the light says dusk)
@@ -63942,7 +64055,7 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
-	controls:setTouchVisible("Run", life.growth.stage >= 1 and not onLine and not life.growth:isMoulting() and not spiderPick.inspecting)
+	controls:setTouchVisible("Run", life.growth:canRun() and not onLine and not life.growth:isMoulting() and not spiderPick.inspecting)
 	M.Prof.lap("hud")
 	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
 		local o = motor:observer()
@@ -64235,7 +64348,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
-			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
+			if life.growth.instarVersion ~= 1 then life.growth:useInstarRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			M.World.prey:after(DT,motor,sensor,sightCast)
@@ -64332,17 +64445,18 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor() * M.Nature.coldSpeed(life))
    for _,event in life:drainEvents() do
-    watch:onLife(event.kind,life.growth.stage)
+    watch:onLife(event.kind,life.growth.stage,life.growth:isAdult())
     if event.kind=="woke" then mateLegs.woke(event.day) end
     if event.kind=="starved" then endLife("starved")
     elseif event.kind=="moult_started" then dropAll()
     elseif event.kind=="moulted" then
-     if life.growth.stage==1 then
+     if life.growth:unlockAt("run") then
       life:showNotice(life.morningText .. "\n" .. ControlText.runUnlocked(device));life.noticeSeconds=12
-     elseif life.growth.stage==2 then
+     elseif life.growth:unlockAt("lock") then
       life:showNotice(life.morningText .. "\n" .. ControlText.lockUnlocked(device));life.noticeSeconds=12
-     elseif session:finishAdult(life.growth.stage) then
-      life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
+     end
+     if session:finishAdult(life.growth) then
+      life:showNotice((if life.growth:unlockAt("lock") then ControlText.lockUnlocked(device).."\n" else "").."Your spider is an adult! Easy is now available in the life menu for this session.")
       life.noticeSeconds=12
      end
     end
@@ -64447,7 +64561,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig.reducedMotion=setting("ReducedMotion")==true
  mateLegs.coupleFrame(rig.reducedMotion,frameDt) -- (the mating scene's camera, cues and looks; before the rigs are drawn)
  rig:noteMeals(prey.feeding.mealsFinished) -- a meal ended: a longer cleaning once it stands still (ROBLOX-87)
- rig:setGrowthStage(life.growth.stage)
+ rig:setLifeGrowth(life.growth)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
  rig.hangDirection=if motor:onLine() and motor.silk.taut and not motor.seized then motor.silk:pivot()-motor.pos else nil
@@ -65127,6 +65241,48 @@ local FADE_SECONDS = 1.5
 local RESTING = 0.8 -- the transparency they settle to (a faint trace, not gone)
 local CALM_FOOD = 0.4 -- above this the hunger line settles; at or below it stays in full
 
+-- Four static, soft gradients, with a wide clear centre. No texture download,
+-- camera effect, flashing, heartbeat, or animation tied to the frame count.
+local function hungerEdges(parent: Instance): {Frame}
+ local edges={}
+ for i=1,4 do
+  local edge=Instance.new("Frame")
+  edge.Name="HungerEdge"..i;edge.BorderSizePixel=0;edge.Active=false
+  edge.BackgroundColor3=Color3.fromRGB(145,18,28);edge.BackgroundTransparency=1
+  edge.AnchorPoint=if i==2 then Vector2.new(1,0) elseif i==4 then Vector2.new(0,1) else Vector2.zero
+  edge.Position=if i==2 then UDim2.fromScale(1,0) elseif i==4 then UDim2.fromScale(0,1) else UDim2.fromScale(0,0)
+  local gradient=Instance.new("UIGradient")
+  gradient.Rotation=({0,180,90,270})[i]
+  gradient.Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(.45,.5),NumberSequenceKeypoint.new(1,1)})
+  gradient.Parent=edge;edge.Visible=false;edge.Parent=parent;table.insert(edges,edge)
+ end
+ return edges
+end
+
+-- The effect describes the reserve, not a separate damage meter. Bounds are
+-- fractions of each viewport dimension, so the centre stays clear on phones.
+function Hud.hungerVeil(food: number): (number,number)
+ local hunger=math.clamp((.85-food)/.85,0,1)
+ local pressure=hunger*hunger*(3-2*hunger)
+ return .03+.29*pressure,.4*pressure
+end
+
+function Hud._hunger(self:any,view:any,dt:number)
+ local shown=view.hungerStyle=="veil" and type(view.food)=="number" and view.hungerPaused~=true
+ local target=if shown then math.clamp(view.food,0,1) else 1
+ -- First display and resets start at the actual reserve; subsequent changes
+ -- ease over real elapsed time, independent of rendering speed or slow motion.
+ if not self.hungerShown or not shown then self.hungerFood=target
+ else self.hungerFood+=(target-self.hungerFood)*(1-math.exp(-math.max(0,dt)*2)) end
+ self.hungerShown=shown
+ local extent,opacity=Hud.hungerVeil(self.hungerFood)
+ for i,edge in self.hungerEdges do
+  edge.Visible=shown and opacity>.0001
+  edge.Size=if i<=2 then UDim2.fromScale(extent,1) else UDim2.fromScale(1,extent)
+  edge.BackgroundTransparency=1-opacity
+ end
+end
+
 local function corner(parent: Instance, r: number)
 	local c = Instance.new("UICorner")
 	c.CornerRadius = UDim.new(0, r)
@@ -65215,6 +65371,7 @@ function Hud.new(playerGui: Instance): any
 	centre.IgnoreGuiInset = true
 	centre.ScreenInsets = Enum.ScreenInsets.None
 	centre.Parent = playerGui
+	local edges=hungerEdges(centre)
 	local reticle = Instance.new("Frame")
 	reticle.Name = "Reticle"
 	reticle.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -65361,6 +65518,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
+		hungerEdges=edges,hungerFood=1,hungerShown=false,
 		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, reticleStroke = stroke, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, moultProgress = moultProgress, noteLabel = note, noteLeft = 0,
@@ -65440,7 +65598,7 @@ function Hud.minimalView(view: any): any
 	for line in string.gmatch(view.notice or "", "[^\n]+") do
 		if string.find(line,"^You can now run%.") or string.find(line,"^You can now lock on%.") then notice=line end
 	end
-	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
+	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,hungerStyle=view.hungerStyle,hungerPaused=view.hungerPaused,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,moultProgress=view.moultProgress,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
 		helpText=view.helpText,prompt=view.contextPrompt,status={},
 		caption=view.soundCaption,captionScale=view.captionScale,saveNoticePaused=view.saveNoticePaused}
@@ -65452,6 +65610,7 @@ function Hud.update(self: any, view: any, dt: number)
 		self.toastLabel.Visible=false;self.noteLabel.Visible=false
 		self.toastLeft=0;self.noteLeft=0
 	end
+	self:_hunger(view,dt)
 	self.foodText.Visible=not minimal
 	self.food.Size=UDim2.fromOffset(if minimal then 150 else HUNGER_WIDTH,if minimal then 6 else 22)
 	self.food.AutomaticSize=if minimal then Enum.AutomaticSize.None else Enum.AutomaticSize.Y
@@ -65473,6 +65632,7 @@ function Hud.update(self: any, view: any, dt: number)
 		self.track.BackgroundTransparency = 0.6 + 0.3 * a
 		if minimal then self.foodFill.BackgroundTransparency=.15;self.track.BackgroundTransparency=.55 end
 	end
+	if view.hungerStyle=="veil" then self.food.Visible=false end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
  self.court.Visible = view.court ~= nil
@@ -67104,7 +67264,7 @@ return WorldShadows
   <Item class="Workspace" referent="297">
     <Properties>
       <string name="Name">Workspace</string>
-      <BinaryString name="AttributesSerialize">BgAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADg4YzY4Yzk4YTAzMjRlOGEJAAAAU2F2ZVN0b3JlAiAAAABXaW5kb3dzaWxsVGVzdF9zdHVkaW9faW50ZWdyYXRlZAgAAABTYXZlV2FpdAMBCAAAAFNlbGZUZXN0AwEKAAAAVGVzdFRhcmdldAMABQAAAFdvcmxkAggAAABwcmVzZXJ2ZQ==</BinaryString>
+      <BinaryString name="AttributesSerialize">BgAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADdjMGJlZGU5MGIzMDFhYzIJAAAAU2F2ZVN0b3JlAiAAAABXaW5kb3dzaWxsVGVzdF9zdHVkaW9faW50ZWdyYXRlZAgAAABTYXZlV2FpdAMBCAAAAFNlbGZUZXN0AwEKAAAAVGVzdFRhcmdldAMABQAAAFdvcmxkAggAAABwcmVzZXJ2ZQ==</BinaryString>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
       <bool name="StreamingEnabled">true</bool>

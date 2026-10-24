@@ -20,7 +20,7 @@ The hunger effect uses four native UI gradients. Hunger changes their width and 
 
 ## Biology boundary
 
-[Bailey's thesis](https://core.ac.uk/download/pdf/215221609.pdf), Table II, reports 15% maturing at seven instars and 85% at eight in its laboratory sample. This is the basis for the game's configured maturity distribution, not a claim about every wild bold jumper or the other species offered as costumes. The source table was located in indexed primary-source text; no full-thesis review is claimed. The lab result does not establish the proposed wild survivorship percentages.
+[Bailey's thesis](https://core.ac.uk/download/pdf/215221609.pdf), Table II, reports 15% maturing at seven instars and 85% at eight in its laboratory sample. This is the basis for the game's configured maturity distribution, not a claim about every wild bold jumper or the other species offered as costumes. The source table was located in indexed primary-source text; no full-thesis review is claimed. The later Vickers et al. feeding study independently identifies instar 1 as inside the sac; its methods and Table 1 are reviewed in [FEEDING-RESEARCH.md](FEEDING-RESEARCH.md). The lab result does not establish the proposed wild survivorship percentages.
 
 ## Remaining approved plan, in separate tested increments
 

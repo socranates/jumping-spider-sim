@@ -1,3 +1,5 @@
+> This is a historical mating-only cohort. Nathan subsequently approved the instar ladder and changed the unlocks to completed moults 2 and 5. See [the later implementation and remaining plan](../instar-hunger/PLAN.md). Its earlier growth-hold paragraph does not describe the current candidate.
+
 # Mating corrections after Claude review — 2026-10-24
 
 Game-source commits `79dd87f2` and `fdf88814`, followed by test correction `75ff806d` on `codex/verified-integration`.

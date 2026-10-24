@@ -1,0 +1,13 @@
+2026-10-24T16:03:21.617Z,186.617111,5a38,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:03:21.617Z,186.617111,5a38,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:03:21.617Z,186.617111,5a38,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:03:21.617Z,186.617111,5a38,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:03:34.011Z,199.011490,09d4,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T16:04:03.117Z,228.117615,5370,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only
+2026-10-24T16:04:24.590Z,249.590042,5f60,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T16:04:32.379Z,257.379730,57a8,6,Info [FLog::CreatorOutput] [INSTAR_HUNGER_RESTORED] 1792857859331 {"seed":100,"moulting":11.999976666666667,"mode":"main","adult":8,"stage":0}
+2026-10-24T16:04:33.308Z,258.308960,673c,6,Info [FLog::CreatorOutput] [INSTAR_HUNGER_MOULT] 1792857859331 {"adult_now":false,"can_lock":false,"instar":3,"stage":1,"goal":4,"can_run":false,"skins":1,"mode":"main","adult":8,"size":1.075}
+2026-10-24T16:04:34.827Z,259.827881,673c,6,Info [FLog::CreatorOutput] [INSTAR_HUNGER_MOULT] 1792857859331 {"adult_now":false,"can_lock":false,"instar":4,"stage":2,"goal":6,"can_run":true,"skins":2,"mode":"main","adult":8,"size":1.15}
+2026-10-24T16:04:36.330Z,261.330048,0bbc,6,Info [FLog::CreatorOutput] [INSTAR_HUNGER_MOULT] 1792857859331 {"adult_now":false,"can_lock":false,"instar":5,"stage":3,"goal":8,"can_run":true,"skins":3,"mode":"main","adult":8,"size":1.2349999999999999}
+2026-10-24T16:04:38.313Z,263.313263,0bbc,6,Info [FLog::CreatorOutput] [INSTAR_HUNGER_MOULT] 1792857859331 {"adult_now":false,"can_lock":false,"instar":6,"stage":4,"goal":11,"can_run":true,"skins":4,"mode":"main","adult":8,"size":1.32}
+2026-10-24T16:06:12.504Z,357.504852,5370,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only

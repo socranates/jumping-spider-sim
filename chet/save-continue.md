@@ -1,3 +1,13 @@
+# Latest checkpoint - current schema, authority and world inventory, 2026-10-23
+
+The current 273-source model is unchanged. DATA-CURRENT.md reconciles envelope/checkpoint/compression versions, bounded sizes, P/R/A1/M1 keys, principal fields and reader/writer ownership against staged code. SECURITY-CURRENT.md reconciles actual ordinary/recovery/replacement/new-life boundaries; no new confirmed corruption/cross-player-write bug found in that scoped review. Historical DATA.md/SECURITY.md now link forward rather than presenting old limits/handlers as current. Semantic review of every graph/species field and hostile native traffic remain unproved.
+
+docs/audit/world_inventory.py generated and independently checked integrated-world/MAP.md and inventory.json from an isolated copy of the exact273 sources. All1404 records: Test Garden21 walkable; Preserve233 walkable +15 backdrop +1135 patches. It includes bounds, spawn, neighbor/retreat IDs, full/low/far draw counts and collision streaming policy. These are generator records in the CLI shim, not native instance counts, active draw totals, measured memory/FPS or close visual/collision traversal. No game or original test stage was edited. Retained world-current1 receipt/output are under docs/integrated-release.
+
+Current-candidate complete CLI first pass is running as prefix menu-full1, Python10612 / exec session54241. It uses unchanged run-cli.py and the exact Windowsill-menu-overflow-attempt1 stage. Do not mutate its game/test inputs or mistake partial output files for a completed receipt. The supplied foundation audit explicitly requests two complete runs for flake assessment. The private-upload question remains unanswered; no publication occurred. Native274/0/0 qualification and closed Studio checkpoint follow. Preserve unrelated save-cost output edits and sourcemap.
+
+---
+
 # Latest checkpoint - complete native Studio suite, 2026-10-23
 
 Current menu-corrected candidate passed the full native Studio self-test: 274 passed, 0 failed, 0 skipped, 591 seconds. docs/native-integrated contains exact-source pre/post guards, screenshots, bounded original output, ten retained CreatorWarning records, and a reproducible qualification. All 273 game sources stayed unchanged; the local test copy only sets Workspace.SelfTest=true. NEVER publish NativeSelfTest.rbxl. Its source is the same guarded private player candidate recorded below, with the dormant read-only arrival probe. Real test-store selection, no memory fixture or old PortTests runner. Studio8124 is closed; no owned Studio/Rojo/CLI job remains at this checkpoint.

@@ -1,3 +1,6 @@
+> Historical named-source review. For the private integrated candidate's
+> current message/ownership boundaries, see [SECURITY-CURRENT.md](SECURITY-CURRENT.md).
+
 # Authority and persistence review
 
 Baseline: v51, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`, place 140, evidence `d9ddc5e0ed43d301`.

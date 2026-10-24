@@ -1,3 +1,7 @@
+> Historical audit snapshot. For the private 273-source integrated candidate,
+> use [DATA-CURRENT.md](DATA-CURRENT.md). Schema, bounds, Preserve scheduling and
+> legacy-import statements below describe the earlier baseline.
+
 ## Runtime ownership and data flow
 
 Server/Main builds collision, decor and lighting and selects the active world before persistence validates it. Server/WorldFocus receives finite bounded positions and moves only the caller's replication focus. Server/Persistence owns SaveService and its once-per-second scheduler; it loads on join, flushes on leave/shutdown. SpiderClient owns the render callback and a 1/60 simulation accumulator; body/GUI draws follow the simulation. LookStream handles client-only looks, while collision comes from server models.

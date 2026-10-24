@@ -207,3 +207,39 @@ Private test 13 and production 140 retain their previous release evidence; the
 earlier private-test authorization was fulfilled. Current standalone Player,
 real-store rejoin, physical-phone, every natural life, whole-map clipping and
 matched-view FPS proof are not inferred. The engine startup gaps remain open.
+
+## Engine-phase follow-up (same game sources)
+
+Run 1792837500922, retained in phases-full1/, observes the unchanged ordinary
+273-source candidate with additional diagnostic phase counters. Its model is
+48fe6df9a527ca011b9f633cee613e815a5792f0bdd1b773eeb18548df06f433.
+The isolated stage is C:/Users/natha/claude-xfer/Windowsill-startup-phases-full1.
+All 276 staged sources compile/type-check. Both native guards, normal title
+readiness, cleanup and final PASS complete; zero CreatorErrors and six retained
+warnings. Editor 18116 is closed, and the original model hash is unchanged.
+
+The first PreAnimation/PreSimulation/PostSimulation callbacks occur at
+0.489568/0.489895/0.490160 seconds. The early render-priority callback first
+runs at 3.779363 seconds; the late callback follows at 3.789117 seconds,
+with one completed game render frame. The first PreRender event callback is
+3.789946 seconds. The two long Heartbeat intervals (2203.79 and 1057.34 ms)
+occur with simulation phase counts of two/three and no render callback yet.
+This localizes them before the first observed render work rather than inside
+a multi-second SpiderSim render callback. It does not identify the engine job
+or prove that game assets cannot contribute. A native MicroProfiler capture
+is still needed for that attribution.
+
+Two bounded Workspace inventories add 12.71 and 9.62 ms of diagnostic work.
+At client-hook readiness, Workspace holds 3092 descendants/2166 BaseParts:
+World 431/386, Decor 1294/724, WorldDecor 1/0. At finish the counts are
+6886/5060: World 1434/1279, Decor 1294/724, WorldDecor 2061/1484. These are
+actual parented Workspace objects. The broad Stats.InstanceCount values of
+54099/54352 at the long gaps must not be presented as this game's drawn-part
+count. Their exact internal composition is not established by the census.
+
+The diagnostic removes all four phase connections and both render bindings.
+No life or real save starts. These extra hooks and census work make this a
+separate instrumented cohort, not a direct speed comparison with full-late1.
+API references used for the observer: [RunService render bindings](https://create.roblox.com/docs/reference/engine/classes/RunService/BindToRenderStep),
+[Stats](https://create.roblox.com/docs/reference/engine/classes/Stats), and
+[MicroProfiler](https://create.roblox.com/docs/performance-optimization/microprofiler).

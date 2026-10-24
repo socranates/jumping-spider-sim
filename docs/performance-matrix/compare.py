@@ -4,9 +4,9 @@ Read saved native evidence; never infer a broad FPS gain from one pair.
 from pathlib import Path
 import argparse,hashlib,json,math
 H=Path(__file__).resolve().parent
-p=argparse.ArgumentParser();p.add_argument('--cohort',type=Path,default=H/'pair1');p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.cohort=a.cohort.resolve()
+p=argparse.ArgumentParser();p.add_argument('--cohort',type=Path,default=H/'pair1');p.add_argument('--builds',type=Path,default=H/'pair1-builds.json');p.add_argument('--require-matched',action='store_true');p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.cohort=a.cohort.resolve()
 sha=lambda b:hashlib.sha256(b).hexdigest()
-prepared=json.loads((H/'pair1-builds.json').read_text())
+prepared=json.loads(a.builds.read_text())
 models={(x['variant'],x['tier']):x for x in prepared['models']}
 records={};inputs={}
 for key,model in models.items():
@@ -53,9 +53,9 @@ for tier in ['full','low']:
    mean_change_percent=(aa['mean_ms']/b['mean_ms']-1)*100)
   assert all(math.isfinite(x)for x in [row['mean_change_percent'],b['mean_ms'],aa['mean_ms']])
   rows.append(row)
-record=dict(inputs=inputs,rows=rows,source_difference=prepared['changed_between_variants'],
+record=dict(inputs=inputs,preparation_sha256=sha(a.builds.read_bytes()),rows=rows,source_difference=prepared['changed_between_variants'],
  conditions_matched=not camera_mismatches,camera_mismatches=camera_mismatches,pairs=2,native_runs=4,workload_samples=36,
- limits='One pair per tier on one local Studio laptop. Authored clock/weather/input pattern match, but actual camera mismatches remain recorded below. These are descriptive observations, not a qualified matched-view comparison. Asynchronous actor phases, GC and machine load are not lockstep. Endpoint attachment is not continuous support proof. No production FPS, causal/general gain, long-memory or physical-phone claim.')
+ limits='One pair per tier on one local Studio laptop. Camera qualification is reported separately at the unchanged .01 tolerance. Asynchronous actor phases, GC and machine load are not lockstep. Endpoint attachment is not continuous support proof. No production FPS, causal/general gain, long-memory or physical-phone claim.')
 assert not a.out.exists(),'Keep prior comparison evidence'
 a.out.write_bytes((json.dumps(record,indent=2)+'\n').encode())
 table=['# Paired native workload observations','',record['limits'],'',
@@ -67,3 +67,4 @@ for row in rows:
  table.append(f"| {row['tier']} | {row['scene']} | {b['mean_ms']:.2f} | {aa['mean_ms']:.2f} | {row['mean_change_percent']:+.1f}% | {b['p95_ms']:.2f} | {aa['p95_ms']:.2f} |")
 a.out.with_suffix('.md').write_bytes(('\n'.join(table)+'\n').encode())
 print(json.dumps(dict(native_runs=4,samples=36,conditions_matched=record['conditions_matched'],camera_mismatches=len(camera_mismatches),output=str(a.out))))
+if a.require_matched:assert record['conditions_matched'],'Retained result does not qualify: camera conditions differ'

@@ -1,5 +1,6 @@
 """Build unpublished unbound benchmark models from ordinary source.
-The legacy before variant replaces LookPlan only. Startup-clock uses current
+The before variant disables seeded base-record sharing in current LookPlan.
+It retains current planning policy and geometry. Startup-clock uses current
 ordinary sources with isolated timing hooks. No upload or external save access.
 """
 from pathlib import Path
@@ -18,7 +19,10 @@ original={f.relative_to(PORT/'src').as_posix():f.read_bytes().replace(b'\r\n',b'
 assert len(original)==273
 source=dict(original)
 if a.variant=='before':
- source['Shared/World/LookPlan.luau']=subprocess.check_output(['git','show','bd67582b5d53473f067244fc1e2e1f94adde173b:roblox_port/src/Shared/World/LookPlan.luau'],cwd=ROOT).replace(b'\r\n',b'\n')
+ key='Shared/World/LookPlan.luau';code=source[key].decode()
+ start=code.index('\t-- All detail levels are read-only views of one seeded decoration list.')
+ end=code.index('\tlocal out: { Garden.Drawn } = {}',start)
+ source[key]=(code[:start]+'\tlocal all = Region.decor(region)\n'+code[end:]).encode()
 probe=(ROOT/'docs/frame-ordinary/probe.luau').read_text()
 probe=probe.replace('ORDINARY_FRAME_','MATRIX_FRAME_').replace('"InstanceCount"}','"InstanceCount","DataReceiveKbps","DataSendKbps"}')
 probe=probe.replace('p50_ms=percentile(.5),','mean_ms=s.duration/math.max(1,s.frames)*1000,p50_ms=percentile(.5),')
@@ -135,6 +139,6 @@ guard='assert(game.PlaceId==0 and game.GameId==0 and not game:GetService("RunSer
 if a.seam_group:guard='assert(workspace:GetAttribute("SeamGroup")=='+json.dumps(a.seam_group)+');'+guard
 guard+='for _,r in expected do local it=game;for n in string.gmatch(r[1],"[^.]+")do it=assert(it:FindFirstChild(n),r[1])end;local s=string.gsub(it.Source,"\\r\\n","\\n");local x,y=1,0;for i=1,#s do x=(x+string.byte(s,i))%65521;y=(y+x)%65521 end;assert(#s==r[2] and y*65536+x==r[3],r[1])end;assert(not game.ServerScriptService.Server.Persistence.Disabled);print("[MATRIX_GUARD]",'+str(source_count)+',"'+a.variant+'","'+a.tier+'","unbound memory_only")'
 (out/'guard.luau').write_bytes((guard+'\n').encode())
-manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,startup_waits=a.startup_clock,decor_nonblocking=True,exercise_decor=a.exercise_decor,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones. Decor exercise deliberately changes optional geometry after the title observation; that cohort is not a performance benchmark.')
+manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,startup_waits=a.startup_clock,startup_engine_phases=a.startup_clock,decor_nonblocking=True,exercise_decor=a.exercise_decor,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones. Decor exercise deliberately changes optional geometry after the title observation; that cohort is not a performance benchmark.')
 (out/'manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode())
 print(json.dumps(dict(place=str(place),sha256=manifest['place_sha256'],sources=source_count,variant=a.variant,tier=a.tier)),flush=True)

@@ -1,0 +1,61 @@
+{
+  "source_revision": "28b5dff91da1d855f8d22c5358462e0c95cdfc34",
+  "sources": 276,
+  "changed_between_variants": [
+    "ReplicatedStorage.Shared.World.LookPlan"
+  ],
+  "identical_fixture_sources": true,
+  "identical_sources_between_tiers": true,
+  "comparator": "Current planning policy and all current geometry; only shared seeded base-record reuse is disabled in before. Per-level caching remains in both.",
+  "native_order": [
+    "before-full",
+    "after-full",
+    "after-low",
+    "before-low"
+  ],
+  "models": [
+    {
+      "variant": "before",
+      "tier": "full",
+      "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-matrix-before-full-pair2\\Windowsill-matrix.rbxlx",
+      "sha256": "49986365913bc74793c1a95487c68a004569e0bc97bbc5823c80deb252c287e5",
+      "manifest_sha256": "b5c41b124bb4fed4263aa850ef356c6d133ef7204ca106423df5920e9432e3bc",
+      "compile": "compile 276/276",
+      "strict_exit_code": 0,
+      "native_executed": false
+    },
+    {
+      "variant": "after",
+      "tier": "full",
+      "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-matrix-after-full-pair2\\Windowsill-matrix.rbxlx",
+      "sha256": "043c24fae12ffd8053cfbe430f1acbe7665e1bff679bb734921da9be00f3a2e3",
+      "manifest_sha256": "0984efde1e940afc5068fd9406bdcd2e9af865704dd7a1f04901774cd92e8898",
+      "compile": "compile 276/276",
+      "strict_exit_code": 0,
+      "native_executed": false
+    },
+    {
+      "variant": "after",
+      "tier": "low",
+      "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-matrix-after-low-pair2\\Windowsill-matrix.rbxlx",
+      "sha256": "3f9e027612fd3270a8cec4b48ca5cc8d1bf35001a6f0928c6266ddd7ce18f9b3",
+      "manifest_sha256": "f52546a5a7425191a23e626b89c3b725ad3f0b51d74905f22a3773692ebe9200",
+      "compile": "compile 276/276",
+      "strict_exit_code": 0,
+      "native_executed": false
+    },
+    {
+      "variant": "before",
+      "tier": "low",
+      "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-matrix-before-low-pair2\\Windowsill-matrix.rbxlx",
+      "sha256": "231811e67e2591dea5cb8644503a8038a1f23a8de888614f20afa6e5745d0571",
+      "manifest_sha256": "00c17f9190ce4a1b1feb09eae42938421eb7d9039c5b82a93e279b535ba1f2e3",
+      "compile": "compile 276/276",
+      "strict_exit_code": 0,
+      "native_executed": false
+    }
+  ],
+  "equivalence_bundle_sha256": "ac4a8375a449402e2d2b4998629805118789fc9e12dc28630fc83993ce15951a",
+  "equivalence_output_sha256": "bb83fd1db011d9fc659dae6173480e60e0a3f83c6161108a88d7091e451e98d0",
+  "limits": "Preparation and CLI record/plan equivalence only. No native execution or causal/general FPS gain follows. All earlier failed or mismatched cohorts remain unchanged."
+}

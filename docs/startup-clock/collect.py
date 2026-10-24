@@ -24,6 +24,12 @@ assert not any(x['kind']=='FAIL'for x in events)and one('PASS')['unbound']
 ready=one('READY');assert ready['title_ready']and ready['save_ready']and ready['navigation']=='ready'
 cleanup=one('CLEANUP');assert cleanup['active']==cleanup['scopes']==cleanup['focus_lost']==0 and not cleanup['life_started']
 first=one('FIRST');summary=one('SUMMARY');assert summary['frames']>=60 and summary['wall_seconds']>=10
+if m.get('startup_engine_phases'):
+ counts=one('ENGINE_COUNTS');assert counts['listeners_disconnected']and counts['render_bindings_removed']
+ assert set(counts['phases'])=={'PreRender','PreAnimation','PreSimulation','PostSimulation','render-first','render-last'}
+ assert all(n>0 for n in counts['phases'].values())
+ firsts=[e['value']for e in events if e['kind']=='ENGINE_FIRST'];assert len(firsts)==6 and {x['name']for x in firsts}==set(counts['phases'])
+ inventory=[e['value']for e in events if e['kind']=='INVENTORY'];assert [x['name']for x in inventory]==['client-hooks-ready','finish']
 if m.get('exercise_decor'):
  assert all(one('DECOR_EXERCISE').values())
  restored=one('DECOR_RESTORED');assert restored['parts']>0 and restored['window_closed']and restored['collision_ready']and not restored['life_started']

@@ -1,5 +1,11 @@
 # Native performance matrix — in progress, 2026-10-24
 
+Current continuation: read PAIR2.md and pair2-builds.json. The builder's new
+before variant removes only base-record sharing from current LookPlan, keeping
+the newer hut-detail policy and ground identical. Its 4805 record/plan checks
+pass. Historical pair1 and the paragraphs below retain their original scope;
+they must not be reclassified as a corrected matched-view pair.
+
 This is an unpublished local Studio benchmark of the normal273-source integration
 candidate. It retains ordinary presentation, lighting, cat and other creatures.
 The three extra modules are the observer, timing probe and yielding in-memory

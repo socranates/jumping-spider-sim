@@ -1,0 +1,3 @@
+SCENERY_CACHE	2431	passed	0	failed	regions	300	old_generations	900	new_generations	300
+SCENERY_PHONE_CACHE	1800	passed	0	failed	regions	300	low_far_generations	300	upgrade_generations	300
+CURRENT_PLAN_EQUIVALENCE passed=574 failed=0

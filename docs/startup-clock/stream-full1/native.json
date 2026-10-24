@@ -1,0 +1,1340 @@
+{
+  "run": "1792844833876",
+  "tier": "full",
+  "model_sha256": "e1cb3f9e98a5a41a7db04c383848f51c10cf265b7c944f8f97f57bd70356b6a2",
+  "source_guards": 2,
+  "manifest_sha256": "431f7666153ddeacc8ce875f53356d512be8f40ab7ff508d07fd17e4b7f3b37d",
+  "native_output_sha256": "95d47e5199d296dec01b2889e3a927f28ba145831d64af70d26aeafa4a1141fa",
+  "events": [
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "client-enter",
+        "heap_kb": 2176,
+        "t": 5.599998985417187e-06,
+        "delta": 5.599998985417187e-06,
+        "server_at": 1792844833.872088
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "direct-imports-done",
+        "heap_kb": 12498,
+        "t": 0.3255334999994375,
+        "delta": 0.32552790000045206,
+        "server_at": 1792844834.197607
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-begin",
+        "heap_kb": 10074,
+        "t": 0.3442524999991292,
+        "delta": 0.018718999999691732,
+        "server_at": 1792844834.216324
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-import-begin",
+        "heap_kb": 10074,
+        "t": 0.34452020000026096,
+        "delta": 0.0002677000011317432,
+        "server_at": 1792844834.216587
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-dependencies-ready",
+        "heap_kb": 10643,
+        "t": 0.37257259999751113,
+        "delta": 0.028052399997250177,
+        "server_at": 1792844834.244644
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-import-end",
+        "heap_kb": 10645,
+        "t": 0.3728395000071032,
+        "delta": 0.0002669000095920637,
+        "server_at": 1792844834.244908
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-new-begin",
+        "heap_kb": 10645,
+        "t": 0.37366219999967143,
+        "delta": 0.0008226999925682321,
+        "server_at": 1792844834.245734
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-map-selected",
+        "heap_kb": 10646,
+        "t": 0.3739872000005562,
+        "delta": 0.00032500000088475645,
+        "server_at": 1792844834.246056
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "home-region-begin",
+        "heap_kb": 10647,
+        "t": 0.3741976000019349,
+        "delta": 0.00021040000137872994,
+        "server_at": 1792844834.246266
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "home-region-end",
+        "heap_kb": 10647,
+        "t": 0.37432970000372734,
+        "delta": 0.00013210000179242343,
+        "server_at": 1792844834.246397
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-bounds-ready",
+        "heap_kb": 10648,
+        "t": 0.37449309999647085,
+        "delta": 0.00016339999274350703,
+        "server_at": 1792844834.246562
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "home-collision-begin",
+        "heap_kb": 10648,
+        "t": 0.3746346999978414,
+        "delta": 0.0001416000013705343,
+        "server_at": 1792844834.246702
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "t": 0.38047639999422245,
+        "name": "PreAnimation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "t": 0.3808511999959592,
+        "name": "PreSimulation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "t": 0.38135670000337996,
+        "name": "PostSimulation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "FIRST",
+      "run": "1792844833876",
+      "value": {
+        "raw_dt_ms": 552.7780652046204,
+        "phase": "home-collision-begin",
+        "t": 0.38182330000563525,
+        "observed_since_begin_ms": 381.82330000563525,
+        "preprobe_span_lower_bound_ms": 170.95476519898511
+      }
+    },
+    {
+      "kind": "REQUIRED_WAIT",
+      "run": "1792844833876",
+      "value": {
+        "elapsed_ms": 36.3286999927368,
+        "parent": "Windowsill",
+        "found": true,
+        "began": 0.37479080000775866,
+        "child": "cover_bark_west"
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "home-pieces-ready",
+        "heap_kb": 10750,
+        "t": 0.4115285000007134,
+        "delta": 0.03689380000287201,
+        "server_at": 1792844834.2836
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "home-collision-end",
+        "heap_kb": 10750,
+        "t": 0.41167719999793917,
+        "delta": 0.00014869999722577631,
+        "server_at": 1792844834.283744
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-new-end",
+        "heap_kb": 10753,
+        "t": 0.4118198000069242,
+        "delta": 0.00014260000898502767,
+        "server_at": 1792844834.283885
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "world-client-end",
+        "heap_kb": 10754,
+        "t": 0.4119120999966981,
+        "delta": 9.229998977389187e-05,
+        "server_at": 1792844834.283978
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "module-table-done",
+        "heap_kb": 11233,
+        "t": 0.4409338999976171,
+        "delta": 0.02902180000091903,
+        "server_at": 1792844834.313003
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "spider-rig-begin",
+        "heap_kb": 11241,
+        "t": 0.44147910000174306,
+        "delta": 0.0005452000041259453,
+        "server_at": 1792844834.313546
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "spider-rig-end",
+        "heap_kb": 12248,
+        "t": 0.4636041000048863,
+        "delta": 0.022125000003143214,
+        "server_at": 1792844834.335676
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "stream-looks-begin",
+        "heap_kb": 12590,
+        "t": 0.47716330000548624,
+        "delta": 0.013559200000599958,
+        "server_at": 1792844834.349236
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "stream-looks-end",
+        "heap_kb": 12664,
+        "t": 0.48790079999889713,
+        "delta": 0.010737499993410893,
+        "server_at": 1792844834.359971
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "hud-begin",
+        "heap_kb": 12666,
+        "t": 0.48818559999926947,
+        "delta": 0.00028480000037234277,
+        "server_at": 1792844834.360251
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "hud-end",
+        "heap_kb": 12676,
+        "t": 0.4926318999932846,
+        "delta": 0.004446299994015135,
+        "server_at": 1792844834.364704
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "animal-bodies-begin",
+        "heap_kb": 12745,
+        "t": 0.5067922000016551,
+        "delta": 0.014160300008370541,
+        "server_at": 1792844834.378862
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "animal-bodies-end",
+        "heap_kb": 12926,
+        "t": 0.5207179999997607,
+        "delta": 0.013925799998105504,
+        "server_at": 1792844834.392788
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "render-binding-begin",
+        "heap_kb": 13329,
+        "t": 0.5728616999986116,
+        "delta": 0.052143699998850934,
+        "server_at": 1792844834.44493
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "client-hooks-ready",
+        "heap_kb": 13351,
+        "t": 0.5737605000031181,
+        "delta": 0.0008988000045064837,
+        "server_at": 1792844834.445826
+      }
+    },
+    {
+      "kind": "CLIENT",
+      "run": "1792844833876",
+      "value": {
+        "navigation": "pending",
+        "title_ready": false,
+        "save_ready": true,
+        "menu": false,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "INVENTORY",
+      "run": "1792844833876",
+      "value": {
+        "scan_ms": 9.93190000008326,
+        "name": "client-hooks-ready",
+        "t": 0.5784248999989359,
+        "workspace": {
+          "meshes": 647,
+          "scripts": 0,
+          "gui": 0,
+          "parts": 2245,
+          "instances": 3181
+        },
+        "roots": {
+          "WorldDecor": {
+            "meshes": 0,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 0,
+            "instances": 1
+          },
+          "Decor": {
+            "meshes": 388,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 724,
+            "instances": 1294
+          },
+          "World": {
+            "meshes": 0,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 465,
+            "instances": 520
+          }
+        }
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "t": 4.315478100004839,
+        "name": "render-first",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 1,
+        "t": 4.324812399994698,
+        "name": "render-last",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 1,
+        "t": 4.326637499994831,
+        "name": "PreRender",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792844833876",
+      "value": {
+        "name": "title-ready",
+        "heap_kb": 25173,
+        "t": 11.341027300004498,
+        "delta": 10.76726680000138,
+        "server_at": 1792844845.219097
+      }
+    },
+    {
+      "kind": "READY",
+      "run": "1792844833876",
+      "value": {
+        "navigation": "ready",
+        "title_ready": true,
+        "save_status": "saved",
+        "save_ready": true,
+        "menu": true,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792844833876",
+      "value": {
+        "focus_lost": 0,
+        "life_started": false,
+        "scopes": 0,
+        "active": 0
+      }
+    },
+    {
+      "kind": "ENGINE_COUNTS",
+      "run": "1792844833876",
+      "value": {
+        "listeners_disconnected": true,
+        "phases": {
+          "PreSimulation": 958,
+          "render-first": 952,
+          "PreRender": 952,
+          "render-last": 952,
+          "PostSimulation": 958,
+          "PreAnimation": 958
+        },
+        "render_bindings_removed": true,
+        "heartbeat": 957
+      }
+    },
+    {
+      "kind": "INVENTORY",
+      "run": "1792844833876",
+      "value": {
+        "scan_ms": 16.271999993477948,
+        "name": "finish",
+        "t": 21.436965700006112,
+        "workspace": {
+          "meshes": 1202,
+          "scripts": 0,
+          "gui": 0,
+          "parts": 5060,
+          "instances": 6886
+        },
+        "roots": {
+          "WorldDecor": {
+            "meshes": 359,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 1484,
+            "instances": 2061
+          },
+          "Decor": {
+            "meshes": 388,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 724,
+            "instances": 1294
+          },
+          "World": {
+            "meshes": 0,
+            "scripts": 0,
+            "gui": 0,
+            "parts": 1279,
+            "instances": 1434
+          }
+        }
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "phase": "client-hooks-ready",
+        "t": 3.0455408999987412,
+        "engine": {
+          "PhysicsStepTime": 0.0008975297096185386,
+          "InstanceCount": 55277,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "engine_phases": {
+          "PreSimulation": 5,
+          "PreAnimation": 5,
+          "PostSimulation": 5
+        },
+        "callback_interval_ms": 2260.772299996461,
+        "heap_kb": 13683,
+        "raw_dt_ms": 1895.3570127487183,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "phase": "client-hooks-ready",
+        "t": 4.288965500003542,
+        "engine": {
+          "PhysicsStepTime": 0.0008526531746610999,
+          "InstanceCount": 55419,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "engine_phases": {
+          "PreSimulation": 6,
+          "PreAnimation": 6,
+          "PostSimulation": 6
+        },
+        "callback_interval_ms": 1243.4246000048006,
+        "heap_kb": 13696,
+        "raw_dt_ms": 1592.949390411377,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 1,
+        "phase": "client-hooks-ready",
+        "t": 4.907137400005013,
+        "engine": {
+          "PhysicsStepTime": 0.0008100205450318754,
+          "InstanceCount": 55536,
+          "RenderGPUFrameTime": 0.0012825599405914545,
+          "RenderCPUFrameTime": 0.002714600181207061,
+          "FrameTime": 0.29941868782043457
+        },
+        "engine_phases": {
+          "PreSimulation": 7,
+          "render-first": 1,
+          "PreRender": 1,
+          "render-last": 1,
+          "PostSimulation": 7,
+          "PreAnimation": 7
+        },
+        "callback_interval_ms": 618.1719000014709,
+        "heap_kb": 14390,
+        "raw_dt_ms": 618.3006763458252,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 8.648499991977587,
+        "t": 4.907137400005013,
+        "name": "navigation startup",
+        "profile_frames": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "phase": "home-collision-begin",
+        "t": 0.38182330000563525,
+        "engine": {
+          "PhysicsStepTime": 5.000090095563792e-05,
+          "InstanceCount": 3536,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "engine_phases": {
+          "PreSimulation": 1,
+          "PreAnimation": 1,
+          "PostSimulation": 1
+        },
+        "callback_interval_ms": 381.82330000563525,
+        "heap_kb": 10657,
+        "raw_dt_ms": 552.7780652046204,
+        "first": true
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 269,
+        "phase": "client-hooks-ready",
+        "t": 9.944467599998461,
+        "engine": {
+          "PhysicsStepTime": 0.00018350747996009886,
+          "InstanceCount": 55870,
+          "RenderGPUFrameTime": 0.0020298699382692575,
+          "RenderCPUFrameTime": 0.006205799989402294,
+          "FrameTime": 0.01661369949579239
+        },
+        "engine_phases": {
+          "PreSimulation": 275,
+          "render-first": 269,
+          "PreRender": 269,
+          "render-last": 269,
+          "PostSimulation": 275,
+          "PreAnimation": 275
+        },
+        "callback_interval_ms": 261.48519999696873,
+        "heap_kb": 24670,
+        "raw_dt_ms": 260.9351575374603,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 9.376899994094856,
+        "t": 9.944467599998461,
+        "name": "navigation startup",
+        "profile_frames": 269
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "phase": "client-hooks-ready",
+        "t": 0.5864191000000574,
+        "engine": {
+          "PhysicsStepTime": 4.750085645355284e-05,
+          "InstanceCount": 7179,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "engine_phases": {
+          "PreSimulation": 2,
+          "PreAnimation": 2,
+          "PostSimulation": 2
+        },
+        "callback_interval_ms": 204.59579999442212,
+        "heap_kb": 13651,
+        "raw_dt_ms": 203.32135260105133,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 0,
+        "phase": "client-hooks-ready",
+        "t": 0.7847686000022804,
+        "engine": {
+          "PhysicsStepTime": 0.00019235772197134793,
+          "InstanceCount": 7303,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "engine_phases": {
+          "PreSimulation": 4,
+          "PreAnimation": 4,
+          "PostSimulation": 4
+        },
+        "callback_interval_ms": 180.66719999478664,
+        "heap_kb": 13681,
+        "raw_dt_ms": 181.5302073955536,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 349,
+        "phase": "title-ready",
+        "t": 11.341758900001878,
+        "engine": {
+          "PhysicsStepTime": 0.00016909121768549085,
+          "InstanceCount": 56721,
+          "RenderGPUFrameTime": 0.002799940062686801,
+          "RenderCPUFrameTime": 0.004948100075125694,
+          "FrameTime": 0.017525499686598778
+        },
+        "engine_phases": {
+          "PreSimulation": 355,
+          "render-first": 349,
+          "PreRender": 349,
+          "render-last": 349,
+          "PostSimulation": 355,
+          "PreAnimation": 355
+        },
+        "callback_interval_ms": 92.80640000361018,
+        "heap_kb": 25174,
+        "raw_dt_ms": 92.82930195331573,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 2.4108000070555136,
+        "t": 11.341758900001878,
+        "name": "prey",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 11.090399988461286,
+        "t": 11.341758900001878,
+        "name": "other rigs",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 7.659800001420081,
+        "t": 11.341758900001878,
+        "name": "sound",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 1.5098000003490597,
+        "t": 11.341758900001878,
+        "name": "rival",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 8.640399988507852,
+        "t": 11.341758900001878,
+        "name": "shadows",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 6.952700001420453,
+        "t": 11.341758900001878,
+        "name": "fly bodies",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 12.593800012837164,
+        "t": 11.341758900001878,
+        "name": "looks",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 1.0810999956447631,
+        "t": 11.341758900001878,
+        "name": "hud",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 6.600900000194088,
+        "t": 11.341758900001878,
+        "name": "spider rig",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 11.654000001726672,
+        "t": 11.341758900001878,
+        "name": "light",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 1.5460999857168645,
+        "t": 11.341758900001878,
+        "name": "wasp",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 4.249400008120574,
+        "t": 11.341758900001878,
+        "name": "navigation startup",
+        "profile_frames": 349
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 3,
+        "phase": "client-hooks-ready",
+        "t": 5.041604600002756,
+        "engine": {
+          "PhysicsStepTime": 0.0007310435175895691,
+          "InstanceCount": 55606,
+          "RenderGPUFrameTime": 0.005997240077704191,
+          "RenderCPUFrameTime": 0.09078900516033173,
+          "FrameTime": 0.5909205079078674
+        },
+        "engine_phases": {
+          "PreSimulation": 9,
+          "render-first": 3,
+          "PreRender": 3,
+          "render-last": 3,
+          "PostSimulation": 9,
+          "PreAnimation": 9
+        },
+        "callback_interval_ms": 85.45529999537393,
+        "heap_kb": 14696,
+        "raw_dt_ms": 87.89386600255966,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 8.223899989388883,
+        "t": 5.041604600002756,
+        "name": "navigation startup",
+        "profile_frames": 3
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 13,
+        "phase": "client-hooks-ready",
+        "t": 5.382611599998199,
+        "engine": {
+          "PhysicsStepTime": 0.0005073811043985188,
+          "InstanceCount": 55852,
+          "RenderGPUFrameTime": 0.0026035599876195192,
+          "RenderCPUFrameTime": 0.00439879996702075,
+          "FrameTime": 0.02753089927136898
+        },
+        "engine_phases": {
+          "PreSimulation": 19,
+          "render-first": 13,
+          "PreRender": 13,
+          "render-last": 13,
+          "PostSimulation": 19,
+          "PreAnimation": 19
+        },
+        "callback_interval_ms": 33.29649999795947,
+        "heap_kb": 17329,
+        "raw_dt_ms": 51.876500248909,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 9.178499996778555,
+        "t": 5.382611599998199,
+        "name": "navigation startup",
+        "profile_frames": 13
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 2,
+        "phase": "client-hooks-ready",
+        "t": 4.956149300007382,
+        "engine": {
+          "PhysicsStepTime": 0.0007695195381529629,
+          "InstanceCount": 55557,
+          "RenderGPUFrameTime": 0.0008038700325414538,
+          "RenderCPUFrameTime": 0.018675699830055237,
+          "FrameTime": 3.6185293197631836
+        },
+        "engine_phases": {
+          "PreSimulation": 8,
+          "render-first": 2,
+          "PreRender": 2,
+          "render-last": 2,
+          "PostSimulation": 8,
+          "PreAnimation": 8
+        },
+        "callback_interval_ms": 49.01190000236966,
+        "heap_kb": 13733,
+        "raw_dt_ms": 45.05953565239906,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 8.992899995064363,
+        "t": 4.956149300007382,
+        "name": "navigation startup",
+        "profile_frames": 2
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792844833876",
+      "value": {
+        "profile_frames": 12,
+        "phase": "client-hooks-ready",
+        "t": 5.34931510000024,
+        "engine": {
+          "PhysicsStepTime": 0.0005340853822417557,
+          "InstanceCount": 55843,
+          "RenderGPUFrameTime": 0.002976000076159835,
+          "RenderCPUFrameTime": 0.004211300052702427,
+          "FrameTime": 0.0274192001670599
+        },
+        "engine_phases": {
+          "PreSimulation": 18,
+          "render-first": 12,
+          "PreRender": 12,
+          "render-last": 12,
+          "PostSimulation": 18,
+          "PreAnimation": 18
+        },
+        "callback_interval_ms": 47.87159999250434,
+        "heap_kb": 16488,
+        "raw_dt_ms": 29.928749427199364,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792844833876",
+      "value": {
+        "ms": 8.18210000579711,
+        "t": 5.34931510000024,
+        "name": "navigation startup",
+        "profile_frames": 12
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "run": "1792844833876",
+      "value": {
+        "raw_after_first": {
+          "over50": 9,
+          "mean_ms": 22.000189649455532,
+          "p95_ms": 19.260980188846588,
+          "max_ms": 1895.3570127487183,
+          "p50_ms": 16.942625865340233,
+          "n": 956
+        },
+        "callback_after_first": {
+          "over50": 8,
+          "mean_ms": 21.998883995803382,
+          "p95_ms": 19.104400009382516,
+          "max_ms": 2260.772299996461,
+          "p50_ms": 16.684599992004223,
+          "n": 956
+        },
+        "frames": 957,
+        "wall_seconds": 21.447823399998015
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792844833876",
+      "value": {
+        "unbound": true,
+        "storage": "yielding-memory",
+        "detail": "full"
+      }
+    }
+  ],
+  "server_marks": [
+    {
+      "at": 1792844833.080389,
+      "heap_kb": 7826,
+      "name": "imports-begin",
+      "clock": 186.29001440000138
+    },
+    {
+      "at": 1792844833.103374,
+      "heap_kb": 8170,
+      "name": "imports-end",
+      "clock": 186.3129997000069
+    },
+    {
+      "at": 1792844833.108543,
+      "heap_kb": 8173,
+      "name": "decor-begin",
+      "clock": 186.31816850000178
+    },
+    {
+      "at": 1792844833.1493,
+      "heap_kb": 9336,
+      "name": "decor-end",
+      "clock": 186.35892529999546
+    },
+    {
+      "at": 1792844833.161637,
+      "heap_kb": 9336,
+      "name": "hidden-plan-begin",
+      "clock": 186.37126400000125
+    },
+    {
+      "at": 1792844833.168218,
+      "heap_kb": 10214,
+      "name": "physical-world-begin",
+      "clock": 186.37784319999628
+    },
+    {
+      "at": 1792844833.286543,
+      "heap_kb": 9532,
+      "name": "physical-world-end",
+      "clock": 186.49616830000014
+    }
+  ],
+  "first": {
+    "raw_dt_ms": 552.7780652046204,
+    "phase": "home-collision-begin",
+    "t": 0.38182330000563525,
+    "observed_since_begin_ms": 381.82330000563525,
+    "preprobe_span_lower_bound_ms": 170.95476519898511
+  },
+  "summary": {
+    "raw_after_first": {
+      "over50": 9,
+      "mean_ms": 22.000189649455532,
+      "p95_ms": 19.260980188846588,
+      "max_ms": 1895.3570127487183,
+      "p50_ms": 16.942625865340233,
+      "n": 956
+    },
+    "callback_after_first": {
+      "over50": 8,
+      "mean_ms": 21.998883995803382,
+      "p95_ms": 19.104400009382516,
+      "max_ms": 2260.772299996461,
+      "p50_ms": 16.684599992004223,
+      "n": 956
+    },
+    "frames": 957,
+    "wall_seconds": 21.447823399998015
+  },
+  "marks": [
+    {
+      "name": "client-enter",
+      "heap_kb": 2176,
+      "t": 5.599998985417187e-06,
+      "delta": 5.599998985417187e-06,
+      "server_at": 1792844833.872088
+    },
+    {
+      "name": "direct-imports-done",
+      "heap_kb": 12498,
+      "t": 0.3255334999994375,
+      "delta": 0.32552790000045206,
+      "server_at": 1792844834.197607
+    },
+    {
+      "name": "world-client-begin",
+      "heap_kb": 10074,
+      "t": 0.3442524999991292,
+      "delta": 0.018718999999691732,
+      "server_at": 1792844834.216324
+    },
+    {
+      "name": "world-client-import-begin",
+      "heap_kb": 10074,
+      "t": 0.34452020000026096,
+      "delta": 0.0002677000011317432,
+      "server_at": 1792844834.216587
+    },
+    {
+      "name": "world-client-dependencies-ready",
+      "heap_kb": 10643,
+      "t": 0.37257259999751113,
+      "delta": 0.028052399997250177,
+      "server_at": 1792844834.244644
+    },
+    {
+      "name": "world-client-import-end",
+      "heap_kb": 10645,
+      "t": 0.3728395000071032,
+      "delta": 0.0002669000095920637,
+      "server_at": 1792844834.244908
+    },
+    {
+      "name": "world-client-new-begin",
+      "heap_kb": 10645,
+      "t": 0.37366219999967143,
+      "delta": 0.0008226999925682321,
+      "server_at": 1792844834.245734
+    },
+    {
+      "name": "world-map-selected",
+      "heap_kb": 10646,
+      "t": 0.3739872000005562,
+      "delta": 0.00032500000088475645,
+      "server_at": 1792844834.246056
+    },
+    {
+      "name": "home-region-begin",
+      "heap_kb": 10647,
+      "t": 0.3741976000019349,
+      "delta": 0.00021040000137872994,
+      "server_at": 1792844834.246266
+    },
+    {
+      "name": "home-region-end",
+      "heap_kb": 10647,
+      "t": 0.37432970000372734,
+      "delta": 0.00013210000179242343,
+      "server_at": 1792844834.246397
+    },
+    {
+      "name": "world-bounds-ready",
+      "heap_kb": 10648,
+      "t": 0.37449309999647085,
+      "delta": 0.00016339999274350703,
+      "server_at": 1792844834.246562
+    },
+    {
+      "name": "home-collision-begin",
+      "heap_kb": 10648,
+      "t": 0.3746346999978414,
+      "delta": 0.0001416000013705343,
+      "server_at": 1792844834.246702
+    },
+    {
+      "name": "home-pieces-ready",
+      "heap_kb": 10750,
+      "t": 0.4115285000007134,
+      "delta": 0.03689380000287201,
+      "server_at": 1792844834.2836
+    },
+    {
+      "name": "home-collision-end",
+      "heap_kb": 10750,
+      "t": 0.41167719999793917,
+      "delta": 0.00014869999722577631,
+      "server_at": 1792844834.283744
+    },
+    {
+      "name": "world-client-new-end",
+      "heap_kb": 10753,
+      "t": 0.4118198000069242,
+      "delta": 0.00014260000898502767,
+      "server_at": 1792844834.283885
+    },
+    {
+      "name": "world-client-end",
+      "heap_kb": 10754,
+      "t": 0.4119120999966981,
+      "delta": 9.229998977389187e-05,
+      "server_at": 1792844834.283978
+    },
+    {
+      "name": "module-table-done",
+      "heap_kb": 11233,
+      "t": 0.4409338999976171,
+      "delta": 0.02902180000091903,
+      "server_at": 1792844834.313003
+    },
+    {
+      "name": "spider-rig-begin",
+      "heap_kb": 11241,
+      "t": 0.44147910000174306,
+      "delta": 0.0005452000041259453,
+      "server_at": 1792844834.313546
+    },
+    {
+      "name": "spider-rig-end",
+      "heap_kb": 12248,
+      "t": 0.4636041000048863,
+      "delta": 0.022125000003143214,
+      "server_at": 1792844834.335676
+    },
+    {
+      "name": "stream-looks-begin",
+      "heap_kb": 12590,
+      "t": 0.47716330000548624,
+      "delta": 0.013559200000599958,
+      "server_at": 1792844834.349236
+    },
+    {
+      "name": "stream-looks-end",
+      "heap_kb": 12664,
+      "t": 0.48790079999889713,
+      "delta": 0.010737499993410893,
+      "server_at": 1792844834.359971
+    },
+    {
+      "name": "hud-begin",
+      "heap_kb": 12666,
+      "t": 0.48818559999926947,
+      "delta": 0.00028480000037234277,
+      "server_at": 1792844834.360251
+    },
+    {
+      "name": "hud-end",
+      "heap_kb": 12676,
+      "t": 0.4926318999932846,
+      "delta": 0.004446299994015135,
+      "server_at": 1792844834.364704
+    },
+    {
+      "name": "animal-bodies-begin",
+      "heap_kb": 12745,
+      "t": 0.5067922000016551,
+      "delta": 0.014160300008370541,
+      "server_at": 1792844834.378862
+    },
+    {
+      "name": "animal-bodies-end",
+      "heap_kb": 12926,
+      "t": 0.5207179999997607,
+      "delta": 0.013925799998105504,
+      "server_at": 1792844834.392788
+    },
+    {
+      "name": "render-binding-begin",
+      "heap_kb": 13329,
+      "t": 0.5728616999986116,
+      "delta": 0.052143699998850934,
+      "server_at": 1792844834.44493
+    },
+    {
+      "name": "client-hooks-ready",
+      "heap_kb": 13351,
+      "t": 0.5737605000031181,
+      "delta": 0.0008988000045064837,
+      "server_at": 1792844834.445826
+    },
+    {
+      "name": "title-ready",
+      "heap_kb": 25173,
+      "t": 11.341027300004498,
+      "delta": 10.76726680000138,
+      "server_at": 1792844845.219097
+    }
+  ],
+  "creator_errors": 0,
+  "creator_warnings": 10,
+  "limits": "Unbound Studio ordinary startup/title only, memory backend and timing hooks. First raw dt and observed wall time are separate. After-first distributions span changing startup phases, not steady gameplay FPS. Not private Player startup, real storage or a before/after optimization claim."
+}

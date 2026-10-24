@@ -44,9 +44,10 @@ dance/threat pose; related pre-existing suites cover additional behavior.
   deferring the reference factory until module loaders exist. It is not the
   optimization's baseline regression result.
 
-Full CI run40093189495 is dispatched for the exact source commit. Until its
-receipt is added, all80-suite success remains pending; older79-suite success
-does not qualify this change.
+Full CI run40093189495 succeeds for the exact source commit at12:28:23Z.
+`github-ci.json` retains the primary API receipt. All80 suites, compile,
+strict types, exports and runner regression steps complete successfully.
+No exact Linux assertion count is inferred from workflow completion.
 
 ## Native engine geometry comparison
 

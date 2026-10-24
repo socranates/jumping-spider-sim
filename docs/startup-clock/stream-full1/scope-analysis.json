@@ -1,0 +1,2948 @@
+{
+  "raw_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\microprofile-20261024-072700-SillStart1.x.html",
+  "raw_sha256": "800862de4768f5ca458cf39677a7bb4b873318196dd6dc9ab1e98db0a278abf1",
+  "raw_bytes": 181119816,
+  "frames": [
+    {
+      "segment": 2,
+      "frame": 644,
+      "absolute": 9780,
+      "start_ms": 11503.772681831719,
+      "duration_ms": 1246.4914853286814,
+      "incomplete": false,
+      "paused": false,
+      "steps": 359288,
+      "stack_underflow_exits": 16,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 520,
+      "longest_scopes": [
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 1019.801250932172,
+          "start_ms": 11504.30022156473
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 987.5449208350547,
+          "start_ms": 11535.362809223068
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 940.347049391336,
+          "start_ms": 11583.74974394524
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 493.707216463904,
+          "start_ms": 11536.068603796153
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 493.1094337956892,
+          "start_ms": 12029.782784514025
+        },
+        {
+          "timer": "Script_Persistence",
+          "group": "Script",
+          "thread": " RBX Worker F",
+          "timer_id": 205,
+          "depth": 0,
+          "ms": 369.7249086092292,
+          "start_ms": 11910.22983111554
+        },
+        {
+          "timer": "Script_Main",
+          "group": "Script",
+          "thread": " RBX Worker F",
+          "timer_id": 206,
+          "depth": 0,
+          "ms": 206.71783664646722,
+          "start_ms": 12280.658199519185
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 85.49147865214258,
+          "start_ms": 12081.00859966662
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 73.15171202720512,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 73.15040936099513,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 68.7563166595395,
+          "start_ms": 11823.031439284434
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 53.163271441761424,
+          "start_ms": 11667.724627699137
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 52.34937436170242,
+          "start_ms": 12524.00586765264
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 52.34937436170242,
+          "start_ms": 12524.00586765264
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 52.3230304427326,
+          "start_ms": 12524.03221157161
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 52.322118576385606,
+          "start_ms": 12524.033123437957
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 52.32191816619945,
+          "start_ms": 12524.033323848143
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 52.29418223147832,
+          "start_ms": 11977.458430111501
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 52.06564531074116,
+          "start_ms": 12385.295183493301
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 51.2369784174839,
+          "start_ms": 12029.768063968331
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 50.40031641036279,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 50.38667849719508,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 50.38586683594116,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "Script_ServerStarterScript",
+          "group": "Script",
+          "thread": " RBX Worker A",
+          "timer_id": 204,
+          "depth": 5,
+          "ms": 50.365314771351166,
+          "start_ms": 12676.961055258067
+        },
+        {
+          "timer": "Script_Persistence",
+          "group": "Script",
+          "thread": " RBX Worker A",
+          "timer_id": 205,
+          "depth": 5,
+          "ms": 47.97316826936094,
+          "start_ms": 12524.088055869981
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 45.62326781709055,
+          "start_ms": 12549.594440630844
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 45.2067962442884,
+          "start_ms": 12685.226001814066
+        },
+        {
+          "timer": "Script_ServerStarterScript",
+          "group": "Script",
+          "thread": " RBX Worker A",
+          "timer_id": 204,
+          "depth": 5,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 44.59477276226255,
+          "start_ms": 12581.894901050951
+        },
+        {
+          "timer": "Script_ServerStarterScript",
+          "group": "Script",
+          "thread": " RBX Worker A",
+          "timer_id": 204,
+          "depth": 5,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 44.07170301144561,
+          "start_ms": 12626.508612575806
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 42.82041195267129,
+          "start_ms": 12342.469440629679
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 36.10926561093453,
+          "start_ms": 12472.098977688382
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 35.21819307331532,
+          "start_ms": 12595.221626467073
+        },
+        {
+          "timer": "assemble",
+          "group": "Physics",
+          "thread": " RBX Worker F",
+          "timer_id": 116,
+          "depth": 0,
+          "ms": 34.910702889658296,
+          "start_ms": 12487.432181079303
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 34.32990331463509,
+          "start_ms": 11943.122524511791
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 33.69786136013988,
+          "start_ms": 11600.934476087932
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "frame": 649,
+      "absolute": 9785,
+      "start_ms": 12928.28622078248,
+      "duration_ms": 533.2661634851515,
+      "incomplete": false,
+      "paused": false,
+      "steps": 35880,
+      "stack_underflow_exits": 15,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 347,
+      "longest_scopes": [
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 519.0277203595884,
+          "start_ms": 12934.805755362757
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 508.42307715244203,
+          "start_ms": 12945.589907226204
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 508.18018919229144,
+          "start_ms": 12945.63181299613
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 404.06402160696047,
+          "start_ms": 13049.926095134404
+        },
+        {
+          "timer": "GameLoad",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 2017,
+          "depth": 6,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "processPacket",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 1987,
+          "depth": 5,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "Replicator ProcessPackets",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1959,
+          "depth": 4,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1958,
+          "depth": 2,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 401.9563765701906,
+          "start_ms": 13050.564963560864
+        },
+        {
+          "timer": "Script_SpiderClient",
+          "group": "Script",
+          "thread": " RBX Worker E",
+          "timer_id": 230,
+          "depth": 7,
+          "ms": 377.31607486681884,
+          "start_ms": 13075.183139979685
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 50.72013015038334,
+          "start_ms": 13219.907582697462
+        },
+        {
+          "timer": "GameLoad",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 2017,
+          "depth": 6,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "processPacket",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 1987,
+          "depth": 5,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "Replicator ProcessPackets",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1959,
+          "depth": 4,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1958,
+          "depth": 2,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 50.210768873820484,
+          "start_ms": 13000.296236061207
+        },
+        {
+          "timer": "Script_PlayerScriptsLoader",
+          "group": "Script",
+          "thread": " RBX Worker E",
+          "timer_id": 228,
+          "depth": 7,
+          "ms": 48.4326294971778,
+          "start_ms": 13000.44556169091
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 48.06976681412914,
+          "start_ms": 12997.465993309808
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 39.293102909315564,
+          "start_ms": 13094.695566290979
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 34.975065873505,
+          "start_ms": 12962.403419581084
+        },
+        {
+          "timer": "GameLoad",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 2017,
+          "depth": 6,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "processPacket",
+          "group": "Network",
+          "thread": " RBX Worker E",
+          "timer_id": 1987,
+          "depth": 5,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "Replicator ProcessPackets",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1959,
+          "depth": 4,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 1958,
+          "depth": 2,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 34.72331936560522,
+          "start_ms": 12958.447001850125
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 34.49520205369532,
+          "start_ms": 13287.794859831745
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 34.49470186327238,
+          "start_ms": 13373.812484531061
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 32.61859196712879,
+          "start_ms": 13187.284431398599
+        },
+        {
+          "timer": "Script_ChatScript",
+          "group": "Script",
+          "thread": " RBX Worker E",
+          "timer_id": 224,
+          "depth": 7,
+          "ms": 32.13441056037118,
+          "start_ms": 12959.603739383072
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 28.537428498278132,
+          "start_ms": 13158.744507793503
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 28.314232509001954,
+          "start_ms": 13425.462227350425
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 25.791076198238613,
+          "start_ms": 12929.82840847902
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker B",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 25.789883757631003,
+          "start_ms": 12929.82840847902
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 25.010119454922403,
+          "start_ms": 13015.123383273552
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 24.660292619440554,
+          "start_ms": 13134.036797706498
+        },
+        {
+          "timer": "Allocate Bandwidth and Run Senders(Network_MegaOutgoing;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker B",
+          "timer_id": 1832,
+          "depth": 2,
+          "ms": 24.11789288864793,
+          "start_ms": 12931.485889650525
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker B",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 24.102551488897916,
+          "start_ms": 12931.486731373307
+        },
+        {
+          "timer": "Allocate Bandwidth and Run Senders",
+          "group": "Jobs",
+          "thread": " RBX Worker B",
+          "timer_id": 1833,
+          "depth": 4,
+          "ms": 24.098082341746704,
+          "start_ms": 12931.487072070622
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 22.66339550410254,
+          "start_ms": 13071.967528481331
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "frame": 652,
+      "absolute": 9788,
+      "start_ms": 13811.70706826788,
+      "duration_ms": 282.34831120555424,
+      "incomplete": true,
+      "paused": false,
+      "steps": 25829,
+      "stack_underflow_exits": 40,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 145,
+      "longest_scopes": [
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 164.25007606033887,
+          "start_ms": 13864.177119623175
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 164.2406968636269,
+          "start_ms": 13864.186498819887
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 164.23943427945414,
+          "start_ms": 13864.18776140406
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker F",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 159.64389886186558,
+          "start_ms": 13871.340671501614
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker F",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 159.64389886186558,
+          "start_ms": 13871.340671501614
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 159.64389886186558,
+          "start_ms": 13871.340671501614
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 159.62083123191815,
+          "start_ms": 13868.806364451597
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 159.61820585847954,
+          "start_ms": 13868.808989825035
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker F",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 150.56727101092747,
+          "start_ms": 13880.41729935255
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker F",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 150.5635032994278,
+          "start_ms": 13880.42106706405
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 141.52697794426012,
+          "start_ms": 13863.243499167993
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 141.52697794426012,
+          "start_ms": 13863.243499167993
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 141.52697794426012,
+          "start_ms": 13863.243499167993
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 139.017350991147,
+          "start_ms": 13890.51147944463
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 139.017350991147,
+          "start_ms": 13890.51147944463
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 139.017350991147,
+          "start_ms": 13890.51147944463
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 139.017350991147,
+          "start_ms": 13890.51147944463
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 139.017350991147,
+          "start_ms": 13890.51147944463
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 136.68456682133774,
+          "start_ms": 13868.085910290916
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 136.68260280151344,
+          "start_ms": 13868.08787431074
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 45.88821091822729,
+          "start_ms": 13817.859700229774
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 45.88525486798153,
+          "start_ms": 13817.860832547325
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 41.8803574954714,
+          "start_ms": 14051.092626186048
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker G",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 41.86023631278164,
+          "start_ms": 14051.112747368737
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker G",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 41.85767106239888,
+          "start_ms": 14051.11531261912
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker G",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 38.80750819322435,
+          "start_ms": 14054.165475488295
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker G",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 38.80537382474182,
+          "start_ms": 14054.167609856779
+        },
+        {
+          "timer": "assemble",
+          "group": "CodeGen",
+          "thread": " RBX Worker A",
+          "timer_id": 172,
+          "depth": 0,
+          "ms": 35.24971676055475,
+          "start_ms": 13833.573071305796
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 34.685592148061914,
+          "start_ms": 13973.882417499568
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 34.68274632341854,
+          "start_ms": 13973.882708094337
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 34.67890846835371,
+          "start_ms": 13973.883369447953
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 34.67196425540351,
+          "start_ms": 13973.886475805837
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 34.6677656620036,
+          "start_ms": 13973.888560071773
+        },
+        {
+          "timer": "Script_asset",
+          "group": "Script",
+          "thread": " RBX Worker G",
+          "timer_id": 191,
+          "depth": 5,
+          "ms": 33.3227126976376,
+          "start_ms": 13974.908166934845
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 27.289644617761496,
+          "start_ms": 13831.509207126755
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 27.28285071245091,
+          "start_ms": 13831.51071020315
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 27.28088669262661,
+          "start_ms": 13831.511401618294
+        },
+        {
+          "timer": "Script_ChatMain",
+          "group": "Script",
+          "thread": " RBX Worker D",
+          "timer_id": 225,
+          "depth": 5,
+          "ms": 27.07889326600298,
+          "start_ms": 13831.550291214917
+        },
+        {
+          "timer": "read_or_mmap",
+          "group": "Systems",
+          "thread": " RBX Worker F",
+          "timer_id": 29,
+          "depth": 5,
+          "ms": 13.83898470748045,
+          "start_ms": 13881.271297258296
+        },
+        {
+          "timer": "read_or_mmap",
+          "group": "Systems",
+          "thread": " RBX Worker E",
+          "timer_id": 29,
+          "depth": 5,
+          "ms": 13.398624240488857,
+          "start_ms": 14027.821726449618
+        },
+        {
+          "timer": "Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 1958,
+          "depth": 2,
+          "ms": 12.861804680816931,
+          "start_ms": 13818.153561685729
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 12.858247400012715,
+          "start_ms": 13818.154233059853
+        },
+        {
+          "timer": "Replicator ProcessPackets",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 1959,
+          "depth": 4,
+          "ms": 12.857105061951643,
+          "start_ms": 13818.154553716151
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 12.705223367333133,
+          "start_ms": 14038.37010741965
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 12.701255245647303,
+          "start_ms": 14038.372682690542
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "frame": 653,
+      "absolute": 9789,
+      "start_ms": 14094.055379473435,
+      "duration_ms": 2047.4954470328066,
+      "incomplete": true,
+      "paused": false,
+      "steps": 1033987,
+      "stack_underflow_exits": 38,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 2293,
+      "longest_scopes": [
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 854.422314813301,
+          "start_ms": 14555.423637137992
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 791.6943883258757,
+          "start_ms": 14618.154810687955
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 497.8808187135965,
+          "start_ms": 14911.935642043762
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 385.9798176522445,
+          "start_ms": 15023.844910025293
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 333.90001419689406,
+          "start_ms": 14400.290149884668
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 333.86381051428674,
+          "start_ms": 14400.324881387449
+        },
+        {
+          "timer": "Script_Plugin",
+          "group": "Script",
+          "thread": " RBX Worker G",
+          "timer_id": 195,
+          "depth": 5,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker G",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 315.7140423671708,
+          "start_ms": 14302.36383085032
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 299.948965045599,
+          "start_ms": 14428.945039210572
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 279.89470975502263,
+          "start_ms": 15129.855816886133
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 257.2640708783256,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 257.2630387658669,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 256.644713218529,
+          "start_ms": 15422.309691482342
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 256.63037386970973,
+          "start_ms": 15422.324030831162
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 256.6296624135489,
+          "start_ms": 15422.324742287323
+        },
+        {
+          "timer": "Heartbeat(Heartbeat;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 95,
+          "depth": 2,
+          "ms": 250.0631725616986,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 250.0455164242985,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "Heartbeat",
+          "group": "Jobs",
+          "thread": " RBX Worker E",
+          "timer_id": 96,
+          "depth": 4,
+          "ms": 250.04304135849952,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "RunService.Heartbeat",
+          "group": "Heartbeat",
+          "thread": " RBX Worker E",
+          "timer_id": 129,
+          "depth": 5,
+          "ms": 239.5420177329762,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "$namecall",
+          "group": "LuaBridge",
+          "thread": " RBX Worker F",
+          "timer_id": 1455,
+          "depth": 6,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "Script_CoreScripts/NotificationScript2",
+          "group": "Script",
+          "thread": " RBX Worker F",
+          "timer_id": 247,
+          "depth": 5,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "WaitingHybridScriptsJob",
+          "group": "Jobs",
+          "thread": " RBX Worker F",
+          "timer_id": 142,
+          "depth": 4,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker F",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "WaitingHybridScriptsJob(Default;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker F",
+          "timer_id": 141,
+          "depth": 2,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker F",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 238.82997036208383,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "Script_SettingsHub",
+          "group": "Script",
+          "thread": " RBX Worker E",
+          "timer_id": 296,
+          "depth": 6,
+          "ms": 238.57913780813715,
+          "start_ms": 15884.107919598302
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 238.4745637730025,
+          "start_ms": 15440.479840927868
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker C",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 238.4724594660479,
+          "start_ms": 15440.481945234824
+        },
+        {
+          "timer": "Script_StarterScript",
+          "group": "Script",
+          "thread": " RBX Worker F",
+          "timer_id": 235,
+          "depth": 7,
+          "ms": 231.20219918399334,
+          "start_ms": 15435.70644188759
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 197.90724413218038,
+          "start_ms": 15476.65818792997
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker A",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 197.89464835198066,
+          "start_ms": 15476.67078371017
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker A",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 197.89357615748474,
+          "start_ms": 15476.671855904666
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 195.61060226935894,
+          "start_ms": 15422.625508291712
+        },
+        {
+          "timer": "Thread (BG)",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 1,
+          "depth": 0,
+          "ms": 195.51619946869278,
+          "start_ms": 15421.821752384594
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 195.50983644528242,
+          "start_ms": 15421.828115408005
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker B",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 195.50946568643803,
+          "start_ms": 15421.828486166849
+        },
+        {
+          "timer": "LoadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 160,
+          "depth": 1,
+          "ms": 195.38084284648625,
+          "start_ms": 15422.855267714585
+        },
+        {
+          "timer": "DataModelPluginLoader::loadPlugin_new",
+          "group": "Studio",
+          "thread": " RBX Worker D",
+          "timer_id": 161,
+          "depth": 2,
+          "ms": 195.3796103238414,
+          "start_ms": 15422.85650023723
+        },
+        {
+          "timer": "PluginLoadUtils::loadPlugin",
+          "group": "Studio",
+          "thread": " RBX Worker A",
+          "timer_id": 162,
+          "depth": 3,
+          "ms": 193.8336265243596,
+          "start_ms": 15480.731805537791
+        },
+        {
+          "timer": "PluginInstancesSourceFile::getPluginWithInstancesAsChildren",
+          "group": "Studio",
+          "thread": " RBX Worker A",
+          "timer_id": 163,
+          "depth": 4,
+          "ms": 193.83188295574007,
+          "start_ms": 15480.733549106411
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "frame": 654,
+      "absolute": 9790,
+      "start_ms": 16141.550826506242,
+      "duration_ms": 1341.349875130853,
+      "incomplete": false,
+      "paused": false,
+      "steps": 309523,
+      "stack_underflow_exits": 21,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 606,
+      "longest_scopes": [
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 724.2505671609192,
+          "start_ms": 16310.621588807802
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 724.2495550894791,
+          "start_ms": 16310.621588807802
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 724.2481021156295,
+          "start_ms": 16310.621588807802
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 724.2336826027358,
+          "start_ms": 16310.621588807802
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 724.2317887264767,
+          "start_ms": 16310.621588807802
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 703.0038712627324,
+          "start_ms": 16319.369122257016
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 490.7438224373881,
+          "start_ms": 16319.436831255929
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 490.7408755726092,
+          "start_ms": 16319.44188159262
+        },
+        {
+          "timer": "Script_Plugin",
+          "group": "Script",
+          "thread": " RBX Worker C",
+          "timer_id": 195,
+          "depth": 5,
+          "ms": 484.1761501654395,
+          "start_ms": 16315.198456434073
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 359.01314323493546,
+          "start_ms": 17022.367443410156
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 359.0063702056859,
+          "start_ms": 17022.36415543054
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 291.0232773789257,
+          "start_ms": 17076.757173418544
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 256.6659366572426,
+          "start_ms": 17034.88345910322
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 256.6659366572426,
+          "start_ms": 17034.88345910322
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 256.6430097319467,
+          "start_ms": 17034.906386028517
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 256.6420878450904,
+          "start_ms": 17034.907307915375
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 256.641717086246,
+          "start_ms": 17034.90767867422
+        },
+        {
+          "timer": "Script_asset",
+          "group": "Script",
+          "thread": " RBX Worker C",
+          "timer_id": 191,
+          "depth": 5,
+          "ms": 255.0099973916067,
+          "start_ms": 17036.539398368855
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 223.19463984759113,
+          "start_ms": 16325.38111720582
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 212.17868395985113,
+          "start_ms": 16810.185582948856
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 212.16024664024627,
+          "start_ms": 16810.18607353629
+        },
+        {
+          "timer": "Script_asset",
+          "group": "Script",
+          "thread": " RBX Worker C",
+          "timer_id": 191,
+          "depth": 5,
+          "ms": 190.84896647196553,
+          "start_ms": 16831.452921513737
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 169.84067936626877,
+          "start_ms": 17058.74793331148
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 169.10816009486086,
+          "start_ms": 16548.578833349766
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 166.69420812957475,
+          "start_ms": 16855.665478153813
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 162.20595270215512,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 162.20595270215512,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 162.20595270215512,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 162.20595270215512,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 162.20595270215512,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 102.30123248098937,
+          "start_ms": 16548.57880412328
+        },
+        {
+          "timer": "PrepareBound",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1473,
+          "depth": 1,
+          "ms": 96.16704744168976,
+          "start_ms": 17386.563835789126
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 92.31680786239758,
+          "start_ms": 16226.80034952312
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 92.00690357103986,
+          "start_ms": 16227.07619368582
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 85.14486798262726,
+          "start_ms": 16410.421262515756
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 83.39026845243313,
+          "start_ms": 16717.705640777407
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 83.08834006896308,
+          "start_ms": 16227.08108327684
+        },
+        {
+          "timer": "Script_main",
+          "group": "Script",
+          "thread": " RBX Worker A",
+          "timer_id": 174,
+          "depth": 5,
+          "ms": 79.10125916200195,
+          "start_ms": 16148.224204295835
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 73.38958889765945,
+          "start_ms": 16319.483626616875
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 71.09528348359157,
+          "start_ms": 17411.684450982662
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 67.46230775206544,
+          "start_ms": 16873.06040049974
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 66.02491621195065,
+          "start_ms": 16160.772166625135
+        },
+        {
+          "timer": "Prepare",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1506,
+          "depth": 2,
+          "ms": 64.93006450944495,
+          "start_ms": 17417.790146878957
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 62.88375584518968,
+          "start_ms": 16810.17263645083
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker D",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 62.10339907986827,
+          "start_ms": 16144.532629460919
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "frame": 655,
+      "absolute": 9791,
+      "start_ms": 17482.900701637096,
+      "duration_ms": 527.8239238400307,
+      "incomplete": false,
+      "paused": false,
+      "steps": 24097,
+      "stack_underflow_exits": 17,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 344,
+      "longest_scopes": [
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 351.7393874652174,
+          "start_ms": 17634.79674144972
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 347.572648011837,
+          "start_ms": 17638.877965041625
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 335.23449468889805,
+          "start_ms": 17651.218874422146
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 333.4602132083388,
+          "start_ms": 17635.1185709822
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker H",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 112.74439685072787,
+          "start_ms": 17508.93779261191
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker G",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 112.670386204024,
+          "start_ms": 17508.95744199562
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 88.50971701370537,
+          "start_ms": 17509.958921757352
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 75.93980851645665,
+          "start_ms": 17522.368691242795
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 67.75359268456589,
+          "start_ms": 17873.30265021088
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 43.04076253482532,
+          "start_ms": 17686.55251211311
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 34.5029274488503,
+          "start_ms": 17873.286657895547
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 33.83682578321839,
+          "start_ms": 17535.002258783108
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 33.665073418642805,
+          "start_ms": 17772.3016681621
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 33.16259456188942,
+          "start_ms": 17907.79298229705
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 32.888664733988605,
+          "start_ms": 17636.93339460837
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 29.39618614594383,
+          "start_ms": 17568.843804226213
+        },
+        {
+          "timer": "Perform",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1523,
+          "depth": 0,
+          "ms": 24.12742364556317,
+          "start_ms": 17484.47901118208
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 23.938264821277755,
+          "start_ms": 17986.696947651297
+        },
+        {
+          "timer": "Write Marshalled",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 71,
+          "depth": 4,
+          "ms": 23.657991593463976,
+          "start_ms": 17940.87150478585
+        },
+        {
+          "timer": "TS::JobStep",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 47,
+          "depth": 3,
+          "ms": 23.657991593463976,
+          "start_ms": 17940.87150478585
+        },
+        {
+          "timer": "Write Marshalled(NotOrderDependent;Game)",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 70,
+          "depth": 2,
+          "ms": 23.657991593463976,
+          "start_ms": 17940.87150478585
+        },
+        {
+          "timer": "TS::Reschedule",
+          "group": "Jobs",
+          "thread": " RBX Worker A",
+          "timer_id": 87,
+          "depth": 1,
+          "ms": 23.657991593463976,
+          "start_ms": 17940.87150478585
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 23.657991593463976,
+          "start_ms": 17940.87150478585
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker F",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 19.6203680725975,
+          "start_ms": 17601.99007496092
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 18.079503918329465,
+          "start_ms": 17686.544356253577
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 18.064512818883998,
+          "start_ms": 17651.224304703148
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker E",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.842409482643575,
+          "start_ms": 17968.583624096533
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.293445065690776,
+          "start_ms": 17839.405110161766
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.282452984501504,
+          "start_ms": 17551.43878078938
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.194752234477278,
+          "start_ms": 17704.753315131653
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.16545310030415,
+          "start_ms": 17839.380219216648
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.157465919343508,
+          "start_ms": 17805.971791917433
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.110259299995164,
+          "start_ms": 17890.54224505955
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.098837171948105,
+          "start_ms": 17755.19519536206
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.967619020085635,
+          "start_ms": 17968.56457552586
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.795266259994037,
+          "start_ms": 17806.166750529002
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.754722444292838,
+          "start_ms": 17990.752928745213
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.719420190001983,
+          "start_ms": 17669.826899248357
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.719069472176216,
+          "start_ms": 17755.41853330855
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 16.654566201199202,
+          "start_ms": 17484.54567888307
+        },
+        {
+          "timer": "TS::ArbiterStep",
+          "group": "Jobs",
+          "thread": " RBX Worker C",
+          "timer_id": 46,
+          "depth": 1,
+          "ms": 16.65381466300113,
+          "start_ms": 17484.54567888307
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.64637944509485,
+          "start_ms": 17772.52817217201
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.631320289690336,
+          "start_ms": 17738.556740469743
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.629024758016442,
+          "start_ms": 17569.01927294718
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.594294925319787,
+          "start_ms": 17941.065141107712
+        }
+      ]
+    },
+    {
+      "segment": 3,
+      "frame": 922,
+      "absolute": 10058,
+      "start_ms": 22760.255186683466,
+      "duration_ms": 261.50931058410094,
+      "incomplete": false,
+      "paused": false,
+      "steps": 5280,
+      "stack_underflow_exits": 15,
+      "stack_overflow_steps": 0,
+      "scopes_over_1ms": 77,
+      "longest_scopes": [
+        {
+          "timer": "sessionTracking_ph2",
+          "group": "telem",
+          "thread": " RBX Worker C",
+          "timer_id": 53,
+          "depth": 1,
+          "ms": 261.24185317017043,
+          "start_ms": 22760.519748170205
+        },
+        {
+          "timer": "Thread (FG)",
+          "group": "Runtime",
+          "thread": " RBX Worker C",
+          "timer_id": 2,
+          "depth": 0,
+          "ms": 261.24185317017043,
+          "start_ms": 22760.519748170205
+        },
+        {
+          "timer": "HeapCategoryWalk",
+          "group": "Memory",
+          "thread": " RBX Worker C",
+          "timer_id": 2093,
+          "depth": 2,
+          "ms": 260.8995926542583,
+          "start_ms": 22760.567846614882
+        },
+        {
+          "timer": "PrepareBound",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1473,
+          "depth": 1,
+          "ms": 257.29740911279214,
+          "start_ms": 22764.335157294187
+        },
+        {
+          "timer": "Prepare",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1506,
+          "depth": 2,
+          "ms": 247.26984536658847,
+          "start_ms": 22774.34405283155
+        },
+        {
+          "timer": "SceneUpdater::UpdatePrepare",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1611,
+          "depth": 3,
+          "ms": 246.81797049935994,
+          "start_ms": 22774.75841091193
+        },
+        {
+          "timer": "SceneUpdater::updateInstancedClusters2",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1620,
+          "depth": 4,
+          "ms": 246.67734267173637,
+          "start_ms": 22774.827231769857
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 56.235769191140264,
+          "start_ms": 22761.052559526153
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 51.55259398162576,
+          "start_ms": 22919.46737194283
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 50.11657566880734,
+          "start_ms": 22817.292657577316
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 35.01925590203052,
+          "start_ms": 22867.444875362686
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.94476898522123,
+          "start_ms": 22919.46269194746
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.53274401342435,
+          "start_ms": 22867.450768257204
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.38174662875224,
+          "start_ms": 22885.06701317469
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.075358701119058,
+          "start_ms": 22953.846116054872
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.04301249707396,
+          "start_ms": 22783.09445339899
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.00551575124473,
+          "start_ms": 22800.204653410972
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 17.001857847826216,
+          "start_ms": 22834.11914732679
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.992699102319023,
+          "start_ms": 22902.470233754888
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.910922143380503,
+          "start_ms": 22766.11679466362
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.871211282515503,
+          "start_ms": 23004.086775272914
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.859897709985944,
+          "start_ms": 22902.516748959093
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.753981761646514,
+          "start_ms": 22817.28331804512
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker D",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.701675120581797,
+          "start_ms": 22971.02867374704
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.664096123072,
+          "start_ms": 22971.007220671658
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.27879877224717,
+          "start_ms": 22987.74429616402
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.26826721696483,
+          "start_ms": 22937.507184206268
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 16.208514084920864,
+          "start_ms": 22851.18679983873
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 11.012881261467442,
+          "start_ms": 22992.895619547875
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.963108556693896,
+          "start_ms": 22971.006237826703
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.772318894518662,
+          "start_ms": 22938.9181921629
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.727966450238114,
+          "start_ms": 23004.09683628178
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.667723983322958,
+          "start_ms": 22855.6119769951
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.58262063281552,
+          "start_ms": 22834.122002336902
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.495230936101052,
+          "start_ms": 22960.294334252885
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.29498024305451,
+          "start_ms": 22802.106485954508
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.278496922764646,
+          "start_ms": 22907.931581258694
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.259428728594628,
+          "start_ms": 22823.671402749256
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker B",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 10.227462886382,
+          "start_ms": 22887.125046252353
+        },
+        {
+          "timer": "PreRender",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1475,
+          "depth": 2,
+          "ms": 9.976930112672107,
+          "start_ms": 22764.362072382188
+        },
+        {
+          "timer": "fireBindToRenderStepCallbacks",
+          "group": "Render",
+          "thread": " RBX Main",
+          "timer_id": 1487,
+          "depth": 3,
+          "ms": 9.573734879660151,
+          "start_ms": 22764.43354867508
+        },
+        {
+          "timer": "Script_SpiderClient",
+          "group": "Script",
+          "thread": " RBX Main",
+          "timer_id": 230,
+          "depth": 4,
+          "ms": 9.484141505940443,
+          "start_ms": 22764.48620645149
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 9.279561952872996,
+          "start_ms": 22770.399770772405
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 9.183796780462217,
+          "start_ms": 22790.863995577805
+        },
+        {
+          "timer": "Sleep",
+          "group": "Runtime",
+          "thread": " RBX Worker A",
+          "timer_id": 11,
+          "depth": 0,
+          "ms": 8.910537491642572,
+          "start_ms": 22928.38748945889
+        }
+      ]
+    }
+  ],
+  "limits": "One local Studio startup file stream including Edit/Play transitions and post-PASS UI. Source includes an unused replicated LibMP wrapper loaded in Edit before capture. Incomplete frame logs and stack underflows prevent exhaustive attribution; inclusive scopes overlap and waits are not exclusive CPU."
+}

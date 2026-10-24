@@ -1,0 +1,105 @@
+{
+  "checked_at": "2026-10-24T12:31:14.4573696Z",
+  "run": {
+    "id": 40093189495,
+    "head_sha": "dd21210557990e0c0040b8028a714201de12e9d2",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/40093189495",
+    "created_at": "2026-10-24T12:15:32Z",
+    "updated_at": "2026-10-24T12:28:23Z"
+  },
+  "jobs": [
+    {
+      "id": 120869911896,
+      "name": "checks",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-24T12:15:35Z",
+      "completed_at": "2026-10-24T12:28:22Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-24T12:15:36Z",
+          "completed_at": "2026-10-24T12:15:37Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-24T12:15:37Z",
+          "completed_at": "2026-10-24T12:15:41Z"
+        },
+        {
+          "name": "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-24T12:15:41Z",
+          "completed_at": "2026-10-24T12:15:43Z"
+        },
+        {
+          "name": "Every module compiles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-24T12:15:43Z",
+          "completed_at": "2026-10-24T12:15:43Z"
+        },
+        {
+          "name": "Strict types",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-24T12:15:43Z",
+          "completed_at": "2026-10-24T12:15:46Z"
+        },
+        {
+          "name": "All suites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-24T12:15:46Z",
+          "completed_at": "2026-10-24T12:28:19Z"
+        },
+        {
+          "name": "Normal and self-test exports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-24T12:28:19Z",
+          "completed_at": "2026-10-24T12:28:19Z"
+        },
+        {
+          "name": "Runner failure and cleanup regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-24T12:28:19Z",
+          "completed_at": "2026-10-24T12:28:19Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-24T12:28:19Z",
+          "completed_at": "2026-10-24T12:28:20Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-24T12:28:20Z",
+          "completed_at": "2026-10-24T12:28:20Z"
+        }
+      ]
+    }
+  ],
+  "limits": "Pinned Linux workflow completed at exact source commit. No Linux assertion count or native/device/whole-game proof inferred."
+}

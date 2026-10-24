@@ -1,0 +1,52 @@
+{
+  "raw_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\microprofile-20261024-072700-SillStart1.x.html",
+  "raw_bytes": 181119816,
+  "raw_sha256": "800862de4768f5ca458cf39677a7bb4b873318196dd6dc9ab1e98db0a278abf1",
+  "model_sha256": "e1cb3f9e98a5a41a7db04c383848f51c10cf265b7c944f8f97f57bd70356b6a2",
+  "matched_ordinary_sources": 273,
+  "events": {
+    "CAPABILITY": {
+      "dataFormat": 65537,
+      "library": 65537,
+      "accessible": true,
+      "compatible": true,
+      "ready": true
+    },
+    "STREAM_START": {
+      "at": 1792844820.759468,
+      "status": {
+        "Active": false,
+        "StreamFrameId": 0,
+        "AbsoluteFrameId": 0,
+        "MarkerMask": 0,
+        "RecordedSizeKb": 0,
+        "MaxSizeKb": 0,
+        "ElapsedMs": 0
+      },
+      "accepted": true
+    },
+    "STREAM_STOP": {
+      "before": {
+        "Active": true,
+        "StreamFrameId": 4884,
+        "AbsoluteFrameId": 14028,
+        "MarkerMask": 0,
+        "RecordedSizeKb": 176359,
+        "MaxSizeKb": 262144,
+        "ElapsedMs": 91684
+      },
+      "at": 1792844912.480625,
+      "accepted": true
+    }
+  },
+  "sdk_source": "https://github.com/Roblox/libmp/releases/download/latest/LibMP.luau",
+  "sdk_sha256": "236fea082f323facd08109f9fd6dab70350bd0cc69617e07cc194778415a0bb8",
+  "sdk_python_archive_sha256": "6e8ebe95583620b05cc60dc73db14b5d0c1c5987a74aac024909771583594fdd",
+  "sdk_docs_commit": "23573b949ed027fdf8820f969bea525b96c357cc",
+  "wasmtime_version": "38.0.0",
+  "staged_compile_sources": 277,
+  "strict_sources": 276,
+  "strict_sdk_excluded": true,
+  "published": false,
+  "limits": "One local Studio file stream. Additional SDK module replicated but not imported by game scripts. It is loaded in Edit before capture. Closed scopes and incomplete frames do not prove exhaustive exclusive CPU attribution. No ordinary game source change or Player/mobile performance claim."
+}

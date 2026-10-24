@@ -1,0 +1,792 @@
+[INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\claude-xfer\Windowsill-startup-stream-full1\src\Shared\Diagnostics\LibMP.luau [game/ReplicatedStorage/Shared/Diagnostics/LibMP](101796,17): TypeError: Key 'ThreadLogDescr' not found in table '{| AppType: any, CaptureToSlotRequest: any, ContainerFormat: any, ContentMode: any, CounterDesc: any, CounterIteratorConfig: any, CounterIteratorState: any, CounterSample: any, CustomData16b: any, DataSlot: any, ExperimentalContentModeRequest: any, ExperimentalFileStreamStartRequest: any, ExperimentalMemoryStreamStartRequest: any, ExperimentalStreamMarkerRequest: any, ExperimentalStreamStatus: any, FlatBuffers: any, FrameDesc: any, GeneralInfo: any, GlobalDesc: any, GroupDesc: any, LabelBufferRegion... *TRUNCATED*'
+src/Shared/Diagnostics/LibMP.luau(335,7): LocalShadow: Variable 'source' shadows previous declaration at line 334
+src/Shared/Diagnostics/LibMP.luau(760,14): IntegerParsing: Hexadecimal number literal exceeded available precision and was truncated to 2^64
+src/Shared/Diagnostics/LibMP.luau(829,7): LocalShadow: Variable 'source' shadows previous declaration at line 828
+src/Shared/Diagnostics/LibMP.luau(835,7): LocalShadow: Variable 'source' shadows previous declaration at line 834
+src/Shared/Diagnostics/LibMP.luau(858,16): FunctionUnused: Function 'rt_multiply_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(862,16): FunctionUnused: Function 'rt_equal_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(903,7): LocalShadow: Variable 'source' shadows previous declaration at line 902
+src/Shared/Diagnostics/LibMP.luau(909,7): LocalShadow: Variable 'source' shadows previous declaration at line 908
+src/Shared/Diagnostics/LibMP.luau(921,7): LocalShadow: Variable 'source' shadows previous declaration at line 920
+src/Shared/Diagnostics/LibMP.luau(926,16): FunctionUnused: Function 'rt_negate_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(930,16): FunctionUnused: Function 'rt_add_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(934,16): FunctionUnused: Function 'rt_not_equal_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(938,16): FunctionUnused: Function 'rt_subtract_f64' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1064,1): GlobalUsedAsLocal: Global 'L3' is only used in the enclosing function 'module'; consider changing it to local
+src/Shared/Diagnostics/LibMP.luau(1068,17): LocalUnused: Variable 'L3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1081,1): GlobalUsedAsLocal: Global 'L1wT' is only used in the enclosing function 'module'; consider changing it to local
+src/Shared/Diagnostics/LibMP.luau(1087,13): LocalUnused: Variable 'LA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1095,8): UninitializedLocal: Variable 'L9' defined at line 1087 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1117,13): LocalUnused: Variable 'LO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1122,9): UninitializedLocal: Variable 'LN' defined at line 1117 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1230,9): UninitializedLocal: Variable 'Lh' defined at line 1222 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1405,10): UninitializedLocal: Variable 'L13' defined at line 1401 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1439,14): LocalUnused: Variable 'L1E' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1444,10): UninitializedLocal: Variable 'L1D' defined at line 1439 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1541,29): LocalUnused: Variable 'L1Z' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1547,10): UninitializedLocal: Variable 'L1V' defined at line 1541 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1569,14): LocalUnused: Variable 'L1g' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1574,10): UninitializedLocal: Variable 'L1f' defined at line 1569 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1699,14): LocalUnused: Variable 'L1x' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1705,10): UninitializedLocal: Variable 'L1w' defined at line 1699 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(1907,14): LocalUnused: Variable 'L2H' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(1913,10): UninitializedLocal: Variable 'L2G' defined at line 1907 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(2033,14): LocalUnused: Variable 'L2h' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(2037,10): UninitializedLocal: Variable 'L2g' defined at line 2033 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(2339,14): LocalUnused: Variable 'L32' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(2343,10): UninitializedLocal: Variable 'L31' defined at line 2339 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(2383,24): LocalUnused: Variable 'L3F' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(2387,10): UninitializedLocal: Variable 'L3C' defined at line 2383 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(2432,10): UninitializedLocal: Variable 'L3X' defined at line 2415 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(3485,14): LocalUnused: Variable 'L4B' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(3495,10): UninitializedLocal: Variable 'L4A' defined at line 3485 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(3564,14): LocalUnused: Variable 'L4P' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(3569,10): UninitializedLocal: Variable 'L4O' defined at line 3564 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(3723,10): UninitializedLocal: Variable 'L4k' defined at line 3716 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(3913,10): UninitializedLocal: Variable 'L56' defined at line 3906 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(4104,14): LocalUnused: Variable 'L5W' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(4109,10): UninitializedLocal: Variable 'L5V' defined at line 4104 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(4305,10): UninitializedLocal: Variable 'L6D' defined at line 4289 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(10023,10): UninitializedLocal: Variable 'L7T' defined at line 10013 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(10551,10): UninitializedLocal: Variable 'L83' defined at line 10546 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(10660,10): UninitializedLocal: Variable 'L8P' defined at line 10655 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(10989,10): UninitializedLocal: Variable 'L8n' defined at line 10984 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11092,14): LocalUnused: Variable 'L98' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11092,19): LocalUnused: Variable 'L99' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11101,9): UninitializedLocal: Variable 'L97' defined at line 11092 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11109,14): LocalUnused: Variable 'L9H' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11113,10): UninitializedLocal: Variable 'L9G' defined at line 11109 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11158,14): LocalUnused: Variable 'L9X' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11164,10): UninitializedLocal: Variable 'L9W' defined at line 11158 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11274,10): UninitializedLocal: Variable 'L9t' defined at line 11263 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11662,14): LocalUnused: Variable 'LAJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11662,19): LocalUnused: Variable 'LAK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11665,9): UninitializedLocal: Variable 'LAI' defined at line 11662 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11683,10): UninitializedLocal: Variable 'LAS' defined at line 11677 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(11787,14): LocalUnused: Variable 'LAr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(11790,10): UninitializedLocal: Variable 'LAq' defined at line 11787 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(12003,14): LocalUnused: Variable 'LBD' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(12014,10): UninitializedLocal: Variable 'LBC' defined at line 12003 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(12376,14): LocalUnused: Variable 'LBi' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(12384,10): UninitializedLocal: Variable 'LBh' defined at line 12376 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(12454,14): LocalUnused: Variable 'LC4' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(12467,10): UninitializedLocal: Variable 'LC3' defined at line 12454 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13167,14): LocalUnused: Variable 'LCb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13171,10): UninitializedLocal: Variable 'LCa' defined at line 13167 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13209,14): LocalUnused: Variable 'LCp' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13214,10): UninitializedLocal: Variable 'LCo' defined at line 13209 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13392,14): LocalUnused: Variable 'LD3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13397,10): UninitializedLocal: Variable 'LD2' defined at line 13392 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13500,19): LocalUnused: Variable 'LDM' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13500,24): LocalUnused: Variable 'LDN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13504,9): UninitializedLocal: Variable 'LDK' defined at line 13500 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13519,10): UninitializedLocal: Variable 'LDV' defined at line 13514 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13641,10): UninitializedLocal: Variable 'LDs' defined at line 13636 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13764,19): LocalUnused: Variable 'LEJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13768,10): UninitializedLocal: Variable 'LEH' defined at line 13764 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13855,19): LocalUnused: Variable 'LEg' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13858,10): UninitializedLocal: Variable 'LEe' defined at line 13855 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(13933,14): LocalUnused: Variable 'LEv' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(13938,11): UninitializedLocal: Variable 'LEu' defined at line 13933 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(14118,14): LocalUnused: Variable 'LF9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(14125,9): UninitializedLocal: Variable 'LF8' defined at line 14118 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(14351,14): LocalUnused: Variable 'LFh' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(14351,84): LocalUnused: Variable 'LFv' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(14375,9): UninitializedLocal: Variable 'LFg' defined at line 14351 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15458,14): LocalUnused: Variable 'LGN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15458,39): LocalUnused: Variable 'LGS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15465,9): UninitializedLocal: Variable 'LGM' defined at line 15458 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15489,14): LocalUnused: Variable 'LGZ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15493,10): UninitializedLocal: Variable 'LGY' defined at line 15489 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15517,14): LocalUnused: Variable 'LGk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15522,10): UninitializedLocal: Variable 'LGj' defined at line 15517 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15545,8): LocalUnused: Variable 'LGs' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15567,14): LocalUnused: Variable 'LH4' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15569,10): UninitializedLocal: Variable 'LH3' defined at line 15567 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15613,14): LocalUnused: Variable 'LHF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15618,10): UninitializedLocal: Variable 'LHE' defined at line 15613 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15649,14): LocalUnused: Variable 'LHQ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15654,10): UninitializedLocal: Variable 'LHP' defined at line 15649 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15693,14): LocalUnused: Variable 'LHf' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15698,10): UninitializedLocal: Variable 'LHe' defined at line 15693 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15772,14): LocalUnused: Variable 'LHv' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15775,10): UninitializedLocal: Variable 'LHu' defined at line 15772 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(15834,14): LocalUnused: Variable 'LI8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(15839,10): UninitializedLocal: Variable 'LI7' defined at line 15834 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16048,19): LocalUnused: Variable 'LIM' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16048,24): LocalUnused: Variable 'LIN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16052,9): UninitializedLocal: Variable 'LIK' defined at line 16048 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16062,14): LocalUnused: Variable 'LIV' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16068,10): UninitializedLocal: Variable 'LIU' defined at line 16062 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16141,14): LocalUnused: Variable 'LIr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16151,10): UninitializedLocal: Variable 'LIq' defined at line 16141 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16566,14): LocalUnused: Variable 'LJG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16575,10): UninitializedLocal: Variable 'LJF' defined at line 16566 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16708,14): LocalUnused: Variable 'LJW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16712,10): UninitializedLocal: Variable 'LJV' defined at line 16708 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16789,14): LocalUnused: Variable 'LJk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16793,10): UninitializedLocal: Variable 'LJj' defined at line 16789 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16870,14): LocalUnused: Variable 'LK3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16879,10): UninitializedLocal: Variable 'LK2' defined at line 16870 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(16955,14): LocalUnused: Variable 'LKS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(16965,10): UninitializedLocal: Variable 'LKR' defined at line 16955 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(17135,19): LocalUnused: Variable 'LKn' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(17142,10): UninitializedLocal: Variable 'LKl' defined at line 17135 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(17254,14): LocalUnused: Variable 'LLA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(17257,10): UninitializedLocal: Variable 'LL9' defined at line 17254 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(17370,14): LocalUnused: Variable 'LLS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(17376,10): UninitializedLocal: Variable 'LLR' defined at line 17370 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(17600,10): UninitializedLocal: Variable 'LLx' defined at line 17587 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(18899,10): UninitializedLocal: Variable 'LMp' defined at line 18894 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19002,14): LocalUnused: Variable 'LNB' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19013,10): UninitializedLocal: Variable 'LNA' defined at line 19002 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19053,14): LocalUnused: Variable 'LNV' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19053,19): LocalUnused: Variable 'LNW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19056,9): UninitializedLocal: Variable 'LNU' defined at line 19053 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19066,14): LocalUnused: Variable 'LNd' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19066,34): LocalUnused: Variable 'LNh' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19076,9): UninitializedLocal: Variable 'LNc' defined at line 19066 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19092,14): LocalUnused: Variable 'LNp' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19097,10): UninitializedLocal: Variable 'LNo' defined at line 19092 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19177,19): LocalUnused: Variable 'LO1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19177,24): LocalUnused: Variable 'LO2' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19181,9): UninitializedLocal: Variable 'LNz' defined at line 19177 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19190,14): LocalUnused: Variable 'LO8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19194,10): UninitializedLocal: Variable 'LO7' defined at line 19190 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19222,10): UninitializedLocal: Variable 'LON' defined at line 19219 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19385,14): LocalUnused: Variable 'LOo' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19390,10): UninitializedLocal: Variable 'LOn' defined at line 19385 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19457,10): UninitializedLocal: Variable 'LP8' defined at line 19454 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19648,14): LocalUnused: Variable 'LPc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19653,10): UninitializedLocal: Variable 'LPb' defined at line 19648 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19707,14): LocalUnused: Variable 'LPr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19707,19): LocalUnused: Variable 'LPs' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19710,9): UninitializedLocal: Variable 'LPq' defined at line 19707 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19717,14): LocalUnused: Variable 'LQ0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19719,10): UninitializedLocal: Variable 'LPz' defined at line 19717 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19740,19): LocalUnused: Variable 'LQH' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19740,24): LocalUnused: Variable 'LQI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19747,9): UninitializedLocal: Variable 'LQF' defined at line 19740 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19782,14): LocalUnused: Variable 'LQg' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19786,10): UninitializedLocal: Variable 'LQf' defined at line 19782 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19813,14): LocalUnused: Variable 'LQw' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19817,10): UninitializedLocal: Variable 'LQv' defined at line 19813 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19842,14): LocalUnused: Variable 'LRB' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19846,10): UninitializedLocal: Variable 'LRA' defined at line 19842 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19871,14): LocalUnused: Variable 'LRN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19875,10): UninitializedLocal: Variable 'LRM' defined at line 19871 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19892,14): LocalUnused: Variable 'LRW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19896,10): UninitializedLocal: Variable 'LRV' defined at line 19892 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19913,14): LocalUnused: Variable 'LRf' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19917,10): UninitializedLocal: Variable 'LRe' defined at line 19913 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(19956,14): LocalUnused: Variable 'LS0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(19963,10): UninitializedLocal: Variable 'LRz' defined at line 19956 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(20065,14): LocalUnused: Variable 'LSK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(20075,10): UninitializedLocal: Variable 'LSJ' defined at line 20065 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(20104,14): LocalUnused: Variable 'LSb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(20115,10): UninitializedLocal: Variable 'LSa' defined at line 20104 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(20985,14): LocalUnused: Variable 'LTE' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(20987,10): UninitializedLocal: Variable 'LTD' defined at line 20985 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(21019,14): LocalUnused: Variable 'LTb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(21027,10): UninitializedLocal: Variable 'LTa' defined at line 21019 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(21515,14): LocalUnused: Variable 'LUH' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(21527,10): UninitializedLocal: Variable 'LUG' defined at line 21515 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22012,14): LocalUnused: Variable 'LUz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22012,19): LocalUnused: Variable 'LV0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22015,9): UninitializedLocal: Variable 'LUy' defined at line 22012 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22027,14): LocalUnused: Variable 'LVD' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22034,10): UninitializedLocal: Variable 'LVC' defined at line 22027 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22184,14): LocalUnused: Variable 'LVY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22187,10): UninitializedLocal: Variable 'LVX' defined at line 22184 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22243,14): LocalUnused: Variable 'LVn' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22248,10): UninitializedLocal: Variable 'LVm' defined at line 22243 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22309,29): LocalUnused: Variable 'LW4' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22316,10): UninitializedLocal: Variable 'LW0' defined at line 22309 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22375,14): LocalUnused: Variable 'LWG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22384,10): UninitializedLocal: Variable 'LWF' defined at line 22375 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22411,14): LocalUnused: Variable 'LWY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22411,19): LocalUnused: Variable 'LWZ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22414,9): UninitializedLocal: Variable 'LWX' defined at line 22411 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22423,14): LocalUnused: Variable 'LWn' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(22434,10): UninitializedLocal: Variable 'LWm' defined at line 22423 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(22923,10): UninitializedLocal: Variable 'LXM' defined at line 22912 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23665,14): LocalUnused: Variable 'LY0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23665,19): LocalUnused: Variable 'LY1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23668,9): UninitializedLocal: Variable 'LXz' defined at line 23665 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23678,14): LocalUnused: Variable 'LYC' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23688,10): UninitializedLocal: Variable 'LYB' defined at line 23678 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23803,14): LocalUnused: Variable 'LYa' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23806,10): UninitializedLocal: Variable 'LYZ' defined at line 23803 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23843,14): LocalUnused: Variable 'LYm' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23848,10): UninitializedLocal: Variable 'LYl' defined at line 23843 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23888,14): LocalUnused: Variable 'LYz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23893,10): UninitializedLocal: Variable 'LYy' defined at line 23888 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23920,24): LocalUnused: Variable 'LZB' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23926,10): UninitializedLocal: Variable 'LZ8' defined at line 23920 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(23951,14): LocalUnused: Variable 'LZN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(23965,10): UninitializedLocal: Variable 'LZM' defined at line 23951 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(28698,14): LocalUnused: Variable 'La8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(28704,10): UninitializedLocal: Variable 'La7' defined at line 28698 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(29302,14): LocalUnused: Variable 'Lac' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(29310,10): UninitializedLocal: Variable 'Lab' defined at line 29302 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(29886,14): LocalUnused: Variable 'LbA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(29891,10): UninitializedLocal: Variable 'Lb9' defined at line 29886 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(30587,14): LocalUnused: Variable 'Lbj' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(30592,10): UninitializedLocal: Variable 'Lbi' defined at line 30587 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(31196,14): LocalUnused: Variable 'LcI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(31200,10): UninitializedLocal: Variable 'LcH' defined at line 31196 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(31319,14): LocalUnused: Variable 'Lcr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(31353,10): UninitializedLocal: Variable 'Lcq' defined at line 31319 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(44424,24): LocalUnused: Variable 'LeQ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(44431,10): UninitializedLocal: Variable 'LeN' defined at line 44424 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(44803,14): LocalUnused: Variable 'Ler' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(44803,34): LocalUnused: Variable 'Lev' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(44808,9): UninitializedLocal: Variable 'Leq' defined at line 44803 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(44905,14): LocalUnused: Variable 'LfG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(44911,10): UninitializedLocal: Variable 'LfF' defined at line 44905 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(45444,14): LocalUnused: Variable 'Lfo' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(45448,10): UninitializedLocal: Variable 'Lfn' defined at line 45444 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(45647,19): LocalUnused: Variable 'LgF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(45654,13): UninitializedLocal: Variable 'LgD' defined at line 45647 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(45894,14): LocalUnused: Variable 'LgR' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(45896,10): UninitializedLocal: Variable 'LgQ' defined at line 45894 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(45929,14): LocalUnused: Variable 'Lgc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(45931,10): UninitializedLocal: Variable 'Lgb' defined at line 45929 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(45998,14): LocalUnused: Variable 'Lgv' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(46014,10): UninitializedLocal: Variable 'Lgu' defined at line 45998 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(46421,24): LocalUnused: Variable 'LhJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(46426,10): UninitializedLocal: Variable 'LhG' defined at line 46421 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(46507,14): LocalUnused: Variable 'Lha' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(46509,10): UninitializedLocal: Variable 'LhZ' defined at line 46507 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(46594,14): LocalUnused: Variable 'Li0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(46594,29): LocalUnused: Variable 'Li3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(46599,9): UninitializedLocal: Variable 'Lhz' defined at line 46594 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50105,19): LocalUnused: Variable 'Lij' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50110,10): UninitializedLocal: Variable 'Lih' defined at line 50105 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50138,14): LocalUnused: Variable 'Lj4' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50138,39): LocalUnused: Variable 'Lj9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50148,9): UninitializedLocal: Variable 'Lj3' defined at line 50138 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50277,14): LocalUnused: Variable 'LjX' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50277,29): LocalUnused: Variable 'Lja' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50287,10): UninitializedLocal: Variable 'LjW' defined at line 50277 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50314,14): LocalUnused: Variable 'Ljo' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50316,10): UninitializedLocal: Variable 'Ljn' defined at line 50314 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50438,14): LocalUnused: Variable 'Lk8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50440,10): UninitializedLocal: Variable 'Lk7' defined at line 50438 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50473,14): LocalUnused: Variable 'LkJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50475,10): UninitializedLocal: Variable 'LkI' defined at line 50473 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(50544,14): LocalUnused: Variable 'Lkl' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(50552,10): UninitializedLocal: Variable 'Lkk' defined at line 50544 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(52633,14): LocalUnused: Variable 'LlV' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(52637,10): UninitializedLocal: Variable 'LlU' defined at line 52633 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(52871,14): LocalUnused: Variable 'Llr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(52885,10): UninitializedLocal: Variable 'Llq' defined at line 52871 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(53145,19): LocalUnused: Variable 'LmL' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(53159,10): UninitializedLocal: Variable 'LmJ' defined at line 53145 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(53502,14): LocalUnused: Variable 'Lmo' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(53504,10): UninitializedLocal: Variable 'Lmn' defined at line 53502 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(53620,14): LocalUnused: Variable 'Ln2' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(53624,10): UninitializedLocal: Variable 'Ln1' defined at line 53620 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(53735,14): LocalUnused: Variable 'LnJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(53737,10): UninitializedLocal: Variable 'LnI' defined at line 53735 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(53893,10): UninitializedLocal: Variable 'Lnj' defined at line 53886 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(54907,10): UninitializedLocal: Variable 'LoQ' defined at line 54901 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(55337,14): LocalUnused: Variable 'Loq' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(55345,10): UninitializedLocal: Variable 'Lop' defined at line 55337 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(55683,14): LocalUnused: Variable 'LpC' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(55686,10): UninitializedLocal: Variable 'LpB' defined at line 55683 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(55830,10): UninitializedLocal: Variable 'LpX' defined at line 55824 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(57281,10): UninitializedLocal: Variable 'LqA' defined at line 57275 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58129,14): LocalUnused: Variable 'Lqc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58131,10): UninitializedLocal: Variable 'Lqb' defined at line 58129 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58207,14): LocalUnused: Variable 'Lqp' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58209,10): UninitializedLocal: Variable 'Lqo' defined at line 58207 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58284,29): LocalUnused: Variable 'Lr6' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58291,10): UninitializedLocal: Variable 'Lr2' defined at line 58284 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58317,29): LocalUnused: Variable 'LrJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58317,34): LocalUnused: Variable 'LrK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58324,9): UninitializedLocal: Variable 'LrF' defined at line 58317 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58349,14): LocalUnused: Variable 'LrT' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58354,10): UninitializedLocal: Variable 'LrS' defined at line 58349 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58412,29): LocalUnused: Variable 'Lri' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58419,10): UninitializedLocal: Variable 'Lre' defined at line 58412 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58475,14): LocalUnused: Variable 'Lrr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58480,10): UninitializedLocal: Variable 'Lrq' defined at line 58475 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58520,29): LocalUnused: Variable 'Ls6' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58527,10): UninitializedLocal: Variable 'Ls2' defined at line 58520 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58562,14): LocalUnused: Variable 'LsF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58564,10): UninitializedLocal: Variable 'LsE' defined at line 58562 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58673,14): LocalUnused: Variable 'LsV' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58678,10): UninitializedLocal: Variable 'LsU' defined at line 58673 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58775,14): LocalUnused: Variable 'Lsl' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(58782,10): UninitializedLocal: Variable 'Lsk' defined at line 58775 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(58997,14): LocalUnused: Variable 'Lsz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(59002,10): UninitializedLocal: Variable 'Lsy' defined at line 58997 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(59209,14): LocalUnused: Variable 'LtE' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(59213,10): UninitializedLocal: Variable 'LtD' defined at line 59209 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(59324,14): LocalUnused: Variable 'LtS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(59328,10): UninitializedLocal: Variable 'LtR' defined at line 59324 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(59387,14): LocalUnused: Variable 'Ltf' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(59391,10): UninitializedLocal: Variable 'Lte' defined at line 59387 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(59588,10): UninitializedLocal: Variable 'Lty' defined at line 59586 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(59943,14): LocalUnused: Variable 'LuN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(59949,10): UninitializedLocal: Variable 'LuM' defined at line 59943 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(60105,9): UninitializedLocal: Variable 'Lug' defined at line 60089 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(60841,10): UninitializedLocal: Variable 'LvN' defined at line 60828 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(62547,10): UninitializedLocal: Variable 'Lw1' defined at line 62544 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(62608,44): LocalUnused: Variable 'LwS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(62619,9): UninitializedLocal: Variable 'LwL' defined at line 62608 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(62755,14): LocalUnused: Variable 'Lwj' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(62757,10): UninitializedLocal: Variable 'Lwi' defined at line 62755 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(63462,14): LocalUnused: Variable 'LxD' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(63472,10): UninitializedLocal: Variable 'LxC' defined at line 63462 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(63725,14): LocalUnused: Variable 'Lxf' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(63731,10): UninitializedLocal: Variable 'Lxe' defined at line 63725 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(63937,10): UninitializedLocal: Variable 'Lxy' defined at line 63929 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64108,19): LocalUnused: Variable 'LyR' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64116,10): UninitializedLocal: Variable 'LyP' defined at line 64108 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64463,10): UninitializedLocal: Variable 'Lyq' defined at line 64455 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64577,14): LocalUnused: Variable 'LzE' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64586,10): UninitializedLocal: Variable 'LzD' defined at line 64577 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64670,14): LocalUnused: Variable 'LzS' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64673,10): UninitializedLocal: Variable 'LzR' defined at line 64670 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64696,14): LocalUnused: Variable 'Lzc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64698,10): UninitializedLocal: Variable 'Lzb' defined at line 64696 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64727,14): LocalUnused: Variable 'Lzk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64729,10): UninitializedLocal: Variable 'Lzj' defined at line 64727 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64745,14): LocalUnused: Variable 'Lzr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64748,10): UninitializedLocal: Variable 'Lzq' defined at line 64745 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64774,15): LocalUnused: Variable 'L101' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64777,11): UninitializedLocal: Variable 'L100' defined at line 64774 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64809,15): LocalUnused: Variable 'L10B' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64812,11): UninitializedLocal: Variable 'L10A' defined at line 64809 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64838,15): LocalUnused: Variable 'L10L' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64841,11): UninitializedLocal: Variable 'L10K' defined at line 64838 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(64874,15): LocalUnused: Variable 'L10a' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(64882,11): UninitializedLocal: Variable 'L10Z' defined at line 64874 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65091,15): LocalUnused: Variable 'L10w' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65094,11): UninitializedLocal: Variable 'L10v' defined at line 65091 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65153,15): LocalUnused: Variable 'L119' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65156,11): UninitializedLocal: Variable 'L118' defined at line 65153 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65212,15): LocalUnused: Variable 'L11L' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65215,11): UninitializedLocal: Variable 'L11K' defined at line 65212 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65248,15): LocalUnused: Variable 'L11X' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65251,11): UninitializedLocal: Variable 'L11W' defined at line 65248 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65285,15): LocalUnused: Variable 'L11k' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65289,11): UninitializedLocal: Variable 'L11j' defined at line 65285 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65501,15): LocalUnused: Variable 'L125' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65504,11): UninitializedLocal: Variable 'L124' defined at line 65501 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65542,15): LocalUnused: Variable 'L12P' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65552,11): UninitializedLocal: Variable 'L12O' defined at line 65542 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65655,15): LocalUnused: Variable 'L12l' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65658,11): UninitializedLocal: Variable 'L12k' defined at line 65655 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65711,15): LocalUnused: Variable 'L130' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65714,11): UninitializedLocal: Variable 'L12z' defined at line 65711 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65742,15): LocalUnused: Variable 'L13B' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65746,11): UninitializedLocal: Variable 'L13A' defined at line 65742 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65809,15): LocalUnused: Variable 'L13N' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65813,11): UninitializedLocal: Variable 'L13M' defined at line 65809 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65889,15): LocalUnused: Variable 'L13Y' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65891,11): UninitializedLocal: Variable 'L13X' defined at line 65889 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65908,15): LocalUnused: Variable 'L13e' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65910,11): UninitializedLocal: Variable 'L13d' defined at line 65908 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65928,15): LocalUnused: Variable 'L13l' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65930,11): UninitializedLocal: Variable 'L13k' defined at line 65928 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65965,15): LocalUnused: Variable 'L13w' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65968,11): UninitializedLocal: Variable 'L13v' defined at line 65965 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(65993,15): LocalUnused: Variable 'L147' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(65998,11): UninitializedLocal: Variable 'L146' defined at line 65993 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66075,15): LocalUnused: Variable 'L14N' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66080,11): UninitializedLocal: Variable 'L14M' defined at line 66075 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66157,15): LocalUnused: Variable 'L14c' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66162,11): UninitializedLocal: Variable 'L14b' defined at line 66157 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66247,15): LocalUnused: Variable 'L14t' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66250,11): UninitializedLocal: Variable 'L14s' defined at line 66247 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66474,15): LocalUnused: Variable 'L15J' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66476,11): UninitializedLocal: Variable 'L15I' defined at line 66474 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66839,15): LocalUnused: Variable 'L15i' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66841,11): UninitializedLocal: Variable 'L15h' defined at line 66839 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66898,15): LocalUnused: Variable 'L15s' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66898,21): LocalUnused: Variable 'L15t' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66901,10): UninitializedLocal: Variable 'L15r' defined at line 66898 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(66915,15): LocalUnused: Variable 'L167' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(66922,11): UninitializedLocal: Variable 'L166' defined at line 66915 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67154,21): LocalUnused: Variable 'L16Y' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67162,11): UninitializedLocal: Variable 'L16W' defined at line 67154 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67501,15): LocalUnused: Variable 'L16t' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67501,33): LocalUnused: Variable 'L16w' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67505,10): UninitializedLocal: Variable 'L16s' defined at line 67501 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67540,15): LocalUnused: Variable 'L175' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67540,45): LocalUnused: Variable 'L17A' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67549,10): UninitializedLocal: Variable 'L174' defined at line 67540 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67592,15): LocalUnused: Variable 'L17P' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67599,11): UninitializedLocal: Variable 'L17O' defined at line 67592 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67835,15): LocalUnused: Variable 'L17m' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67835,45): LocalUnused: Variable 'L17r' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67844,10): UninitializedLocal: Variable 'L17l' defined at line 67835 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67884,15): LocalUnused: Variable 'L180' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67884,45): LocalUnused: Variable 'L185' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67893,10): UninitializedLocal: Variable 'L17z' defined at line 67884 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67933,15): LocalUnused: Variable 'L18E' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67933,45): LocalUnused: Variable 'L18J' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67942,10): UninitializedLocal: Variable 'L18D' defined at line 67933 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67981,15): LocalUnused: Variable 'L18P' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67981,21): LocalUnused: Variable 'L18Q' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(67984,10): UninitializedLocal: Variable 'L18O' defined at line 67981 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(67997,15): LocalUnused: Variable 'L18d' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68004,11): UninitializedLocal: Variable 'L18c' defined at line 67997 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68157,11): UninitializedLocal: Variable 'L18x' defined at line 68150 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68271,21): LocalUnused: Variable 'L19L' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68279,11): UninitializedLocal: Variable 'L19J' defined at line 68271 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68617,15): LocalUnused: Variable 'L19f' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68617,21): LocalUnused: Variable 'L19g' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68620,10): UninitializedLocal: Variable 'L19e' defined at line 68617 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68628,15): LocalUnused: Variable 'L19l' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68628,21): LocalUnused: Variable 'L19m' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68631,10): UninitializedLocal: Variable 'L19k' defined at line 68628 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68643,15): LocalUnused: Variable 'L19w' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68650,11): UninitializedLocal: Variable 'L19v' defined at line 68643 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68790,15): LocalUnused: Variable 'L1AB' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68790,21): LocalUnused: Variable 'L1AC' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68793,10): UninitializedLocal: Variable 'L1AA' defined at line 68790 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68801,15): LocalUnused: Variable 'L1AH' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68801,21): LocalUnused: Variable 'L1AI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68804,10): UninitializedLocal: Variable 'L1AG' defined at line 68801 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68812,15): LocalUnused: Variable 'L1AN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68812,21): LocalUnused: Variable 'L1AO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68815,10): UninitializedLocal: Variable 'L1AM' defined at line 68812 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68824,15): LocalUnused: Variable 'L1AT' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68824,21): LocalUnused: Variable 'L1AU' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68827,10): UninitializedLocal: Variable 'L1AS' defined at line 68824 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(68836,15): LocalUnused: Variable 'L1Ae' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(68839,11): UninitializedLocal: Variable 'L1Ad' defined at line 68836 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69069,15): LocalUnused: Variable 'L1Au' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69069,21): LocalUnused: Variable 'L1Av' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69072,10): UninitializedLocal: Variable 'L1At' defined at line 69069 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69080,15): LocalUnused: Variable 'L1B0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69080,21): LocalUnused: Variable 'L1B1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69083,10): UninitializedLocal: Variable 'L1Az' defined at line 69080 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69091,15): LocalUnused: Variable 'L1B6' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69091,21): LocalUnused: Variable 'L1B7' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69094,10): UninitializedLocal: Variable 'L1B5' defined at line 69091 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69104,15): LocalUnused: Variable 'L1BF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69108,11): UninitializedLocal: Variable 'L1BE' defined at line 69104 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69236,15): LocalUnused: Variable 'L1Ba' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69240,11): UninitializedLocal: Variable 'L1BZ' defined at line 69236 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69367,15): LocalUnused: Variable 'L1Bq' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69374,11): UninitializedLocal: Variable 'L1Bp' defined at line 69367 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(69602,15): LocalUnused: Variable 'L1CI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(69621,10): UninitializedLocal: Variable 'L1CH' defined at line 69602 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(71599,15): LocalUnused: Variable 'L1Cs' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(71607,11): UninitializedLocal: Variable 'L1Cr' defined at line 71599 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(71738,11): UninitializedLocal: Variable 'L1DT' defined at line 71725 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73133,15): LocalUnused: Variable 'L1EJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73139,11): UninitializedLocal: Variable 'L1EI' defined at line 73133 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73288,15): LocalUnused: Variable 'L1Ef' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73290,11): UninitializedLocal: Variable 'L1Ee' defined at line 73288 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73319,15): LocalUnused: Variable 'L1Es' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73321,11): UninitializedLocal: Variable 'L1Er' defined at line 73319 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73351,15): LocalUnused: Variable 'L1F5' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73353,11): UninitializedLocal: Variable 'L1F4' defined at line 73351 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73425,15): LocalUnused: Variable 'L1FI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73427,11): UninitializedLocal: Variable 'L1FH' defined at line 73425 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73452,15): LocalUnused: Variable 'L1FR' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73454,11): UninitializedLocal: Variable 'L1FQ' defined at line 73452 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(73486,15): LocalUnused: Variable 'L1Fc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(73497,12): UninitializedLocal: Variable 'L1Fb' defined at line 73486 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74092,15): LocalUnused: Variable 'L1Fz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74092,27): LocalUnused: Variable 'L1G1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74101,11): UninitializedLocal: Variable 'L1Fy' defined at line 74092 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74396,15): LocalUnused: Variable 'L1GF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74401,11): UninitializedLocal: Variable 'L1GE' defined at line 74396 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74420,15): LocalUnused: Variable 'L1GQ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74424,11): UninitializedLocal: Variable 'L1GP' defined at line 74420 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74499,15): LocalUnused: Variable 'L1Gj' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74503,11): UninitializedLocal: Variable 'L1Gi' defined at line 74499 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74739,15): LocalUnused: Variable 'L1H0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74743,11): UninitializedLocal: Variable 'L1Gz' defined at line 74739 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74766,15): LocalUnused: Variable 'L1H9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74771,11): UninitializedLocal: Variable 'L1H8' defined at line 74766 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74801,15): LocalUnused: Variable 'L1HL' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74810,11): UninitializedLocal: Variable 'L1HK' defined at line 74801 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74869,15): LocalUnused: Variable 'L1Hb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74879,11): UninitializedLocal: Variable 'L1Ha' defined at line 74869 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74925,15): LocalUnused: Variable 'L1Hr' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74935,11): UninitializedLocal: Variable 'L1Hq' defined at line 74925 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(74982,15): LocalUnused: Variable 'L1I8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(74991,11): UninitializedLocal: Variable 'L1I7' defined at line 74982 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75051,15): LocalUnused: Variable 'L1IP' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75060,11): UninitializedLocal: Variable 'L1IO' defined at line 75051 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75119,15): LocalUnused: Variable 'L1Ih' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75128,11): UninitializedLocal: Variable 'L1Ig' defined at line 75119 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75180,15): LocalUnused: Variable 'L1Iy' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75190,11): UninitializedLocal: Variable 'L1Ix' defined at line 75180 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75247,15): LocalUnused: Variable 'L1JM' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75257,11): UninitializedLocal: Variable 'L1JL' defined at line 75247 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75592,15): LocalUnused: Variable 'L1Js' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75602,11): UninitializedLocal: Variable 'L1Jr' defined at line 75592 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75648,15): LocalUnused: Variable 'L1K6' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75658,11): UninitializedLocal: Variable 'L1K5' defined at line 75648 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75702,15): LocalUnused: Variable 'L1KL' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75711,11): UninitializedLocal: Variable 'L1KK' defined at line 75702 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75762,15): LocalUnused: Variable 'L1KZ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75772,11): UninitializedLocal: Variable 'L1KY' defined at line 75762 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75814,15): LocalUnused: Variable 'L1Ko' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75824,11): UninitializedLocal: Variable 'L1Kn' defined at line 75814 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75869,15): LocalUnused: Variable 'L1L4' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(75871,11): UninitializedLocal: Variable 'L1L3' defined at line 75869 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(75905,11): UninitializedLocal: Variable 'L1LI' defined at line 75900 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(76006,15): LocalUnused: Variable 'L1Le' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(76012,11): UninitializedLocal: Variable 'L1Ld' defined at line 76006 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(76696,11): UninitializedLocal: Variable 'L1M6' defined at line 76686 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77013,15): LocalUnused: Variable 'L1Mi' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77020,11): UninitializedLocal: Variable 'L1Mh' defined at line 77013 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77114,11): UninitializedLocal: Variable 'L1N6' defined at line 77107 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77214,15): LocalUnused: Variable 'L1NX' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77221,11): UninitializedLocal: Variable 'L1NW' defined at line 77214 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77323,15): LocalUnused: Variable 'L1Nz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77330,11): UninitializedLocal: Variable 'L1Ny' defined at line 77323 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77442,15): LocalUnused: Variable 'L1OO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77449,11): UninitializedLocal: Variable 'L1ON' defined at line 77442 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77509,15): LocalUnused: Variable 'L1Ok' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77518,11): UninitializedLocal: Variable 'L1Oj' defined at line 77509 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(77709,15): LocalUnused: Variable 'L1PJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(77729,11): UninitializedLocal: Variable 'L1PI' defined at line 77709 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(78440,11): UninitializedLocal: Variable 'L1Q4' defined at line 78433 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(78511,15): LocalUnused: Variable 'L1QT' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(78518,11): UninitializedLocal: Variable 'L1QS' defined at line 78511 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(78620,15): LocalUnused: Variable 'L1Qv' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(78627,11): UninitializedLocal: Variable 'L1Qu' defined at line 78620 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(78751,11): UninitializedLocal: Variable 'L1RO' defined at line 78744 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(78992,15): LocalUnused: Variable 'L1S3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(78999,11): UninitializedLocal: Variable 'L1S2' defined at line 78992 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79107,27): LocalUnused: Variable 'L1SP' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79107,33): LocalUnused: Variable 'L1SQ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79111,10): UninitializedLocal: Variable 'L1SM' defined at line 79107 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79134,21): LocalUnused: Variable 'L1Sc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79141,10): UninitializedLocal: Variable 'L1Sa' defined at line 79134 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79149,21): LocalUnused: Variable 'L1Sl' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79149,39): LocalUnused: Variable 'L1So' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79156,10): UninitializedLocal: Variable 'L1Sj' defined at line 79149 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79188,27): LocalUnused: Variable 'L1Sz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79188,33): LocalUnused: Variable 'L1T0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79192,10): UninitializedLocal: Variable 'L1Sw' defined at line 79188 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79220,21): LocalUnused: Variable 'L1TF' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79220,45): LocalUnused: Variable 'L1TJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79228,10): UninitializedLocal: Variable 'L1TD' defined at line 79220 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79262,27): LocalUnused: Variable 'L1TU' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79262,33): LocalUnused: Variable 'L1TV' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79266,10): UninitializedLocal: Variable 'L1TR' defined at line 79262 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79294,21): LocalUnused: Variable 'L1Tk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79294,45): LocalUnused: Variable 'L1To' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79302,10): UninitializedLocal: Variable 'L1Ti' defined at line 79294 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79336,27): LocalUnused: Variable 'L1Tz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79336,33): LocalUnused: Variable 'L1U0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79340,10): UninitializedLocal: Variable 'L1Tw' defined at line 79336 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79369,21): LocalUnused: Variable 'L1UG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79369,51): LocalUnused: Variable 'L1UL' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(79378,10): UninitializedLocal: Variable 'L1UE' defined at line 79369 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(79491,10): UninitializedLocal: Variable 'L1Up' defined at line 79455 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(82636,51): LocalUnused: Variable 'L1Vl' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(82647,11): UninitializedLocal: Variable 'L1Ve' defined at line 82636 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(82727,11): UninitializedLocal: Variable 'L1W0' defined at line 82722 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(82827,21): LocalUnused: Variable 'L1WK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(82834,11): UninitializedLocal: Variable 'L1WI' defined at line 82827 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(83158,21): LocalUnused: Variable 'L1Wl' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(83164,11): UninitializedLocal: Variable 'L1Wj' defined at line 83158 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(83327,15): LocalUnused: Variable 'L1X1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(83331,11): UninitializedLocal: Variable 'L1X0' defined at line 83327 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(83385,15): LocalUnused: Variable 'L1XK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(83391,11): UninitializedLocal: Variable 'L1XJ' defined at line 83385 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(83547,15): LocalUnused: Variable 'L1Xh' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(83550,11): UninitializedLocal: Variable 'L1Xg' defined at line 83547 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(83751,15): LocalUnused: Variable 'L1Y0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(83762,11): UninitializedLocal: Variable 'L1Xz' defined at line 83751 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84381,15): LocalUnused: Variable 'L1YU' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84383,11): UninitializedLocal: Variable 'L1YT' defined at line 84381 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84445,15): LocalUnused: Variable 'L1Yj' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84447,11): UninitializedLocal: Variable 'L1Yi' defined at line 84445 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84538,15): LocalUnused: Variable 'L1Z0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84541,11): UninitializedLocal: Variable 'L1Yz' defined at line 84538 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84617,11): UninitializedLocal: Variable 'L1ZF' defined at line 84615 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84738,15): LocalUnused: Variable 'L1ZZ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84740,11): UninitializedLocal: Variable 'L1ZY' defined at line 84738 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84767,15): LocalUnused: Variable 'L1Zk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84771,11): UninitializedLocal: Variable 'L1Zj' defined at line 84767 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(84956,15): LocalUnused: Variable 'L1a2' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(84960,11): UninitializedLocal: Variable 'L1a1' defined at line 84956 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85166,15): LocalUnused: Variable 'L1aK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85168,11): UninitializedLocal: Variable 'L1aJ' defined at line 85166 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85191,15): LocalUnused: Variable 'L1aU' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85193,11): UninitializedLocal: Variable 'L1aT' defined at line 85191 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85220,15): LocalUnused: Variable 'L1ad' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85223,11): UninitializedLocal: Variable 'L1ac' defined at line 85220 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85281,15): LocalUnused: Variable 'L1ar' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85284,11): UninitializedLocal: Variable 'L1aq' defined at line 85281 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85361,15): LocalUnused: Variable 'L1b5' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85364,11): UninitializedLocal: Variable 'L1b4' defined at line 85361 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85409,15): LocalUnused: Variable 'L1bK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85412,11): UninitializedLocal: Variable 'L1bJ' defined at line 85409 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85501,15): LocalUnused: Variable 'L1bc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85504,11): UninitializedLocal: Variable 'L1bb' defined at line 85501 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85603,15): LocalUnused: Variable 'L1bs' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85606,11): UninitializedLocal: Variable 'L1br' defined at line 85603 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85693,15): LocalUnused: Variable 'L1c8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85696,11): UninitializedLocal: Variable 'L1c7' defined at line 85693 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85800,15): LocalUnused: Variable 'L1cO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85800,33): LocalUnused: Variable 'L1cR' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85804,10): UninitializedLocal: Variable 'L1cN' defined at line 85800 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(85813,15): LocalUnused: Variable 'L1cY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(85817,11): UninitializedLocal: Variable 'L1cX' defined at line 85813 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86027,15): LocalUnused: Variable 'L1cp' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86030,11): UninitializedLocal: Variable 'L1co' defined at line 86027 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86113,15): LocalUnused: Variable 'L1d5' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86116,11): UninitializedLocal: Variable 'L1d4' defined at line 86113 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86179,15): LocalUnused: Variable 'L1dI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86182,11): UninitializedLocal: Variable 'L1dH' defined at line 86179 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86312,15): LocalUnused: Variable 'L1dY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86326,11): UninitializedLocal: Variable 'L1dX' defined at line 86312 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86451,15): LocalUnused: Variable 'L1dw' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86470,10): UninitializedLocal: Variable 'L1dv' defined at line 86451 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86767,11): UninitializedLocal: Variable 'L1eV' defined at line 86761 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86874,15): LocalUnused: Variable 'L1ev' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86881,11): UninitializedLocal: Variable 'L1eu' defined at line 86874 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(86987,15): LocalUnused: Variable 'L1fJ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(86993,11): UninitializedLocal: Variable 'L1fI' defined at line 86987 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87067,15): LocalUnused: Variable 'L1fb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87070,11): UninitializedLocal: Variable 'L1fa' defined at line 87067 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87164,15): LocalUnused: Variable 'L1fq' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87167,11): UninitializedLocal: Variable 'L1fp' defined at line 87164 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87210,11): UninitializedLocal: Variable 'L1g5' defined at line 87208 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87340,15): LocalUnused: Variable 'L1gY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87345,11): UninitializedLocal: Variable 'L1gX' defined at line 87340 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87714,15): LocalUnused: Variable 'L1gz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87716,11): UninitializedLocal: Variable 'L1gy' defined at line 87714 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87741,15): LocalUnused: Variable 'L1h9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87743,11): UninitializedLocal: Variable 'L1h8' defined at line 87741 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87770,15): LocalUnused: Variable 'L1hK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87772,11): UninitializedLocal: Variable 'L1hJ' defined at line 87770 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87816,15): LocalUnused: Variable 'L1hW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87819,11): UninitializedLocal: Variable 'L1hV' defined at line 87816 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87856,39): LocalUnused: Variable 'L1ho' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87863,11): UninitializedLocal: Variable 'L1hj' defined at line 87856 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87908,15): LocalUnused: Variable 'L1hy' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87911,11): UninitializedLocal: Variable 'L1hx' defined at line 87908 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87931,15): LocalUnused: Variable 'L1i7' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87931,21): LocalUnused: Variable 'L1i8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87934,10): UninitializedLocal: Variable 'L1i6' defined at line 87931 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87942,27): LocalUnused: Variable 'L1iK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87949,10): UninitializedLocal: Variable 'L1iH' defined at line 87942 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(87982,27): LocalUnused: Variable 'L1ib' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(87990,11): UninitializedLocal: Variable 'L1iY' defined at line 87982 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88067,11): UninitializedLocal: Variable 'L1io' defined at line 88063 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88095,33): LocalUnused: Variable 'L1iy' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88095,39): LocalUnused: Variable 'L1iz' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88103,10): UninitializedLocal: Variable 'L1iu' defined at line 88095 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88115,39): LocalUnused: Variable 'L1j9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88115,45): LocalUnused: Variable 'L1jA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88123,10): UninitializedLocal: Variable 'L1j4' defined at line 88115 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88146,11): UninitializedLocal: Variable 'L1jN' defined at line 88138 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88552,15): LocalUnused: Variable 'L1jt' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88554,11): UninitializedLocal: Variable 'L1js' defined at line 88552 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88650,21): LocalUnused: Variable 'L1k9' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88650,27): LocalUnused: Variable 'L1kA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88654,10): UninitializedLocal: Variable 'L1k7' defined at line 88650 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88687,11): UninitializedLocal: Variable 'L1kO' defined at line 88679 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88788,15): LocalUnused: Variable 'L1kh' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(88792,11): UninitializedLocal: Variable 'L1kg' defined at line 88788 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(88841,11): UninitializedLocal: Variable 'L1l2' defined at line 88822 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90427,15): LocalUnused: Variable 'L1lp' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90431,11): UninitializedLocal: Variable 'L1lo' defined at line 90427 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90505,15): LocalUnused: Variable 'L1m3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90509,11): UninitializedLocal: Variable 'L1m2' defined at line 90505 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90568,33): LocalUnused: Variable 'L1mO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90581,11): UninitializedLocal: Variable 'L1mK' defined at line 90568 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90615,15): LocalUnused: Variable 'L1mb' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90620,11): UninitializedLocal: Variable 'L1ma' defined at line 90615 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90773,15): LocalUnused: Variable 'L1mo' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90777,11): UninitializedLocal: Variable 'L1mn' defined at line 90773 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(90843,15): LocalUnused: Variable 'L1n0' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(90846,11): UninitializedLocal: Variable 'L1mz' defined at line 90843 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(91000,15): LocalUnused: Variable 'L1nE' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(91002,11): UninitializedLocal: Variable 'L1nD' defined at line 91000 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(91088,15): LocalUnused: Variable 'L1nN' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(91094,11): UninitializedLocal: Variable 'L1nM' defined at line 91088 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(91118,15): LocalUnused: Variable 'L1nX' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(91122,11): UninitializedLocal: Variable 'L1nW' defined at line 91118 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(91182,15): LocalUnused: Variable 'L1nu' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(91216,10): UninitializedLocal: Variable 'L1nt' defined at line 91182 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(92804,15): LocalUnused: Variable 'L1og' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(92810,11): UninitializedLocal: Variable 'L1of' defined at line 92804 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(92935,15): LocalUnused: Variable 'L1ow' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(92942,11): UninitializedLocal: Variable 'L1ov' defined at line 92935 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(92991,15): LocalUnused: Variable 'L1pA' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(92997,14): UninitializedLocal: Variable 'L1p9' defined at line 92991 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(93203,15): LocalUnused: Variable 'L1pK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(93205,11): UninitializedLocal: Variable 'L1pJ' defined at line 93203 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(93244,15): LocalUnused: Variable 'L1pY' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(93250,11): UninitializedLocal: Variable 'L1pX' defined at line 93244 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(93310,15): LocalUnused: Variable 'L1pt' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(93325,10): UninitializedLocal: Variable 'L1ps' defined at line 93310 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(93406,15): LocalUnused: Variable 'L1qK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(93421,11): UninitializedLocal: Variable 'L1qJ' defined at line 93406 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(94511,15): LocalUnused: Variable 'L1qw' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(94526,11): UninitializedLocal: Variable 'L1qv' defined at line 94511 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(94694,27): LocalUnused: Variable 'L1rI' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(94704,11): UninitializedLocal: Variable 'L1rF' defined at line 94694 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(94758,15): LocalUnused: Variable 'L1rW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(94760,11): UninitializedLocal: Variable 'L1rV' defined at line 94758 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(94869,15): LocalUnused: Variable 'L1rh' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(94879,11): UninitializedLocal: Variable 'L1rg' defined at line 94869 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(96565,15): LocalUnused: Variable 'L1s3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(96569,11): UninitializedLocal: Variable 'L1s2' defined at line 96565 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(97091,15): LocalUnused: Variable 'L1sL' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97091,33): LocalUnused: Variable 'L1sO' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97097,10): UninitializedLocal: Variable 'L1sK' defined at line 97091 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(97111,15): LocalUnused: Variable 'L1sW' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97121,11): UninitializedLocal: Variable 'L1sV' defined at line 97111 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(97233,15): LocalUnused: Variable 'L1ss' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97238,11): UninitializedLocal: Variable 'L1sr' defined at line 97233 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(97286,21): LocalUnused: Variable 'L1t3' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97295,10): UninitializedLocal: Variable 'L1t1' defined at line 97286 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(97349,15): LocalUnused: Variable 'L1tG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(97362,11): UninitializedLocal: Variable 'L1tF' defined at line 97349 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98410,15): LocalUnused: Variable 'L1td' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98420,10): UninitializedLocal: Variable 'L1tc' defined at line 98410 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98452,15): LocalUnused: Variable 'L1ts' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98455,11): UninitializedLocal: Variable 'L1tr' defined at line 98452 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98499,15): LocalUnused: Variable 'L1u5' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98508,11): UninitializedLocal: Variable 'L1u4' defined at line 98499 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98563,15): LocalUnused: Variable 'L1uK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98571,11): UninitializedLocal: Variable 'L1uJ' defined at line 98563 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98635,21): LocalUnused: Variable 'L1ub' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98635,27): LocalUnused: Variable 'L1uc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98639,10): UninitializedLocal: Variable 'L1uZ' defined at line 98635 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98647,15): LocalUnused: Variable 'L1uk' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98655,11): UninitializedLocal: Variable 'L1uj' defined at line 98647 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98719,15): LocalUnused: Variable 'L1v8' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98721,11): UninitializedLocal: Variable 'L1v7' defined at line 98719 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98804,15): LocalUnused: Variable 'L1vR' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98809,10): UninitializedLocal: Variable 'L1vQ' defined at line 98804 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98825,15): LocalUnused: Variable 'L1vc' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98845,11): UninitializedLocal: Variable 'L1vb' defined at line 98825 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(98998,15): LocalUnused: Variable 'L1w1' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(98998,39): LocalUnused: Variable 'L1w5' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(99007,10): UninitializedLocal: Variable 'L1w0' defined at line 98998 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(99030,15): LocalUnused: Variable 'L1wG' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(99030,39): LocalUnused: Variable 'L1wK' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(99042,10): UninitializedLocal: Variable 'L1wF' defined at line 99030 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(99117,8): LocalUnused: Variable 'L1wQ' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(99124,9): LocalUnused: Variable 'L1wT' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(99994,8): UninitializedLocal: Variable 'L1wb' defined at line 1049 is never initialized or assigned; initialize with 'nil' to silence
+src/Shared/Diagnostics/LibMP.luau(100164,17): LocalUnused: Variable 'rshift' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(100343,11): LocalUnused: Variable 'GenerateTypes' is never used; prefix with '_' to silence
+src/Shared/Diagnostics/LibMP.luau(101006,3): ImplicitReturn: Function 'CounterName' can implicitly return no values even though there's an explicit return at line 101005; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(101492,3): ImplicitReturn: Function 'FilenamePostfix' can implicitly return no values even though there's an explicit return at line 101491; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(101799,3): ImplicitReturn: Function 'ThreadLogs' can implicitly return no values even though there's an explicit return at line 101798; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(101901,3): ImplicitReturn: Function 'PlatformInfoJson' can implicitly return no values even though there's an explicit return at line 101900; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(102005,3): ImplicitReturn: Function 'GroupName' can implicitly return no values even though there's an explicit return at line 102004; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(102932,3): ImplicitReturn: Function 'ThreadName' can implicitly return no values even though there's an explicit return at line 102931; add explicit return to silence
+src/Shared/Diagnostics/LibMP.luau(103075,3): ImplicitReturn: Function 'TimerName' can implicitly return no values even though there's an explicit return at line 103074; add explicit return to silence

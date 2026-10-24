@@ -1,6 +1,6 @@
 """Join immutable native geometry, ordinary source hashes and local checks."""
 from pathlib import Path
-import hashlib,json,subprocess
+import ast,hashlib,json,subprocess
 H=Path(__file__).resolve().parent;R=H.parents[1]
 stage=Path('C:/Users/natha/claude-xfer/Windowsill-rig-hair-native1')
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -29,5 +29,16 @@ record=dict(evidence_id=receipt['evidence_id'],source_commit='dd21210557990e0c00
  compile_passed=273,strict_diagnostics=0,runner_passed=5,local_targeted_passed=11247,
  model_sha256=m['place_sha256'],native_passed=True,published=False,
  limits='Operation-saving and native fixture equivalence only; no paired FPS or broad audit completion.')
-(H/'qualification.json').write_text(json.dumps(record,indent=2)+'\n')
+ci=H/'github-ci.json'
+if ci.exists():
+ data=json.loads(ci.read_text())
+ assert data['run']['head_sha']==record['source_commit']and data['run']['conclusion']=='success'
+ assert all(j['status']=='completed'and j['conclusion']=='success'for j in data['jobs'])
+ steps={s['name']:s for j in data['jobs']for s in j['steps']}
+ for name in ['Every module compiles','Strict types','All suites','Normal and self-test exports','Runner failure and cleanup regressions']:
+  assert steps[name]['status']=='completed'and steps[name]['conclusion']=='success',name
+ suites=[n for n in ast.walk(ast.parse((R/'roblox_port/tests/run.py').read_text()))if isinstance(n,ast.List)and len(n.elts)>70]
+ assert len(suites)==1 and len(suites[0].elts)==80
+ record.update(full_ci_run=data['run']['id'],full_ci_conclusion='success',full_ci_suites=80)
+(H/'qualification.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())
 print(json.dumps(record))

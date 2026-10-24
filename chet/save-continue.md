@@ -1,3 +1,15 @@
+Latest continuation: full80-suite CI40093189495 SUCCEEDS atdd212105; see
+docs/rig-hair-cache/github-ci.json and qualification.json. Ordinary evidence
+remains032b5985ac17eeb2. Read docs/startup-clock/STREAM.md for the new native
+early startup capture. Current source guards, PASS/cleanup and0 errors complete;
+Studio/plugin initialization overlaps the delay. Incomplete frame logs prevent
+exclusive attribution. No plugin was disabled and no game source changed.
+The raw181MB trace stays local at its documented hash. All Studio editors are
+closed and the staged model hash is unchanged. Separate actual standalone
+Player behavior from Studio initialization next; older private13 timing is an
+older-source cohort, and its authorization remains fulfilled. Goal ACTIVE.
+
+Earlier pending-CI handoff, superseded by the completed receipt above:
 Current continuation: read docs/rig-hair-cache/README.md first. Ordinary source
 is now evidence032b5985ac17eeb2 atdd212105; only SpiderRig changes from the
 previous candidate. Fixed local hair turns are cached, with native143,800-part

@@ -1,10 +1,19 @@
+Latest startup attribution supplement: ../startup-clock/STREAM.md retains a
+finalized native file stream covering the early pause, current273 ordinary
+source hashes, both277-source guards, PASS/cleanup and0 CreatorErrors. It
+shows substantial Studio/plugin initialization overlapping startup, including
+built-in tools in the Studio log. Incomplete frames and underflowed scopes
+prevent exhaustive attribution. No plugins disabled, no game behavior changed,
+and no standalone Player or phone claim. Rig CI40093189495 now succeeds for
+all 80 suites and all workflow steps at dd212105; receipt is in ../rig-hair-cache.
+
 Latest rig optimization supplement, 2026-10-24: evidence032b5985ac17eeb2,
 source/test/export commitdd212105. ../rig-hair-cache/README.md records fixed
 leg-hair orientation caching:18,160 repeated lookAt calls removed in560 frames,
 with143,800 part comparisons. Native28/0, both278-source guards, zero errors,
 cleanup/closed editor/hash unchanged. Local11,247/0 related checks,273/273
-compile, strict0, runner5/5, exact exports. Full80-suite CI40093189495 is
-pending. Fresh unpaused Server-tab and later paused client dumps are retained;
+compile, strict0, runner5/5, exact exports. Full80-suite CI40093189495 succeeds.
+Fresh unpaused Server-tab and later paused client dumps are retained;
 local Studio rendering/client scopes prevent dedicated-server claims. No paired
 FPS gain or hitch resolution claimed. No new publication; broader audit active.
 # Current foundation evidence and remaining work

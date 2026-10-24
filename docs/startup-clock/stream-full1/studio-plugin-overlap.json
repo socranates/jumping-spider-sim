@@ -1,0 +1,230 @@
+[
+  {
+    "at": "2026-10-24T12:27:14.466Z",
+    "plugin": "builtin_SelectDragger.rbxm",
+    "ms": 95.12400000002685,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.479Z",
+    "plugin": "sabuiltin_InputActionManager.rbxm",
+    "ms": 108.6866999999927,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.640Z",
+    "plugin": "sabuiltin_Debugger.rbxm",
+    "ms": 270.97470000001067,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.764Z",
+    "plugin": "builtin_MoveDragger.rbxm",
+    "ms": 67.77239999999551,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.798Z",
+    "plugin": "builtin_SimulationStep.rbxm",
+    "ms": 16.390599999994038,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.799Z",
+    "plugin": "sabuiltin_FindReplaceAll.rbxm",
+    "ms": 429.55529999997566,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.834Z",
+    "plugin": "user_RojoManagedPlugin.rbxm",
+    "ms": 33.54150000001255,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.844Z",
+    "plugin": "builtin_ScaleDragger.rbxm",
+    "ms": 75.02310000000989,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.861Z",
+    "plugin": "builtin_RotateDragger.rbxm",
+    "ms": 141.78580000000807,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.889Z",
+    "plugin": "sabuiltin_MultitouchEmulator.rbxm",
+    "ms": 517.1583999999996,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.903Z",
+    "plugin": "sabuiltin_DirectionalCurveEditor.rbxm",
+    "ms": 532.7877000000001,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.941Z",
+    "plugin": "sabuiltin_PerformanceTools.rbxm",
+    "ms": 571.2750000000142,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.968Z",
+    "plugin": "sabuiltin_AudioEqualizerEditor.rbxm",
+    "ms": 599.2233999999996,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:14.995Z",
+    "plugin": "sabuiltin_ControlsEmulator.rbxm",
+    "ms": 625.1465999999937,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:15.054Z",
+    "plugin": "sabuiltin_AttenuationCurveEditor.rbxm",
+    "ms": 683.0592000000024,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:15.068Z",
+    "plugin": "sabuiltin_ExplorerPlugin.rbxm",
+    "ms": 697.3500000000001,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:15.068Z",
+    "plugin": "sabuiltin_Tutorials.rbxm",
+    "ms": 377.4385000000109,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:15.098Z",
+    "plugin": "sabuiltin_Assistant.rbxm",
+    "ms": 727.0659000000137,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:15.110Z",
+    "plugin": "sabuiltin_SceneAnalysis.rbxm",
+    "ms": 576.5206999999748,
+    "dataModel": "PlayServer"
+  },
+  {
+    "at": "2026-10-24T12:27:16.164Z",
+    "plugin": "builtin_SelectDragger.rbxm",
+    "ms": 73.09609999998656,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.458Z",
+    "plugin": "sabuiltin_InputActionManager.rbxm",
+    "ms": 112.55320000000779,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.478Z",
+    "plugin": "sabuiltin_Debugger.rbxm",
+    "ms": 390.07349999999974,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.537Z",
+    "plugin": "sabuiltin_AudioEqualizerEditor.rbxm",
+    "ms": 446.315200000015,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.557Z",
+    "plugin": "builtin_SimulationStep.rbxm",
+    "ms": 27.628899999996293,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.567Z",
+    "plugin": "sabuiltin_DirectionalCurveEditor.rbxm",
+    "ms": 477.6726999999994,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.572Z",
+    "plugin": "user_RojoManagedPlugin.rbxm",
+    "ms": 32.376900000002706,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.579Z",
+    "plugin": "builtin_MoveDragger.rbxm",
+    "ms": 488.76540000000546,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.586Z",
+    "plugin": "sabuiltin_ControlsEmulator.rbxm",
+    "ms": 496.97589999999536,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.594Z",
+    "plugin": "builtin_ScaleDragger.rbxm",
+    "ms": 76.62669999999139,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.670Z",
+    "plugin": "sabuiltin_FindReplaceAll.rbxm",
+    "ms": 504.29940000000784,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.676Z",
+    "plugin": "builtin_RotateDragger.rbxm",
+    "ms": 184.27059999999074,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.735Z",
+    "plugin": "sabuiltin_AttenuationCurveEditor.rbxm",
+    "ms": 645.66769999999,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.749Z",
+    "plugin": "sabuiltin_Tutorials.rbxm",
+    "ms": 288.987800000001,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.753Z",
+    "plugin": "sabuiltin_ExplorerPlugin.rbxm",
+    "ms": 607.8842999999949,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.758Z",
+    "plugin": "sabuiltin_SceneAnalysis.rbxm",
+    "ms": 373.8309999999956,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.759Z",
+    "plugin": "sabuiltin_PerformanceTools.rbxm",
+    "ms": 412.70529999999894,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.800Z",
+    "plugin": "sabuiltin_MultitouchEmulator.rbxm",
+    "ms": 453.43560000000593,
+    "dataModel": "PlayClient"
+  },
+  {
+    "at": "2026-10-24T12:27:16.953Z",
+    "plugin": "sabuiltin_Assistant.rbxm",
+    "ms": 862.6794000000189,
+    "dataModel": "PlayClient"
+  }
+]

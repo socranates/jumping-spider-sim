@@ -4,7 +4,7 @@ import argparse,hashlib,json,re
 p=argparse.ArgumentParser();p.add_argument('--stage',type=Path,required=True);p.add_argument('--log',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 m=json.loads((a.stage/'manifest.json').read_text())
-assert m['startup_clock']and m['source_count']==276 and m['variant']=='after'
+assert m['startup_clock']and m['source_count']==(277 if m.get('microprofiler_sdk_sha256')else 276)and m['variant']=='after'
 assert sha(Path(m['place']).read_bytes())==m['place_sha256']and sha((a.stage/'guard.luau').read_bytes())==m['guard_sha256']
 events=[];guards=[];diagnostics=[];lines=[];server=[]
 for line in a.log.read_text(encoding='utf8').splitlines():
@@ -16,7 +16,7 @@ for line in a.log.read_text(encoding='utf8').splitlines():
  elif '[FLog::CreatorOutput]'in line and '[MATRIX_GUARD]'in line:guards.append(line);lines.append(line)
  elif '[FLog::CreatorError]'in line or '[FLog::CreatorWarning]'in line:diagnostics.append(line);lines.append(line)
 assert len({x['run']for x in events})==1
-expected=f"[MATRIX_GUARD] 276 after {m['tier']} unbound memory_only"
+expected=f"[MATRIX_GUARD] {m['source_count']} after {m['tier']} unbound memory_only"
 assert len(guards)>=2 and all(x.endswith(expected)for x in guards)
 def one(kind):
  values=[x['value']for x in events if x['kind']==kind];assert len(values)==1,(kind,len(values));return values[0]

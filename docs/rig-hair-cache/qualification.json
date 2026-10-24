@@ -16,5 +16,8 @@
   "model_sha256": "b0a761a85267ff5f6aa515fe58b31149a1270ca0136867a7d38b8adae0c86f7b",
   "native_passed": true,
   "published": false,
-  "limits": "Operation-saving and native fixture equivalence only; no paired FPS or broad audit completion."
+  "limits": "Operation-saving and native fixture equivalence only; no paired FPS or broad audit completion.",
+  "full_ci_run": 40093189495,
+  "full_ci_conclusion": "success",
+  "full_ci_suites": 80
 }

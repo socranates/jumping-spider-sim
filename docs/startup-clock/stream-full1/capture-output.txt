@@ -1,0 +1,3 @@
+2026-10-24T12:26:25.733Z,143.733124,0f94,6,Info [FLog::CreatorOutput] [LIBMP_CAPABILITY] {"dataFormat":65537,"library":65537,"accessible":true,"compatible":true,"ready":true}
+2026-10-24T12:27:00.628Z,178.628113,0f94,6,Info [FLog::CreatorOutput] [LIBMP_STREAM_START] {"at":1792844820.759468,"status":{"Active":false,"StreamFrameId":0,"AbsoluteFrameId":0,"MarkerMask":0,"RecordedSizeKb":0,"MaxSizeKb":0,"ElapsedMs":0},"accepted":true}
+2026-10-24T12:28:32.349Z,270.349274,37f0,6,Info [FLog::CreatorOutput] [LIBMP_STREAM_STOP] {"before":{"Active":true,"StreamFrameId":4884,"AbsoluteFrameId":14028,"MarkerMask":0,"RecordedSizeKb":176359,"MaxSizeKb":262144,"ElapsedMs":91684},"at":1792844912.480625,"accepted":true}

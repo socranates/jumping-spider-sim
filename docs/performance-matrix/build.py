@@ -1,5 +1,6 @@
 """Build unpublished unbound benchmark models from ordinary source.
-Only LookPlan differs between before/after. No upload or external save access.
+The legacy before variant replaces LookPlan only. Startup-clock uses current
+ordinary sources with isolated timing hooks. No upload or external save access.
 """
 from pathlib import Path
 import argparse,hashlib,json,subprocess,xml.etree.ElementTree as ET,zlib
@@ -56,6 +57,8 @@ if a.startup_clock:
   'local home = m.region(m.HOME) :: WorldMap.Region':'local home = StartupTrace.call("home-region",function()return m.region(m.HOME)end) :: WorldMap.Region',
   'local lo, hi = m.bounds()':'local lo, hi = m.bounds();StartupTrace.mark("world-bounds-ready")',
   'local flat = ws:FindFirstChild(name)':'StartupTrace.mark("home-collision-begin")\nlocal flat = ws:FindFirstChild(name)',
+  'if remaining>0 then child=parent:WaitForChild(childName,remaining) end':'if remaining>0 then local started=StartupTrace.elapsed();child=parent:WaitForChild(childName,remaining);StartupTrace.note("REQUIRED_WAIT",{parent=parent.Name,child=childName,began=started,elapsed_ms=(StartupTrace.elapsed()-started)*1000,found=child~=nil})end',
+  ' -- Optional visuals arrive independently; only essential collision gates startup.':'StartupTrace.mark("home-pieces-ready")\n -- Optional visuals arrive independently; only essential collision gates startup.',
   'pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)':'StartupTrace.mark("home-collision-end")\npcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)'}
  for old,new in anchors.items():assert code.count(old)==1,old;code=code.replace(old,new)
  source['Client/WorldClient.luau']=code.encode()
@@ -122,6 +125,6 @@ guard='assert(game.PlaceId==0 and game.GameId==0 and not game:GetService("RunSer
 if a.seam_group:guard='assert(workspace:GetAttribute("SeamGroup")=='+json.dumps(a.seam_group)+');'+guard
 guard+='for _,r in expected do local it=game;for n in string.gmatch(r[1],"[^.]+")do it=assert(it:FindFirstChild(n),r[1])end;local s=string.gsub(it.Source,"\\r\\n","\\n");local x,y=1,0;for i=1,#s do x=(x+string.byte(s,i))%65521;y=(y+x)%65521 end;assert(#s==r[2] and y*65536+x==r[3],r[1])end;assert(not game.ServerScriptService.Server.Persistence.Disabled);print("[MATRIX_GUARD]",'+str(source_count)+',"'+a.variant+'","'+a.tier+'","unbound memory_only")'
 (out/'guard.luau').write_bytes((guard+'\n').encode())
-manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
+manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,startup_waits=a.startup_clock,decor_nonblocking=True,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
 (out/'manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode())
 print(json.dumps(dict(place=str(place),sha256=manifest['place_sha256'],sources=source_count,variant=a.variant,tier=a.tier)),flush=True)

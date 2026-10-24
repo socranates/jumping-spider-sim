@@ -388,7 +388,7 @@ local function streamed(never: boolean, streaming: boolean?): any
  return askedSill, askedWorkspace, client, seen, problem, p
 end
 
-check("with instance streaming on, the client waits for every box of the sill that is not there yet, and for the Decor, before the sim begins", function()
+check("streamed startup waits for every essential home box without waiting for optional Decor", function()
 	local askedSill, askedWorkspace, c, seen = streamed(false)
 	local late = { Layout.PIECES[1].id, Layout.PIECES[12].id, Layout.PIECES[#Layout.PIECES].id }
 	assert(#askedSill == #late, `asked the sill for {#askedSill} boxes`)
@@ -398,7 +398,10 @@ check("with instance streaming on, the client waits for every box of the sill th
 		assert(c.sill:FindFirstChild(id) ~= nil, `{id} has arrived`)
 	end
 	assert(#c.sill:GetChildren() == #Layout.PIECES, "the sill is whole")
-	assert(table.find(askedWorkspace, "Decor") ~= nil and c.decor ~= nil and c.decor.Name == "Decor", "the drawn sill was waited for and is there")
+	assert(table.find(askedWorkspace, "Decor") == nil and c.decor == nil, "optional visuals cannot block controller construction")
+	local decor=Instance.new("Model");decor.Name="Decor";decor.Parent=workspace
+	c:update(c.spawnPos,nil,0)
+	assert(c.decor==decor,"decoration arriving after construction is discovered without a wait")
 	assert(#seen == 0, "nothing to say when everything came")
 	workspace:ClearAllChildren()
 end)
@@ -1167,6 +1170,72 @@ check("flat legacy worlds retain their original jump and fall scope",function()
  local flat=flatWorld();local client=WorldClient.new(workspace,Instance.new("Player"),WorldMap)
  assert(client.root==flat and client:playerCanAdvance(assert(WorldMap.region("bed_a")).spawn.pos) and not client.playerLoading)
  workspace.StreamingEnabled=old;workspace:ClearAllChildren()
+end)
+
+-- Optional streamed visuals arrive independently of essential home collision.
+local Breakaway=require("../src/Shared/Habitat/Breakaway")
+local HutLife=require("../src/Client/HutLife")
+local function visual(parent: Instance,name: string): BasePart
+ local p=Instance.new("Part");p.Name=name;p.CFrame=CFrame.new(2,4,6);p.Transparency=.3;p.Parent=parent
+ return p
+end
+local function folder(parent: Instance,name: string): Instance
+ local p=Instance.new("Folder");p.Name=name;p.Parent=parent;return p
+end
+check("late leaf geometry joins an active fall without resetting its timer or baseline",function()
+ workspace:ClearAllChildren()
+ local world=folder(workspace,"LeafFixture");local collider=visual(world,"leaf_tip");collider.Transparency=1
+ local leaf=Breakaway.new(world,nil);leaf:apply({left=4})
+ local decor=folder(workspace,"Decor");leaf:syncDecor(decor,0,false)
+ local pilea=folder(decor,"Pilea");local tip=folder(pilea,"leaf_tip");local blade=visual(tip,"Blade")
+ local home=blade.CFrame;local remaining=leaf.left
+ leaf:syncDecor(decor,.25,false)
+ assert(#leaf.pieces==1 and blade.Transparency==1 and blade.Position.Y<home.Position.Y-4,"late descendant must show the current fallen state")
+ assert(leaf.left==remaining and not collider.CanQuery,"binding cannot change the saved timer or collision state")
+ local vein=visual(tip,"Vein");local veinHome=vein.CFrame
+ leaf:syncDecor(decor,.25,false)
+ assert(#leaf.pieces==2 and vein.Transparency==1,"parts arriving after their parent are included")
+ for _=1,12 do leaf:syncDecor(decor,.25,false) end
+ leaf:apply(nil)
+ assert((blade.Position-home.Position).Magnitude<1e-6 and blade.Transparency==.3,"refreshes cannot capture a fallen transform as the baseline")
+ assert((vein.Position-veinHome.Position).Magnitude<1e-6 and collider.CanQuery,"reset restores every late part and collision")
+ workspace:ClearAllChildren()
+end)
+check("leaf stream-out and replacement prune references and retain logical fall state",function()
+ workspace:ClearAllChildren()
+ local world=folder(workspace,"LeafFixture");visual(world,"leaf_tip")
+ local decor=folder(workspace,"Decor");local tip=folder(folder(decor,"Pilea"),"leaf_tip");local blade=visual(tip,"Blade")
+ local leaf=Breakaway.new(world,decor);local home=blade.CFrame;leaf:apply({left=3})
+ blade.Parent=nil;leaf:syncDecor(decor,.25,true)
+ assert(#leaf.pieces==0 and leaf.left==3 and blade.Transparency==.3,"stream-out releases cached parts without changing progress")
+ blade.Parent=tip;leaf:syncDecor(decor,.25,true)
+ assert(#leaf.pieces==1 and blade.Transparency==1,"same-instance return retains the original baseline")
+ leaf:apply(nil);assert((blade.Position-home.Position).Magnitude<1e-6)
+ local other=folder(workspace,"ReplacementDecor");local replacement=visual(folder(folder(other,"Pilea"),"leaf_tip"),"NewBlade")
+ leaf:apply({left=2});leaf:syncDecor(other,0,false)
+ assert(#leaf.pieces==1 and leaf.pieces[1].part==replacement and leaf.left==2 and replacement.Transparency==1,"replacement binds immediately in the saved pose")
+ assert(blade.Transparency==.3 and (blade.Position-home.Position).Magnitude<1e-6,"old visuals are released in their original state")
+ leaf:syncDecor(nil,0,false);assert(#leaf.pieces==0 and leaf.left==2)
+ workspace:ClearAllChildren()
+end)
+check("late sash visuals follow the existing window without replaying the opening",function()
+ workspace:ClearAllChildren()
+ local root=folder(workspace,"WindowFixture");local hut=HutLife.new(root,nil,123,workspace)
+ assert(not hut:passable() and hut.sash.CanQuery,"physical sash exists before optional decoration")
+ local original=hut.sash;local decor=folder(workspace,"Decor");hut:bindDecor(decor)
+ local wall=folder(decor,"Wall");local rail=visual(wall,"SashRail");hut:bindDecor(decor)
+ assert(rail.Transparency==1 and hut.sash==original and hut.opened==0,"late raised sash is hidden while the physical sash stays shut")
+ local top=visual(wall,"SashTop");hut.moment=10;hut:bindDecor(decor)
+ assert(top.Transparency==1 and hut.moment==10,"late top cannot reset an opening in progress")
+ hut:restore(true);local wedge=hut.wedge
+ assert(hut:passable() and hut.opened==1 and rail.Transparency==.3 and top.Transparency==.3)
+ local nextDecor=folder(workspace,"ReplacementDecor");local nextWall=folder(nextDecor,"Wall");local nextRail=visual(nextWall,"SashRail")
+ for _=1,10 do hut:bindDecor(nextDecor) end
+ assert(hut.wedge==wedge and hut.opened==1 and nextRail.Transparency==.3,"restored open window must not replay or hide replacement visuals")
+ hut:reshut();hut:bindDecor(nextDecor);assert(nextRail.Transparency==1)
+ nextRail.Parent=nil;hut:bindDecor(nextDecor)
+ assert(next(hut.hidden)==nil and nextRail.Transparency==.3,"removed sash visuals release their hidden-state references")
+ workspace:ClearAllChildren()
 end)
 
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)

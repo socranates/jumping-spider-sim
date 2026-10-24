@@ -116,8 +116,13 @@ end
 -- The sill's Decor's raised sash (its bottom rail and its top), hidden while the sash is down and shown again when it is up.
 local function raisedSash(self: any, show: boolean)
 	local decor = self.decor
-	if decor == nil then return end
-	local wall = decor:FindFirstChild("Wall")
+	local wall = if decor then decor:FindFirstChild("Wall") else nil
+	local rail = if wall then wall:FindFirstChild("SashRail") else nil
+	local top = if wall then wall:FindFirstChild("SashTop") else nil
+	-- Streamed-out/replaced visuals must not retain a hidden-state reference.
+	for p, transparency in self.hidden do
+		if p ~= rail and p ~= top then (p :: BasePart).Transparency = transparency; self.hidden[p] = nil end
+	end
 	if wall == nil then return end
 	for _, name in { "SashRail", "SashTop" } do
 		local p = wall:FindFirstChild(name)
@@ -131,6 +136,13 @@ local function raisedSash(self: any, show: boolean)
 			end
 		end
 	end
+end
+
+-- Decor (and its two sash parts) may arrive after construction or be replaced.
+-- Reconcile only the visual state; never recreate collision or replay opening.
+function HutLife.bindDecor(self: any, decor: Instance?)
+	self.decor = decor
+	raisedSash(self, self.open)
 end
 
 -- The sash down: the gap filled, drawn as the lowered sash's glass over its bottom rail.

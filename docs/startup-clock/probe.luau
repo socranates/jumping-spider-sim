@@ -3,9 +3,10 @@
 local Run=game:GetService("RunService")
 local WS=game:GetService("Workspace")
 local Http=game:GetService("HttpService")
+local Stats:any=game:GetService("Stats")
 local Prof=require(script.Parent.FrameProfile)
 local P={}
-local s:any={begun=false,phase="none",frames=0,gaps={},raw={},intervals={}}
+local s:any={begun=false,phase="none",frames=0,gaps={},raw={},intervals={},unavailable={}}
 local tag=tostring(DateTime.now().UnixTimestampMillis)
 local function emit(kind:string,value:any)print("[STARTUP_CLOCK_"..kind.."]",tag,Http:JSONEncode(value))end
 function P.mark(name:string)
@@ -15,6 +16,7 @@ function P.mark(name:string)
  s.lastMark=now
 end
 function P.note(name:string,value:any)emit(name,value)end
+function P.elapsed():number return os.clock()-s.born end
 function P.begin()
  assert(not s.begun and Run:IsStudio()and Run:IsClient()and game.PlaceId==0 and game.GameId==0 and WS:GetAttribute("StartupClock")==true)
  s.begun=true;s.born=os.clock();s.lastMark=s.born
@@ -30,6 +32,12 @@ function P.begin()
   if dt>.04 or interval>.04 then
    local row={t=elapsed,raw_dt_ms=dt*1000,callback_interval_ms=interval*1000,first=s.frames==1,phase=s.phase,heap_kb=gcinfo(),
     profile_frames=Prof.state.frames,parts=table.clone(Prof.state.current)}
+   local engine={}
+   for _,key in {"FrameTime","RenderCPUFrameTime","RenderGPUFrameTime","PhysicsStepTime","InstanceCount"}do
+    local okay,value=pcall(function():any return Stats[key]end)
+    if okay and type(value)=="number"then engine[key]=value else s.unavailable[key]=tostring(value)end
+   end
+   row.engine=engine
    table.insert(s.gaps,row)
    table.sort(s.gaps,function(a:any,b:any):boolean return math.max(a.raw_dt_ms,a.callback_interval_ms)>math.max(b.raw_dt_ms,b.callback_interval_ms)end)
    if #s.gaps>12 then table.remove(s.gaps)end
@@ -53,6 +61,7 @@ function P.finish(ok:boolean,why:any)
   for name,seconds in parts do if seconds>.001 then emit("GAP_PART",{t=row.t,name=name,ms=seconds*1000,profile_frames=row.profile_frames})end end
  end
  emit("SUMMARY",{wall_seconds=os.clock()-s.born,frames=s.frames,raw_after_first=summary(s.raw),callback_after_first=summary(s.intervals)})
+ for name,why in s.unavailable do emit("UNAVAILABLE",{name=name,problem=why})end
  emit(if ok then"PASS"else"FAIL",{problem=if ok then nil else string.sub(tostring(why),1,400),unbound=true,storage="yielding-memory",detail=WS:GetAttribute("Detail")})
  WS:SetAttribute("StartupClockFinished",true)
 end

@@ -5,18 +5,44 @@ local Breakaway={}
 Breakaway.__index=Breakaway
 Breakaway.RESET=8
 Breakaway.FALL=0.7
+-- Only the small leaf-tip subtree is scanned, at most four times per second.
+-- Polling also handles children arriving after their streamed parent, without
+-- retaining listeners or parts from an old Decor tree.
+Breakaway.DECOR_INTERVAL=0.25
 function Breakaway.new(world: Instance, decor: Instance?): any
  local part=world:FindFirstChild("leaf_tip")
- local pieces={}
+ local self=setmetatable({pieces={},decor=nil,decorClock=Breakaway.DECOR_INTERVAL,transparency=if part and part:IsA("BasePart") then part.Transparency else 0,part=part,home=if part and part:IsA("BasePart") then part.CFrame else CFrame.identity,
+  left=0,elapsed=0,last=nil},Breakaway)
+ self:syncDecor(decor,0,false)
+ return self
+end
+function Breakaway.syncDecor(self: any,decor: Instance?,dt: number,reduced: boolean)
+ self.decorClock+=math.max(0,dt)
+ if decor==self.decor and self.decorClock<Breakaway.DECOR_INTERVAL then return end
+ self.decor,self.decorClock=decor,0
  local pilea=if decor then decor:FindFirstChild("Pilea") else nil
  local tip=if pilea then pilea:FindFirstChild("leaf_tip") else nil
+ local old={}
+ for _,entry in self.pieces do old[entry.part]=entry end
+ local pieces={}
+ local changed=false
  if tip then
   for _,p in tip:GetDescendants() do
-   if p:IsA("BasePart") then table.insert(pieces,{part=p,frame=p.CFrame,transparency=p.Transparency}) end
+   if p:IsA("BasePart") then
+    local entry=old[p]
+    if entry==nil then entry={part=p,frame=p.CFrame,transparency=p.Transparency};changed=true end
+    table.insert(pieces,entry);old[p]=nil
+   end
   end
  end
- return setmetatable({pieces=pieces,transparency=if part and part:IsA("BasePart") then part.Transparency else 0,part=part,home=if part and part:IsA("BasePart") then part.CFrame else CFrame.identity,
-  left=0,elapsed=0,last=nil},Breakaway)
+ for p,entry in old do
+  p.CFrame,p.Transparency=entry.frame,entry.transparency
+  changed=true
+ end
+ if changed then
+  self.pieces=pieces
+  self:draw(reduced) -- preserve the current fall/restore state on late visuals
+ end
 end
 function Breakaway.valid(record: any): boolean
  return record==nil or (type(record)=="table" and type(record.left)=="number" and record.left==record.left and record.left>=0 and record.left<=Breakaway.RESET)

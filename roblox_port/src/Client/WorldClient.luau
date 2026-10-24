@@ -56,7 +56,6 @@ end
 
 -- Shared essential-world arrival deadline; failure stops construction before any motor exists. Decor is best effort.
 WorldClient.PIECES_WAIT = 30
-WorldClient.DECOR_WAIT = 10
 -- The focus report (ROBLOX-95): sent when the spider is more than this many studs from where it last reported, or this many seconds after the last report.
 WorldClient.REPORT_MOVE = 8
 WorldClient.REPORT_EVERY = 2
@@ -121,11 +120,11 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
    if not part:IsA("BasePart") then unavailable(piece.id.." collision part") end
   end
  end
- if streaming and decor==nil then decor=ws:WaitForChild("Decor",WorldClient.DECOR_WAIT) end
+ -- Optional visuals arrive independently; only essential collision gates startup.
  pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)
 
 	return setmetatable({
-		map = m, player = player, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
+		map = m, player = player, workspace = ws, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
 		home = home.id, region = home,
 		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
 		homeMin = home.bounds[1], homeMax = home.bounds[2],
@@ -296,6 +295,7 @@ end
 -- ROBLOX-108: the looks of the regions outside the window, made on this client at its tier ("full" or "low") near the spider from now on (Client/LookStream; each
 -- `update` follows the spider). In a place with only the sill straight in the workspace (the box worlds) there is nothing to draw and nothing is made.
 function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
+	self.decor = ws:FindFirstChild("Decor")
 	if self.root == self.sill then return nil end
 	self.looks = LookStream.new(ws, tier, self.root, self.map)
 	-- (ROBLOX-115) in the preserve, the trains beyond the north fence, with the looks
@@ -314,6 +314,8 @@ end
 -- the region it is in has arrived whole (warned about once if not). `nextPosition`
 -- keeps the fixed-tick destination hold live even on a render without a tick.
 function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?, nextPosition: Vector3?)
+	self.decor = self.workspace:FindFirstChild("Decor")
+	if self.hut ~= nil then self.hut:bindDecor(self.decor) end
 	self.region = self.map.at(pos) or self.region
 	-- A render can contain no fixed tick. Keep a refused destination waiting on
 	-- those frames too, rather than clearing the hold just because here is ready.

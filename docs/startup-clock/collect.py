@@ -32,6 +32,7 @@ if m.get('startup_profile'):
  required[3:3]=['world-client-import-begin','world-client-dependencies-ready','world-client-import-end','world-client-new-begin',
   'world-map-selected','home-region-begin','home-region-end','world-bounds-ready','home-collision-begin','home-collision-end','world-client-new-end']
  assert [x['name']for x in server]==['imports-begin','imports-end','decor-begin','decor-end','hidden-plan-begin','physical-world-begin','physical-world-end']
+if m.get('startup_waits'):required.insert(required.index('home-collision-end'),'home-pieces-ready')
 assert [x['name']for x in marks]==required,[x['name']for x in marks]
 assert all(b['t']>=a['t']for a,b in zip(marks,marks[1:]))
 assert not any('[FLog::CreatorError]'in x for x in diagnostics)

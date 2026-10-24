@@ -1,0 +1,7 @@
+FAIL world_client: late leaf geometry joins an active fall without resetting its timer or baseline
+    C:/Users/natha/AppData/Local/Temp/tmpqhvqnft9.luau:64782: attempt to call missing method 'syncDecor' of table
+FAIL world_client: leaf stream-out and replacement prune references and retain logical fall state
+    C:/Users/natha/AppData/Local/Temp/tmpqhvqnft9.luau:64802: attempt to call missing method 'syncDecor' of table
+FAIL world_client: late sash visuals follow the existing window without replaying the opening
+    C:/Users/natha/AppData/Local/Temp/tmpqhvqnft9.luau:64818: attempt to call missing method 'bindDecor' of table
+WORLD_CLIENT passed=0 failed=3

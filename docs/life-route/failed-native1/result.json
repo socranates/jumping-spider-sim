@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "run": "1792849498480",
+  "source_guards": 2,
+  "creator_errors": 0,
+  "complete_meals": 7,
+  "stopped_at": "Meal7 automatically entered a moult before the explicit rest request; driver assertion failed.",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T134250Z_Studio_24F18_last.log",
+  "log_sha256": "0830b68cc9c7fd4c5a3b67938b2d98adc7b5163827ecb882951fc1258673344c",
+  "cleanup": "Driver clock override and listener cleaned; scripted server finish was not reached. Stop/close ended local memory session. This run is not a qualification."
+}

@@ -1,0 +1,8 @@
+sourcemap 0 Created sourcemap at C:\Users\natha\claude-xfer\Windowsill-life-route-native1\sourcemap.json
+
+strict 0 [INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+
+Building project 'WindowsillMatrix_after_full'
+Built project to Windowsill-matrix.rbxlx
+{"place": "C:\\Users\\natha\\claude-xfer\\Windowsill-life-route-native1\\Windowsill-matrix.rbxlx", "sha256": "d115ed57aa12ee32eae064ec14a1cb4436b24cbabf76c7a9064f86174ed0dcb1", "sources": 276, "variant": "after", "tier": "full"}

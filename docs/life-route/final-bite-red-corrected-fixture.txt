@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmpi3l91xmq.luau:67816: feeding/survival/context failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpi3l91xmq.luau:67816
+FAIL MEALS Eat finishing in the Crack does not also Rest or moult
+MEALS passed=91 failed=1

@@ -1,0 +1,51 @@
+{
+  "source_commit": "fa7367fb893a53a66fae71970e5d3116ec8e9d6b",
+  "evidence_id": "5e9ac432e9933ed9",
+  "ordinary_sources": 273,
+  "game_module_changes": [
+    "Client/SpiderClient.client.luau"
+  ],
+  "targeted_suites": {
+    "MEALS": [
+      92,
+      0
+    ],
+    "LOCAL_REST": [
+      33,
+      0
+    ],
+    "LOCAL_REST_CLIENT": [
+      17,
+      0
+    ],
+    "GROWTH": [
+      571,
+      0
+    ]
+  },
+  "targeted_passes": 713,
+  "targeted_failures": 0,
+  "native_run": "1792850357913",
+  "native_meals": 62,
+  "native_moults": 9,
+  "native_adult_modes": 3,
+  "unchanged_final_bite_native_driver": true,
+  "full_route_fixture_clock_corrected": true,
+  "native_guards": 2,
+  "native_errors": 0,
+  "native_warnings": 6,
+  "native_model_sha256": "f05899bfb21f365ffac5e8cff9f2bfc4799cf6f6c657c9b2a31ee9c2f6f89b87",
+  "native_log_sha256": "3b6c6ed67937294b76f0104e249b217c908f6b27ac90977d879897004b6ebace",
+  "export_hashes": {
+    "TheWindowsill.rbxlx": "87ed5f9d8ca8f7259a1dcc72a132806a9a7cf42f507bee5826445dd3e040d513",
+    "TheWindowsillTests.rbxlx": "3bb694fc12a9eb6a0c48e7e62ac294f9d86c220fb56f611a03ba9675ef21f5bb"
+  },
+  "full_ci_run": 40099833793,
+  "full_ci_status": "completed",
+  "full_ci_conclusion": "success",
+  "full_ci_suites": 80,
+  "published": false,
+  "private_published_version_unchanged": 14,
+  "production_changed": false,
+  "limits": "Local unbound Studio/memory. Captures and safe Crack arrival are scripted; actual input-state taps drive struggle/feeding. Clock advances are accelerated for moult/hardening. No stage, energy or food counters assigned. Earned adult unlock and local retained-rest preparation; not natural hunts, full mating/generation, online saves/rejoin, physical devices or FPS proof."
+}

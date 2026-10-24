@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmpb590y3iw.luau:66739: attempt to call a nil value
+stacktrace:
+C:/Users/natha/AppData/Local/Temp/tmpb590y3iw.luau:66739 function frame
+C:/Users/natha/AppData/Local/Temp/tmpb590y3iw.luau:67129
+C:/Users/natha/AppData/Local/Temp/tmpb590y3iw.luau:67777 function frames
+C:/Users/natha/AppData/Local/Temp/tmpb590y3iw.luau:67798

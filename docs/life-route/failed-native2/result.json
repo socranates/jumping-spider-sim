@@ -1,0 +1,13 @@
+{
+  "passed": false,
+  "run": "1792850020648",
+  "source_guards": 2,
+  "creator_errors": 0,
+  "complete_meals": 7,
+  "completed_moults": 1,
+  "hardened": true,
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T135032Z_Studio_D92BC_last.log",
+  "log_sha256": "67fca47c0f84971dbeb8006bb0a1e4ee9c50677a0eba8c7207398aa28a7ae81c",
+  "stopped_at": "Checkpoint wait expired: per-instance diagnostic clock closures were correctly refused by ObjectRecord as unnamed functions. Same driver as native1 now leaves meal7 ready, uses separate Rest, moults and hardens. This is a fixture failure, not a source save regression.",
+  "cleanup": "Driver clock override and listener cleaned; server finish not reached; stopped and closed local memory session."
+}

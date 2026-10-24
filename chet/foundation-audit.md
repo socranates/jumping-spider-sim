@@ -1,3 +1,29 @@
+Latest feeding/progression supplement, 2026-10-24: source/test commit fa7367fb,
+ordinary evidence 5e9ac432e9933ed9, 273 sources. docs/life-route/ records and
+fixes a real input bug: the final Eat tap in the Crack also requested Rest,
+starting a ready moult without a second press. Rest is now queued only when
+the jaws were empty at input time (including the captured-rival context).
+Focused regressions 713/0; full 80-suite CI 40099833793 SUCCEEDED, including
+compile, strict types, exports and runner cleanup checks. Native run
+1792850357913 passes 62 complete meals, nine moults/hardenings and three adult
+lives (Normal, Easy, Free); exact 7/10 thresholds, unlocks, drawn stage and
+retained local rests. Both 276-source guards, 0 CreatorErrors, six retained
+style/asset warnings, operation cleanup; Studio 27420 exited, model unchanged.
+Captures/safe Crack arrival are scripted and clocks accelerated; no forced
+food, energy or growth counters. Not natural hunting, mating/eggs/generations,
+online rest/rejoin, physical devices or FPS proof. Failed native1 exposed the
+real input bug; native2 kept the identical driver and confirmed that fix but
+hit an unnamed diagnostic-clock function at checkpoint capture. Both remain
+preserved. Only the unpublished fixture clock was corrected for native3.
+qualification.json binds sources, exports, native run and successful CI.
+These ordinary exports supersede the older 597db4c421e47c5e cohort below;
+that predator fix and its proof remain part of this candidate's history.
+Private published version 14 still has 032b5985ac17eeb2. No new publication,
+production/main/OneDrive/Godot/synced-source changes. Broader goal ACTIVE:
+continue the remaining full reproductive route, natural strikes, whole-map
+collision/content/device coverage and hypothesis-driven startup profiling.
+This qualified progression subset does not close the entire foundation audit.
+
 Latest foundation progress: see [the current health ledger](../docs/audit/HEALTH-CURRENT.md)
 and [predator ending fix](../docs/predator-endings/README.md). Five newer lethal
 outcomes were silently ignored; the small unpublished fix passes targeted and

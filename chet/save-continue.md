@@ -1,6 +1,29 @@
 # Current integration handoff â€” 2026-10-24
 
-Latest completed continuation: optional-Decor startup fix, ordinary evidence
+Latest completed measurement pass: docs/performance-matrix/PAIR2.md and
+pair2-comparison.json qualify four current runs/36 workload samples,8 guards,
+0 CreatorErrors,cleanup and0 camera mismatches at unchanged.01 tolerance.
+Both variants keep current hut policy/geometry; only base-record sharing differs.
+4805 equivalence checks pass. Means are mixed: no blanket speedup. Ordinary
+source/export evidence remains105c83862d500f43 at source/test commitc8054893.
+
+docs/startup-clock/phases-full1 locates gaps before first render callbacks;
+internal cause remains unproved. docs/microprofiler-current retains a paused
+128-frame client dump and unqualified overlapping60-frame Server-tab request.
+A separate fresh garden fixture passes both276-source guards/cleanup with0
+errors, but mouse-state trouble prevented a fresh server dump. No pointer-release
+command executed. Its largest measured game-code lap is SpiderRig (2.20ms mean),
+not proof of a specific expensive operation. All Studio editors are closed.
+
+Next read docs/microprofiler-current/README.md: qualify a fresh unpaused server
+capture with explicit fixture pointer release, inspect SpiderRig using existing
+laps, and pursue the separate early startup gap. The matched pair is complete;
+do not repeat without a new change or concrete measurement concern. Broader
+natural-life, whole-map, device/input and content coverage remains open. No new
+publication; prior private13 authorization remains fulfilled. Goal ACTIVE.
+
+Earlier source-fix continuation, retaining its exact qualification:
+optional-Decor startup fix, ordinary evidence
 105c83862d500f43, 273 sources, source/test commit c8054893. Read
 docs/startup-clock/README.md and qualification.json first. Deep2 measured
 essential home collision ready at 0.485 s followed by 4,777 ms waiting on
@@ -17,8 +40,8 @@ Client hooks now install at 0.525 s in the ordinary observation instead of
 5.541 s in deep2, but title still takes 11.283 s. Separate 2.46 s/1.24 s engine
 callback gaps occur before the first completed game render frame. Do not
 claim those pauses fixed, a causal overall speed percentage or gameplay FPS.
-Next investigate engine/instance-arrival timing before changing another
-simulation budget, and qualify a matched-view performance pair. The wider
+Investigate engine/instance-arrival timing before changing another simulation
+budget; the later matched-view pair is now recorded above. The wider
 audit, natural-life, whole-map and physical-phone work remains open. Goal
 ACTIVE. Current fixes are pushed only to github/codex/verified-integration.
 The previous private 13 authorization is already fulfilled; do not use it

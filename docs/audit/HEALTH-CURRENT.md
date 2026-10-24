@@ -1,5 +1,18 @@
 # Current foundation evidence and remaining work
 
+Latest measurement supplement,2026-10-24: ordinary evidence remains
+105c83862d500f43. ../performance-matrix/PAIR2.md now qualifies four current
+native runs/36 workloads,8 source guards,0 CreatorErrors,cleanup and0 camera
+mismatches at the unchanged.01 tolerance. Both variants keep current hut policy
+and geometry; only base-record sharing differs.4805 equivalence checks pass.
+Means are mixed, with no blanket FPS gain. ../startup-clock/phases-full1
+locates initial gaps before render callbacks without identifying their internal
+cause. ../microprofiler-current records an actual128-frame client dump,
+rejects an overlapping paused-buffer Server-tab request as independent timing,
+and retains a separate one-minute garden PASS/both guards/zero errors. Its
+fresh server dump was not obtained. Startup/server isolation, device and broader
+audit coverage remain open. No ordinary source change or new publication.
+
 Latest supplement, 2026-10-24: ordinary candidate 105c83862d500f43, 273 sources,
 source/test commit c8054893. ../startup-clock/README.md and qualification.json
 record a proven 4,777 ms optional-Decor wait after essential home collision was
@@ -62,7 +75,7 @@ Island work and new rare content are not being added during this foundation pass
 | Natural life loop, all modes and predator endings | Deterministic life/feeding/predator suites and scripted self-test components | Scripted setup or isolated death check is not the requested complete natural life in every mode; broader native coverage remains |
 | Camera, held prey, grapple, meshes and seams in both tiers | Collision/streaming suites, streamed-out holds, automated region/self-test checks; ../outdoor-seams verifies four repaired hut edges at both tiers,8 walks/8 hops through9960 attached walking frames | Selected hut edges qualified; whole-map close visual sweep, all meshes/grapple angles and every edge/rearrival remain unproved |
 | Controls, switching and accessibility | Input/settings/menu suites; six native normal/large-text reflow/scroll cases; title clipping corrected; ../touch-labels/native-font.json:16 actual buttons and40 candidate native layout cases,0 failures versus13 Legacy failures | Font fix verified in unpublished candidate; private13 still has Legacy text. Ordinary New Life observed; actual touch controls were not enabled/forced in Studio. Complete controller/touch comfort and every accessibility path remain; no physical-phone result |
-| Eight-scene full/low performance matrix | ../performance-matrix/PAIR1.md: four native runs/36 samples; later ../camera-handover/native-trace30: nine corrected65-degree full-tier samples, native PASS/both277 guards, active wildlife,0 script errors. Means16.69-20.45ms, one>50ms frame | Old before/after views mismatch, so no causal/general gain. Corrected camera and30-minute route now complete at their bounded scopes; a new qualified matched-view pair and phone proof remain missing |
+| Eight-scene full/low performance matrix | ../performance-matrix/PAIR2.md and pair2-comparison.json: four current runs/36 workloads,8 guards,0 CreatorErrors,cleanup,0 camera mismatches at.01; scene/actor/weather/viewport match within each tier, current-policy comparator and4805 equivalence checks. Older cohorts retain their scopes | Matched current pair completed. Full means -2.8% to +3.2%; low mostly near16.67ms with night hut+3.3%, including80.61ms hitch. One pair per tier with live actors/GC does not establish a causal/general gain or statistical non-regression. Physical-phone proof remains conditional on access |
 | Startup/load and memory | Earlier Player startup probes remain; ../camera-handover/trace30-summary.md: completed1800s native garden route,102888 attached frames/44 turns,0 findings/loading/menu-rest pause/focus events; both277-source guards and native PASS,0 script errors. Five-minute heap/engine/instance windows retained | Bounded route memory evidence now complete: fluctuating heap, final2054KB below start; no steadily rising floor observed. Not universal leak freedom, natural lives, all seams or phone proof. Long trace has no frame-time percentiles. Earlier standalone startup gap remains unresolved |
 | Module/runtime inventory | integrated-source/MAP.md and inventory.json index the pre-hut-repair273-source cohort:65161 lines,435 lexical runtime sites;13 files over800 lines. The later repair changes two existing modules; all273 current sources compile/type-check | Historical lexical index with the repair supplement above; semantic dependency/cadence/cleanup review not inferred |
 | Code and authority review | SECURITY-CURRENT.md reconciles actual message/ownership boundaries; historical CODE-REVIEW.md, persistence qualification and current source index | Scoped boundary review complete; exhaustive module semantics and hostile native traffic remain unproved. Solo life remains client-authoritative; validation is not anti-cheat. Large architecture changes remain proposals |

@@ -29,6 +29,9 @@ No UI snapshot or heavy local command runs during the timed samples.
 | Variant | Run | Status | Source guards | Notes |
 |---|---|---|---:|---|
 | before/full | 1792837930256 | PASS | 2 | All nine workloads and cleanup; walk 150.08 studs/60.03 action seconds, alive/attached endpoint |
+| after/full | 1792838564863 | PASS | 2 | All nine workloads and cleanup; same walk distance and endpoint; profiler UI used only after PASS |
+| after/low | 1792839907557 | PASS | 2 | All nine workloads and cleanup; walk 3602 frames, no frame over 50 ms |
+| before/low | 1792840384575 | PASS | 2 | All nine workloads and cleanup; walk 3598 frames, no frame over 50 ms |
 
 before/full model SHA256:
 49986365913bc74793c1a95487c68a004569e0bc97bbc5823c80deb252c287e5.
@@ -37,7 +40,30 @@ the immutable file hash still matches. pair2/before-full retains the original
 bounded output and collected data. The endpoint screenshot was taken only
 after native PASS and is a selected view, not a matched-camera visual proof.
 
-The remaining cohorts and the strict .01 camera comparison are not complete
-yet. No end-to-end gain, physical-phone result, universal clipping or natural
-life qualification follows. Endpoint attachment alone is not continuous
-support proof. The ordinary source/export build is unchanged by this work.
+All four cohorts are collected with --require-methods, two source guards each,
+zero CreatorErrors, and complete memory-save fixture cleanup. Each editor was
+stopped and closed without saving temporary state; all four immutable model
+hashes match pair2-builds.json. Warning records remain in their bounded output.
+
+pair2-comparison.json/.md pass --require-matched: zero camera mismatches at
+the unchanged .01 tolerance. Scene positions, rain, wind, clocks, actors,
+ordinary-live state and per-pair viewport dimensions also match. Full uses
+1360x441; low uses 1360x436 after the command bar was reopened. This is a
+within-tier comparison, not a claim that full/low viewport areas are identical.
+All game cameras use FOV 65. Endpoint JPEGs are post-PASS selected views only.
+
+Interpretation: full-tier means range from -2.8% to +3.2%; low-tier means are
+mostly near the observed 16.67 ms cadence, with the night hut +3.3%. Its
+80.61 ms candidate hitch is retained, as are all other adverse observations.
+There is no uniform end-to-end speedup. Streaming-walk replan means are
+2.7104/2.7077 ms before/after at full and 1.4909/1.4472 ms at low; low worst
+replan is 5.65/7.09 ms. These are descriptive one-pair observations with live
+actors and GC, not a causal estimate or statistical non-regression guarantee.
+The 4805 equivalence checks and 900-to-300 cold-generation reduction remain
+the direct mechanism/output evidence.
+
+No physical-phone result, universal clipping or natural-life qualification
+follows. Endpoint attachment alone is not continuous support proof. Startup
+sample records have zero render frames/1x1 initial view and must not be used
+as first-visible-frame or startup-FPS measurements. Ordinary source/export is
+unchanged; the separate engine-phase probe and profiler scopes stay separate.

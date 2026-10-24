@@ -1,0 +1,5389 @@
+{
+  "run": "1792840384575",
+  "variant": "before",
+  "tier": "low",
+  "passed": true,
+  "source_count": 276,
+  "model_sha256": "231811e67e2591dea5cb8644503a8038a1f23a8de888614f20afa6e5745d0571",
+  "manifest_sha256": "00c17f9190ce4a1b1feb09eae42938421eb7d9039c5b82a93e279b535ba1f2e3",
+  "native_output_sha256": "eb35ecc810345b2c2c86906c8cd3bff6726db20a0f417c4ea61880ccc3fa58f1",
+  "source_guards": 2,
+  "scenes": [
+    {
+      "state": {
+        "wind": 1.029023289680481,
+        "cat_enabled": true,
+        "region": "sill",
+        "live": true,
+        "simulation": 10.183333333333419,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -22,
+          0.3100000023841858,
+          6
+        ],
+        "clock": [
+          1,
+          6
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "sill_dawn",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 2.0044984817504883,
+        "cat_enabled": true,
+        "region": "hut_desk",
+        "live": true,
+        "simulation": 5.366666666666653,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          80,
+          4.309999942779541,
+          45
+        ],
+        "clock": [
+          1,
+          21
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "hut_lamp_night",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 3.0892152786254883,
+        "cat_enabled": true,
+        "region": "garden_a1",
+        "live": true,
+        "simulation": 5.433333333333319,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -150,
+          -84.29000091552734,
+          -90
+        ],
+        "clock": [
+          4,
+          9
+        ],
+        "mode": "attached",
+        "rain": 0.85,
+        "detail": "low"
+      },
+      "scene": "garden_rain",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 3.019221782684326,
+        "cat_enabled": true,
+        "region": "meadow_a3",
+        "live": true,
+        "simulation": 5.3833333333333195,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -60,
+          -84.29000091552734,
+          -828
+        ],
+        "clock": [
+          2,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "meadow_wind",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "pond_a2",
+        "live": true,
+        "simulation": 5.349999999999986,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          652,
+          -85.79000091552734,
+          -1044.6705322265625
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "pond_active",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "bin",
+        "live": true,
+        "simulation": 5.416666666666653,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          60,
+          5.710000038146973,
+          -774
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "can",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "hut_doorway",
+        "live": true,
+        "simulation": 5.3833333333333195,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          160.75,
+          -69.69000244140625,
+          215
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "doorway",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 2.0044984817504883,
+        "cat_enabled": true,
+        "region": "lamp_1",
+        "live": true,
+        "simulation": 5.366666666666653,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -188,
+          -68.29000091552734,
+          -768
+        ],
+        "clock": [
+          1,
+          21
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "bench_lamppost_night",
+      "variant": "before"
+    },
+    {
+      "state": {
+        "wind": 3.019221782684326,
+        "cat_enabled": true,
+        "region": "garden_a1",
+        "live": true,
+        "simulation": 5.3833333333333195,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -150,
+          -84.29000091552734,
+          -90
+        ],
+        "clock": [
+          2,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "scene": "three_region_walk",
+      "variant": "before"
+    }
+  ],
+  "samples": [
+    {
+      "over50": 1,
+      "frames": 1,
+      "heap_growth_kb": 11528,
+      "seconds": 0.5795266032218933,
+      "mean_ms": 579.5266032218933,
+      "p95_ms": 579.5266032218933,
+      "extra": {
+        "cat_enabled": true,
+        "region": "sill",
+        "live": false,
+        "simulation": 0,
+        "viewport": [
+          1,
+          1
+        ],
+        "position": [
+          -22,
+          0.3100000023841858,
+          6
+        ],
+        "clock": [
+          1,
+          9
+        ],
+        "mode": "attached",
+        "detail": "low"
+      },
+      "render_worst_ms": 0,
+      "p50_ms": 579.5266032218933,
+      "render_frames": 0,
+      "render_mean_ms": 0,
+      "sample": "client-startup",
+      "wall_seconds": 0.9216648000001442,
+      "over100": 1,
+      "p99_ms": 579.5266032218933,
+      "worst_ms": 579.5266032218933,
+      "over33": 1
+    },
+    {
+      "over50": 0,
+      "frames": 1201,
+      "heap_growth_kb": 18,
+      "seconds": 20.01476393453777,
+      "mean_ms": 16.665082376800807,
+      "p95_ms": 18.117576837539673,
+      "extra": {
+        "wind": 1.029023289680481,
+        "cat_enabled": true,
+        "region": "sill",
+        "live": true,
+        "simulation": 30.199999999999566,
+        "simulation_seconds": 20.016666666666147,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -22,
+          0.3100000023841858,
+          6
+        ],
+        "clock": [
+          1,
+          6
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 7.652100000996143,
+      "p50_ms": 16.903406009078026,
+      "render_frames": 1201,
+      "render_mean_ms": 2.642383930408768,
+      "sample": "sill_dawn",
+      "wall_seconds": 20.01758709999558,
+      "over100": 0,
+      "p99_ms": 19.045447930693626,
+      "worst_ms": 20.72088047862053,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1187,
+      "heap_growth_kb": 4502,
+      "seconds": 20.005184293724597,
+      "mean_ms": 16.85356722301988,
+      "p95_ms": 19.169878214597702,
+      "extra": {
+        "wind": 2.0044984817504883,
+        "cat_enabled": true,
+        "region": "hut_desk",
+        "live": true,
+        "simulation": 25.39999999999984,
+        "simulation_seconds": 20.033333333333186,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          80,
+          4.309999942779541,
+          45
+        ],
+        "clock": [
+          1,
+          21
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 11.491799989016727,
+      "p50_ms": 16.91659726202488,
+      "render_frames": 1187,
+      "render_mean_ms": 2.860236731256855,
+      "sample": "hut_lamp_night",
+      "wall_seconds": 20.011823499997263,
+      "over100": 0,
+      "p99_ms": 23.9958968013525,
+      "worst_ms": 29.155179858207703,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1201,
+      "heap_growth_kb": 3694,
+      "seconds": 20.015641854144633,
+      "mean_ms": 16.66581336731443,
+      "p95_ms": 18.15778762102127,
+      "extra": {
+        "wind": 3.0892152786254883,
+        "cat_enabled": true,
+        "region": "garden_a1",
+        "live": true,
+        "simulation": 25.449999999999836,
+        "simulation_seconds": 20.016666666666517,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -150,
+          -84.29000091552734,
+          -90
+        ],
+        "clock": [
+          4,
+          9
+        ],
+        "mode": "attached",
+        "rain": 0.85,
+        "detail": "low"
+      },
+      "render_worst_ms": 10.890899997320957,
+      "p50_ms": 16.901416704058647,
+      "render_frames": 1201,
+      "render_mean_ms": 3.1291054953387913,
+      "sample": "garden_rain",
+      "wall_seconds": 20.017957000003662,
+      "over100": 0,
+      "p99_ms": 19.144419580698013,
+      "worst_ms": 26.08327753841877,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1201,
+      "heap_growth_kb": 1431,
+      "seconds": 20.01835220027715,
+      "mean_ms": 16.668070108473895,
+      "p95_ms": 18.09295266866684,
+      "extra": {
+        "wind": 3.019221782684326,
+        "cat_enabled": true,
+        "region": "meadow_a3",
+        "live": true,
+        "simulation": 25.39999999999984,
+        "simulation_seconds": 20.01666666666652,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -60,
+          -84.29000091552734,
+          -828
+        ],
+        "clock": [
+          2,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 8.580499998060986,
+      "p50_ms": 16.917634755373,
+      "render_frames": 1201,
+      "render_mean_ms": 2.969686011374241,
+      "sample": "meadow_wind",
+      "wall_seconds": 20.018075200001476,
+      "over100": 0,
+      "p99_ms": 19.030798226594925,
+      "worst_ms": 20.038919523358345,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1199,
+      "heap_growth_kb": 1254,
+      "seconds": 20.015958064235747,
+      "mean_ms": 16.693876617377605,
+      "p95_ms": 18.25079880654812,
+      "extra": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "pond_a2",
+        "live": true,
+        "simulation": 25.366666666666507,
+        "simulation_seconds": 20.01666666666652,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          652,
+          -85.79000091552734,
+          -1044.6705322265625
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 12.192499998491257,
+      "p50_ms": 16.898764297366142,
+      "render_frames": 1199,
+      "render_mean_ms": 3.1182385321185726,
+      "sample": "pond_active",
+      "wall_seconds": 20.01866700001119,
+      "over100": 0,
+      "p99_ms": 19.281068816781044,
+      "worst_ms": 23.1094341725111,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1201,
+      "heap_growth_kb": -3955,
+      "seconds": 20.01480244938284,
+      "mean_ms": 16.665114445780883,
+      "p95_ms": 18.27479526400566,
+      "extra": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "bin",
+        "live": true,
+        "simulation": 25.43333333333317,
+        "simulation_seconds": 20.016666666666517,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          60,
+          5.710000038146973,
+          -774
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 8.973099989816546,
+      "p50_ms": 16.90633036196232,
+      "render_frames": 1201,
+      "render_mean_ms": 2.933277185762233,
+      "sample": "can",
+      "wall_seconds": 20.019109899993055,
+      "over100": 0,
+      "p99_ms": 19.1043671220541,
+      "worst_ms": 22.104455158114433,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1198,
+      "heap_growth_kb": -374,
+      "seconds": 20.015202531591058,
+      "mean_ms": 16.70718074423294,
+      "p95_ms": 18.158724531531334,
+      "extra": {
+        "wind": 0.8273427486419678,
+        "cat_enabled": true,
+        "region": "hut_doorway",
+        "live": true,
+        "simulation": 25.39999999999984,
+        "simulation_seconds": 20.01666666666652,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          160.75,
+          -69.69000244140625,
+          215
+        ],
+        "clock": [
+          1,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 9.95330000296235,
+      "p50_ms": 16.92373864352703,
+      "render_frames": 1198,
+      "render_mean_ms": 3.1802024209727295,
+      "sample": "doorway",
+      "wall_seconds": 20.01740160000918,
+      "over100": 0,
+      "p99_ms": 19.540928304195404,
+      "worst_ms": 26.83686651289463,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 1201,
+      "heap_growth_kb": 7666,
+      "seconds": 20.015263655222952,
+      "mean_ms": 16.66549846396582,
+      "p95_ms": 18.060894683003426,
+      "extra": {
+        "wind": 2.0044984817504883,
+        "cat_enabled": true,
+        "region": "lamp_1",
+        "live": true,
+        "simulation": 25.383333333333173,
+        "simulation_seconds": 20.01666666666652,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          -188,
+          -68.29000091552734,
+          -768
+        ],
+        "clock": [
+          1,
+          21
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 8.361800006241538,
+      "p50_ms": 16.932645812630653,
+      "render_frames": 1201,
+      "render_mean_ms": 2.719186011807575,
+      "sample": "bench_lamppost_night",
+      "wall_seconds": 20.01854629999434,
+      "over100": 0,
+      "p99_ms": 18.97583156824112,
+      "worst_ms": 19.509276375174522,
+      "over33": 0
+    },
+    {
+      "over50": 0,
+      "frames": 3598,
+      "heap_growth_kb": -3955,
+      "seconds": 60.028874843381345,
+      "mean_ms": 16.68395632111766,
+      "p95_ms": 18.127817660570145,
+      "extra": {
+        "wind": 3.019221782684326,
+        "cat_enabled": true,
+        "region": "garden_a3",
+        "live": true,
+        "distance": 150.08323669433594,
+        "simulation": 65.41666666666424,
+        "visited": {
+          "garden_a1": true,
+          "garden_a3": true,
+          "garden_a2": true
+        },
+        "simulation_seconds": 60.03333333333092,
+        "viewport": [
+          1360,
+          436
+        ],
+        "position": [
+          0.0832366943359375,
+          -84.29000854492188,
+          -90
+        ],
+        "clock": [
+          2,
+          12
+        ],
+        "mode": "attached",
+        "rain": 0,
+        "detail": "low"
+      },
+      "render_worst_ms": 15.877700003329664,
+      "p50_ms": 16.926594078540802,
+      "render_frames": 3598,
+      "render_mean_ms": 3.971331600975861,
+      "sample": "three_region_walk",
+      "wall_seconds": 60.033794200004195,
+      "over100": 0,
+      "p99_ms": 19.24695633351803,
+      "worst_ms": 25.9874165058136,
+      "over33": 0
+    }
+  ],
+  "cameras": [
+    {
+      "scene": "sill_dawn",
+      "yaw": 0,
+      "fov": 65,
+      "look": [
+        0,
+        -0.4226182699203491,
+        -0.9063077569007874
+      ],
+      "position": [
+        -22,
+        2.873091459274292,
+        10.531538963317871
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "hut_lamp_night",
+      "yaw": 3.141592653589793,
+      "fov": 65,
+      "look": [
+        7.923193834358244e-08,
+        -0.4226182699203491,
+        0.9063077569007874
+      ],
+      "position": [
+        80,
+        6.873091220855713,
+        40.46846008300781
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "garden_rain",
+      "yaw": 0.7853981633974483,
+      "fov": 65,
+      "look": [
+        -0.6408563256263733,
+        -0.4226182699203491,
+        -0.6408563256263733
+      ],
+      "position": [
+        -146.79571533203125,
+        -81.72691345214844,
+        -86.79571533203125
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "meadow_wind",
+      "yaw": 0,
+      "fov": 65,
+      "look": [
+        0,
+        -0.4226182699203491,
+        -0.9063077569007874
+      ],
+      "position": [
+        -60,
+        -81.72691345214844,
+        -823.4684448242188
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "pond_active",
+      "yaw": 1.5707963267948966,
+      "fov": 65,
+      "look": [
+        -0.9063077569007874,
+        -0.4226182699203491,
+        3.961596917179122e-08
+      ],
+      "position": [
+        656.5315551757812,
+        -83.22691345214844,
+        -1044.6705322265625
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "can",
+      "yaw": 0,
+      "fov": 65,
+      "look": [
+        0,
+        -0.4226182699203491,
+        -0.9063077569007874
+      ],
+      "position": [
+        60,
+        8.273091316223145,
+        -769.4684448242188
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "doorway",
+      "yaw": 1.5707963267948966,
+      "fov": 65,
+      "look": [
+        -0.9063077569007874,
+        -0.4226182699203491,
+        3.961596917179122e-08
+      ],
+      "position": [
+        165.2815399169922,
+        -67.12691497802734,
+        215
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "bench_lamppost_night",
+      "yaw": 1.5707963267948966,
+      "fov": 65,
+      "look": [
+        -0.9063077569007874,
+        -0.4226182699203491,
+        3.961596917179122e-08
+      ],
+      "position": [
+        -185.1590576171875,
+        -66.51525115966797,
+        -768
+      ],
+      "elevation": 0.4363323129985824
+    },
+    {
+      "scene": "three_region_walk",
+      "yaw": 0,
+      "fov": 65,
+      "look": [
+        0,
+        -0.4226182699203491,
+        -0.9063077569007874
+      ],
+      "position": [
+        -150,
+        -81.72691345214844,
+        -85.46846008300781
+      ],
+      "elevation": 0.4363323129985824
+    }
+  ],
+  "actors": [
+    {
+      "damselflies": 1,
+      "scene": "pond_active",
+      "frog_here": true,
+      "frog_distance": 5.009600639343262,
+      "frog_on_screen": true
+    }
+  ],
+  "events": [
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.00017326460510957986,
+        "name": "HeartbeatTime",
+        "mean": 0.00017326460510957986,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "RenderGPUFrameTime",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 3533,
+        "name": "InstanceCount",
+        "mean": 3533,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "SceneTriangleCount",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 5.890822887420654,
+        "name": "DataSendKbps",
+        "mean": 5.890822887420654,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 3.8610662159044296e-05,
+        "name": "PhysicsStepTime",
+        "mean": 3.8610662159044296e-05,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "FrameTime",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "RenderCPUFrameTime",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "SceneDrawcallCount",
+        "mean": 0,
+        "n": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792840384575",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10880,
+        "phase": "client-enter",
+        "t": 0.4571308000013232,
+        "dt_ms": 579.5266032218933,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.00017326460510957986,
+          "RenderGPUFrameTime": 0,
+          "InstanceCount": 3533,
+          "SceneTriangleCount": 0,
+          "PhysicsStepTime": 3.8610662159044296e-05,
+          "DataSendKbps": 5.890822887420654,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "SceneDrawcallCount": 0
+        },
+        "sample": "client-startup",
+        "index": 1
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 1,
+        "frames": 1,
+        "heap_growth_kb": 11528,
+        "seconds": 0.5795266032218933,
+        "mean_ms": 579.5266032218933,
+        "p95_ms": 579.5266032218933,
+        "extra": {
+          "cat_enabled": true,
+          "region": "sill",
+          "live": false,
+          "simulation": 0,
+          "viewport": [
+            1,
+            1
+          ],
+          "position": [
+            -22,
+            0.3100000023841858,
+            6
+          ],
+          "clock": [
+            1,
+            9
+          ],
+          "mode": "attached",
+          "detail": "low"
+        },
+        "render_worst_ms": 0,
+        "p50_ms": 579.5266032218933,
+        "render_frames": 0,
+        "render_mean_ms": 0,
+        "sample": "client-startup",
+        "wall_seconds": 0.9216648000001442,
+        "over100": 1,
+        "p99_ms": 579.5266032218933,
+        "worst_ms": 579.5266032218933,
+        "over33": 1
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792840384575",
+      "value": {
+        "heap_kb": 1328,
+        "t": 8.999923011288047e-07,
+        "name": "client-enter",
+        "delta": 8.999923011288047e-07
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792840384575",
+      "value": {
+        "heap_kb": 12848,
+        "t": 0.9197016999969492,
+        "name": "client-constructed",
+        "delta": 0.919700800004648
+      }
+    },
+    {
+      "kind": "COUNTERS",
+      "run": "1792840384575",
+      "value": {
+        "unavailable": []
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.6154999941354617,
+        "name": "sound",
+        "sample": "sill_dawn",
+        "mean_ms": 0.5082288094751458
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.5934999973978847,
+        "name": "spider rig",
+        "sample": "sill_dawn",
+        "mean_ms": 0.30909150701063104
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.686699990183115,
+        "name": "hud",
+        "sample": "sill_dawn",
+        "mean_ms": 0.23661298899493372
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.096699998830445,
+        "name": "wasp",
+        "sample": "sill_dawn",
+        "mean_ms": 0.18249150702865913
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8336999890161678,
+        "name": "prey",
+        "sample": "sill_dawn",
+        "mean_ms": 0.15985095765347437
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.8807000014930964,
+        "name": "other rigs",
+        "sample": "sill_dawn",
+        "mean_ms": 0.1545394671930436
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6678000063402578,
+        "name": "camera",
+        "sample": "sill_dawn",
+        "mean_ms": 0.1544516235086904
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.1135999957332388,
+        "name": "light",
+        "sample": "sill_dawn",
+        "mean_ms": 0.15388984168390374
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6017999985488132,
+        "name": "fly bodies",
+        "sample": "sill_dawn",
+        "mean_ms": 0.14195620326054276
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8814999891910702,
+        "name": "senses",
+        "sample": "sill_dawn",
+        "mean_ms": 0.12413039146790703
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5317999894032255,
+        "name": "rival",
+        "sample": "sill_dawn",
+        "mean_ms": 0.09838168201642382
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.48800000513438135,
+        "name": "world",
+        "sample": "sill_dawn",
+        "mean_ms": 0.08720932556002198
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2153999957954511,
+        "name": "save",
+        "sample": "sill_dawn",
+        "mean_ms": 0.06175628664758333
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3521000035107136,
+        "name": "life",
+        "sample": "sill_dawn",
+        "mean_ms": 0.051186927898610936
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2533000078983605,
+        "name": "motor",
+        "sample": "sill_dawn",
+        "mean_ms": 0.051112323088728845
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21209999977145344,
+        "name": "percepts",
+        "sample": "sill_dawn",
+        "mean_ms": 0.03772098224045558
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.18090000958181918,
+        "name": "looks",
+        "sample": "sill_dawn",
+        "mean_ms": 0.026562864124289497
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.112599998828955,
+        "name": "poses",
+        "sample": "sill_dawn",
+        "mean_ms": 0.02052756056436132
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.06839999696239829,
+        "name": "panels",
+        "sample": "sill_dawn",
+        "mean_ms": 0.015001498963598543
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.12289998994674534,
+        "name": "mating",
+        "sample": "sill_dawn",
+        "mean_ms": 0.014232888877497277
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.23940000392030925,
+        "name": "frame",
+        "sample": "sill_dawn",
+        "mean_ms": 0.010572855825013296
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.036299999919719994,
+        "name": "lock button",
+        "sample": "sill_dawn",
+        "mean_ms": 0.008163530334266528
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.04430000262800604,
+        "name": "bug bodies",
+        "sample": "sill_dawn",
+        "mean_ms": 0.00711756897101537
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4695999959949404,
+        "name": "shadows",
+        "sample": "sill_dawn",
+        "mean_ms": 0.00490716069767703
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.017400001524947584,
+        "name": "other",
+        "sample": "sill_dawn",
+        "mean_ms": 0.004757535542581668
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.04449998959898949,
+        "name": "nature",
+        "sample": "sill_dawn",
+        "mean_ms": 0.003553622008803813
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03779999678954482,
+        "name": "appearance",
+        "sample": "sill_dawn",
+        "mean_ms": 0.003510657751713286
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03929999365936965,
+        "name": "lock",
+        "sample": "sill_dawn",
+        "mean_ms": 0.0032613656083649205
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03919999289792031,
+        "name": "lines",
+        "sample": "sill_dawn",
+        "mean_ms": 0.0029547039144513488
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.012300006346777081,
+        "name": "perception hud",
+        "sample": "sill_dawn",
+        "mean_ms": 0.0029124065131130475
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.027599991881288588,
+        "name": "eyes",
+        "sample": "sill_dawn",
+        "mean_ms": 0.001736885983265043
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.000895863922778517,
+        "name": "HeartbeatTime",
+        "mean": 0.0006186246676291018,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.01747138984501362,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.007281326028525358,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 55658,
+        "name": "InstanceCount",
+        "mean": 55658,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 64996,
+        "name": "SceneTriangleCount",
+        "mean": 60890.24146544546,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.6737585067749023,
+        "name": "DataSendKbps",
+        "mean": 0.49850957613007213,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.00025568052660673857,
+        "name": "PhysicsStepTime",
+        "mean": 7.66852553416757e-05,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.02555360086262226,
+        "name": "FrameTime",
+        "mean": 0.016665975335631814,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 0.012088200077414513,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.004503890009694651,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "max": 61,
+        "name": "SceneDrawcallCount",
+        "mean": 51.64279766860949,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "sill_dawn",
+        "calls": 1201,
+        "worst_ms": 0.15029999485705048,
+        "mean_ms": 0.0030492092862719057,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1201,
+        "heap_growth_kb": 18,
+        "seconds": 20.01476393453777,
+        "mean_ms": 16.665082376800807,
+        "p95_ms": 18.117576837539673,
+        "extra": {
+          "wind": 1.029023289680481,
+          "cat_enabled": true,
+          "region": "sill",
+          "live": true,
+          "simulation": 30.199999999999566,
+          "simulation_seconds": 20.016666666666147,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            -22,
+            0.3100000023841858,
+            6
+          ],
+          "clock": [
+            1,
+            6
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 7.652100000996143,
+        "p50_ms": 16.903406009078026,
+        "render_frames": 1201,
+        "render_mean_ms": 2.642383930408768,
+        "sample": "sill_dawn",
+        "wall_seconds": 20.01758709999558,
+        "over100": 0,
+        "p99_ms": 19.045447930693626,
+        "worst_ms": 20.72088047862053,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.5184999938355759,
+        "name": "sound",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.5085463350960041
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.8154999997932464,
+        "name": "spider rig",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.36409300763606034
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.1789000127464533,
+        "name": "hud",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.2980615838656199
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 6.59240000823047,
+        "name": "wasp",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.23883369865728402
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7528999994974583,
+        "name": "camera",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.19368070740734872
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.9015000036451966,
+        "name": "other rigs",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.19093976388355874
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.603400000021793,
+        "name": "light",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.17712990719369567
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.0811000101966783,
+        "name": "prey",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.1423713562489513
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.153699995484203,
+        "name": "rival",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.11581179426040299
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.45939999108668417,
+        "name": "world",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.1079596463542215
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5953999934718013,
+        "name": "motor",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.09292628478642126
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.49869999929796904,
+        "name": "save",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.07247287267750395
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6960000027902424,
+        "name": "senses",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.06375585503163399
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4363000043667853,
+        "name": "life",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.056349199715701244
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.23119999968912452,
+        "name": "percepts",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.04829924197423428
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.15029999485705048,
+        "name": "looks",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.029726874262464044
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.23629999486729503,
+        "name": "fly bodies",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.02823807937606993
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21460000425577164,
+        "name": "poses",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.02761743894112065
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.37799999699927866,
+        "name": "panels",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.018043891972902983
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.1652999926591292,
+        "name": "mating",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.01666512216830496
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5945000011706725,
+        "name": "bug bodies",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.012577674898402115
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.07239999831654131,
+        "name": "frame",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.012141533280611383
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.1531000016257167,
+        "name": "lock button",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.010732687486899763
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.06790000770706683,
+        "name": "other",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.006066301415153412
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4276999970898032,
+        "name": "shadows",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.005817607810847122
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.02609999501146376,
+        "name": "nature",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.004106150023939705
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.014699995517730713,
+        "name": "appearance",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.003985678064581964
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.07179999374784529,
+        "name": "lines",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.0038145745489683563
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21239998750388622,
+        "name": "perception hud",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.0037204720820955424
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.01580000389367342,
+        "name": "lock",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.003532350254864938
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03720000677276403,
+        "name": "eyes",
+        "sample": "hut_lamp_night",
+        "mean_ms": 0.002219039880986017
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.0009457363630644977,
+        "name": "HeartbeatTime",
+        "mean": 0.0006767039885254077,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.03284052014350891,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.015328980899528109,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 55505,
+        "name": "InstanceCount",
+        "mean": 55505,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 46536,
+        "name": "SceneTriangleCount",
+        "mean": 36743.0901432182,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.5826120376586914,
+        "name": "DataSendKbps",
+        "mean": 0.49698056530430224,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.00029228601488284767,
+        "name": "PhysicsStepTime",
+        "mean": 9.719471843252807e-05,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.03225649893283844,
+        "name": "FrameTime",
+        "mean": 0.016857748604815048,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 0.02632169984281063,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.008569109184932663,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "max": 31,
+        "name": "SceneDrawcallCount",
+        "mean": 20.63437236731255,
+        "n": 1187
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "hut_lamp_night",
+        "calls": 1187,
+        "worst_ms": 0.027000001864507794,
+        "mean_ms": 0.0033436396206111634,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1187,
+        "heap_growth_kb": 4502,
+        "seconds": 20.005184293724597,
+        "mean_ms": 16.85356722301988,
+        "p95_ms": 19.169878214597702,
+        "extra": {
+          "wind": 2.0044984817504883,
+          "cat_enabled": true,
+          "region": "hut_desk",
+          "live": true,
+          "simulation": 25.39999999999984,
+          "simulation_seconds": 20.033333333333186,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            80,
+            4.309999942779541,
+            45
+          ],
+          "clock": [
+            1,
+            21
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 11.491799989016727,
+        "p50_ms": 16.91659726202488,
+        "render_frames": 1187,
+        "render_mean_ms": 2.860236731256855,
+        "sample": "hut_lamp_night",
+        "wall_seconds": 20.011823499997263,
+        "over100": 0,
+        "p99_ms": 23.9958968013525,
+        "worst_ms": 29.155179858207703,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.956599997356534,
+        "name": "sound",
+        "sample": "garden_rain",
+        "mean_ms": 0.5579010824602894
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.9545000104699284,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "mean_ms": 0.3743987513094835
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7684000011067837,
+        "name": "bug bodies",
+        "sample": "garden_rain",
+        "mean_ms": 0.3071425477396402
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.2969999990891665,
+        "name": "hud",
+        "sample": "garden_rain",
+        "mean_ms": 0.29179483794507965
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.6526999970665202,
+        "name": "light",
+        "sample": "garden_rain",
+        "mean_ms": 0.2514378019116336
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.628500002785586,
+        "name": "wasp",
+        "sample": "garden_rain",
+        "mean_ms": 0.23141340548882133
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.7746999985538423,
+        "name": "other rigs",
+        "sample": "garden_rain",
+        "mean_ms": 0.1831229806289877
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8957000100053847,
+        "name": "camera",
+        "sample": "garden_rain",
+        "mean_ms": 0.18170849312729606
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.3441999908536673,
+        "name": "rival",
+        "sample": "garden_rain",
+        "mean_ms": 0.12051423835268804
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.296699992963113,
+        "name": "motor",
+        "sample": "garden_rain",
+        "mean_ms": 0.10620074904602111
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3867999912472442,
+        "name": "world",
+        "sample": "garden_rain",
+        "mean_ms": 0.1006461282150795
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.681600024108775,
+        "name": "prey",
+        "sample": "garden_rain",
+        "mean_ms": 0.07687901766541538
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5857999931322411,
+        "name": "save",
+        "sample": "garden_rain",
+        "mean_ms": 0.06929633621179532
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6792000058339909,
+        "name": "life",
+        "sample": "garden_rain",
+        "mean_ms": 0.05104404645968076
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.626300010480918,
+        "name": "senses",
+        "sample": "garden_rain",
+        "mean_ms": 0.0362307243701497
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.22929999977350235,
+        "name": "percepts",
+        "sample": "garden_rain",
+        "mean_ms": 0.03522364711778612
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.35239999124314636,
+        "name": "looks",
+        "sample": "garden_rain",
+        "mean_ms": 0.029158617642112573
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.35600000410340726,
+        "name": "poses",
+        "sample": "garden_rain",
+        "mean_ms": 0.02707202298850516
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6053999968571588,
+        "name": "mating",
+        "sample": "garden_rain",
+        "mean_ms": 0.017240466188436235
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21800000104121864,
+        "name": "panels",
+        "sample": "garden_rain",
+        "mean_ms": 0.0172052458160325
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3232000017305836,
+        "name": "frame",
+        "sample": "garden_rain",
+        "mean_ms": 0.012402664098929735
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.10000000474974513,
+        "name": "lock button",
+        "sample": "garden_rain",
+        "mean_ms": 0.009913904997861349
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6362999993143603,
+        "name": "fly bodies",
+        "sample": "garden_rain",
+        "mean_ms": 0.009100832522274472
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03530000685714185,
+        "name": "other",
+        "sample": "garden_rain",
+        "mean_ms": 0.005926061896114865
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4442999925231561,
+        "name": "shadows",
+        "sample": "garden_rain",
+        "mean_ms": 0.0054302249892035515
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.018399994587525725,
+        "name": "nature",
+        "sample": "garden_rain",
+        "mean_ms": 0.004153372361235551
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.05040000542066991,
+        "name": "appearance",
+        "sample": "garden_rain",
+        "mean_ms": 0.0037432141020641253
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.023499989765696228,
+        "name": "lines",
+        "sample": "garden_rain",
+        "mean_ms": 0.0035361367134147826
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.018799997633323073,
+        "name": "perception hud",
+        "sample": "garden_rain",
+        "mean_ms": 0.003535636653386981
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.027400004910305142,
+        "name": "lock",
+        "sample": "garden_rain",
+        "mean_ms": 0.003524146565324553
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.01819999306462705,
+        "name": "eyes",
+        "sample": "garden_rain",
+        "mean_ms": 0.0022081597540473297
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.001024332013912499,
+        "name": "HeartbeatTime",
+        "mean": 0.0006251259102591924,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.02912309020757675,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.013082319652688046,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 55696,
+        "name": "InstanceCount",
+        "mean": 55696,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 78060,
+        "name": "SceneTriangleCount",
+        "mean": 73938.62447960033,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.5678210258483887,
+        "name": "DataSendKbps",
+        "mean": 0.49667030374374516,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.00025534487213008106,
+        "name": "PhysicsStepTime",
+        "mean": 9.177534523115597e-05,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.02776310034096241,
+        "name": "FrameTime",
+        "mean": 0.0166672446837123,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.02077619917690754,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.0057546525370084575,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "max": 44,
+        "name": "SceneDrawcallCount",
+        "mean": 41.195670274771025,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "garden_rain",
+        "calls": 1201,
+        "worst_ms": 0.022899999748915434,
+        "mean_ms": 0.0032266442782030776,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1201,
+        "heap_growth_kb": 3694,
+        "seconds": 20.015641854144633,
+        "mean_ms": 16.66581336731443,
+        "p95_ms": 18.15778762102127,
+        "extra": {
+          "wind": 3.0892152786254883,
+          "cat_enabled": true,
+          "region": "garden_a1",
+          "live": true,
+          "simulation": 25.449999999999836,
+          "simulation_seconds": 20.016666666666517,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            -150,
+            -84.29000091552734,
+            -90
+          ],
+          "clock": [
+            4,
+            9
+          ],
+          "mode": "attached",
+          "rain": 0.85,
+          "detail": "low"
+        },
+        "render_worst_ms": 10.890899997320957,
+        "p50_ms": 16.901416704058647,
+        "render_frames": 1201,
+        "render_mean_ms": 3.1291054953387913,
+        "sample": "garden_rain",
+        "wall_seconds": 20.017957000003662,
+        "over100": 0,
+        "p99_ms": 19.144419580698013,
+        "worst_ms": 26.08327753841877,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.8148999952245504,
+        "name": "sound",
+        "sample": "meadow_wind",
+        "mean_ms": 0.5805216485178478
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.190400002291426,
+        "name": "spider rig",
+        "sample": "meadow_wind",
+        "mean_ms": 0.4061252293801191
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.4798000047449023,
+        "name": "hud",
+        "sample": "meadow_wind",
+        "mean_ms": 0.31793622013013173
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 6.036199993104674,
+        "name": "wasp",
+        "sample": "meadow_wind",
+        "mean_ms": 0.2388485426991072
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8993000083137304,
+        "name": "camera",
+        "sample": "meadow_wind",
+        "mean_ms": 0.18904354669927984
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.108800006681122,
+        "name": "other rigs",
+        "sample": "meadow_wind",
+        "mean_ms": 0.1882975852091934
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4535999905783683,
+        "name": "world",
+        "sample": "meadow_wind",
+        "mean_ms": 0.15902298110873392
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9231000149156898,
+        "name": "prey",
+        "sample": "meadow_wind",
+        "mean_ms": 0.1256247298357943
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.3440000038826838,
+        "name": "rival",
+        "sample": "meadow_wind",
+        "mean_ms": 0.12324279738643629
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.45909998880233616,
+        "name": "motor",
+        "sample": "meadow_wind",
+        "mean_ms": 0.11498659445832854
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.5533999976469204,
+        "name": "light",
+        "sample": "meadow_wind",
+        "mean_ms": 0.09691290565672175
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.19060001068282872,
+        "name": "save",
+        "sample": "meadow_wind",
+        "mean_ms": 0.07290141557397199
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.31119999766815454,
+        "name": "percepts",
+        "sample": "meadow_wind",
+        "mean_ms": 0.059356369860594366
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6931999960215762,
+        "name": "life",
+        "sample": "meadow_wind",
+        "mean_ms": 0.055812240001876574
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2384999970672652,
+        "name": "senses",
+        "sample": "meadow_wind",
+        "mean_ms": 0.04114487924414154
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5918999959249049,
+        "name": "fly bodies",
+        "sample": "meadow_wind",
+        "mean_ms": 0.03442572823853204
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3122000052826479,
+        "name": "looks",
+        "sample": "meadow_wind",
+        "mean_ms": 0.03144288071404854
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.29910000739619136,
+        "name": "poses",
+        "sample": "meadow_wind",
+        "mean_ms": 0.027011823399398758
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7692999934079126,
+        "name": "mating",
+        "sample": "meadow_wind",
+        "mean_ms": 0.01876835966134579
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.16490000416524708,
+        "name": "panels",
+        "sample": "meadow_wind",
+        "mean_ms": 0.018755370919878823
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.11829999857582152,
+        "name": "bug bodies",
+        "sample": "meadow_wind",
+        "mean_ms": 0.01291298924886748
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.057900004321709275,
+        "name": "frame",
+        "sample": "meadow_wind",
+        "mean_ms": 0.012565528467758175
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.038700003642588854,
+        "name": "lock button",
+        "sample": "meadow_wind",
+        "mean_ms": 0.010464696103972937
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03980001201853156,
+        "name": "other",
+        "sample": "meadow_wind",
+        "mean_ms": 0.006344629017667973
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.42209999810438603,
+        "name": "shadows",
+        "sample": "meadow_wind",
+        "mean_ms": 0.005397501827231597
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.02439999661874026,
+        "name": "nature",
+        "sample": "meadow_wind",
+        "mean_ms": 0.004398834224822128
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.015700003132224083,
+        "name": "appearance",
+        "sample": "meadow_wind",
+        "mean_ms": 0.003963030571719751
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.05699999746866524,
+        "name": "lines",
+        "sample": "meadow_wind",
+        "mean_ms": 0.003865945282245642
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.01920000067912042,
+        "name": "lock",
+        "sample": "meadow_wind",
+        "mean_ms": 0.0036696086125487123
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.0447999918833375,
+        "name": "perception hud",
+        "sample": "meadow_wind",
+        "mean_ms": 0.0036619488163645705
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03340000694151968,
+        "name": "eyes",
+        "sample": "meadow_wind",
+        "mean_ms": 0.0022594505055597383
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.0009453933453187346,
+        "name": "HeartbeatTime",
+        "mean": 0.0006725198312064084,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.02172713167965412,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.012130574840078321,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 55951,
+        "name": "InstanceCount",
+        "mean": 55951,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 73760,
+        "name": "SceneTriangleCount",
+        "mean": 69176.98917568693,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.5944013595581055,
+        "name": "DataSendKbps",
+        "mean": 0.4972296341025363,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.0002369127032579854,
+        "name": "PhysicsStepTime",
+        "mean": 7.16847226204284e-05,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.02363399975001812,
+        "name": "FrameTime",
+        "mean": 0.01666733996243178,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 0.014330999925732613,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.005121373447964122,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "max": 39,
+        "name": "SceneDrawcallCount",
+        "mean": 36.306411323896754,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "meadow_wind",
+        "calls": 1201,
+        "worst_ms": 0.02989999484270811,
+        "mean_ms": 0.003525561978381366,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1201,
+        "heap_growth_kb": 1431,
+        "seconds": 20.01835220027715,
+        "mean_ms": 16.668070108473895,
+        "p95_ms": 18.09295266866684,
+        "extra": {
+          "wind": 3.019221782684326,
+          "cat_enabled": true,
+          "region": "meadow_a3",
+          "live": true,
+          "simulation": 25.39999999999984,
+          "simulation_seconds": 20.01666666666652,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            -60,
+            -84.29000091552734,
+            -828
+          ],
+          "clock": [
+            2,
+            12
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 8.580499998060986,
+        "p50_ms": 16.917634755373,
+        "render_frames": 1201,
+        "render_mean_ms": 2.969686011374241,
+        "sample": "meadow_wind",
+        "wall_seconds": 20.018075200001476,
+        "over100": 0,
+        "p99_ms": 19.030798226594925,
+        "worst_ms": 20.038919523358345,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.7181000002892688,
+        "name": "sound",
+        "sample": "pond_active",
+        "mean_ms": 0.631782985706965
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.3406999971484765,
+        "name": "spider rig",
+        "sample": "pond_active",
+        "mean_ms": 0.42254920753520653
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9621000062907115,
+        "name": "hud",
+        "sample": "pond_active",
+        "mean_ms": 0.3366516259190331
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.662299998220988,
+        "name": "wasp",
+        "sample": "pond_active",
+        "mean_ms": 0.22721851521625638
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.350300012039952,
+        "name": "other rigs",
+        "sample": "pond_active",
+        "mean_ms": 0.19400250224182594
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8112999930744991,
+        "name": "camera",
+        "sample": "pond_active",
+        "mean_ms": 0.19071718104151827
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5989000055706128,
+        "name": "world",
+        "sample": "pond_active",
+        "mean_ms": 0.18318340282456513
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.4252000109991059,
+        "name": "prey",
+        "sample": "pond_active",
+        "mean_ms": 0.16736405339147165
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7499000057578087,
+        "name": "rival",
+        "sample": "pond_active",
+        "mean_ms": 0.12697823203370376
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9079000010387972,
+        "name": "motor",
+        "sample": "pond_active",
+        "mean_ms": 0.1120279401150828
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.6451999981654808,
+        "name": "light",
+        "sample": "pond_active",
+        "mean_ms": 0.08277623019512476
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4474000015761703,
+        "name": "save",
+        "sample": "pond_active",
+        "mean_ms": 0.07233519599222663
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3880000003846362,
+        "name": "percepts",
+        "sample": "pond_active",
+        "mean_ms": 0.07140742278629891
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7144999981392175,
+        "name": "life",
+        "sample": "pond_active",
+        "mean_ms": 0.053808090024669686
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4520999937085435,
+        "name": "senses",
+        "sample": "pond_active",
+        "mean_ms": 0.040154879246865574
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4501000075833872,
+        "name": "fly bodies",
+        "sample": "pond_active",
+        "mean_ms": 0.036967139318468886
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3403000009711832,
+        "name": "looks",
+        "sample": "pond_active",
+        "mean_ms": 0.03136355291577825
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.175300010596402,
+        "name": "poses",
+        "sample": "pond_active",
+        "mean_ms": 0.02674195165945927
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.1255999959539622,
+        "name": "panels",
+        "sample": "pond_active",
+        "mean_ms": 0.018716513671895942
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.145800004247576,
+        "name": "mating",
+        "sample": "pond_active",
+        "mean_ms": 0.017476980768130923
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21290000586304814,
+        "name": "bug bodies",
+        "sample": "pond_active",
+        "mean_ms": 0.015622768714714073
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.07679998816456646,
+        "name": "frame",
+        "sample": "pond_active",
+        "mean_ms": 0.012683569624250268
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.1981999957934022,
+        "name": "lock button",
+        "sample": "pond_active",
+        "mean_ms": 0.011329775130658956
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.027300004148855805,
+        "name": "other",
+        "sample": "pond_active",
+        "mean_ms": 0.006397414387042965
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.43289999302942306,
+        "name": "shadows",
+        "sample": "pond_active",
+        "mean_ms": 0.005615763370106128
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.048000001697801054,
+        "name": "nature",
+        "sample": "pond_active",
+        "mean_ms": 0.004456713978198044
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.026599998818710446,
+        "name": "appearance",
+        "sample": "pond_active",
+        "mean_ms": 0.003982818891990268
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.023900007363408804,
+        "name": "lines",
+        "sample": "pond_active",
+        "mean_ms": 0.00394595527397725
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.019400002202019095,
+        "name": "perception hud",
+        "sample": "pond_active",
+        "mean_ms": 0.0037206840165249933
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.12820000119972974,
+        "name": "lock",
+        "sample": "pond_active",
+        "mean_ms": 0.003710925676941474
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3778999962378293,
+        "name": "eyes",
+        "sample": "pond_active",
+        "mean_ms": 0.0025485404496204678
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.0010128061985597014,
+        "name": "HeartbeatTime",
+        "mean": 0.0006394538601145406,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.01945037953555584,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.012683223790059595,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 56195,
+        "name": "InstanceCount",
+        "mean": 56195,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 77860,
+        "name": "SceneTriangleCount",
+        "mean": 77801.65804837365,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.5940786600112915,
+        "name": "DataSendKbps",
+        "mean": 0.4965023896016112,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.0002658305747900158,
+        "name": "PhysicsStepTime",
+        "mean": 7.096423528535636e-05,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.028649000450968742,
+        "name": "FrameTime",
+        "mean": 0.016695026786775764,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 0.014993599615991116,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.005872016598635957,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "max": 66,
+        "name": "SceneDrawcallCount",
+        "mean": 62.3511259382819,
+        "n": 1199
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "pond_active",
+        "calls": 1199,
+        "worst_ms": 0.05909999890718609,
+        "mean_ms": 0.0034584656647686923,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1199,
+        "heap_growth_kb": 1254,
+        "seconds": 20.015958064235747,
+        "mean_ms": 16.693876617377605,
+        "p95_ms": 18.25079880654812,
+        "extra": {
+          "wind": 0.8273427486419678,
+          "cat_enabled": true,
+          "region": "pond_a2",
+          "live": true,
+          "simulation": 25.366666666666507,
+          "simulation_seconds": 20.01666666666652,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            652,
+            -85.79000091552734,
+            -1044.6705322265625
+          ],
+          "clock": [
+            1,
+            12
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 12.192499998491257,
+        "p50_ms": 16.898764297366142,
+        "render_frames": 1199,
+        "render_mean_ms": 3.1182385321185726,
+        "sample": "pond_active",
+        "wall_seconds": 20.01866700001119,
+        "over100": 0,
+        "p99_ms": 19.281068816781044,
+        "worst_ms": 23.1094341725111,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.0383000082802027,
+        "name": "sound",
+        "sample": "can",
+        "mean_ms": 0.526736469454788
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.6805999912321568,
+        "name": "spider rig",
+        "sample": "can",
+        "mean_ms": 0.4148582845757041
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7572000031359494,
+        "name": "hud",
+        "sample": "can",
+        "mean_ms": 0.30026994190499845
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.6205000000773,
+        "name": "wasp",
+        "sample": "can",
+        "mean_ms": 0.23182214834705245
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.233700011856854,
+        "name": "other rigs",
+        "sample": "can",
+        "mean_ms": 0.17366069939705178
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.41140000394079834,
+        "name": "camera",
+        "sample": "can",
+        "mean_ms": 0.1695627810648308
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.46379999548662454,
+        "name": "world",
+        "sample": "can",
+        "mean_ms": 0.13703788475767026
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4329000075813383,
+        "name": "senses",
+        "sample": "can",
+        "mean_ms": 0.12956877598617703
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4776999994646758,
+        "name": "fly bodies",
+        "sample": "can",
+        "mean_ms": 0.12533172333925546
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.49950000538956374,
+        "name": "rival",
+        "sample": "can",
+        "mean_ms": 0.12532922571686272
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.41449999844189733,
+        "name": "prey",
+        "sample": "can",
+        "mean_ms": 0.1140697748240527
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5474000063259155,
+        "name": "save",
+        "sample": "can",
+        "mean_ms": 0.07476852606502374
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.4463999978033826,
+        "name": "light",
+        "sample": "can",
+        "mean_ms": 0.07458392995565534
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3288000007160008,
+        "name": "motor",
+        "sample": "can",
+        "mean_ms": 0.07230008332778798
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.23870001314207911,
+        "name": "life",
+        "sample": "can",
+        "mean_ms": 0.05084412987343967
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2747999969869852,
+        "name": "percepts",
+        "sample": "can",
+        "mean_ms": 0.04820116544739467
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3260999947087839,
+        "name": "looks",
+        "sample": "can",
+        "mean_ms": 0.0327374689885067
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21569999807979912,
+        "name": "poses",
+        "sample": "can",
+        "mean_ms": 0.025977601978534694
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.16710000636521727,
+        "name": "panels",
+        "sample": "can",
+        "mean_ms": 0.019668193187872468
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.0391000066883862,
+        "name": "mating",
+        "sample": "can",
+        "mean_ms": 0.017763280565055592
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.11069999891333282,
+        "name": "frame",
+        "sample": "can",
+        "mean_ms": 0.013154371414561567
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.061400001868605614,
+        "name": "bug bodies",
+        "sample": "can",
+        "mean_ms": 0.012872522856499674
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.11079999967478216,
+        "name": "lock button",
+        "sample": "can",
+        "mean_ms": 0.00982772717459808
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4352999967522919,
+        "name": "shadows",
+        "sample": "can",
+        "mean_ms": 0.005768442977775046
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.02989999484270811,
+        "name": "other",
+        "sample": "can",
+        "mean_ms": 0.005554704434784295
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.05839999357704073,
+        "name": "nature",
+        "sample": "can",
+        "mean_ms": 0.004403663606853608
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.019099999917671084,
+        "name": "appearance",
+        "sample": "can",
+        "mean_ms": 0.0041508746176778175
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.02439999661874026,
+        "name": "lock",
+        "sample": "can",
+        "mean_ms": 0.0038129062047515135
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.021700005163438618,
+        "name": "lines",
+        "sample": "can",
+        "mean_ms": 0.0033341383430246048
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.0337999954354018,
+        "name": "perception hud",
+        "sample": "can",
+        "mean_ms": 0.003325562139676045
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.012100004823878407,
+        "name": "eyes",
+        "sample": "can",
+        "mean_ms": 0.001980183234315778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.0010109259746968746,
+        "name": "HeartbeatTime",
+        "mean": 0.0006689817690601469,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.024884279817342758,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.010728452657097385,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 56267,
+        "name": "InstanceCount",
+        "mean": 56267,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 83988,
+        "name": "SceneTriangleCount",
+        "mean": 81408.26977518735,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.6208491325378418,
+        "name": "DataSendKbps",
+        "mean": 0.49540964213140204,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.00018439222185406834,
+        "name": "PhysicsStepTime",
+        "mean": 6.424490875951468e-05,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.023426199331879616,
+        "name": "FrameTime",
+        "mean": 0.016667392174655155,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 0.015008199959993362,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.004662141788961811,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "max": 48,
+        "name": "SceneDrawcallCount",
+        "mean": 42.94004995836803,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "can",
+        "calls": 1201,
+        "worst_ms": 0.19400000746827573,
+        "mean_ms": 0.0037573691656026713,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1201,
+        "heap_growth_kb": -3955,
+        "seconds": 20.01480244938284,
+        "mean_ms": 16.665114445780883,
+        "p95_ms": 18.27479526400566,
+        "extra": {
+          "wind": 0.8273427486419678,
+          "cat_enabled": true,
+          "region": "bin",
+          "live": true,
+          "simulation": 25.43333333333317,
+          "simulation_seconds": 20.016666666666517,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            60,
+            5.710000038146973,
+            -774
+          ],
+          "clock": [
+            1,
+            12
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 8.973099989816546,
+        "p50_ms": 16.90633036196232,
+        "render_frames": 1201,
+        "render_mean_ms": 2.933277185762233,
+        "sample": "can",
+        "wall_seconds": 20.019109899993055,
+        "over100": 0,
+        "p99_ms": 19.1043671220541,
+        "worst_ms": 22.104455158114433,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.9213000050513074,
+        "name": "sound",
+        "sample": "doorway",
+        "mean_ms": 0.7091724541160133
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.6658999995561317,
+        "name": "spider rig",
+        "sample": "doorway",
+        "mean_ms": 0.4020504173192037
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9421999857295305,
+        "name": "hud",
+        "sample": "doorway",
+        "mean_ms": 0.3174410683911594
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.925299992668442,
+        "name": "wasp",
+        "sample": "doorway",
+        "mean_ms": 0.23829323866984534
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.5996999902417883,
+        "name": "other rigs",
+        "sample": "doorway",
+        "mean_ms": 0.20345784632171518
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.6291000065393746,
+        "name": "light",
+        "sample": "doorway",
+        "mean_ms": 0.19597020033258752
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7633000059286132,
+        "name": "camera",
+        "sample": "doorway",
+        "mean_ms": 0.18936510842135298
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7705000025453046,
+        "name": "prey",
+        "sample": "doorway",
+        "mean_ms": 0.13277904823471406
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6609999982174486,
+        "name": "rival",
+        "sample": "doorway",
+        "mean_ms": 0.12556652732633478
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4188999882899225,
+        "name": "senses",
+        "sample": "doorway",
+        "mean_ms": 0.11418806322166565
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6179000047268346,
+        "name": "world",
+        "sample": "doorway",
+        "mean_ms": 0.08574215336104167
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4817000008188188,
+        "name": "motor",
+        "sample": "doorway",
+        "mean_ms": 0.08161118552294748
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4558000073302537,
+        "name": "save",
+        "sample": "doorway",
+        "mean_ms": 0.07372771321565771
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5022000113967806,
+        "name": "life",
+        "sample": "doorway",
+        "mean_ms": 0.05781327239255217
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3254999901400879,
+        "name": "percepts",
+        "sample": "doorway",
+        "mean_ms": 0.045041485593085934
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4972999886376783,
+        "name": "fly bodies",
+        "sample": "doorway",
+        "mean_ms": 0.036395492393368756
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.301799998851493,
+        "name": "looks",
+        "sample": "doorway",
+        "mean_ms": 0.030952754680406244
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9701000089989975,
+        "name": "poses",
+        "sample": "doorway",
+        "mean_ms": 0.02985500850779267
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.28249999741092324,
+        "name": "panels",
+        "sample": "doorway",
+        "mean_ms": 0.018550166915126537
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.21549999655690044,
+        "name": "mating",
+        "sample": "doorway",
+        "mean_ms": 0.0179424040013293
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.16679998952895403,
+        "name": "bug bodies",
+        "sample": "doorway",
+        "mean_ms": 0.015016360398271558
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.07539999205619097,
+        "name": "frame",
+        "sample": "doorway",
+        "mean_ms": 0.0124870619368514
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.10559998918324709,
+        "name": "lock button",
+        "sample": "doorway",
+        "mean_ms": 0.011394240712970091
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.05880001117475331,
+        "name": "other",
+        "sample": "doorway",
+        "mean_ms": 0.006663522575997463
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.5579999997280538,
+        "name": "shadows",
+        "sample": "doorway",
+        "mean_ms": 0.005813689341920993
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.035899996873922646,
+        "name": "nature",
+        "sample": "doorway",
+        "mean_ms": 0.004277963208082056
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.04129999433644116,
+        "name": "lines",
+        "sample": "doorway",
+        "mean_ms": 0.004239816334058153
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.13210000179242343,
+        "name": "appearance",
+        "sample": "doorway",
+        "mean_ms": 0.004067529285970285
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.06349998875521123,
+        "name": "perception hud",
+        "sample": "doorway",
+        "mean_ms": 0.003947579282070067
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.23820000933483243,
+        "name": "lock",
+        "sample": "doorway",
+        "mean_ms": 0.003929633199422308
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.025899993488565087,
+        "name": "eyes",
+        "sample": "doorway",
+        "mean_ms": 0.0024494157592145622
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.0009437978733330965,
+        "name": "HeartbeatTime",
+        "mean": 0.0006556449266471659,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.027176620438694954,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.012138051285605897,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 56290,
+        "name": "InstanceCount",
+        "mean": 56290,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 68196,
+        "name": "SceneTriangleCount",
+        "mean": 64408.75792988314,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.617292046546936,
+        "name": "DataSendKbps",
+        "mean": 0.4969147259683561,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.0002962342696264386,
+        "name": "PhysicsStepTime",
+        "mean": 9.154301223421068e-05,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.02803339995443821,
+        "name": "FrameTime",
+        "mean": 0.01670786853761526,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 0.02125369943678379,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.005581878956705829,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "max": 36,
+        "name": "SceneDrawcallCount",
+        "mean": 33.813021702838064,
+        "n": 1198
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "doorway",
+        "calls": 1198,
+        "worst_ms": 0.11850000009872019,
+        "mean_ms": 0.0035307179396553818,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1198,
+        "heap_growth_kb": -374,
+        "seconds": 20.015202531591058,
+        "mean_ms": 16.70718074423294,
+        "p95_ms": 18.158724531531334,
+        "extra": {
+          "wind": 0.8273427486419678,
+          "cat_enabled": true,
+          "region": "hut_doorway",
+          "live": true,
+          "simulation": 25.39999999999984,
+          "simulation_seconds": 20.01666666666652,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            160.75,
+            -69.69000244140625,
+            215
+          ],
+          "clock": [
+            1,
+            12
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 9.95330000296235,
+        "p50_ms": 16.92373864352703,
+        "render_frames": 1198,
+        "render_mean_ms": 3.1802024209727295,
+        "sample": "doorway",
+        "wall_seconds": 20.01740160000918,
+        "over100": 0,
+        "p99_ms": 19.540928304195404,
+        "worst_ms": 26.83686651289463,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.226299995323643,
+        "name": "sound",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.5100948378780266
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.2353999956976622,
+        "name": "spider rig",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.3999702748963702
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.1088999890489504,
+        "name": "hud",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.30890357996665524
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7611999899381772,
+        "name": "camera",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.2439761866373766
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.610699998214841,
+        "name": "wasp",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.2349945877466993
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.2380000009434298,
+        "name": "other rigs",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.18415836797207888
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7910999993328005,
+        "name": "rival",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.12283663632391606
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.4121999954804778,
+        "name": "world",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.12017993315723613
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3660000074887648,
+        "name": "motor",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.10852706109471758
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.569899992318824,
+        "name": "light",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.08635462113333514
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.24920000578276813,
+        "name": "save",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.07163455455029286
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3750999894691631,
+        "name": "life",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.055246044984680574
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6427000043913722,
+        "name": "prey",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.04670766027055706
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3369999903952703,
+        "name": "senses",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.038187427331963335
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2182000025641173,
+        "name": "looks",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.03032014986779696
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.29999999969732016,
+        "name": "poses",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.02657601986746137
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.15559999155811965,
+        "name": "percepts",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.022485262301299165
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.31709999893791974,
+        "name": "panels",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.019129142484574934
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3122000052826479,
+        "name": "mating",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.017940382801576345
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.08030000026337802,
+        "name": "frame",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.012433555282611279
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.13690000923816115,
+        "name": "lock button",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.01053563711478869
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.059600002714432776,
+        "name": "fly bodies",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.00884296436944153
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.0447999918833375,
+        "name": "bug bodies",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.006825395374730241
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.052799994591623545,
+        "name": "other",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.005794921259843216
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.43039998854510486,
+        "name": "shadows",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.005499583573141085
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.022899999748915434,
+        "name": "nature",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.004317402155514649
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.09359999967273325,
+        "name": "appearance",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.004049042798791989
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.019099999917671084,
+        "name": "lock",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.003633638301559512
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.04150001041125506,
+        "name": "lines",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.00352098236585906
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.04600000102072954,
+        "name": "perception hud",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.003378101229841366
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.03979999746661633,
+        "name": "eyes",
+        "sample": "bench_lamppost_night",
+        "mean_ms": 0.0021320567148381676
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.0008978566038422287,
+        "name": "HeartbeatTime",
+        "mean": 0.0006474629266022377,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.02435637079179287,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.011750854061316268,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 56266,
+        "name": "InstanceCount",
+        "mean": 56266,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 85384,
+        "name": "SceneTriangleCount",
+        "mean": 84519.68026644463,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.589525580406189,
+        "name": "DataSendKbps",
+        "mean": 0.4938411107418638,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.0002187821955885738,
+        "name": "PhysicsStepTime",
+        "mean": 5.045850119939757e-05,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.02825249917805195,
+        "name": "FrameTime",
+        "mean": 0.01666516950935572,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 0.014844800345599651,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.0050757425514629095,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "max": 41,
+        "name": "SceneDrawcallCount",
+        "mean": 37.52789342214821,
+        "n": 1201
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "bench_lamppost_night",
+        "calls": 1201,
+        "worst_ms": 0.0523999915458262,
+        "mean_ms": 0.003319816859373102,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 1201,
+        "heap_growth_kb": 7666,
+        "seconds": 20.015263655222952,
+        "mean_ms": 16.66549846396582,
+        "p95_ms": 18.060894683003426,
+        "extra": {
+          "wind": 2.0044984817504883,
+          "cat_enabled": true,
+          "region": "lamp_1",
+          "live": true,
+          "simulation": 25.383333333333173,
+          "simulation_seconds": 20.01666666666652,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            -188,
+            -68.29000091552734,
+            -768
+          ],
+          "clock": [
+            1,
+            21
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 8.361800006241538,
+        "p50_ms": 16.932645812630653,
+        "render_frames": 1201,
+        "render_mean_ms": 2.719186011807575,
+        "sample": "bench_lamppost_night",
+        "wall_seconds": 20.01854629999434,
+        "over100": 0,
+        "p99_ms": 18.97583156824112,
+        "worst_ms": 19.509276375174522,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 4.583100002491847,
+        "name": "spider rig",
+        "sample": "three_region_walk",
+        "mean_ms": 1.1296662869517653
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.063699997961521,
+        "name": "sound",
+        "sample": "three_region_walk",
+        "mean_ms": 0.6098945803381257
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.6630000027362257,
+        "name": "hud",
+        "sample": "three_region_walk",
+        "mean_ms": 0.3495372150348538
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9917000134009868,
+        "name": "camera",
+        "sample": "three_region_walk",
+        "mean_ms": 0.25669066144827507
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 4.767100006574765,
+        "name": "light",
+        "sample": "three_region_walk",
+        "mean_ms": 0.2487165370158887
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 5.07219998689834,
+        "name": "wasp",
+        "sample": "three_region_walk",
+        "mean_ms": 0.23123635365745482
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 2.696399998967536,
+        "name": "other rigs",
+        "sample": "three_region_walk",
+        "mean_ms": 0.205958143312681
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.9922000026563182,
+        "name": "motor",
+        "sample": "three_region_walk",
+        "mean_ms": 0.14865875474415177
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 1.2865000026067719,
+        "name": "rival",
+        "sample": "three_region_walk",
+        "mean_ms": 0.1164987492390283
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 3.8186000019777566,
+        "name": "bug bodies",
+        "sample": "three_region_walk",
+        "mean_ms": 0.10159660924081482
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8855000050971285,
+        "name": "world",
+        "sample": "three_region_walk",
+        "mean_ms": 0.10126631456456267
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 6.461099997977726,
+        "name": "prey",
+        "sample": "three_region_walk",
+        "mean_ms": 0.08215986650235606
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7373999978881329,
+        "name": "save",
+        "sample": "three_region_walk",
+        "mean_ms": 0.07149130069410502
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 7.693099993048236,
+        "name": "looks",
+        "sample": "three_region_walk",
+        "mean_ms": 0.06533371307301501
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.8653000113554299,
+        "name": "life",
+        "sample": "three_region_walk",
+        "mean_ms": 0.051812729407402135
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.3364000003784895,
+        "name": "senses",
+        "sample": "three_region_walk",
+        "mean_ms": 0.035772734842449014
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.7406999939121306,
+        "name": "poses",
+        "sample": "three_region_walk",
+        "mean_ms": 0.028106920345605614
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.17359999765176326,
+        "name": "percepts",
+        "sample": "three_region_walk",
+        "mean_ms": 0.02691612001850796
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.27639999461825937,
+        "name": "panels",
+        "sample": "three_region_walk",
+        "mean_ms": 0.01779588665780205
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.2641000028233975,
+        "name": "mating",
+        "sample": "three_region_walk",
+        "mean_ms": 0.016752501409880046
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 4.378800003905781,
+        "name": "lock button",
+        "sample": "three_region_walk",
+        "mean_ms": 0.014351917778224886
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.12399999832268804,
+        "name": "frame",
+        "sample": "three_region_walk",
+        "mean_ms": 0.012156614791273165
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.949399996898137,
+        "name": "fly bodies",
+        "sample": "three_region_walk",
+        "mean_ms": 0.01052982216601774
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.259000007645227,
+        "name": "nature",
+        "sample": "three_region_walk",
+        "mean_ms": 0.007239688757166117
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.28190000739414245,
+        "name": "other",
+        "sample": "three_region_walk",
+        "mean_ms": 0.007059866562776895
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.6934999983059242,
+        "name": "shadows",
+        "sample": "three_region_walk",
+        "mean_ms": 0.005901306388090018
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.06829999620094895,
+        "name": "lines",
+        "sample": "three_region_walk",
+        "mean_ms": 0.004152807222266142
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.040099999750964344,
+        "name": "perception hud",
+        "sample": "three_region_walk",
+        "mean_ms": 0.004018593698825683
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.11800001084338874,
+        "name": "appearance",
+        "sample": "three_region_walk",
+        "mean_ms": 0.003881545374938714
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.10810000821948051,
+        "name": "lock",
+        "sample": "three_region_walk",
+        "mean_ms": 0.0035596999135660444
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792840384575",
+      "value": {
+        "worst_ms": 0.17529999604448676,
+        "name": "eyes",
+        "sample": "three_region_walk",
+        "mean_ms": 0.0026177598239909374
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.0010436158627271652,
+        "name": "HeartbeatTime",
+        "mean": 0.0006926480523439894,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.027622079476714134,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.012541546423677738,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 56528,
+        "name": "InstanceCount",
+        "mean": 56351.76375764314,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 96364,
+        "name": "SceneTriangleCount",
+        "mean": 74909.11728738187,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.6081842184066772,
+        "name": "DataSendKbps",
+        "mean": 0.4980609463926419,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.00041642997530288994,
+        "name": "PhysicsStepTime",
+        "mean": 8.645687501083613e-05,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.029456499963998795,
+        "name": "FrameTime",
+        "mean": 0.016684680498448956,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 0.01961899921298027,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.006349277826390535,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "max": 51,
+        "name": "SceneDrawcallCount",
+        "mean": 44.625903279599775,
+        "n": 3598
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "calls": 19,
+        "worst_ms": 3.8189000042621046,
+        "mean_ms": 0.9483684223500619,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "calls": 3598,
+        "worst_ms": 0.4398000019136816,
+        "mean_ms": 0.0033310452085159193,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792840384575",
+      "value": {
+        "sample": "three_region_walk",
+        "calls": 75,
+        "worst_ms": 5.649599988828413,
+        "mean_ms": 1.4908893350123738,
+        "name": "replan"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792840384575",
+      "value": {
+        "over50": 0,
+        "frames": 3598,
+        "heap_growth_kb": -3955,
+        "seconds": 60.028874843381345,
+        "mean_ms": 16.68395632111766,
+        "p95_ms": 18.127817660570145,
+        "extra": {
+          "wind": 3.019221782684326,
+          "cat_enabled": true,
+          "region": "garden_a3",
+          "live": true,
+          "distance": 150.08323669433594,
+          "simulation": 65.41666666666424,
+          "visited": {
+            "garden_a1": true,
+            "garden_a3": true,
+            "garden_a2": true
+          },
+          "simulation_seconds": 60.03333333333092,
+          "viewport": [
+            1360,
+            436
+          ],
+          "position": [
+            0.0832366943359375,
+            -84.29000854492188,
+            -90
+          ],
+          "clock": [
+            2,
+            12
+          ],
+          "mode": "attached",
+          "rain": 0,
+          "detail": "low"
+        },
+        "render_worst_ms": 15.877700003329664,
+        "p50_ms": 16.926594078540802,
+        "render_frames": 3598,
+        "render_mean_ms": 3.971331600975861,
+        "sample": "three_region_walk",
+        "wall_seconds": 60.033794200004195,
+        "over100": 0,
+        "p99_ms": 19.24695633351803,
+        "worst_ms": 25.9874165058136,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792840384575",
+      "value": {
+        "online": false,
+        "cat_enabled": true,
+        "ordinary_ui": true,
+        "storage": "yielding-memory"
+      }
+    }
+  ],
+  "trace": [],
+  "creator_errors": 0,
+  "creator_warnings": 8,
+  "complete_fixture_scope": true,
+  "methods_instrumented": true,
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T111123Z_Studio_32921_last.log",
+  "limits": "One local Studio workload. Free-play fixtures fix clock, use authored arrivals and memory storage. Not production FPS, a natural life, real network/storage or physical phone proof."
+}

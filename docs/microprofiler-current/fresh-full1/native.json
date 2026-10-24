@@ -1,0 +1,1471 @@
+{
+  "run": "1792841330889",
+  "passed": true,
+  "source_guards": 2,
+  "creator_errors": 0,
+  "creator_warnings": 6,
+  "model_sha256": "ebbcefdbfe71effe411dfc877e36dc82c9472eece675308c25851361ac9de5ce",
+  "manifest_sha256": "9b7bfb5d29d02d662d631fbfa1103ca01b1b38e57d351de81e668a54ffc596d3",
+  "native_output_sha256": "113ca0d3b07bc25a36a2cb915ae7d205088d8ed8dbbb5b6df633072a40ca5dc8",
+  "source_evidence": "105c83862d500f43",
+  "events": [
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.00011320597695885226,
+        "name": "HeartbeatTime",
+        "mean": 0.00011320597695885226,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.072Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "RenderGPUFrameTime",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.073Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 3830,
+        "name": "InstanceCount",
+        "mean": 3830,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.080Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "SceneTriangleCount",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.080Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 3.908841133117676,
+        "name": "DataSendKbps",
+        "mean": 3.908841133117676,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.080Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.0001952120364876464,
+        "name": "PhysicsStepTime",
+        "mean": 0.0001952120364876464,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.080Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.080Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "FrameTime",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.081Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "RenderCPUFrameTime",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.081Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "max": 0,
+        "name": "SceneDrawcallCount",
+        "mean": 0,
+        "n": 1
+      },
+      "at": "2026-10-24T11:28:51.081Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10753,
+        "phase": "client-enter",
+        "t": 0.37308659999689553,
+        "dt_ms": 485.65712571144104,
+        "index": 1
+      },
+      "at": "2026-10-24T11:28:51.081Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.00011320597695885226,
+          "RenderGPUFrameTime": 0,
+          "InstanceCount": 3830,
+          "SceneTriangleCount": 0,
+          "PhysicsStepTime": 0.0001952120364876464,
+          "DataSendKbps": 3.908841133117676,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "SceneDrawcallCount": 0
+        },
+        "sample": "client-startup",
+        "index": 1
+      },
+      "at": "2026-10-24T11:28:51.082Z"
+    },
+    {
+      "kind": "END",
+      "run": "1792841330889",
+      "value": {
+        "over50": 1,
+        "frames": 1,
+        "heap_growth_kb": 11438,
+        "seconds": 0.48565712571144104,
+        "mean_ms": 485.65712571144104,
+        "p95_ms": 485.65712571144104,
+        "extra": {
+          "cat_enabled": true,
+          "region": "sill",
+          "live": false,
+          "simulation": 0,
+          "viewport": [
+            1,
+            1
+          ],
+          "position": [
+            -22,
+            0.3100000023841858,
+            6
+          ],
+          "clock": [
+            1,
+            9
+          ],
+          "mode": "attached",
+          "detail": "full"
+        },
+        "render_worst_ms": 0,
+        "p50_ms": 485.65712571144104,
+        "render_frames": 0,
+        "render_mean_ms": 0,
+        "sample": "client-startup",
+        "wall_seconds": 0.789461599997594,
+        "over100": 1,
+        "p99_ms": 485.65712571144104,
+        "worst_ms": 485.65712571144104,
+        "over33": 1
+      },
+      "at": "2026-10-24T11:28:51.082Z"
+    },
+    {
+      "kind": "MARK",
+      "run": "1792841330889",
+      "value": {
+        "heap_kb": 1332,
+        "t": 1.1999945854768157e-06,
+        "name": "client-enter",
+        "delta": 1.1999945854768157e-06
+      },
+      "at": "2026-10-24T11:28:51.082Z"
+    },
+    {
+      "kind": "MARK",
+      "run": "1792841330889",
+      "value": {
+        "heap_kb": 12762,
+        "t": 0.7802130999916699,
+        "name": "client-constructed",
+        "delta": 0.7802118999970844
+      },
+      "at": "2026-10-24T11:28:51.082Z"
+    },
+    {
+      "kind": "COUNTERS",
+      "run": "1792841330889",
+      "value": {
+        "unavailable": []
+      },
+      "at": "2026-10-24T11:28:51.082Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 6.580799992661923,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "mean_ms": 2.1995195944119543
+      },
+      "at": "2026-10-24T11:30:11.792Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 5.635900000925176,
+        "name": "sound",
+        "sample": "garden_rain",
+        "mean_ms": 0.6602954666991712
+      },
+      "at": "2026-10-24T11:30:11.792Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 7.190699994680472,
+        "name": "light",
+        "sample": "garden_rain",
+        "mean_ms": 0.4796487326463857
+      },
+      "at": "2026-10-24T11:30:11.792Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 3.708300006110221,
+        "name": "hud",
+        "sample": "garden_rain",
+        "mean_ms": 0.403474410999313
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 3.074499996728264,
+        "name": "camera",
+        "sample": "garden_rain",
+        "mean_ms": 0.3333128839491303
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 7.732900005066767,
+        "name": "wasp",
+        "sample": "garden_rain",
+        "mean_ms": 0.2565270204559083
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 2.0057000074302778,
+        "name": "bug bodies",
+        "sample": "garden_rain",
+        "mean_ms": 0.25121735766359354
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 5.48930000513792,
+        "name": "other rigs",
+        "sample": "garden_rain",
+        "mean_ms": 0.23662520130317688
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.9123000054387376,
+        "name": "motor",
+        "sample": "garden_rain",
+        "mean_ms": 0.1339076949039609
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 2.140800002962351,
+        "name": "rival",
+        "sample": "garden_rain",
+        "mean_ms": 0.1308872652409669
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 1.2990999966859818,
+        "name": "world",
+        "sample": "garden_rain",
+        "mean_ms": 0.1049018788396981
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.550300013856031,
+        "name": "prey",
+        "sample": "garden_rain",
+        "mean_ms": 0.08428383516447711
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.9820999985095114,
+        "name": "save",
+        "sample": "garden_rain",
+        "mean_ms": 0.07508407403011394
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.37370000791270286,
+        "name": "life",
+        "sample": "garden_rain",
+        "mean_ms": 0.0627853264956136
+      },
+      "at": "2026-10-24T11:30:11.793Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.3237000055378303,
+        "name": "percepts",
+        "sample": "garden_rain",
+        "mean_ms": 0.04197614074044725
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.42559999565128237,
+        "name": "senses",
+        "sample": "garden_rain",
+        "mean_ms": 0.03848392477922465
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.1742999884299934,
+        "name": "looks",
+        "sample": "garden_rain",
+        "mean_ms": 0.030474232109864885
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.9169000113615766,
+        "name": "poses",
+        "sample": "garden_rain",
+        "mean_ms": 0.026292007033805655
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.21569999807979912,
+        "name": "mating",
+        "sample": "garden_rain",
+        "mean_ms": 0.018928332878968324
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.1860999909695238,
+        "name": "panels",
+        "sample": "garden_rain",
+        "mean_ms": 0.017941395609850405
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.22790000366512686,
+        "name": "lock button",
+        "sample": "garden_rain",
+        "mean_ms": 0.015368475991890363
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.22110001009423286,
+        "name": "other",
+        "sample": "garden_rain",
+        "mean_ms": 0.013712346906034354
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.07890000415500253,
+        "name": "frame",
+        "sample": "garden_rain",
+        "mean_ms": 0.012424247066262313
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.6418999982997775,
+        "name": "fly bodies",
+        "sample": "garden_rain",
+        "mean_ms": 0.009892484274699222
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 1.2392000062391162,
+        "name": "shadows",
+        "sample": "garden_rain",
+        "mean_ms": 0.006192454573404752
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.6169999978737906,
+        "name": "lines",
+        "sample": "garden_rain",
+        "mean_ms": 0.005022934745074201
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.0543000060133636,
+        "name": "nature",
+        "sample": "garden_rain",
+        "mean_ms": 0.004885028184421001
+      },
+      "at": "2026-10-24T11:30:11.794Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.07049999840091914,
+        "name": "appearance",
+        "sample": "garden_rain",
+        "mean_ms": 0.0044904861560251365
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.20809999841731042,
+        "name": "perception hud",
+        "sample": "garden_rain",
+        "mean_ms": 0.004252371031878743
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.04329999501351267,
+        "name": "lock",
+        "sample": "garden_rain",
+        "mean_ms": 0.003738920456406797
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "PART",
+      "run": "1792841330889",
+      "value": {
+        "worst_ms": 0.05299999611452222,
+        "name": "eyes",
+        "sample": "garden_rain",
+        "mean_ms": 0.002550581642550153
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.0010790012311190367,
+        "name": "HeartbeatTime",
+        "mean": 0.0006705672343404863,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.0564640611410141,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.015230425607380834,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 58648,
+        "name": "InstanceCount",
+        "mean": 58648,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 181422,
+        "name": "SceneTriangleCount",
+        "mean": 175225.0587533552,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.6364049911499023,
+        "name": "DataSendKbps",
+        "mean": 0.4884008374937321,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.0004544101539067924,
+        "name": "PhysicsStepTime",
+        "mean": 0.00016059145733569825,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0,
+        "name": "DataReceiveKbps",
+        "mean": 0,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.057732999324798584,
+        "name": "FrameTime",
+        "mean": 0.01790121879040875,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 0.05063470080494881,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.009448822579256881,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "max": 70,
+        "name": "SceneDrawcallCount",
+        "mean": 62.13152400835073,
+        "n": 3353
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "calls": 3353,
+        "worst_ms": 0.08069998875726014,
+        "mean_ms": 0.0034228452410015077,
+        "name": "dew"
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 40772,
+        "phase": "garden_rain",
+        "t": 52.56538410000212,
+        "dt_ms": 57.10619315505028,
+        "index": 1
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.00068855588324368,
+          "RenderGPUFrameTime": 0.020948098972439766,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178842,
+          "PhysicsStepTime": 0.00019189226441085339,
+          "DataSendKbps": 0.5281100869178772,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.02002130076289177,
+          "RenderCPUFrameTime": 0.010950200259685516,
+          "SceneDrawcallCount": 64
+        },
+        "sample": "garden_rain",
+        "index": 1
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007039904012344778,
+          "RenderGPUFrameTime": 0.0564640611410141,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178819,
+          "PhysicsStepTime": 0.00018229764827992767,
+          "DataSendKbps": 0.5281100869178772,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.01866989955306053,
+          "RenderCPUFrameTime": 0.012399500235915184,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 1
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007187506998889148,
+          "RenderGPUFrameTime": 0.017393048852682114,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178818,
+          "PhysicsStepTime": 0.00022314256057143211,
+          "DataSendKbps": 0.49450191855430603,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.05648230016231537,
+          "RenderCPUFrameTime": 0.049629900604486465,
+          "SceneDrawcallCount": 64
+        },
+        "sample": "garden_rain",
+        "index": 1
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 2.1297999919625,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 1
+      },
+      "at": "2026-10-24T11:30:11.795Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 30444,
+        "phase": "garden_rain",
+        "t": 44.88590619999741,
+        "dt_ms": 55.116161704063416,
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007646760786883533,
+          "RenderGPUFrameTime": 0.014466609805822372,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 176864,
+          "PhysicsStepTime": 8.884887938620523e-05,
+          "DataSendKbps": 0.5842784643173218,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.017224200069904327,
+          "RenderCPUFrameTime": 0.006341199856251478,
+          "SceneDrawcallCount": 67
+        },
+        "sample": "garden_rain",
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007264422602020204,
+          "RenderGPUFrameTime": 0.04753769934177399,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178782,
+          "PhysicsStepTime": 0.00013451203994918615,
+          "DataSendKbps": 0.5842784643173218,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.019392099231481552,
+          "RenderCPUFrameTime": 0.012621499598026276,
+          "SceneDrawcallCount": 67
+        },
+        "sample": "garden_rain",
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0006901201559230685,
+          "RenderGPUFrameTime": 0.01453710999339819,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 179646,
+          "PhysicsStepTime": 0.00017789204139262438,
+          "DataSendKbps": 0.5186637043952942,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.057732999324798584,
+          "RenderCPUFrameTime": 0.05063470080494881,
+          "SceneDrawcallCount": 67
+        },
+        "sample": "garden_rain",
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.908899997943081,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.050299993949011,
+        "name": "light",
+        "sample": "garden_rain",
+        "index": 2
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 38114,
+        "phase": "garden_rain",
+        "t": 47.671039399996516,
+        "dt_ms": 50.13897269964218,
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0006944984197616577,
+          "RenderGPUFrameTime": 0.016732968389987946,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178770,
+          "PhysicsStepTime": 0.0001811980619095266,
+          "DataSendKbps": 0.46037474274635315,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.01815279945731163,
+          "RenderCPUFrameTime": 0.01236880011856556,
+          "SceneDrawcallCount": 66
+        },
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007603295962326229,
+          "RenderGPUFrameTime": 0.01924441009759903,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178772,
+          "PhysicsStepTime": 0.0001721381559036672,
+          "DataSendKbps": 0.4321991801261902,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.01837809942662716,
+          "RenderCPUFrameTime": 0.011736799962818623,
+          "SceneDrawcallCount": 68
+        },
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007721823640167713,
+          "RenderGPUFrameTime": 0.030290398746728897,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178806,
+          "PhysicsStepTime": 0.0001635312510188669,
+          "DataSendKbps": 0.4321991801261902,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.047887299209833145,
+          "RenderCPUFrameTime": 0.026964500546455383,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.6176000062841922,
+        "name": "other rigs",
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.7010000010486692,
+        "name": "sound",
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 4.5190999953774735,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 7.190699994680472,
+        "name": "light",
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.2064999900758266,
+        "name": "camera",
+        "sample": "garden_rain",
+        "index": 3
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 38740,
+        "phase": "garden_rain",
+        "t": 74.75840939999034,
+        "dt_ms": 45.98743095993996,
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.000807101430837065,
+          "RenderGPUFrameTime": 0.022044768556952477,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 179251,
+          "PhysicsStepTime": 9.188288822770119e-05,
+          "DataSendKbps": 0.40532925724983215,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.02034500055015087,
+          "RenderCPUFrameTime": 0.010418899357318878,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0008164875907823443,
+          "RenderGPUFrameTime": 0.02549780160188675,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 179250,
+          "PhysicsStepTime": 8.728873945074156e-05,
+          "DataSendKbps": 0.40532925724983215,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.021952299401164055,
+          "RenderCPUFrameTime": 0.013029800727963448,
+          "SceneDrawcallCount": 64
+        },
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007756631821393967,
+          "RenderGPUFrameTime": 0.024949710816144943,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 179250,
+          "PhysicsStepTime": 8.292429993161932e-05,
+          "DataSendKbps": 0.3790515959262848,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.043464601039886475,
+          "RenderCPUFrameTime": 0.01881069876253605,
+          "SceneDrawcallCount": 64
+        },
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 2.1866000024601817,
+        "name": "other rigs",
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.590500003658235,
+        "name": "sound",
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.796Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 6.403799998224713,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 2.6655999972717836,
+        "name": "light",
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.1505999864311889,
+        "name": "camera",
+        "sample": "garden_rain",
+        "index": 4
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 38332,
+        "phase": "garden_rain",
+        "t": 47.7161039999919,
+        "dt_ms": 44.88232359290123,
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007603295962326229,
+          "RenderGPUFrameTime": 0.01924441009759903,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178772,
+          "PhysicsStepTime": 0.0001721381559036672,
+          "DataSendKbps": 0.4321991801261902,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.01837809942662716,
+          "RenderCPUFrameTime": 0.011736799962818623,
+          "SceneDrawcallCount": 68
+        },
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007721823640167713,
+          "RenderGPUFrameTime": 0.030290398746728897,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178806,
+          "PhysicsStepTime": 0.0001635312510188669,
+          "DataSendKbps": 0.4321991801261902,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.047887299209833145,
+          "RenderCPUFrameTime": 0.026964500546455383,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0008333117584697902,
+          "RenderGPUFrameTime": 0.02327325940132141,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178830,
+          "PhysicsStepTime": 0.00015535468992311507,
+          "DataSendKbps": 0.3996129333972931,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.04761200025677681,
+          "RenderCPUFrameTime": 0.0371491014957428,
+          "SceneDrawcallCount": 66
+        },
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 2.4268999986816198,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.0528999991947785,
+        "name": "light",
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.0752999951364473,
+        "name": "camera",
+        "sample": "garden_rain",
+        "index": 5
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP",
+      "run": "1792841330889",
+      "value": {
+        "sample": "garden_rain",
+        "heap_kb": 34706,
+        "phase": "garden_rain",
+        "t": 49.72825190000003,
+        "dt_ms": 43.685443699359894,
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0005612780223600566,
+          "RenderGPUFrameTime": 0.025012999773025513,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178818,
+          "PhysicsStepTime": 0.00011809805437223986,
+          "DataSendKbps": 0.44813278317451477,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.023416100069880486,
+          "RenderCPUFrameTime": 0.01467910036444664,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0005332141299732029,
+          "RenderGPUFrameTime": 0.0374738872051239,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178819,
+          "PhysicsStepTime": 0.00011219315638300031,
+          "DataSendKbps": 0.42496609687805176,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.02320449985563755,
+          "RenderCPUFrameTime": 0.016280800104141235,
+          "SceneDrawcallCount": 66
+        },
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792841330889",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0005561959696933627,
+          "RenderGPUFrameTime": 0.019476480782032013,
+          "InstanceCount": 58648,
+          "SceneTriangleCount": 178818,
+          "PhysicsStepTime": 0.00010658349492587149,
+          "DataSendKbps": 0.42496609687805176,
+          "DataReceiveKbps": 0,
+          "FrameTime": 0.042965300381183624,
+          "RenderCPUFrameTime": 0.03151930123567581,
+          "SceneDrawcallCount": 65
+        },
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.183500004117377,
+        "name": "other rigs",
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 2.7307999989716336,
+        "name": "spider rig",
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.4731000119354576,
+        "name": "light",
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792841330889",
+      "value": {
+        "ms": 1.319799994234927,
+        "name": "camera",
+        "sample": "garden_rain",
+        "index": 6
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "END",
+      "run": "1792841330889",
+      "value": {
+        "over50": 3,
+        "frames": 3353,
+        "heap_growth_kb": -8842,
+        "seconds": 60.01566381752491,
+        "mean_ms": 17.899094487779575,
+        "p95_ms": 23.988863453269005,
+        "extra": {
+          "wind": 3.0892152786254883,
+          "cat_enabled": true,
+          "region": "garden_a1",
+          "live": true,
+          "simulation": 70.1999999999973,
+          "simulation_seconds": 60.01666666666388,
+          "viewport": [
+            1360,
+            441
+          ],
+          "position": [
+            -150,
+            -84.29000091552734,
+            -90
+          ],
+          "clock": [
+            4,
+            9
+          ],
+          "mode": "attached",
+          "rain": 0.85,
+          "detail": "full"
+        },
+        "render_worst_ms": 20.62899999145884,
+        "p50_ms": 17.027897760272026,
+        "render_frames": 3353,
+        "render_mean_ms": 5.669097106984272,
+        "sample": "garden_rain",
+        "wall_seconds": 60.02092120000452,
+        "over100": 0,
+        "p99_ms": 29.971439391374588,
+        "worst_ms": 57.10619315505028,
+        "over33": 16
+      },
+      "at": "2026-10-24T11:30:11.797Z"
+    },
+    {
+      "kind": "PASS",
+      "run": "1792841330889",
+      "value": {
+        "online": false,
+        "cat_enabled": true,
+        "ordinary_ui": true,
+        "storage": "yielding-memory"
+      },
+      "at": "2026-10-24T11:30:12.208Z"
+    }
+  ],
+  "first_ui_profiler_opened_during_sample": true,
+  "server_capture_obtained": false,
+  "published": false,
+  "limits": "One rainy garden diagnostic. The native profiler was briefly opened during its 60-second lap sample; not part of the matched matrix. PASS includes asserted memory-save fixture cleanup. Subsequent live UI attempts did not produce a fresh server dump. A pointer-release command was not visibly entered and was never executed; both source guards pass. No ordinary source changes, online saves or standalone server qualification."
+}

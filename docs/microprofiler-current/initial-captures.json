@@ -1,0 +1,32 @@
+{
+  "source_evidence": "105c83862d500f43",
+  "game_source_commit": "c80548933395eed5f7ccdd227af70210d49cd03f",
+  "native_model": "pair2/after-full",
+  "run": "1792838564863",
+  "captures": {
+    "client-paused": {
+      "raw_file": "%LOCALAPPDATA%/Roblox/logs/microprofile-20261024-055335.html",
+      "raw_bytes": 4884809,
+      "raw_sha256": "a773400d94898ee6dae40ff5199770164ac53b74071b1779e0f6a63f7ab705e5",
+      "exported_summary_sha256": "aa53cd8801a0270d7c5ee155c03984e8f351ee67d15840200b01776c40fc2dd6",
+      "retained_summary_sha256": "3fadc22662c814c1c5f63aa9c5382ebdfeb92008bad904a9a2e584d7130dcfec",
+      "marker_export_sha256": "af623400ed27d6c6ab102b61dc7681cea4a015b33cbbed2e07946318e7b81200",
+      "frames": 128
+    },
+    "server-request-paused": {
+      "raw_file": "%LOCALAPPDATA%/Roblox/logs/log_F1893_microprofile_20261024-060133.html",
+      "raw_bytes": 2691175,
+      "raw_sha256": "2bcb62c42843b236057d17911abeb36bbcc91776b04ddc71a6498ef10b594f59",
+      "exported_summary_sha256": "6d0e0cd50fe47a85b29c2d1e3e3d054e3d6a7484bf472d19fcef324efd7b42a9",
+      "retained_summary_sha256": "d414947103986dc2f542b5a34eac5eb441ba17f2f30a29dd9f8373539e97115f",
+      "marker_export_sha256": "cba289663728d1a03d9010bae7d8d0eccbe78c9d336d20b1a6a10166f9898be0",
+      "frames": 60
+    }
+  },
+  "native_version": "Studio 0.744.0.7441077",
+  "published": false,
+  "scope": "Active garden endpoint after the matched benchmark PASS; profiler UI and dump export activity occurred after timed workloads.",
+  "server_qualification": false,
+  "server_limit": "Server-tab request occurred while the native profiler was paused. The 60-frame export repeats client capture maxima and render/GPU content. Not independent server timing; retain as an overlapping/stale-buffer diagnostic.",
+  "limits": "Profiler wall times include scheduling/UI/GC effects and nested scopes. Sleep is not busy CPU. Identical alias totals are not additive. Not a startup capture, statistical benchmark, or proof of a cause inside SpiderClient."
+}

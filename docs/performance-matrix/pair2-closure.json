@@ -1,0 +1,52 @@
+{
+  "source_evidence": "105c83862d500f43",
+  "source_count": 273,
+  "models": [
+    {
+      "cohort": "before-full",
+      "run": "1792837930256",
+      "model_sha256": "49986365913bc74793c1a95487c68a004569e0bc97bbc5823c80deb252c287e5",
+      "source_guards": 2,
+      "creator_errors": 0,
+      "passed": true,
+      "closed_without_saving": true
+    },
+    {
+      "cohort": "after-full",
+      "run": "1792838564863",
+      "model_sha256": "043c24fae12ffd8053cfbe430f1acbe7665e1bff679bb734921da9be00f3a2e3",
+      "source_guards": 2,
+      "creator_errors": 0,
+      "passed": true,
+      "closed_without_saving": true
+    },
+    {
+      "cohort": "after-low",
+      "run": "1792839907557",
+      "model_sha256": "3f9e027612fd3270a8cec4b48ca5cc8d1bf35001a6f0928c6266ddd7ce18f9b3",
+      "source_guards": 2,
+      "creator_errors": 0,
+      "passed": true,
+      "closed_without_saving": true
+    },
+    {
+      "cohort": "before-low",
+      "run": "1792840384575",
+      "model_sha256": "231811e67e2591dea5cb8644503a8038a1f23a8de888614f20afa6e5745d0571",
+      "source_guards": 2,
+      "creator_errors": 0,
+      "passed": true,
+      "closed_without_saving": true
+    }
+  ],
+  "matching_camera_pairs": true,
+  "unchanged_tolerance": 0.01,
+  "native_runs": 4,
+  "workload_samples": 36,
+  "source_guards": 8,
+  "creator_errors": 0,
+  "studio_running": false,
+  "comparison_sha256": "b8f026e91bce38458f576a31fcfd6aafadbf1ebe646a0e92f725a3d653269287",
+  "published": false,
+  "limits": "Only matched within-tier controlled workloads; one pair per tier, not causal/general gain or universal qualification."
+}

@@ -1,0 +1,71 @@
+Browser tab: 1, Title: "Windowsill Save Tests / Overview", URL: "https://create.roblox.com/dashboard/creations/experiences/10771634917/overview".
+1 AXWebArea Windowsill Save Tests / Overview, URL: create.roblox.com/dashboard/creations/experiences/10771634917/overview
+	2 container
+		3 button menu
+		4 container Description: breadcrumb, ID: navigation-breadcrumbs
+			27 content list
+				28 link Description: Creations, Value: create.roblox.com/dashboard/creations
+				29 text Windowsill Save Tests
+				30 text Overview
+		5 button Search
+		6 button Notifications
+		7 pop up button (collapsed) socranates, Secondary Actions: Expand
+			31 image socranates
+		8 container applayout-scroll-container
+			32 container creator-hub-main-content
+				33 text Windowsill Save Tests
+				34 container
+					35 text Game access:
+					36 link Description: Private, Value: create.roblox.com/dashboard/creations/experiences/10771634917/audience-reach
+				37 container
+					38 text Audience reach:
+					39 link Description: Private, Value: create.roblox.com/dashboard/creations/experiences/10771634917/audience-reach
+				40 text Updated 10/23/2026, 11:26:34 PM
+				41 text --
+				42 text 0
+				43 text 0 Visits
+				44 button View on Roblox
+				45 container
+					46 text Expand your audience reach Setup your ID verification to reach more players.
+					47 link Description: Start, Value: roblox.com/my/account?idVerification#!/info
+				48 container
+					49 heading Value: 6, Snapshot of 7-day moving averages Snapshot shows 7-day moving averages. You can use these charts to identify the direction of short-term trends. You can find daily metrics on other dashboards and Explore mode.
+						50 text Snapshot of 7-day moving averages
+						51 button (collapsed) Secondary Actions: Expand, Description: Snapshot shows 7-day moving averages. You can use these charts to identify the direction of short-term trends. You can find daily metrics on other dashboards and Explore mode.
+					52 link Description: Explore, Value: create.roblox.com/dashboard/creations/experiences/10771634917/analytics/explore?smoothing=l7-moving-average&metric=ForwardD1Retention&granularity=Daily&breakdown=TopFirstPlayAcquisitionSources&rangeType=Custom&minTime=1792195200000&maxTime=1792713600000&aref=L2Rhc2hib2FyZC9jcmVhdGlvbnMvZXhwZXJpZW5jZXMvMTA3NzE2MzQ5MTcvb3ZlcnZpZXc%3D&chartType=spline
+					53 pop up button More options
+					54 tab group tabs
+						55 tab (selected, settable, boolean) Day 1 retention --, Value: 1
+						56 tab (selectable, settable, boolean) New users --, Value: 0
+						57 tab (selectable, settable, boolean) Average playtime --, Value: 0
+						58 tab (selectable, settable, boolean) Daily active users --, Value: 0
+						59 tab (selectable, settable, boolean) Daily revenue --, Value: 0
+					60 button scroll left
+					61 button scroll right
+					62 container
+						63 text Date range
+						64 combo box (collapsed) Date range Last 7 days, Value: Last 7 days, Secondary Actions: Expand
+							65 text Last 7 days
+					66 image Description: Chart title, Help: Created with Highcharts 12.2.0
+					67 text No data for selected period.
+			68 text ©2026 Roblox Corporation. All rights reserved.
+			9 container
+				10 link Description: Terms, Value: roblox.com/info/terms
+				11 text ·
+				12 link Description: Privacy, Value: roblox.com/info/privacy
+				13 text ·
+				14 link Description: Accessibility, Value: roblox.com/info/accessibility
+				15 text ·
+				16 link Description: Support, Value: roblox.com/info/help
+				17 text ·
+				18 button Your Privacy Choices
+			19 container
+				20 link Description: X, Value: x.com/Roblox
+				21 link Description: Facebook, Value: facebook.com/Roblox/
+				22 link Description: LinkedIn, Value: linkedin.com/company/roblox
+				23 link Description: Instagram, Value: instagram.com/roblox/
+				24 link Description: YouTube, Value: youtube.com/Roblox
+			25 link Description: English, Value: roblox.com/my/account
+		26 text /dashboard/creations/experiences/10771634917/overview
+
+The focused UI element is 1 AXWebArea Windowsill Save Tests / Overview, URL: create.roblox.com/dashboard/creations/experiences/10771634917/overview

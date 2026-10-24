@@ -1,0 +1,123 @@
+Browser tab: 8, Title: "Windowsill Save Tests / Version History", URL: "https://create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/version-history".
+1 AXWebArea Windowsill Save Tests / Version History, URL: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/version-history
+	2 container
+		3 container
+			4 link Description: CREATOR, Value: create.roblox.com/
+			5 link Description: Home, Value: create.roblox.com/
+			6 link Description: Creations, Value: create.roblox.com/dashboard/creations
+			7 link Description: Learn, Value: create.roblox.com/docs/
+			8 link Description: Store, Value: create.roblox.com/store/
+			9 link Description: Forum, Value: devforum.roblox.com/
+			10 link Description: Updates, Value: create.roblox.com/updates
+			11 link Description: Finances, Value: create.roblox.com/dashboard/devex
+			12 link Description: Analytics, Value: create.roblox.com/dashboard/analytics
+			13 link Description: Ads, Value: create.roblox.com/advertise
+			14 button All tools
+			15 link Description: Roblox.com, Value: roblox.com/
+			16 button Studio
+			17 button Hide sidebar
+			18 link Description: Back to Places, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places
+			69 content list
+				70 container
+					71 image Windowsill Save Tests
+					72 text Windowsill Save Tests
+					73 button more
+			19 outline mui-tree-view-1
+				20 row Basic Settings, Value: 0, ID: mui-tree-view-1-basicSettings
+					21 container
+						22 link Description: Basic Settings, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/configure
+				23 row Icon, Value: 0, ID: mui-tree-view-1-icon
+					24 container
+						25 link Description: Icon, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/icon
+				26 row Thumbnails, Value: 0, ID: mui-tree-view-1-thumbnails
+					27 container
+						28 link Description: Thumbnails, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/thumbnails
+				29 row Videos New, Value: 0, ID: mui-tree-view-1-videos
+					30 container
+						31 link Description: Videos New, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/videos
+				32 row Access, Value: 0, ID: mui-tree-view-1-access
+					33 container
+						34 link Description: Access, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/access
+				35 row Version History, Value: 1, ID: mui-tree-view-1-versionHistory
+					36 container
+						37 link Description: Version History, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/version-history
+				38 row Permissions, Value: 0, ID: mui-tree-view-1-permissions
+					39 container
+						40 link Description: Permissions, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/permissions
+		41 button menu
+		42 container Description: breadcrumb, ID: navigation-breadcrumbs
+			43 content list
+				74 link Description: Creations, Value: create.roblox.com/dashboard/creations
+				75 link Description: Windowsill Save Tests, Value: create.roblox.com/dashboard/creations/experiences/10771634917/overview
+				76 link Description: Places, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places
+				77 text Windowsill Save Tests
+				78 text Version History
+		45 button Search
+		46 button Notifications
+		47 pop up button (collapsed) socranates, Secondary Actions: Expand
+			79 image socranates
+		48 container applayout-scroll-container
+			49 container creator-hub-main-content
+				50 heading Version History, Value: 1
+					80 text Version History
+				81 text Choosing to restore a previous version will only save the version. In order to publish the previous version, open and publish it in Studio.
+				82 container
+					83 checkbox (settable, integer) Description: Show published only, Value: 1
+					84 text Show published only
+				172 table
+					173 row
+						174 cell
+							175 text Version
+						176 cell
+							177 text Last Updated (in local time)
+						178 cell
+							179 text Published Version
+					180 row
+						181 cell
+							182 text 14
+						183 cell
+							184 text October 24, 2026 at 8:08 AM
+					185 row
+						186 cell
+							187 text 13
+						188 cell
+							189 text October 23, 2026 at 11:26 PM
+						190 cell
+							191 button Restore
+					192 row
+						193 cell
+							194 text 2
+						195 cell
+							196 text October 17, 2026 at 10:56 PM
+						197 cell
+							198 button Restore
+					199 row
+						200 cell
+							201 container
+								202 text Rows per page:
+								203 combo box (collapsed) Rows per page: 10, Value: 10, Secondary Actions: Expand
+									204 text 10
+								205 text 1-3
+								206 button (disabled) Go to previous page
+								207 button (disabled) Go to next page
+			170 text ©2026 Roblox Corporation. All rights reserved.
+			52 container
+				53 link Description: Terms, Value: roblox.com/info/terms
+				54 text ·
+				55 link Description: Privacy, Value: roblox.com/info/privacy
+				56 text ·
+				57 link Description: Accessibility, Value: roblox.com/info/accessibility
+				58 text ·
+				59 link Description: Support, Value: roblox.com/info/help
+				60 text ·
+				61 button Your Privacy Choices
+			62 container
+				63 link Description: X, Value: x.com/Roblox
+				64 link Description: Facebook, Value: facebook.com/Roblox/
+				65 link Description: LinkedIn, Value: linkedin.com/company/roblox
+				66 link Description: Instagram, Value: instagram.com/roblox/
+				67 link Description: YouTube, Value: youtube.com/Roblox
+			68 link Description: English, Value: roblox.com/my/account
+		171 text Creator Dashboard
+
+The focused UI element is 83 checkbox (settable, integer) Description: Show published only, Value: 1

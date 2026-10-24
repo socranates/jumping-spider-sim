@@ -1,3 +1,20 @@
+Latest private publication and Player supplement,2026-10-24: user explicitly
+approved evidence032b5985ac17eeb2 / VerifiedPrivateCurrent.rbxl for existing
+PRIVATE place109879630247781. docs/private-current/PLAYER.md records published
+version14 in Dashboard and two actual Player runtime PlaceVersion14 arrivals.
+Both274-source guards pass; each run completes a90s observer and six15s
+windows (12 windows total), exact evidence/store, cleanup and0 script errors/focus losses. Ordinary
+New Life reaches the playable sill with readable labels and0/7 meals. First
+final30s stationary sample57.26 callbacks/s; fresh run53.14/s mixes intro/play,
+so no matched FPS gain. Startup remains variable: observed callback maxima
+240.17/638.26ms; first raw dt partly predates probe, not all game work. Both
+players/Studio and owned tray children closed. Full80-suite CI remains qualified.
+Production/main/OneDrive/Godot/synced sources unchanged. Broader audit ACTIVE;
+prior private13-only pending-publication language below is historical. Next:
+bounded current ordinary life/rest/save and remaining collision/content coverage,
+plus hypothesis-driven startup attribution. Do not repeat completed arrival runs
+without new evidence. New variants/production require their own release decision.
+
 Latest continuation: full80-suite CI40093189495 SUCCEEDS atdd212105; see
 docs/rig-hair-cache/github-ci.json and qualification.json. Ordinary evidence
 remains032b5985ac17eeb2. Read docs/startup-clock/STREAM.md for the new native

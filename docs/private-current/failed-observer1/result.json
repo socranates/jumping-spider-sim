@@ -1,0 +1,12 @@
+{
+  "failed": true,
+  "scope": "Studio-only early identity guard",
+  "error": "ReplicatedFirst.PlayerArrivalProbe:5: assertion failed",
+  "source_guards": 2,
+  "companion_startup_passed": true,
+  "companion_cleanup": true,
+  "model_sha256": "a5cd572daf463d9be7066ebd32155a78cfa0406d696426228c3ee9ea90d83eb3",
+  "candidate_unchanged_sha256": "2dbbb2091c5f1a6a67db3a8188767118d109440f328b3489175ab7c0ab24aca7",
+  "published": false,
+  "hypothesis": "Workspace diagnostic attribute had not replicated at ReplicatedFirst entry; next fixture records actual availability."
+}

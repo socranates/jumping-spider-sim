@@ -1,0 +1,45 @@
+{
+  "published_version": 14,
+  "evidence_id": "032b5985ac17eeb2",
+  "private_place": 109879630247781,
+  "source_guards": 2,
+  "complete_runs": 2,
+  "windows": 12,
+  "runs": [
+    {
+      "run": "1792847476459",
+      "title_ready_s": 8.09219710000616,
+      "first_callback": {
+        "raw_dt_ms": 770.4088091850281,
+        "t": 0.06751780000922736,
+        "observed_since_begin_ms": 67.51780000922736,
+        "preprobe_span_lower_bound_ms": 702.8910091758007
+      },
+      "largest_observed_callback_ms": 240.1701999915531,
+      "last30_mean_ms": 17.46339580908185,
+      "last30_callback_rate": 57.26263155989108,
+      "last30_worst_callback_ms": 49.228699994273484,
+      "heartbeat_callbacks": 5107,
+      "creator_warnings": 3,
+      "receipt": "player-first-final/player.json"
+    },
+    {
+      "run": "1792847652314",
+      "title_ready_s": 13.66363559999445,
+      "first_callback": {
+        "raw_dt_ms": 1320.741057395935,
+        "t": 0.019765000004554167,
+        "observed_since_begin_ms": 19.765000004554167,
+        "preprobe_span_lower_bound_ms": 1300.976057391381
+      },
+      "largest_observed_callback_ms": 638.2621000084328,
+      "last30_mean_ms": 18.819332747804754,
+      "last30_callback_rate": 53.13684674163851,
+      "last30_worst_callback_ms": 48.63639999530278,
+      "heartbeat_callbacks": 4284,
+      "creator_warnings": 3,
+      "receipt": "player-warm-closed/player.json"
+    }
+  ],
+  "limits": "Arrival and ordinary entry only. Different title/intro/gameplay mixes; no paired speedup, full-life, save/rejoin, whole-map or physical-device qualification. Startup cause unresolved. No independent download and rehash of published asset."
+}

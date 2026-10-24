@@ -1,0 +1,28 @@
+{
+  "log_sha256": "c3f9060dd0fc76821b65a9f46ff1d8b8ddb2a642364784c914275b2c6cc47e7e",
+  "categories": {
+    "RobloxStarter": 13,
+    "RobloxStarterNetworkStarterModule": 1,
+    "FlagFetchingStarterModule": 4,
+    "Output": 39,
+    "Systray": 2,
+    "RobloxTelemetryFactory": 1,
+    "ProfileTelemetry": 1,
+    "AppRemoteCheckStarterModule": 3,
+    "LocalStorageHandler": 1,
+    "SingleSurfaceApp": 3,
+    "DataModelStarterModule": 1,
+    "DataModelPatchConfigurer": 12,
+    "Graphics": 17,
+    "DMNotificationMonitor": 14,
+    "SurfaceController": 3,
+    "CreatorWarning": 3,
+    "RbxmFileManager": 1,
+    "UgcExperienceController": 2,
+    "ExperienceContextHolder": 3,
+    "ExperienceCoordinator": 2,
+    "ClientMemStatus": 1
+  },
+  "low_memory_lines": 0,
+  "scope": "Counts only. Platform categories are not automatically game script exceptions; full logs remain local."
+}

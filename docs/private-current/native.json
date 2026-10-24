@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-24T12:48:42.9442659Z",
+  "source_count": 274,
+  "unchanged_game_sources": 273,
+  "source_guards": 2,
+  "evidence_id": "032b5985ac17eeb2",
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "test_store": "WindowsillTest_playerRig_20261024a1",
+  "saved_editor": "C:/Users/natha/claude-xfer/Windowsill-private-current-20261024a1/VerifiedPrivateCurrent.rbxl",
+  "saved_editor_sha256": "2dbbb2091c5f1a6a67db3a8188767118d109440f328b3489175ab7c0ab24aca7",
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T12:43:24.205Z,49.205055,1098,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:43:24.205Z,49.205055,1098,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:43:24.205Z,49.205055,1098,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:43:24.205Z,49.205055,1098,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:43:35.024Z,60.024643,0324,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "published": false,
+  "studio_pid": 26736,
+  "native_execution": false,
+  "limits": "Exact source, target, settings and local-save qualification only. No Play, upload or publication."
+}

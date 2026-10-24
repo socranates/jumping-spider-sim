@@ -1,0 +1,568 @@
+{
+  "complete": true,
+  "run": "1792847652314",
+  "published_version": 14,
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "evidence_id": "032b5985ac17eeb2",
+  "test_store": "WindowsillTest_playerRig_20261024a1",
+  "saved_editor_sha256": "2dbbb2091c5f1a6a67db3a8188767118d109440f328b3489175ab7c0ab24aca7",
+  "prepared_sha256": "c06272b0c6bab7aadf941b537f829ea9dad484594c5bf90154538aef4668008f",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441080_20261024T131404Z_Player_2D8AE_last.log",
+  "log_sha256": "f2ccdabcb2eb16d5497ec6c8988ace0fe8414b3f48d632328b6fd791ed699784",
+  "events": [
+    {
+      "kind": "BEGIN",
+      "value": {
+        "universe": 10771634917,
+        "duration_s": 90,
+        "place": 109879630247781,
+        "place_version": 14,
+        "readonly": true,
+        "detail": "auto"
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.003094200001214631,
+        "name": "PreAnimation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.0033340999943902716,
+        "name": "PreSimulation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.0038997000083327293,
+        "name": "PostSimulation",
+        "raw_dt_ms": 66.66667014360428
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "initial-replication",
+        "t": 0.019765000004554167
+      }
+    },
+    {
+      "kind": "FIRST",
+      "value": {
+        "raw_dt_ms": 1320.741057395935,
+        "t": 0.019765000004554167,
+        "observed_since_begin_ms": 19.765000004554167,
+        "preprobe_span_lower_bound_ms": 1300.976057391381
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.02650720000383444,
+        "name": "render-first",
+        "raw_dt_ms": 1340.7514095306396
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.026749199998448603,
+        "name": "render-last",
+        "raw_dt_ms": 1340.7514095306396
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "value": {
+        "t": 0.027147600005264394,
+        "name": "PreRender",
+        "raw_dt_ms": 1340.7514095306396
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "navigation-or-title",
+        "t": 0.7934782000083942
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "title-ready",
+        "t": 13.66363559999445
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 98.51352870464325,
+          "p95_ms": 32.92025253176689,
+          "max_ms": 1320.741057395935,
+          "p50_ms": 20.06031945347786,
+          "n": 634
+        },
+        "callbacks": {
+          "p99_ms": 94.4381000008434,
+          "p95_ms": 32.26150000409689,
+          "max_ms": 638.2621000084328,
+          "p50_ms": 20.145699993008748,
+          "n": 634
+        },
+        "index": 1,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 16.321598276495934,
+        "t": 15.003185599998687,
+        "frames": 634,
+        "engine": {
+          "PhysicsStepTime": 0.00025637802900746465,
+          "SceneDrawcallCount": 132,
+          "InstanceCount": 47998,
+          "RenderGPUFrameTime": 0.022477831691503525,
+          "RenderCPUFrameTime": 0.027091698721051216,
+          "FrameTime": 0.027920400723814964
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 0,
+        "wall_seconds": 15.003185599998687,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 15.003185599998687
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 37.21780329942703,
+          "p95_ms": 32.135527580976486,
+          "max_ms": 73.53870570659637,
+          "p50_ms": 24.84937570989132,
+          "n": 605
+        },
+        "callbacks": {
+          "p99_ms": 37.73310000542551,
+          "p95_ms": 32.16239999164827,
+          "max_ms": 72.92720000259578,
+          "p50_ms": 24.595299997599795,
+          "n": 605
+        },
+        "index": 2,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 15.011870428919792,
+        "t": 30.016654999999446,
+        "frames": 605,
+        "engine": {
+          "PhysicsStepTime": 0.00024055720132309943,
+          "SceneDrawcallCount": 102,
+          "InstanceCount": 47998,
+          "RenderGPUFrameTime": 0.025445809587836266,
+          "RenderCPUFrameTime": 0.02991519868373871,
+          "FrameTime": 0.030527599155902863
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 15.003185599998687,
+        "wall_seconds": 15.013469400000758,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 15.013469400000758
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 36.97887435555458,
+          "p95_ms": 34.21345353126526,
+          "max_ms": 44.90045830607414,
+          "p50_ms": 20.903294906020164,
+          "n": 670
+        },
+        "callbacks": {
+          "p99_ms": 36.86689998721704,
+          "p95_ms": 33.760699996491894,
+          "max_ms": 45.11300000012852,
+          "p50_ms": 20.678100001532584,
+          "n": 670
+        },
+        "index": 3,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.994437004439533,
+        "t": 45.01116049999837,
+        "frames": 670,
+        "engine": {
+          "PhysicsStepTime": 0.0001170105388155207,
+          "SceneDrawcallCount": 114,
+          "InstanceCount": 47998,
+          "RenderGPUFrameTime": 0.015993520617485046,
+          "RenderCPUFrameTime": 0.01386410091072321,
+          "FrameTime": 0.014182199724018574
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 30.016654999999446,
+        "wall_seconds": 14.994505499998922,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.994505499998922
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 30.987227335572243,
+          "p95_ms": 28.13311107456684,
+          "max_ms": 72.74036109447479,
+          "p50_ms": 17.14954897761345,
+          "n": 781
+        },
+        "callbacks": {
+          "p99_ms": 31.234199996106327,
+          "p95_ms": 27.892600002815016,
+          "max_ms": 85.64459999615792,
+          "p50_ms": 17.245399998500943,
+          "n": 781
+        },
+        "index": 4,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.996556067839265,
+        "t": 60.007715800005826,
+        "frames": 781,
+        "engine": {
+          "PhysicsStepTime": 2.214575943071395e-05,
+          "SceneDrawcallCount": 107,
+          "InstanceCount": 47999,
+          "RenderGPUFrameTime": 0.015075759962201118,
+          "RenderCPUFrameTime": 0.01707329973578453,
+          "FrameTime": 0.018062999472022057
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 45.01116049999837,
+        "wall_seconds": 14.996555300007458,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.996555300007458
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 33.22406858205795,
+          "p95_ms": 29.144970700144768,
+          "max_ms": 39.340704679489136,
+          "p50_ms": 17.069751396775246,
+          "n": 801
+        },
+        "callbacks": {
+          "p99_ms": 32.74029999738559,
+          "p95_ms": 29.14009999949485,
+          "max_ms": 38.91779998957645,
+          "p50_ms": 17.22239999799058,
+          "n": 801
+        },
+        "index": 5,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.999326560646296,
+        "t": 75.00652140000602,
+        "frames": 801,
+        "engine": {
+          "PhysicsStepTime": 1.559245902171824e-05,
+          "SceneDrawcallCount": 105,
+          "InstanceCount": 47999,
+          "RenderGPUFrameTime": 0.016246531158685684,
+          "RenderCPUFrameTime": 0.006466499995440245,
+          "FrameTime": 0.015434499830007553
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 60.007715800005826,
+        "wall_seconds": 14.998805600000196,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.998805600000196
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "value": {
+        "raw": {
+          "p99_ms": 27.971720322966576,
+          "p95_ms": 25.110650807619095,
+          "max_ms": 49.6317595243454,
+          "p50_ms": 18.027683719992638,
+          "n": 793
+        },
+        "callbacks": {
+          "p99_ms": 27.714199997717515,
+          "p95_ms": 24.815299999318086,
+          "max_ms": 48.63639999530278,
+          "p50_ms": 18.052400002488866,
+          "n": 793
+        },
+        "index": 6,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.998855807818472,
+        "t": 90.0057322000066,
+        "frames": 793,
+        "engine": {
+          "PhysicsStepTime": 9.862429578788579e-05,
+          "SceneDrawcallCount": 94,
+          "InstanceCount": 47999,
+          "RenderGPUFrameTime": 0.014669500291347504,
+          "RenderCPUFrameTime": 0.009298800490796566,
+          "FrameTime": 0.01437699981033802
+        },
+        "focus_lost": 0,
+        "focus_gained": 0,
+        "started_at": 75.00652140000602,
+        "wall_seconds": 14.999210800000583,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.999210800000583
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 1,
+          "PreAnimation": 1,
+          "PostSimulation": 1
+        },
+        "callback_interval_ms": 19.765000004554167,
+        "phase": "initial-replication",
+        "t": 0.019765000004554167,
+        "first": true,
+        "raw_dt_ms": 1320.741057395935
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 3,
+          "render-first": 2,
+          "PreRender": 2,
+          "render-last": 2,
+          "PostSimulation": 3,
+          "PreAnimation": 3
+        },
+        "callback_interval_ms": 638.2621000084328,
+        "phase": "navigation-or-title",
+        "t": 0.7934782000083942,
+        "first": false,
+        "raw_dt_ms": 642.2327756881714
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 4,
+          "render-first": 3,
+          "PreRender": 3,
+          "render-last": 3,
+          "PostSimulation": 4,
+          "PreAnimation": 4
+        },
+        "callback_interval_ms": 322.46769999619573,
+        "phase": "navigation-or-title",
+        "t": 1.11594590000459,
+        "first": false,
+        "raw_dt_ms": 322.06156849861145
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 582,
+          "render-first": 581,
+          "PreRender": 581,
+          "render-last": 581,
+          "PostSimulation": 582,
+          "PreAnimation": 582
+        },
+        "callback_interval_ms": 138.54189999983646,
+        "phase": "title-ready",
+        "t": 13.66363559999445,
+        "first": false,
+        "raw_dt_ms": 137.98527419567108
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 2,
+          "render-first": 1,
+          "PreRender": 1,
+          "render-last": 1,
+          "PostSimulation": 2,
+          "PreAnimation": 2
+        },
+        "callback_interval_ms": 135.45109999540728,
+        "phase": "initial-replication",
+        "t": 0.15521609999996144,
+        "first": false,
+        "raw_dt_ms": 131.9005787372589
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 8,
+          "render-first": 7,
+          "PreRender": 7,
+          "render-last": 7,
+          "PostSimulation": 8,
+          "PreAnimation": 8
+        },
+        "callback_interval_ms": 120.24920000112616,
+        "phase": "navigation-or-title",
+        "t": 1.4096550999965984,
+        "first": false,
+        "raw_dt_ms": 119.66978013515472
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 30,
+          "render-first": 29,
+          "PreRender": 29,
+          "render-last": 29,
+          "PostSimulation": 30,
+          "PreAnimation": 30
+        },
+        "callback_interval_ms": 47.07280000729952,
+        "phase": "navigation-or-title",
+        "t": 2.334766200001468,
+        "first": false,
+        "raw_dt_ms": 98.51352870464325
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 27,
+          "render-first": 26,
+          "PreRender": 26,
+          "render-last": 26,
+          "PostSimulation": 27,
+          "PreAnimation": 27
+        },
+        "callback_interval_ms": 94.68449999985751,
+        "phase": "navigation-or-title",
+        "t": 2.1651850000052946,
+        "first": false,
+        "raw_dt_ms": 95.29023617506027
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 5,
+          "render-first": 4,
+          "PreRender": 4,
+          "render-last": 4,
+          "PostSimulation": 5,
+          "PreAnimation": 5
+        },
+        "callback_interval_ms": 94.4381000008434,
+        "phase": "navigation-or-title",
+        "t": 1.2103840000054333,
+        "first": false,
+        "raw_dt_ms": 93.82788836956024
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 29,
+          "render-first": 28,
+          "PreRender": 28,
+          "render-last": 28,
+          "PostSimulation": 29,
+          "PreAnimation": 29
+        },
+        "callback_interval_ms": 88.71689999068622,
+        "phase": "navigation-or-title",
+        "t": 2.2876933999941684,
+        "first": false,
+        "raw_dt_ms": 37.31986880302429
+      }
+    },
+    {
+      "kind": "END",
+      "value": {
+        "render_bindings_removed": true,
+        "expected_evidence": "032b5985ac17eeb2",
+        "skipped_windows": 0,
+        "world_failed": false,
+        "phase": "title-ready",
+        "t": 90.0057322000066,
+        "expected_store": "WindowsillTest_playerRig_20261024a1",
+        "focus_gained": 0,
+        "connections_disconnected": 7,
+        "place_version": 14,
+        "focus_lost": 0,
+        "engine_phases": {
+          "PreSimulation": 4284,
+          "render-first": 4283,
+          "PreRender": 4283,
+          "render-last": 4283,
+          "PostSimulation": 4284,
+          "PreAnimation": 4284
+        },
+        "windows": 6,
+        "unavailable": [],
+        "evidence": "032b5985ac17eeb2",
+        "store": "WindowsillTest_playerRig_20261024a1"
+      }
+    }
+  ],
+  "creator_errors": [],
+  "recognizable_script_errors": [],
+  "creator_warnings": [
+    "2026-10-24T13:14:06.267Z,2.267550,162c,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error url:`https://apis.roblox.com/attribution/v1/events/post-authentication`",
+    "2026-10-24T13:14:06.267Z,2.267550,162c,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error code:`nil`",
+    "2026-10-24T13:14:06.267Z,2.267550,162c,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error body:`nil`"
+  ],
+  "title_ready_s": 13.66363559999445,
+  "first_callback": {
+    "raw_dt_ms": 1320.741057395935,
+    "t": 0.019765000004554167,
+    "observed_since_begin_ms": 19.765000004554167,
+    "preprobe_span_lower_bound_ms": 1300.976057391381
+  },
+  "last30": {
+    "frames": 1594,
+    "seconds": 29.99801640000078
+  },
+  "limits": "Bounded current private Player arrival, with read-only observer overhead. Windows can mix title, intro and gameplay; not a matched FPS comparison, full life, full save/rejoin or physical device qualification. Published asset bytes are not independently downloaded."
+}

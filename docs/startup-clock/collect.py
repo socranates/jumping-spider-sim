@@ -4,7 +4,7 @@ import argparse,hashlib,json,re
 p=argparse.ArgumentParser();p.add_argument('--stage',type=Path,required=True);p.add_argument('--log',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 m=json.loads((a.stage/'manifest.json').read_text())
-assert m['startup_clock']and m['source_count']==(277 if m.get('microprofiler_sdk_sha256')else 276)and m['variant']=='after'
+assert m['startup_clock']and m['source_count']==276+bool(m.get('microprofiler_sdk_sha256'))+bool(m.get('private_current_probe_sha256'))and m['variant']=='after'
 assert sha(Path(m['place']).read_bytes())==m['place_sha256']and sha((a.stage/'guard.luau').read_bytes())==m['guard_sha256']
 events=[];guards=[];diagnostics=[];lines=[];server=[]
 for line in a.log.read_text(encoding='utf8').splitlines():

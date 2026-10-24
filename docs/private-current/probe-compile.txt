@@ -1,0 +1,2 @@
+Compiled 0 KLOC into 7 KB bytecode (read 0.02s, parse 0.00s, compile 0.00s)
+compile exit 0

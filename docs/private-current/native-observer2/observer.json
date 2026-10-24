@@ -1,0 +1,567 @@
+{
+  "passed": true,
+  "run": "1792846739757",
+  "source_count": 277,
+  "source_guards": 2,
+  "model_sha256": "40ac0a8f5561b22b68dbaa19c3fc2d7bd409c987035fe54c9946b52569e0c7ec",
+  "original_probe_sha256": "f3986e68e96b25f33764e757b93bc85565492cf5202be2413c9104eaaf042c0f",
+  "observer_output_sha256": "a358810b4cd97b0b63beba0e790ec744676728e0af84016010681f429aa09887",
+  "guard_override_only": true,
+  "events": [
+    {
+      "kind": "BEGIN",
+      "run": "1792846739757",
+      "value": {
+        "universe": 0,
+        "duration_s": 90,
+        "place": 0,
+        "place_version": 0,
+        "readonly": true,
+        "detail": "auto"
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 0.0051992999942740425,
+        "name": "PreAnimation",
+        "raw_dt_ms": 29.16666865348816
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 0.005617599992547184,
+        "name": "PreSimulation",
+        "raw_dt_ms": 29.16666865348816
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 0.005815899989102036,
+        "name": "PostSimulation",
+        "raw_dt_ms": 29.16666865348816
+      }
+    },
+    {
+      "kind": "PHASE",
+      "run": "1792846739757",
+      "value": {
+        "name": "initial-replication",
+        "t": 0.006121099999290891
+      }
+    },
+    {
+      "kind": "FIRST",
+      "run": "1792846739757",
+      "value": {
+        "raw_dt_ms": 22.906091064214706,
+        "t": 0.006121099999290891,
+        "observed_since_begin_ms": 6.121099999290891,
+        "preprobe_span_lower_bound_ms": 16.784991064923815
+      }
+    },
+    {
+      "kind": "PHASE",
+      "run": "1792846739757",
+      "value": {
+        "name": "navigation-or-title",
+        "t": 0.7015730999992229
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 5.239560799993342,
+        "name": "render-first",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 5.2488761999993585,
+        "name": "render-last",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "ENGINE_FIRST",
+      "run": "1792846739757",
+      "value": {
+        "t": 5.250319399987347,
+        "name": "PreRender",
+        "raw_dt_ms": 16.699999570846558
+      }
+    },
+    {
+      "kind": "PHASE",
+      "run": "1792846739757",
+      "value": {
+        "name": "title-ready",
+        "t": 11.62457989998802
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 92.86919236183167,
+          "p95_ms": 27.996612712740898,
+          "max_ms": 2056.0269355773926,
+          "p50_ms": 16.924945637583733,
+          "n": 554
+        },
+        "callbacks": {
+          "p99_ms": 88.48740000394173,
+          "p95_ms": 26.979499991284683,
+          "max_ms": 2360.766899990267,
+          "p50_ms": 16.712600001483224,
+          "n": 554
+        },
+        "index": 1,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 15.01695414306596,
+        "t": 15.00063599999703,
+        "frames": 554,
+        "engine": {
+          "PhysicsStepTime": 2.1497799025382847e-06,
+          "SceneDrawcallCount": 16,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.0030539201106876135,
+          "RenderCPUFrameTime": 0.0031368001364171505,
+          "FrameTime": 0.016493000090122223
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 0,
+        "wall_seconds": 15.00063599999703,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 15.00063599999703
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 19.20107752084732,
+          "p95_ms": 18.116630613803864,
+          "max_ms": 114.16029930114746,
+          "p50_ms": 16.90872758626938,
+          "n": 893
+        },
+        "callbacks": {
+          "p99_ms": 18.617299996549264,
+          "p95_ms": 17.906199995195493,
+          "max_ms": 114.37140000634827,
+          "p50_ms": 16.687100011040457,
+          "n": 893
+        },
+        "index": 2,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 15.016311382409185,
+        "t": 30.016264399993815,
+        "frames": 893,
+        "engine": {
+          "PhysicsStepTime": 1.1048587111872621e-05,
+          "SceneDrawcallCount": 113,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.00881986040621996,
+          "RenderCPUFrameTime": 0.004263299982994795,
+          "FrameTime": 0.01678990013897419
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 15.00063599999703,
+        "wall_seconds": 15.015628399996785,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 15.015628399996785
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 19.03299428522587,
+          "p95_ms": 18.086886033415794,
+          "max_ms": 38.82361575961113,
+          "p50_ms": 16.93461835384369,
+          "n": 899
+        },
+        "callbacks": {
+          "p99_ms": 18.55200000863988,
+          "p95_ms": 17.8538999898592,
+          "max_ms": 39.472000004025176,
+          "p50_ms": 16.666099996655248,
+          "n": 899
+        },
+        "index": 3,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.99810507055372,
+        "t": 45.015022799998405,
+        "frames": 899,
+        "engine": {
+          "PhysicsStepTime": 2.287740608153399e-05,
+          "SceneDrawcallCount": 118,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.01675764098763466,
+          "RenderCPUFrameTime": 0.005705599673092365,
+          "FrameTime": 0.015996800735592842
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 30.016264399993815,
+        "wall_seconds": 14.99875840000459,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.99875840000459
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 24.214215576648712,
+          "p95_ms": 21.53901197016239,
+          "max_ms": 53.2013475894928,
+          "p50_ms": 16.98606088757515,
+          "n": 870
+        },
+        "callbacks": {
+          "p99_ms": 24.468299990985543,
+          "p95_ms": 21.529500008909963,
+          "max_ms": 53.03500000445638,
+          "p50_ms": 16.782899998361245,
+          "n": 870
+        },
+        "index": 4,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 14.998593783937395,
+        "t": 60.01458019998972,
+        "frames": 870,
+        "engine": {
+          "PhysicsStepTime": 3.478125290712342e-05,
+          "SceneDrawcallCount": 117,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.015650160610675812,
+          "RenderCPUFrameTime": 0.013391200453042984,
+          "FrameTime": 0.01613740064203739
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 45.015022799998405,
+        "wall_seconds": 14.999557399991318,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.999557399991318
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 23.013455793261528,
+          "p95_ms": 20.91744914650917,
+          "max_ms": 25.209374725818634,
+          "p50_ms": 16.981810331344604,
+          "n": 879
+        },
+        "callbacks": {
+          "p99_ms": 22.93469999858644,
+          "p95_ms": 20.42460000666324,
+          "max_ms": 24.77189998899121,
+          "p50_ms": 16.77269999345299,
+          "n": 879
+        },
+        "index": 5,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 15.001422113738954,
+        "t": 75.01396159999422,
+        "frames": 879,
+        "engine": {
+          "PhysicsStepTime": 0.00010533144813962281,
+          "SceneDrawcallCount": 112,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.015981679782271385,
+          "RenderCPUFrameTime": 0.013140600174665451,
+          "FrameTime": 0.01568100042641163
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 60.01458019998972,
+        "wall_seconds": 14.999381400004495,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 14.999381400004495
+      }
+    },
+    {
+      "kind": "WINDOW",
+      "run": "1792846739757",
+      "value": {
+        "raw": {
+          "p99_ms": 23.248130455613136,
+          "p95_ms": 21.097732707858086,
+          "max_ms": 26.409875601530075,
+          "p50_ms": 16.957245767116547,
+          "n": 876
+        },
+        "callbacks": {
+          "p99_ms": 23.3353000076022,
+          "p95_ms": 21.127500003785826,
+          "max_ms": 25.081599989789538,
+          "p50_ms": 16.729700000723824,
+          "n": 876
+        },
+        "index": 6,
+        "evidence": "032b5985ac17eeb2",
+        "raw_seconds": 15.000478802248836,
+        "t": 90.01471219999075,
+        "frames": 876,
+        "engine": {
+          "PhysicsStepTime": 5.8946970966644585e-05,
+          "SceneDrawcallCount": 111,
+          "InstanceCount": 58662,
+          "RenderGPUFrameTime": 0.019322281703352928,
+          "RenderCPUFrameTime": 0.011534899473190308,
+          "FrameTime": 0.017115099355578423
+        },
+        "focus_lost": 0,
+        "focus_gained": 1,
+        "started_at": 75.01396159999422,
+        "wall_seconds": 15.000750599996536,
+        "phase": "title-ready",
+        "samples_truncated": false,
+        "store": "WindowsillTest_playerRig_20261024a1",
+        "observed_seconds": 15.000750599996536
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 6,
+          "PreAnimation": 6,
+          "PostSimulation": 6
+        },
+        "callback_interval_ms": 2360.766899990267,
+        "phase": "navigation-or-title",
+        "t": 3.478435899989563,
+        "first": false,
+        "raw_dt_ms": 2056.0269355773926
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 7,
+          "PreAnimation": 7,
+          "PostSimulation": 7
+        },
+        "callback_interval_ms": 1753.9821000100346,
+        "phase": "navigation-or-title",
+        "t": 5.232417999999598,
+        "first": false,
+        "raw_dt_ms": 2042.7334308624268
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 3,
+          "PreAnimation": 3,
+          "PostSimulation": 3
+        },
+        "callback_interval_ms": 692.9560999997193,
+        "phase": "navigation-or-title",
+        "t": 0.7015730999992229,
+        "first": false,
+        "raw_dt_ms": 694.0659284591675
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 4,
+          "PreAnimation": 4,
+          "PostSimulation": 4
+        },
+        "callback_interval_ms": 382.2700000018813,
+        "phase": "navigation-or-title",
+        "t": 1.0838431000011042,
+        "first": false,
+        "raw_dt_ms": 378.18536162376404
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 8,
+          "render-first": 1,
+          "PreRender": 1,
+          "render-last": 1,
+          "PostSimulation": 8,
+          "PreAnimation": 8
+        },
+        "callback_interval_ms": 167.57909998705145,
+        "phase": "navigation-or-title",
+        "t": 5.399997099986649,
+        "first": false,
+        "raw_dt_ms": 167.30853915214539
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 962,
+          "render-first": 955,
+          "PreRender": 955,
+          "render-last": 955,
+          "PostSimulation": 962,
+          "PreAnimation": 962
+        },
+        "callback_interval_ms": 114.37140000634827,
+        "phase": "title-ready",
+        "t": 21.948297199996887,
+        "first": false,
+        "raw_dt_ms": 114.16029930114746
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 11,
+          "render-first": 4,
+          "PreRender": 4,
+          "render-last": 4,
+          "PostSimulation": 11,
+          "PreAnimation": 11
+        },
+        "callback_interval_ms": 88.48740000394173,
+        "phase": "navigation-or-title",
+        "t": 5.585842899992713,
+        "first": false,
+        "raw_dt_ms": 92.86919236183167
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 960,
+          "render-first": 953,
+          "PreRender": 953,
+          "render-last": 953,
+          "PostSimulation": 960,
+          "PreAnimation": 960
+        },
+        "callback_interval_ms": 77.20150001114234,
+        "phase": "title-ready",
+        "t": 21.82688059999782,
+        "first": false,
+        "raw_dt_ms": 77.88464426994324
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 13,
+          "render-first": 6,
+          "PreRender": 6,
+          "render-last": 6,
+          "PostSimulation": 13,
+          "PreAnimation": 13
+        },
+        "callback_interval_ms": 65.1335000002291,
+        "phase": "navigation-or-title",
+        "t": 5.68387179999263,
+        "first": false,
+        "raw_dt_ms": 64.99094516038895
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792846739757",
+      "value": {
+        "engine_phases": {
+          "PreSimulation": 10,
+          "render-first": 3,
+          "PreRender": 3,
+          "render-last": 3,
+          "PostSimulation": 10,
+          "PreAnimation": 10
+        },
+        "callback_interval_ms": 64.43749999743886,
+        "phase": "navigation-or-title",
+        "t": 5.497355499988771,
+        "first": false,
+        "raw_dt_ms": 59.377726167440414
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792846739757",
+      "value": {
+        "render_bindings_removed": true,
+        "expected_evidence": "032b5985ac17eeb2",
+        "skipped_windows": 0,
+        "world_failed": false,
+        "phase": "title-ready",
+        "t": 90.01471219999075,
+        "expected_store": "WindowsillTest_playerRig_20261024a1",
+        "focus_gained": 1,
+        "connections_disconnected": 7,
+        "place_version": 0,
+        "focus_lost": 0,
+        "engine_phases": {
+          "PreSimulation": 4971,
+          "render-first": 4964,
+          "PreRender": 4964,
+          "render-last": 4964,
+          "PostSimulation": 4971,
+          "PreAnimation": 4971
+        },
+        "windows": 6,
+        "unavailable": [],
+        "evidence": "032b5985ac17eeb2",
+        "store": "WindowsillTest_playerRig_20261024a1"
+      }
+    }
+  ],
+  "published": false,
+  "limits": "Native observer/cleanup test in local Studio with yielding-memory storage and a Studio-only identity guard. No private publication, standalone Player timing or general FPS proof."
+}

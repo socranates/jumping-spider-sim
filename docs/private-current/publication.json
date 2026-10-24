@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-10-24T13:10:07.886581+00:00",
+  "authorization": "User explicitly replied Publish and test privately for evidence 032b5985ac17eeb2 and VerifiedPrivateCurrent.rbxl at private place 109879630247781.",
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "published_version": 14,
+  "published_only_dashboard": "dashboard-after-published.txt",
+  "private_access_dashboard": "dashboard-after-access.txt",
+  "source_guards": 2,
+  "creator_errors": [],
+  "script_history_rate_limit_count": 214,
+  "original_log_sha256": "4b69854e739a15889e0db0b914b4ee88bc3c3a0b80360a7946b0e72673e515f4",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T130646Z_Studio_11FD5_last.log",
+  "saved_editor_sha256": "2dbbb2091c5f1a6a67db3a8188767118d109440f328b3489175ab7c0ab24aca7",
+  "notes": "Alt+P initiated publish; menu Publish was clicked before inspecting asynchronous logs. Both completions report v14 and Dashboard has one new published version. Script-history HTTP429 failures retained. Runtime version and evidence still require Player confirmation. Studio closed before Player launch; no game source changes. Production not published. Both completed standalone runs confirm PlaceVersion14, evidence and store; all game windows and owned tray children closed.",
+  "player_runtime_versions": [
+    14,
+    14
+  ],
+  "player_evidence_confirmed": true,
+  "studio_closed": true,
+  "player_windows_closed": true
+}

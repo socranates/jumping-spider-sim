@@ -95,20 +95,40 @@ restored FOV when the setting changed, leaving the title's52.89-53.07 lens
 instead of gameplay65. The small fix reclaims an unchanged selected lens
 outside eye view. Four red title paths now pass; title/settings/eyes/client
 total1443/0. Normal/test exports rebuilt evidence66a9319760fa7c29. No movement,
-sensitivity, default setting or lighting changes. Native verification pending.
+sensitivity, default setting or lighting changes. The corrected camera now has
+completed native evidence below.
 
-NEXT: fresh foreground Studio model
+COMPLETED: foreground Studio model
 C:/Users/natha/claude-xfer/Windowsill-matrix-after-full-lens-trace30-r2/Windowsill-matrix.rbxlx
 SHA256 df95c94a37f67d3d114ca3f1a3f5e6dc0a330f65f8a6bfa11faf9c93e457d717.
-All277 sources compiled/strict0. This runs the short matrix then1800 wall seconds
-of genuine Left/Right garden traversal, recording each Heartbeat mode and minute
-memory/focus rows. No native execution yet. The failed first trace stage had
-only a strict singleton-type issue; r2 corrected the fixture direction switch.
-Do not mutate it after qualification. Guard before, F5, original PASS/FAIL,
-ShiftF5, refocus commandbar before CtrlReturn postguard, collect --require-methods.
-Verify camera rows65 and inspect all trace findings/pause/focus/memory data;
-duration alone cannot establish leak/fall freedom. No snapshots/heavy commands
-during samples. All owned Studio/Player/CLI sessions are stopped now.
+All277 sources compiled/strict0. The short matrix and1800-second Left/Right
+garden traversal completed natively. Former StudioPID26956/window6687492 is
+stopped and closed without saving editor state. Immutable model hash matches.
+Native log:
+C:/Users/natha/AppData/Local/Roblox/logs/0.744.0.7441077_20261024T072158Z_Studio_DBE07_last.log
+Frame run1792826576539 has all nine workload ENDs, nine camera rows65 and
+authoritative PASS. Trace1792826863197 completed1800.016 wall/1800.017 sim seconds,
+102888 frames all attached,44 turns,0 findings/loading/menu-title-rest pause
+frames/focus events. Both277-source guards passed;0 CreatorErrors/8 warnings.
+docs/camera-handover/native-trace30 retains original bounded events and parsed
+data; trace30-summary.json/.md gives all five-minute memory windows. Lua heap
+ended2054KB below start, engine386.49MB; window floors/counts remain bounded.
+Not a universal leak-free verdict. Short means16.69-20.45ms; one>50ms hut frame.
+No long-trace frame-time percentiles, no general FPS gain, phone or whole-map claim.
+No UI snapshots occurred during timed windows. The final HUD was observed after
+PASS; a documentation search around minute2 returned~1.6MB, an operator-load
+caveat retained in the report. No native session/local CLI test is running.
+Linux CI40073784522/job120812685573 completed SUCCESS for every configured
+step; docs/camera-handover/github-ci.json records the API outcomes, not exact
+assertion counts. Its fcb8e18e source matches5597fcf6 game/test/project inputs.
+
+NEXT: correct the confirmed obsolete hungry_at_home game note through generator
+ADAPTED (not biological text): it refers to words under the day that minimal
+Preserve HUD removes. Preserve frozen originals; notebook checks/export follow.
+docs/audit/NOTEBOOK-VISION-FEEDING.md records claim-level primary-source checks
+on12 pages, partial coverage and access limits. Other content/native-device/
+natural-life/whole-map scopes remain in HEALTH-CURRENT.md. The formal pre-fix
+before/after pairs retain conditions_matched=false; no gain claim is permitted.
 Production/saves unchanged; goal remains ACTIVE.
 
 ## Completed evidence, correctly scoped

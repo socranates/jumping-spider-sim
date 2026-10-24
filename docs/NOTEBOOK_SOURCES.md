@@ -1,5 +1,10 @@
 # Naturalist's notebook: sources and how far each was checked
 
+2026-10-24 supplement: [vision and feeding claim review](audit/NOTEBOOK-VISION-FEEDING.md)
+records the opened sections of four primary publications, species bounds,
+confirmed2012 DOI, partial-page coverage and current access failures. It does
+not alter game pages or replace the historical access limits below.
+
 Current private-candidate scope, 2026-10-23: the staged NotebookPages contains
 50 pages. The original opening counts below describe an earlier notebook;
 later entries extend it. See [the current content checkpoint](audit/CONTENT-CURRENT.md).

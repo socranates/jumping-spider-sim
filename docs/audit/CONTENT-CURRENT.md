@@ -27,7 +27,13 @@ directly exposed no abstract in this session; PMC returned a browser challenge.
 No claim of reading that study's full text is made. The existing rare-build
 source audit in RARE_SIGHTINGS_PLAN.md remains intact.
 
-This is not a new sentence-by-sentence re-audit of the other 49 pages. In
+The later [vision and feeding supplement](NOTEBOOK-VISION-FEEDING.md) checks
+specific claims in twelve distinct pages against opened primary sections and
+abstracts. Its first six table rows cover five pages, because motion_first
+has two claim rows. The supplement also records a confirmed stale HUD
+description in hungry_at_home, queued for generator correction after timing.
+It records species bounds and incomplete page coverage; it changes no game text.
+This is not a new sentence-by-sentence re-audit of the other49 pages. In
 particular, earlier notes about unconsulted books, abstract-only checks and
 uncertain generalizations are still real limitations. Not every player-facing
 UI string, creature dimension, caption, alternate input label or Reduced Motion

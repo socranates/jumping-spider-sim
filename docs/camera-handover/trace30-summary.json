@@ -1,0 +1,763 @@
+{
+  "input_sha256": "b610c2c745cc3b25d088f6aa01f206c949c92cd8b0a79dc7b03aafff52eeb1c7",
+  "frame_run": "1792826576539",
+  "trace_run": "1792826863197",
+  "requested_seconds": 1800,
+  "actual": {
+    "max_step": 0.37497711181640625,
+    "elapsed": 1800.0155513999925,
+    "simulation": 1800.0166666653013,
+    "regions": {
+      "garden_a1": true,
+      "garden_a2": true,
+      "garden_a3": true
+    },
+    "loading_frames": 0,
+    "turns": 44,
+    "minimum_y": -84.29000854492188,
+    "focus_gained": 0,
+    "focus_lost": 0,
+    "completed": true,
+    "memory": {
+      "lua_kb": 34871,
+      "engine_mb": 386.4921875,
+      "instances": 58907
+    },
+    "lua_growth_kb": -2054,
+    "frames": 102888,
+    "paused_frames": 0,
+    "modes": {
+      "attached": 102888
+    },
+    "findings": 0
+  },
+  "minute_rows": [
+    {
+      "max_step": 0.08333587646484375,
+      "elapsed": 0.025742399986484088,
+      "simulation": 0.03333333333333144,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 37207,
+        "engine_mb": 748.953125,
+        "instances": 59168
+      },
+      "modes": {
+        "attached": 1
+      },
+      "frames": 1,
+      "loading_frames": 0,
+      "turns": 0,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.2916755676269531,
+      "elapsed": 60.0320103999984,
+      "simulation": 60.03333333332992,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 39678,
+        "engine_mb": 738.4765625,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 3533
+      },
+      "frames": 3533,
+      "loading_frames": 0,
+      "turns": 1,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.2916755676269531,
+      "elapsed": 120.04522219998762,
+      "simulation": 120.05000000004209,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 47834,
+        "engine_mb": 582.17578125,
+        "instances": 58911
+      },
+      "modes": {
+        "attached": 6894
+      },
+      "frames": 6894,
+      "loading_frames": 0,
+      "turns": 2,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.333343505859375,
+      "elapsed": 180.0671074999991,
+      "simulation": 180.08333333342318,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 40565,
+        "engine_mb": 340.1015625,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 9951
+      },
+      "frames": 9951,
+      "loading_frames": 0,
+      "turns": 4,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.333343505859375,
+      "elapsed": 240.0746677999996,
+      "simulation": 240.08333333338663,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 41926,
+        "engine_mb": 371.8203125,
+        "instances": 59162
+      },
+      "modes": {
+        "attached": 13303
+      },
+      "frames": 13303,
+      "loading_frames": 0,
+      "turns": 5,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.333343505859375,
+      "elapsed": 300.0887364999944,
+      "simulation": 300.0999999999987,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 47406,
+        "engine_mb": 390.7265625,
+        "instances": 58654
+      },
+      "modes": {
+        "attached": 16781
+      },
+      "frames": 16781,
+      "loading_frames": 0,
+      "turns": 7,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 360.10423199999786,
+      "simulation": 360.1166666666108,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 45201,
+        "engine_mb": 390.30859375,
+        "instances": 58911
+      },
+      "modes": {
+        "attached": 20181
+      },
+      "frames": 20181,
+      "loading_frames": 0,
+      "turns": 8,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 420.1180672999908,
+      "simulation": 420.1333333332229,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 36130,
+        "engine_mb": 388.72265625,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 23602
+      },
+      "frames": 23602,
+      "loading_frames": 0,
+      "turns": 10,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 480.13349519998883,
+      "simulation": 480.1333333331683,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 52565,
+        "engine_mb": 389,
+        "instances": 58906
+      },
+      "modes": {
+        "attached": 26984
+      },
+      "frames": 26984,
+      "loading_frames": 0,
+      "turns": 11,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 540.1475606999884,
+      "simulation": 540.1499999997804,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 31744,
+        "engine_mb": 388.90625,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 30340
+      },
+      "frames": 30340,
+      "loading_frames": 0,
+      "turns": 13,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 600.1624431999953,
+      "simulation": 600.1666666663925,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 34604,
+        "engine_mb": 388.85546875,
+        "instances": 58911
+      },
+      "modes": {
+        "attached": 33787
+      },
+      "frames": 33787,
+      "loading_frames": 0,
+      "turns": 14,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 660.1771758999967,
+      "simulation": 660.1833333330046,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 46523,
+        "engine_mb": 391.88671875,
+        "instances": 58654
+      },
+      "modes": {
+        "attached": 37210
+      },
+      "frames": 37210,
+      "loading_frames": 0,
+      "turns": 16,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 720.1891185999993,
+      "simulation": 720.1999999996167,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 35165,
+        "engine_mb": 391.0546875,
+        "instances": 59158
+      },
+      "modes": {
+        "attached": 40678
+      },
+      "frames": 40678,
+      "loading_frames": 0,
+      "turns": 17,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 780.2032072999864,
+      "simulation": 780.2166666662288,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 40565,
+        "engine_mb": 388.34375,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 44164
+      },
+      "frames": 44164,
+      "loading_frames": 0,
+      "turns": 19,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 840.2181724999973,
+      "simulation": 840.2333333328409,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 45165,
+        "engine_mb": 386.4609375,
+        "instances": 58911
+      },
+      "modes": {
+        "attached": 47643
+      },
+      "frames": 47643,
+      "loading_frames": 0,
+      "turns": 20,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 900.2324624999892,
+      "simulation": 900.2333333327863,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 35999,
+        "engine_mb": 385.875,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 51095
+      },
+      "frames": 51095,
+      "loading_frames": 0,
+      "turns": 22,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 960.247491999995,
+      "simulation": 960.2499999993985,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 36259,
+        "engine_mb": 391.8046875,
+        "instances": 59158
+      },
+      "modes": {
+        "attached": 54524
+      },
+      "frames": 54524,
+      "loading_frames": 0,
+      "turns": 23,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1020.2553629999893,
+      "simulation": 1020.2666666660106,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 46078,
+        "engine_mb": 391.359375,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 58009
+      },
+      "frames": 58009,
+      "loading_frames": 0,
+      "turns": 25,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1080.255855899988,
+      "simulation": 1080.2666666659559,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 36182,
+        "engine_mb": 390.3671875,
+        "instances": 58911
+      },
+      "modes": {
+        "attached": 61448
+      },
+      "frames": 61448,
+      "loading_frames": 0,
+      "turns": 26,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1140.2681663999974,
+      "simulation": 1140.283333332568,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 47063,
+        "engine_mb": 388.94921875,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 64863
+      },
+      "frames": 64863,
+      "loading_frames": 0,
+      "turns": 28,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1200.2732526999898,
+      "simulation": 1200.2833333325134,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 31692,
+        "engine_mb": 385.890625,
+        "instances": 59158
+      },
+      "modes": {
+        "attached": 68316
+      },
+      "frames": 68316,
+      "loading_frames": 0,
+      "turns": 29,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1260.285836799987,
+      "simulation": 1260.2999999991255,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 40014,
+        "engine_mb": 385.6015625,
+        "instances": 58910
+      },
+      "modes": {
+        "attached": 71769
+      },
+      "frames": 71769,
+      "loading_frames": 0,
+      "turns": 31,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1320.301465499986,
+      "simulation": 1320.3166666657376,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 33095,
+        "engine_mb": 386.40625,
+        "instances": 58907
+      },
+      "modes": {
+        "attached": 75224
+      },
+      "frames": 75224,
+      "loading_frames": 0,
+      "turns": 32,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1380.3146250999998,
+      "simulation": 1380.316666665683,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 35902,
+        "engine_mb": 386.8046875,
+        "instances": 58903
+      },
+      "modes": {
+        "attached": 78675
+      },
+      "frames": 78675,
+      "loading_frames": 0,
+      "turns": 34,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1440.3285639999958,
+      "simulation": 1440.333333332295,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 44593,
+        "engine_mb": 385.40234375,
+        "instances": 58882
+      },
+      "modes": {
+        "attached": 82151
+      },
+      "frames": 82151,
+      "loading_frames": 0,
+      "turns": 35,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1500.3434325999988,
+      "simulation": 1500.3499999989072,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 41282,
+        "engine_mb": 382.109375,
+        "instances": 58894
+      },
+      "modes": {
+        "attached": 85617
+      },
+      "frames": 85617,
+      "loading_frames": 0,
+      "turns": 37,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1560.3579058999894,
+      "simulation": 1560.3666666655192,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 32073,
+        "engine_mb": 384.2109375,
+        "instances": 58907
+      },
+      "modes": {
+        "attached": 89069
+      },
+      "frames": 89069,
+      "loading_frames": 0,
+      "turns": 38,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1620.3725153999985,
+      "simulation": 1620.3833333321313,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 46504,
+        "engine_mb": 396.73828125,
+        "instances": 58903
+      },
+      "modes": {
+        "attached": 92537
+      },
+      "frames": 92537,
+      "loading_frames": 0,
+      "turns": 40,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1680.3860795999935,
+      "simulation": 1680.3999999987434,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 33452,
+        "engine_mb": 395.234375,
+        "instances": 58882
+      },
+      "modes": {
+        "attached": 95996
+      },
+      "frames": 95996,
+      "loading_frames": 0,
+      "turns": 41,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    },
+    {
+      "max_step": 0.37497711181640625,
+      "elapsed": 1740.400029299999,
+      "simulation": 1740.4166666653555,
+      "focus_gained": 0,
+      "focus_lost": 0,
+      "memory": {
+        "lua_kb": 45840,
+        "engine_mb": 394.25390625,
+        "instances": 58894
+      },
+      "modes": {
+        "attached": 99458
+      },
+      "frames": 99458,
+      "loading_frames": 0,
+      "turns": 43,
+      "paused_frames": 0,
+      "minimum_y": -84.29000854492188
+    }
+  ],
+  "five_minute_windows": [
+    {
+      "from_seconds": 0,
+      "to_seconds": 300,
+      "rows": 5,
+      "lua_kb": {
+        "min": 37207,
+        "median": 40565,
+        "max": 47834
+      },
+      "engine_mb": {
+        "min": 340.1015625,
+        "median": 582.17578125,
+        "max": 748.953125
+      },
+      "instances": {
+        "min": 58910,
+        "median": 58911,
+        "max": 59168
+      }
+    },
+    {
+      "from_seconds": 300,
+      "to_seconds": 600,
+      "rows": 5,
+      "lua_kb": {
+        "min": 31744,
+        "median": 45201,
+        "max": 52565
+      },
+      "engine_mb": {
+        "min": 388.72265625,
+        "median": 389,
+        "max": 390.7265625
+      },
+      "instances": {
+        "min": 58654,
+        "median": 58910,
+        "max": 58911
+      }
+    },
+    {
+      "from_seconds": 600,
+      "to_seconds": 900,
+      "rows": 5,
+      "lua_kb": {
+        "min": 34604,
+        "median": 40565,
+        "max": 46523
+      },
+      "engine_mb": {
+        "min": 386.4609375,
+        "median": 388.85546875,
+        "max": 391.88671875
+      },
+      "instances": {
+        "min": 58654,
+        "median": 58911,
+        "max": 59158
+      }
+    },
+    {
+      "from_seconds": 900,
+      "to_seconds": 1200,
+      "rows": 5,
+      "lua_kb": {
+        "min": 35999,
+        "median": 36259,
+        "max": 47063
+      },
+      "engine_mb": {
+        "min": 385.875,
+        "median": 390.3671875,
+        "max": 391.8046875
+      },
+      "instances": {
+        "min": 58910,
+        "median": 58910,
+        "max": 59158
+      }
+    },
+    {
+      "from_seconds": 1200,
+      "to_seconds": 1500,
+      "rows": 5,
+      "lua_kb": {
+        "min": 31692,
+        "median": 35902,
+        "max": 44593
+      },
+      "engine_mb": {
+        "min": 385.40234375,
+        "median": 385.890625,
+        "max": 386.8046875
+      },
+      "instances": {
+        "min": 58882,
+        "median": 58907,
+        "max": 59158
+      }
+    },
+    {
+      "from_seconds": 1500,
+      "to_seconds": 1800,
+      "rows": 5,
+      "lua_kb": {
+        "min": 32073,
+        "median": 41282,
+        "max": 46504
+      },
+      "engine_mb": {
+        "min": 382.109375,
+        "median": 394.25390625,
+        "max": 396.73828125
+      },
+      "instances": {
+        "min": 58882,
+        "median": 58894,
+        "max": 58907
+      }
+    }
+  ],
+  "findings": [],
+  "turnless_intervals": [],
+  "review_notes": [],
+  "all_camera_fov_65": true,
+  "limits": "One Studio full-detail Free-play route at fixed clock in garden_a1/a2/a3, yielding-memory storage. Minute memory is sampled, modes/height/steps observed each Heartbeat. Paused frames mean menu/title/rest states, not all visual stutters; no long-trace frame-time percentiles were recorded. No forced GC. Stats engine memory includes Studio overhead; gcinfo is one Lua VM. Descriptive trend only, not proof of absence of leaks, every map seam, natural lives, real storage or physical-phone stability."
+}

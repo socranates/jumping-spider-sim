@@ -1,0 +1,13 @@
+{
+  "inputs": {
+    "qualified_source": "C:\\Users\\natha\\claude-xfer\\Windowsill-menu-overflow-attempt1\\roblox_port\\src\\Client\\SpiderInput.luau",
+    "qualified_source_sha256": "2e2d2d3acea655fc495c4781c040980f901c5187cdefdb8a8128047b90d2ccee",
+    "builder": "docs/menu-overflow/build.py",
+    "builder_sha256": "2ea23f5664d4bd43042a0a89740e21cdb5c03106f758d8075e8eb9e5c7ee0da6"
+  },
+  "outputs": {
+    "spider-input.luau": "55ceaeac7357a19d67ef9454111e6de0bb210c9a18c79edb8f1e9664e57408dc",
+    "build.py": "32d2743e50da8e6341dea14ff620da22fd6994169dd7c024275f6f23406c5ba9"
+  },
+  "scope": "Explicit existing UI font for touch buttons; bindings, labels, sizes, hit targets and handlers unchanged."
+}

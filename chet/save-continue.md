@@ -1,4 +1,14 @@
-# Latest checkpoint - private version 13 published and played, 2026-10-23
+# Latest checkpoint - touch-font candidate prepared; native check pending, 2026-10-23
+
+This goal turn made PROGRESS: one-line touch-font candidate derived, built273/273, full strict0, existing input/HUD cohort1489/0 (settings1163/client27/run196/hud103). docs/touch-labels records source/build derivation and a strict-checked native layout fixture. No unit test added for the small presentation change. New model C:/Users/natha/claude-xfer/Windowsill-touch-font-attempt1/TheWindowsill-candidate.rbxlx SHA64a3ff7e865ce53d401569e8e12605ddff419028ccfd887d518e03e2514b0a6b. It is UNPUBLISHED, UNACTIVATED and not yet a verified visual fix. Only Client/SpiderInput gains explicit Enum.Font.GothamMedium; labels/bindings/handlers/sizes/positions/visibility/settings unchanged. Published private13 and its qualified snapshots remain intact. User notified before the presentation change.
+
+menu-full2 of the PUBLISHED candidate still runs, exec67944; latest authoritative poll returned live and completed through title.luau after selftest/garden/nature. It is not terminal or failed. Do not restart. Targeted new-candidate CLI87658 and build46251 are terminal exit0. No Studio/Player/Rojo open. Laptop available physical memory about978MB at last check: finish the existing full repeat before launching Studio. Native correctness check is pending, not a reason to mark the goal blocked or complete.
+
+NEXT: poll67944, qualify complete repeated menu-full1/menu-full2 with docs/audit/verify_current_cli.py then --check, preserve exact273 published sources. Then use docs/touch-labels/README.md to inspect the NEW unbound font candidate locally in Studio: fresh exact window, stopped guard.luau, Play, CLIENT native-check.luau, retain original TOUCH_FONT_NATIVE JSON and screenshot, inspect all fit/extra-row failures, stop/guard/close. Never publish this local fixture or overwrite qualified stages. No FPS/phone claim from glyph layout. Current startup stall remains unresolved. Save-cost logs/sourcemap unrelated dirt preserved.
+
+---
+
+# Previous checkpoint - private version 13 published and played, 2026-10-23
 
 The human's "Publish private test build" authorization is fulfilled. Existing PRIVATE Windowsill Save Tests, universe10771634917/place109879630247781, is published as version13 (23:26 Central). Creator Dashboard published-only history and access/reach Private are retained under docs/private-player. A separate post-publication production check still shows published140; no production upload, access/security change, main merge, OneDrive/Godot/synced-source edit or source activation occurred.
 

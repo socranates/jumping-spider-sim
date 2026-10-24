@@ -2,9 +2,11 @@
 
 2026-10-24. Integration line: codex/verified-integration. Normal roblox_port/src
 now contains273 sources imported from the verified font candidate. A later
-generator-driven notebook correction is the only game-source difference; its
-1784 focused checks, compile/strict and export evidence1ba4c21a1753e03d are in
-../integration/notebook-receipt.json. The frozen
+generator-driven notebook correction and subsequent camera lens handover fix
+are the only game-source differences. Notebook evidence1ba4c21a1753e03d stays
+in ../integration/notebook-receipt.json. The camera fix has1443 focused passes,
+compile/strict and current export evidence66a9319760fa7c29 in
+../camera-handover/receipt.json; its native check is pending. The frozen
 224-source proof checkout remains at c457af12. Private test13 is published;
 this integration/font variant is not published or merged to main. Private13 has273 game sources and hashes in ../menu-overflow/README.md.
 The subsequent font-only candidate also has273 sources, model SHA256
@@ -26,7 +28,7 @@ Island work and new rare content are not being added during this foundation pass
 | Natural life loop, all modes and predator endings | Deterministic life/feeding/predator suites and scripted self-test components | Scripted setup or isolated death check is not the requested complete natural life in every mode; broader native coverage remains |
 | Camera, held prey, grapple, meshes and seams in both tiers | Collision/streaming suites, streamed-out holds, automated region/self-test checks | Whole-map close visual sweep and both-tier edge/rearrival cases not all proved |
 | Controls, switching and accessibility | Input/settings/menu suites; six native normal/large-text reflow/scroll cases; title clipping corrected; ../touch-labels/native-font.json:16 actual buttons and40 candidate native layout cases,0 failures versus13 Legacy failures | Font fix verified in unpublished candidate; private13 still has Legacy text. Ordinary New Life observed; actual touch controls were not enabled/forced in Studio. Complete controller/touch comfort and every accessibility path remain; no physical-phone result |
-| Eight-scene full/low performance matrix | ../performance-matrix/RESULTS.md: completed current full-tier9-sample native workload (can/doorway split), both276-source guards, active frog/damselfly,150stud three-region walk and save cleanup. Means16.78–20.96ms;0 script errors. Prior component/matched3-scene evidence remains in ../frame-ordinary | Current full-tier coverage complete for this scripted cohort; formal before/after and low native pairs pending. Four identically instrumented pair1 models compile/strict, differ only in LookPlan between variants. No general FPS or phone gain inferred; first complete cohort lacks optional look-method watcher |
+| Eight-scene full/low performance matrix | ../performance-matrix/PAIR1.md: four native runs,36 workload samples, both276-source guards each, active frog/damselfly, garden walks and save cleanup;0 CreatorErrors. Original pilot remains in RESULTS.md | Coverage complete for the scripted pre-camera-fix cohort, but comparison conditions_matched=false: actual lens differed across runs. All18 camera deviations retained at .01 tolerance; no causal/general FPS gain. Exposed title-to-game FOV bug is corrected with1443 CLI checks; native corrected-lens and30-minute trace pending. No phone claim |
 | Startup/load and memory | Earlier Studio attribution plus two private Player probes: title-ready 9.42s/14.13s, initial Heartbeat gaps 1.56s/1.87s; second run final stationary 30s 56.97 FPS, worst31.58ms, no >50ms frames | Startup gap unresolved outside Studio too. First run has low-memory messages, second does not; cause unproved. No general FPS improvement or 30-minute leak-free claim |
 | Module/runtime inventory | integrated-source/MAP.md and inventory.json: 273 staged sources, 65161 lines, 435 lexical runtime sites; 13 files over800 lines; all strict | Current lexical index only. Three cast/runtime import sites explicit; semantic dependency/cadence/cleanup review not inferred |
 | Code and authority review | SECURITY-CURRENT.md reconciles actual message/ownership boundaries; historical CODE-REVIEW.md, persistence qualification and current source index | Scoped boundary review complete; exhaustive module semantics and hostile native traffic remain unproved. Solo life remains client-authoritative; validation is not anti-cheat. Large architecture changes remain proposals |

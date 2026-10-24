@@ -12,7 +12,12 @@ font candidate64a3ff7e865ce53d401569e8e12605ddff419028ccfd887d518e03e2514b0a6b
 after newline normalization. promotion.json records59 added/changed files
 from the224-source base. The frozen proof tree, OneDrive original, Godot and
 synced project references are intact. The subsequent notebook correction is
-the sole game-source difference from that baseline (see below).
+one game-source difference from that baseline (see below). A subsequent
+SpiderCamera fix restores the configured lens after title/intro ownership;
+docs/camera-handover records its four red title paths and1443 passing focused
+checks. Current normal/test export evidence is66a9319760fa7c29. The corrected
+handover has not run natively yet; full CLI qualification of this later edit
+is not inferred from the preserved baseline.
 
 The normal tests/run.py discovers269 ModuleScripts lazily and keeps server/
 shared admission facades separate. It includes the qualified server-clock shim
@@ -75,19 +80,36 @@ route failed. The pond view also needed moving from pond_a1 to the frog's actual
 support. Attempt3 corrected those, logged camera/actor conditions and passed.
 
 The first complete cohort did not mount the optional look-method watcher.
-Four formal pair1 models now include it consistently and are statically
-qualified in pair1-builds.json (all276 compile/strict; one LookPlan source
-difference before/after, identical sources across tiers). They have NOT run
-natively. Next run serially:
-C:/Users/natha/claude-xfer/Windowsill-matrix-after-full-pair1/Windowsill-matrix.rbxlx
-C:/Users/natha/claude-xfer/Windowsill-matrix-before-full-pair1/Windowsill-matrix.rbxlx
-C:/Users/natha/claude-xfer/Windowsill-matrix-after-low-pair1/Windowsill-matrix.rbxlx
-C:/Users/natha/claude-xfer/Windowsill-matrix-before-low-pair1/Windowsill-matrix.rbxlx
-For each: source guard before, F5, original completion, Shift+F5, click stopped
-command bar before Ctrl+Return postguard, then collect.py --require-methods.
-Do not snapshot UI/run heavy local commands during samples. All owned Studio/
-Player/CLI sessions are stopped now. The ordinary game sources/exports and
-production/saves were unchanged by this benchmark work. Goal remains ACTIVE.
+Four formal pair1 models included it consistently and have now completed
+natively: after/full1792824522568, before/full1792824986522,
+after/low1792825466424, before/low1792825826218. All36 workload samples,
+both276-source guards per run,0 CreatorErrors,8 retained warnings each.
+PAIR1.md and pair1/ retain raw bounded events/manifests; pair1-comparison.json
+records mixed descriptive changes and conditions_matched=false. Actual FOV
+differed by.04266(full)/.16454(low), outside unchanged.01 tolerance. Other
+recorded view/state/actor conditions match. Do NOT claim an overall gain or
+reclassify these pre-fix runs as corrected-lens evidence.
+
+This exposed a real title/game camera ownership bug. SpiderCamera only
+restored FOV when the setting changed, leaving the title's52.89-53.07 lens
+instead of gameplay65. The small fix reclaims an unchanged selected lens
+outside eye view. Four red title paths now pass; title/settings/eyes/client
+total1443/0. Normal/test exports rebuilt evidence66a9319760fa7c29. No movement,
+sensitivity, default setting or lighting changes. Native verification pending.
+
+NEXT: fresh foreground Studio model
+C:/Users/natha/claude-xfer/Windowsill-matrix-after-full-lens-trace30-r2/Windowsill-matrix.rbxlx
+SHA256 df95c94a37f67d3d114ca3f1a3f5e6dc0a330f65f8a6bfa11faf9c93e457d717.
+All277 sources compiled/strict0. This runs the short matrix then1800 wall seconds
+of genuine Left/Right garden traversal, recording each Heartbeat mode and minute
+memory/focus rows. No native execution yet. The failed first trace stage had
+only a strict singleton-type issue; r2 corrected the fixture direction switch.
+Do not mutate it after qualification. Guard before, F5, original PASS/FAIL,
+ShiftF5, refocus commandbar before CtrlReturn postguard, collect --require-methods.
+Verify camera rows65 and inspect all trace findings/pause/focus/memory data;
+duration alone cannot establish leak/fall freedom. No snapshots/heavy commands
+during samples. All owned Studio/Player/CLI sessions are stopped now.
+Production/saves unchanged; goal remains ACTIVE.
 
 ## Completed evidence, correctly scoped
 

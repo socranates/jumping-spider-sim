@@ -10,7 +10,7 @@ assert sha(Path(manifest['place']).read_bytes())==manifest['place_sha256']
 assert sha((a.stage/'guard.luau').read_bytes())==manifest['guard_sha256']
 lines=a.log.read_text(encoding='utf8',errors='strict').splitlines()
 pattern=re.compile(r'\[MATRIX_FRAME_(\w+)\]\s+(\d+)\s+(\{.*\})$')
-events=[];scenes=[];guards=[];diagnostics=[];kept=[];cameras=[];actors=[]
+events=[];scenes=[];guards=[];diagnostics=[];kept=[];cameras=[];actors=[];trace=[]
 for line in lines:
  if '[FLog::CreatorOutput]'in line and '[MATRIX_FRAME_'in line:
   m=pattern.search(line);assert m,'Malformed or truncated native event: '+line[:100]
@@ -23,7 +23,10 @@ for line in lines:
   if m[1]=='CAMERA':cameras.append(json.loads(m[2]))
   elif m[1]=='ACTORS':actors.append(json.loads(m[2]))
   kept.append(line)
- elif '[FLog::CreatorOutput]'in line and re.search(r'\[MATRIX_GUARD\]\s+276\s+',line):
+ elif '[FLog::CreatorOutput]'in line and '[MATRIX_TRACE_'in line:
+  m=re.search(r'\[MATRIX_TRACE_(\w+)\]\s+(\d+)\s+(\{.*\})$',line);assert m,'Malformed/truncated trace event'
+  trace.append(dict(kind=m[1],run=m[2],value=json.loads(m[3])));kept.append(line)
+ elif '[FLog::CreatorOutput]'in line and re.search(r'\[MATRIX_GUARD\]\s+'+str(manifest['source_count'])+r'\s+',line):
   guards.append(line);kept.append(line)
  elif '[FLog::CreatorError]'in line or '[FLog::CreatorWarning]'in line:
   diagnostics.append(line);kept.append(line)
@@ -52,15 +55,21 @@ if not a.allow_partial:
  assert all(ends[-1]['extra']['visited'].get(k)for k in ['garden_a1','garden_a2','garden_a3'])
  if a.require_methods:
   for sample in expected[1:]:
-   assert any(e['kind']=='METHOD'and e['value']['sample']==sample and e['value']['name']=='work'and e['value']['calls']>0 for e in events),'Missing native look-method observations: '+sample
+   assert any(e['kind']=='METHOD'and e['value']['sample']==sample and e['value']['name']in ['work','dew','replan']and e['value']['calls']>0 for e in events),'Missing native look-method observations: '+sample
+ if manifest.get('long_trace_seconds',0):
+  assert len({e['run']for e in trace})==1
+  starts=[e for e in trace if e['kind']=='BEGIN'];endsTrace=[e for e in trace if e['kind']=='END']
+  assert len(starts)==len(endsTrace)==1 and endsTrace[0]['value']['completed']
+  assert endsTrace[0]['value']['elapsed']>=manifest['long_trace_seconds']
+  assert len([e for e in trace if e['kind']=='ROW'])>=manifest['long_trace_seconds']//60
 assert not a.out.exists(),'Do not replace retained native evidence'
 a.out.mkdir(parents=True)
 raw=('\n'.join(kept)+'\n').encode()
 (a.out/'native-output.txt').write_bytes(raw)
 record=dict(run=run,variant=manifest['variant'],tier=manifest['tier'],passed=passed,
- source_count=276,model_sha256=manifest['place_sha256'],manifest_sha256=sha((a.stage/'manifest.json').read_bytes()),
+ source_count=manifest['source_count'],model_sha256=manifest['place_sha256'],manifest_sha256=sha((a.stage/'manifest.json').read_bytes()),
  native_output_sha256=sha(raw),source_guards=len(guards),scenes=scenes,samples=ends,cameras=cameras,actors=actors,
- events=events,creator_errors=sum('[FLog::CreatorError]'in x for x in diagnostics),
+ events=events,trace=trace,creator_errors=sum('[FLog::CreatorError]'in x for x in diagnostics),
  creator_warnings=sum('[FLog::CreatorWarning]'in x for x in diagnostics),
  complete_fixture_scope=not a.allow_partial,methods_instrumented=any(e['kind']=='METHOD'for e in events),original_log=str(a.log),
  limits='One local Studio workload. Free-play fixtures fix clock, use authored arrivals and memory storage. Not production FPS, a natural life, real network/storage or physical phone proof.')

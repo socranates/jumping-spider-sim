@@ -1,0 +1,958 @@
+{
+  "inputs": {
+    "pair1\\after-full\\native.json": "5451d2947756dd0c466e250040fbd1161d0effd4a3eeaa886eb33e0862cd6060",
+    "pair1\\before-full\\native.json": "014bd4088dbb17f7c9245dfdc97689b1ed8b195b22f22cbbdf403c7c94460faf",
+    "pair1\\after-low\\native.json": "2884996f74db81435dddc3b98aafe4222118ca256eaa89d1d62f7ba482cd73fe",
+    "pair1\\before-low\\native.json": "53890709519614bca6ad73284033e280d13710ced2bec0c8827d632fc45039f7"
+  },
+  "rows": [
+    {
+      "tier": "full",
+      "scene": "sill_dawn",
+      "before": {
+        "mean_ms": 16.665604472669038,
+        "p95_ms": 18.46880093216896,
+        "worst_ms": 20.99577896296978,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 4.511704163217365,
+        "heap_growth_kb": -1827
+      },
+      "after": {
+        "mean_ms": 16.664370502377807,
+        "p95_ms": 18.817409873008728,
+        "worst_ms": 21.945418789982796,
+        "frames": 1202,
+        "over50": 0,
+        "render_mean_ms": 4.423004658886455,
+        "heap_growth_kb": 194
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "sill_dawn",
+          "calls": 1201,
+          "worst_ms": 0.02580000727903098,
+          "mean_ms": 0.0032216485608741333,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "sill_dawn",
+          "calls": 1202,
+          "worst_ms": 0.007299997378140688,
+          "mean_ms": 0.003051081688388153,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.007404293635160375
+    },
+    {
+      "tier": "full",
+      "scene": "hut_lamp_night",
+      "before": {
+        "mean_ms": 17.884359685029967,
+        "p95_ms": 22.075723856687546,
+        "worst_ms": 44.39143463969231,
+        "frames": 1119,
+        "over50": 0,
+        "render_mean_ms": 4.84241277919768,
+        "heap_growth_kb": -1657
+      },
+      "after": {
+        "mean_ms": 18.419140715943694,
+        "p95_ms": 24.21451173722744,
+        "worst_ms": 32.498933374881744,
+        "frames": 1087,
+        "over50": 0,
+        "render_mean_ms": 5.068144986306153,
+        "heap_growth_kb": 6377
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "hut_lamp_night",
+          "calls": 1119,
+          "worst_ms": 0.019500002963468432,
+          "mean_ms": 0.0037973190277442,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "hut_lamp_night",
+          "calls": 1087,
+          "worst_ms": 0.047599998652003706,
+          "mean_ms": 0.0035864764598747432,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 2.9902162578477
+    },
+    {
+      "tier": "full",
+      "scene": "garden_rain",
+      "before": {
+        "mean_ms": 19.667426899097464,
+        "p95_ms": 25.871403515338898,
+        "worst_ms": 62.199875712394714,
+        "frames": 1018,
+        "over50": 1,
+        "render_mean_ms": 5.663040274933021,
+        "heap_growth_kb": 5746
+      },
+      "after": {
+        "mean_ms": 18.637876791161535,
+        "p95_ms": 24.000804871320724,
+        "worst_ms": 48.23267459869385,
+        "frames": 1074,
+        "over50": 0,
+        "render_mean_ms": 5.707782495482777,
+        "heap_growth_kb": 11987
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "garden_rain",
+          "calls": 1018,
+          "worst_ms": 0.02130000211764127,
+          "mean_ms": 0.003565324282055,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "garden_rain",
+          "calls": 1074,
+          "worst_ms": 0.03749999450519681,
+          "mean_ms": 0.003704375944454119,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -5.2347981930629395
+    },
+    {
+      "tier": "full",
+      "scene": "meadow_wind",
+      "before": {
+        "mean_ms": 17.593560814824748,
+        "p95_ms": 22.054625675082207,
+        "worst_ms": 35.493794828653336,
+        "frames": 1138,
+        "over50": 0,
+        "render_mean_ms": 5.4111940249969885,
+        "heap_growth_kb": -1327
+      },
+      "after": {
+        "mean_ms": 18.48211039170719,
+        "p95_ms": 24.06712807714939,
+        "worst_ms": 35.451486706733704,
+        "frames": 1083,
+        "over50": 0,
+        "render_mean_ms": 5.630861403246858,
+        "heap_growth_kb": 8219
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "meadow_wind",
+          "calls": 1138,
+          "worst_ms": 0.04050000279676169,
+          "mean_ms": 0.003930931506896971,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "meadow_wind",
+          "calls": 1083,
+          "worst_ms": 0.02260001201648265,
+          "mean_ms": 0.0038593723440830036,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 5.050424903944006
+    },
+    {
+      "tier": "full",
+      "scene": "pond_active",
+      "before": {
+        "mean_ms": 17.64339260507303,
+        "p95_ms": 24.028943851590157,
+        "worst_ms": 36.76564246416092,
+        "frames": 1134,
+        "over50": 0,
+        "render_mean_ms": 5.4504026456363786,
+        "heap_growth_kb": -6917
+      },
+      "after": {
+        "mean_ms": 17.76398072629083,
+        "p95_ms": 23.317094892263412,
+        "worst_ms": 34.18686240911484,
+        "frames": 1127,
+        "over50": 0,
+        "render_mean_ms": 5.253619609503203,
+        "heap_growth_kb": -13264
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "pond_active",
+          "calls": 1134,
+          "worst_ms": 0.04069998976774514,
+          "mean_ms": 0.004643827231848904,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "pond_active",
+          "calls": 1127,
+          "worst_ms": 0.17329999536741525,
+          "mean_ms": 0.004521828050169013,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 0.6834746803918268
+    },
+    {
+      "tier": "full",
+      "scene": "can",
+      "before": {
+        "mean_ms": 16.68034037187075,
+        "p95_ms": 18.7204796820879,
+        "worst_ms": 26.035021990537643,
+        "frames": 1200,
+        "over50": 0,
+        "render_mean_ms": 4.779567916618059,
+        "heap_growth_kb": -291
+      },
+      "after": {
+        "mean_ms": 16.933443495931257,
+        "p95_ms": 20.01117914915085,
+        "worst_ms": 28.117656707763672,
+        "frames": 1182,
+        "over50": 0,
+        "render_mean_ms": 4.952477834300909,
+        "heap_growth_kb": -2069
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "can",
+          "calls": 1200,
+          "worst_ms": 0.014899997040629387,
+          "mean_ms": 0.0032478336288477294,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "can",
+          "calls": 1182,
+          "worst_ms": 0.04579999949783087,
+          "mean_ms": 0.0033303719897779705,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 1.5173738569947526
+    },
+    {
+      "tier": "full",
+      "scene": "doorway",
+      "before": {
+        "mean_ms": 17.245415481839018,
+        "p95_ms": 21.01772464811802,
+        "worst_ms": 51.17161571979523,
+        "frames": 1161,
+        "over50": 1,
+        "render_mean_ms": 5.043424202923797,
+        "heap_growth_kb": 12351
+      },
+      "after": {
+        "mean_ms": 16.70739232004311,
+        "p95_ms": 18.92324723303318,
+        "worst_ms": 27.000432834029198,
+        "frames": 1198,
+        "over50": 0,
+        "render_mean_ms": 4.672974373977449,
+        "heap_growth_kb": 739
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "doorway",
+          "calls": 1161,
+          "worst_ms": 0.02340000355616212,
+          "mean_ms": 0.003535831268394685,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "doorway",
+          "calls": 1198,
+          "worst_ms": 0.019099999917671084,
+          "mean_ms": 0.00338564280298879,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -3.119803998706183
+    },
+    {
+      "tier": "full",
+      "scene": "bench_lamppost_night",
+      "before": {
+        "mean_ms": 17.01356310432202,
+        "p95_ms": 20.940758287906647,
+        "worst_ms": 44.035959988832474,
+        "frames": 1177,
+        "over50": 0,
+        "render_mean_ms": 5.096202888455797,
+        "heap_growth_kb": -669
+      },
+      "after": {
+        "mean_ms": 16.98442526316496,
+        "p95_ms": 20.199080929160118,
+        "worst_ms": 29.935000464320183,
+        "frames": 1179,
+        "over50": 0,
+        "render_mean_ms": 4.877884902287234,
+        "heap_growth_kb": 6876
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "bench_lamppost_night",
+          "calls": 1177,
+          "worst_ms": 0.022199994418770075,
+          "mean_ms": 0.003912744002821068,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "bench_lamppost_night",
+          "calls": 1179,
+          "worst_ms": 0.03650000144261867,
+          "mean_ms": 0.00380653070364514,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.17126242738452202
+    },
+    {
+      "tier": "full",
+      "scene": "three_region_walk",
+      "before": {
+        "mean_ms": 17.032823278337506,
+        "p95_ms": 20.989563316106796,
+        "worst_ms": 38.20227459073067,
+        "frames": 3525,
+        "over50": 0,
+        "render_mean_ms": 5.947007233952338,
+        "heap_growth_kb": -3063
+      },
+      "after": {
+        "mean_ms": 17.23249888434647,
+        "p95_ms": 21.90757729113102,
+        "worst_ms": 43.18227618932724,
+        "frames": 3484,
+        "over50": 0,
+        "render_mean_ms": 5.773808438395612,
+        "heap_growth_kb": 6339
+      },
+      "before_methods": {
+        "work": {
+          "sample": "three_region_walk",
+          "calls": 51,
+          "worst_ms": 2.807899989420548,
+          "mean_ms": 1.1396607841757656,
+          "name": "work"
+        },
+        "dew": {
+          "sample": "three_region_walk",
+          "calls": 3525,
+          "worst_ms": 0.21270000434014946,
+          "mean_ms": 0.004064624102006778,
+          "name": "dew"
+        },
+        "replan": {
+          "sample": "three_region_walk",
+          "calls": 75,
+          "worst_ms": 7.899699994595721,
+          "mean_ms": 2.6130693330196664,
+          "name": "replan"
+        }
+      },
+      "after_methods": {
+        "work": {
+          "sample": "three_region_walk",
+          "calls": 51,
+          "worst_ms": 3.699699998833239,
+          "mean_ms": 1.1166921581652964,
+          "name": "work"
+        },
+        "dew": {
+          "sample": "three_region_walk",
+          "calls": 3484,
+          "worst_ms": 0.31430000672116876,
+          "mean_ms": 0.004265499305765676,
+          "name": "dew"
+        },
+        "replan": {
+          "sample": "three_region_walk",
+          "calls": 75,
+          "worst_ms": 6.4944000041577965,
+          "mean_ms": 2.576755999471061,
+          "name": "replan"
+        }
+      },
+      "mean_change_percent": 1.172298935684446
+    },
+    {
+      "tier": "low",
+      "scene": "sill_dawn",
+      "before": {
+        "mean_ms": 16.820606646557298,
+        "p95_ms": 18.219545483589172,
+        "worst_ms": 119.37330663204193,
+        "frames": 1191,
+        "over50": 2,
+        "render_mean_ms": 2.8206301428672624,
+        "heap_growth_kb": 7899
+      },
+      "after": {
+        "mean_ms": 16.72094737536701,
+        "p95_ms": 18.16178485751152,
+        "worst_ms": 26.08109451830387,
+        "frames": 1197,
+        "over50": 0,
+        "render_mean_ms": 2.9341989975637945,
+        "heap_growth_kb": -7844
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "sill_dawn",
+          "calls": 1191,
+          "worst_ms": 0.022499996703118086,
+          "mean_ms": 0.0029995799203239863,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "sill_dawn",
+          "calls": 1197,
+          "worst_ms": 0.3369999903952703,
+          "mean_ms": 0.003445947928600785,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.592483215881423
+    },
+    {
+      "tier": "low",
+      "scene": "hut_lamp_night",
+      "before": {
+        "mean_ms": 18.23014475808959,
+        "p95_ms": 24.26264062523842,
+        "worst_ms": 35.16919165849686,
+        "frames": 1098,
+        "over50": 0,
+        "render_mean_ms": 3.5655526412640977,
+        "heap_growth_kb": 1969
+      },
+      "after": {
+        "mean_ms": 17.27070899019733,
+        "p95_ms": 21.978989243507385,
+        "worst_ms": 30.689379200339317,
+        "frames": 1159,
+        "over50": 0,
+        "render_mean_ms": 2.9156294218563845,
+        "heap_growth_kb": -3813
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "hut_lamp_night",
+          "calls": 1098,
+          "worst_ms": 0.027900008717551827,
+          "mean_ms": 0.0036783242703776788,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "hut_lamp_night",
+          "calls": 1159,
+          "worst_ms": 0.021099986042827368,
+          "mean_ms": 0.0034390855399767987,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -5.262908115233211
+    },
+    {
+      "tier": "low",
+      "scene": "garden_rain",
+      "before": {
+        "mean_ms": 16.666065600640966,
+        "p95_ms": 18.097110092639923,
+        "worst_ms": 19.999779760837555,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.981841132261629,
+        "heap_growth_kb": 6245
+      },
+      "after": {
+        "mean_ms": 16.66501540454922,
+        "p95_ms": 18.382009118795395,
+        "worst_ms": 21.23565971851349,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 3.15336744368098,
+        "heap_growth_kb": 643
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "garden_rain",
+          "calls": 1201,
+          "worst_ms": 0.017600003047846258,
+          "mean_ms": 0.003039300740583273,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "garden_rain",
+          "calls": 1201,
+          "worst_ms": 0.1353999978164211,
+          "mean_ms": 0.003438967238506031,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.0063014038040654086
+    },
+    {
+      "tier": "low",
+      "scene": "meadow_wind",
+      "before": {
+        "mean_ms": 16.66665649806133,
+        "p95_ms": 18.159156665205956,
+        "worst_ms": 20.420724526047707,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.7232109909607902,
+        "heap_growth_kb": 2736
+      },
+      "after": {
+        "mean_ms": 16.664836210641486,
+        "p95_ms": 18.410401418805122,
+        "worst_ms": 23.851390928030014,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 3.09869233985518,
+        "heap_growth_kb": 6790
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "meadow_wind",
+          "calls": 1201,
+          "worst_ms": 0.022700012777931988,
+          "mean_ms": 0.0032487924991611338,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "meadow_wind",
+          "calls": 1201,
+          "worst_ms": 0.360800011549145,
+          "mean_ms": 0.003959616869308061,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.010921731182589323
+    },
+    {
+      "tier": "low",
+      "scene": "pond_active",
+      "before": {
+        "mean_ms": 16.666395998374558,
+        "p95_ms": 18.0780291557312,
+        "worst_ms": 20.238319411873817,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.8251590340912576,
+        "heap_growth_kb": -12393
+      },
+      "after": {
+        "mean_ms": 16.666783361876387,
+        "p95_ms": 18.108882009983063,
+        "worst_ms": 24.97272565960884,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.8741631973513497,
+        "heap_growth_kb": 2456
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "pond_active",
+          "calls": 1201,
+          "worst_ms": 0.012500007869675756,
+          "mean_ms": 0.0031850126178991005,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "pond_active",
+          "calls": 1201,
+          "worst_ms": 0.013500000932253897,
+          "mean_ms": 0.0033935887811179714,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 0.0023242187565220007
+    },
+    {
+      "tier": "low",
+      "scene": "can",
+      "before": {
+        "mean_ms": 16.665160946771316,
+        "p95_ms": 18.117090687155724,
+        "worst_ms": 21.17850072681904,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.700803164028924,
+        "heap_growth_kb": -3622
+      },
+      "after": {
+        "mean_ms": 16.665270283731395,
+        "p95_ms": 18.320271745324135,
+        "worst_ms": 20.518163219094276,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.9395750211154366,
+        "heap_growth_kb": -3781
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "can",
+          "calls": 1201,
+          "worst_ms": 0.18770000315271318,
+          "mean_ms": 0.0033129057174255384,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "can",
+          "calls": 1201,
+          "worst_ms": 0.18790000467561185,
+          "mean_ms": 0.003637968556533609,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 0.0006560810329236944
+    },
+    {
+      "tier": "low",
+      "scene": "doorway",
+      "before": {
+        "mean_ms": 16.67951984020571,
+        "p95_ms": 18.09329353272915,
+        "worst_ms": 34.04345363378525,
+        "frames": 1200,
+        "over50": 0,
+        "render_mean_ms": 2.8891860833149017,
+        "heap_growth_kb": -1499
+      },
+      "after": {
+        "mean_ms": 16.666586378234115,
+        "p95_ms": 18.506357446312904,
+        "worst_ms": 20.301425829529762,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 3.027286178026357,
+        "heap_growth_kb": -2838
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "doorway",
+          "calls": 1200,
+          "worst_ms": 0.018499995348975062,
+          "mean_ms": 0.0031730830111579658,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "doorway",
+          "calls": 1201,
+          "worst_ms": 0.6059000006644055,
+          "mean_ms": 0.0038780183798876235,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": -0.07754097297465457
+    },
+    {
+      "tier": "low",
+      "scene": "bench_lamppost_night",
+      "before": {
+        "mean_ms": 16.665351238228897,
+        "p95_ms": 18.122166395187378,
+        "worst_ms": 20.933333784341812,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.384974604830585,
+        "heap_growth_kb": -4243
+      },
+      "after": {
+        "mean_ms": 16.667625049499794,
+        "p95_ms": 18.135521560907364,
+        "worst_ms": 20.48017457127571,
+        "frames": 1201,
+        "over50": 0,
+        "render_mean_ms": 2.5287435471744617,
+        "heap_growth_kb": -2782
+      },
+      "before_methods": {
+        "dew": {
+          "sample": "bench_lamppost_night",
+          "calls": 1201,
+          "worst_ms": 0.051399998483248055,
+          "mean_ms": 0.0029806829846466426,
+          "name": "dew"
+        }
+      },
+      "after_methods": {
+        "dew": {
+          "sample": "bench_lamppost_night",
+          "calls": 1201,
+          "worst_ms": 0.012799995602108538,
+          "mean_ms": 0.003125478842526017,
+          "name": "dew"
+        }
+      },
+      "mean_change_percent": 0.013643944483332504
+    },
+    {
+      "tier": "low",
+      "scene": "three_region_walk",
+      "before": {
+        "mean_ms": 16.67062283416766,
+        "p95_ms": 18.106091767549515,
+        "worst_ms": 27.92302891612053,
+        "frames": 3601,
+        "over50": 0,
+        "render_mean_ms": 3.6094528464757563,
+        "heap_growth_kb": -970
+      },
+      "after": {
+        "mean_ms": 16.702659356080794,
+        "p95_ms": 18.163997679948807,
+        "worst_ms": 28.912216424942017,
+        "frames": 3594,
+        "over50": 0,
+        "render_mean_ms": 3.7234260433339683,
+        "heap_growth_kb": -1544
+      },
+      "before_methods": {
+        "work": {
+          "sample": "three_region_walk",
+          "calls": 19,
+          "worst_ms": 3.668599994853139,
+          "mean_ms": 0.8941842112874024,
+          "name": "work"
+        },
+        "dew": {
+          "sample": "three_region_walk",
+          "calls": 3601,
+          "worst_ms": 0.025500004994682968,
+          "mean_ms": 0.002874034992173486,
+          "name": "dew"
+        },
+        "replan": {
+          "sample": "three_region_walk",
+          "calls": 75,
+          "worst_ms": 5.5373999930452555,
+          "mean_ms": 1.3529666658723727,
+          "name": "replan"
+        }
+      },
+      "after_methods": {
+        "work": {
+          "sample": "three_region_walk",
+          "calls": 19,
+          "worst_ms": 3.678699998999946,
+          "mean_ms": 0.9582736851083801,
+          "name": "work"
+        },
+        "dew": {
+          "sample": "three_region_walk",
+          "calls": 3594,
+          "worst_ms": 0.029699993319809437,
+          "mean_ms": 0.0031574010616686643,
+          "name": "dew"
+        },
+        "replan": {
+          "sample": "three_region_walk",
+          "calls": 75,
+          "worst_ms": 7.332499997573905,
+          "mean_ms": 1.449631999906463,
+          "name": "replan"
+        }
+      },
+      "mean_change_percent": 0.19217351524187798
+    }
+  ],
+  "source_difference": [
+    "ReplicatedStorage.Shared.World.LookPlan"
+  ],
+  "conditions_matched": false,
+  "camera_mismatches": [
+    {
+      "tier": "full",
+      "scene": "sill_dawn",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "hut_lamp_night",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "garden_rain",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "meadow_wind",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "pond_active",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "can",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "doorway",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "bench_lamppost_night",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "full",
+      "scene": "three_region_walk",
+      "field": "fov",
+      "before": 52.8916130065918,
+      "after": 52.93427276611328,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "sill_dawn",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "hut_lamp_night",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "garden_rain",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "meadow_wind",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "pond_active",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "can",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "doorway",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "bench_lamppost_night",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    },
+    {
+      "tier": "low",
+      "scene": "three_region_walk",
+      "field": "fov",
+      "before": 52.905113220214844,
+      "after": 53.06965255737305,
+      "tolerance": 0.01
+    }
+  ],
+  "pairs": 2,
+  "native_runs": 4,
+  "workload_samples": 36,
+  "limits": "One pair per tier on one local Studio laptop. Authored clock/weather/input pattern match, but actual camera mismatches remain recorded below. These are descriptive observations, not a qualified matched-view comparison. Asynchronous actor phases, GC and machine load are not lockstep. Endpoint attachment is not continuous support proof. No production FPS, causal/general gain, long-memory or physical-phone claim."
+}

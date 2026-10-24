@@ -61088,9 +61088,12 @@ function SpiderCamera.configure(self: any, c: Settings)
 	if c.touch ~= nil then self.touchSens = c.touch end
 	if c.invertX ~= nil then self.invertX = c.invertX end
 	if c.invertY ~= nil then self.invertY = c.invertY end
-	if c.fov ~= nil and c.fov ~= self.fov then
+	if c.fov ~= nil then
 		self.fov = c.fov
-		if not self.eyeView then self.camera.FieldOfView = c.fov end
+		-- The title/intro also writes this Camera. Reclaim the configured lens
+		-- before each title/game handover, even when the setting itself is unchanged.
+		-- SpiderEyes retains ownership while eye view is active.
+		if not self.eyeView and self.camera.FieldOfView ~= c.fov then self.camera.FieldOfView = c.fov end
 	end
 	if c.distance ~= nil and c.distance ~= self.settingDistance then
 		self.settingDistance = c.distance
@@ -66924,7 +66927,7 @@ return WorldShadows
   <Item class="Workspace" referent="296">
     <Properties>
       <string name="Name">Workspace</string>
-      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADFiYTRjMjFhMTc1M2UwM2QIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
+      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADY2YTkzMTk3NjBmYTdjMjkIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
       <bool name="StreamingEnabled">true</bool>

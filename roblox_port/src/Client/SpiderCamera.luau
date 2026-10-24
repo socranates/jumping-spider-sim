@@ -151,9 +151,12 @@ function SpiderCamera.configure(self: any, c: Settings)
 	if c.touch ~= nil then self.touchSens = c.touch end
 	if c.invertX ~= nil then self.invertX = c.invertX end
 	if c.invertY ~= nil then self.invertY = c.invertY end
-	if c.fov ~= nil and c.fov ~= self.fov then
+	if c.fov ~= nil then
 		self.fov = c.fov
-		if not self.eyeView then self.camera.FieldOfView = c.fov end
+		-- The title/intro also writes this Camera. Reclaim the configured lens
+		-- before each title/game handover, even when the setting itself is unchanged.
+		-- SpiderEyes retains ownership while eye view is active.
+		if not self.eyeView and self.camera.FieldOfView ~= c.fov then self.camera.FieldOfView = c.fov end
 	end
 	if c.distance ~= nil and c.distance ~= self.settingDistance then
 		self.settingDistance = c.distance

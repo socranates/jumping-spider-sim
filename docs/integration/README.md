@@ -59,7 +59,8 @@ The portable evidence ID is Workspace.PortEvidence in generated models. The
 builder checks lighting/material invariants, source identity/enablement and
 normal/test separation, then cleans its temporary project files. It does not
 stamp source files; old BuildInfo belongs to the legacy runner. Current build
-evidence:1ba4c21a1753e03d (after notebook correction). The full-run baseline was
+evidence:66a9319760fa7c29 (after camera handover fix, ../camera-handover).
+Notebook-only evidence was1ba4c21a1753e03d. The full-run baseline was
 4f45e2b55221e1f3. Build identity is not native execution or publication.
 
 ## Small notebook correction

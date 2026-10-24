@@ -1096,6 +1096,9 @@ do
 	setAll({ FieldOfView = 80, CameraDistance = 6.5 })
 	frames(3)
 	check(camera.FieldOfView == 80, `the field of view is shown at once ({camera.FieldOfView})`)
+	camera.FieldOfView = 52 -- the title's lens; the player has not changed settings
+	frames(1)
+	check(camera.FieldOfView == 80, "the selected nondefault lens is restored without toggling its setting")
 	check(driver.cam.settingDistance == 6.5, "the distance reaches the camera")
 	setAll({ FieldOfView = Model.default("FieldOfView"), CameraDistance = Model.default("CameraDistance") })
 	frames(3)

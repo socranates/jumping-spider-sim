@@ -486,6 +486,7 @@ check("the intro of a new life: chosen from the title card, the spider in the cr
 	frames(40)
 	assert(not gui:FindFirstChild("WindowsillIntro").Enabled, "and the intro's screen is gone")
 	assert(ctx.soundscape.title == false, "the title card's music is over (the game's own plays)")
+	assert(camera.FieldOfView == 65, `skip restores the configured gameplay field of view ({camera.FieldOfView})`)
 end)
 
 check("never twice in a save: another new life from the life menu has no intro", function()
@@ -515,6 +516,7 @@ check("the intro played through: the walk out of the crack, the captions in turn
 	assert(not title:playing() and not gui:FindFirstChild("WindowsillIntro").Enabled, "then it is over")
 	local d = (camera.CFrame.Position - ctx.motor.pos).Magnitude
 	assert(d < 8 and d > 0.5, `the game's camera behind the spider ({d})`)
+	assert(camera.FieldOfView == 65, `completed intro restores gameplay field of view ({camera.FieldOfView})`)
 end)
 
 check("the intro under Reduced Motion holds each shot still; a screen opened over it pauses it; Resume ends it", function()
@@ -535,6 +537,7 @@ check("the intro under Reduced Motion holds each shot still; a screen opened ove
 	assert(ctx.menu:choose("Resume"), "Resume")
 	frames(2)
 	assert(not title:playing() and ctx.hud.safe.Enabled, "the intro is over, the game is the player's")
+	assert(camera.FieldOfView == 65, `Resume restores gameplay field of view ({camera.FieldOfView})`)
 end)
 
 check("Continue from the title card begins the life: the drift lets the camera go, and the life menu offers Resume", function()
@@ -560,6 +563,7 @@ check("Continue from the title card begins the life: the drift lets the camera g
 	assert(ctx.session.started and not ctx.menu:isShowing() and not ctx.title:playing(), "the life runs, with no intro")
 	assert((camera.CFrame.Position - ctx.motor.pos).Magnitude < 8, "the game's camera")
 	assert(ctx.soundscape.title == false, "the title's music is over")
+	assert(camera.FieldOfView == 65, `Continue restores gameplay field of view ({camera.FieldOfView})`)
 	ctx.openMenu()
 	assert(ctx.menu.look == "card" and ctx.menu.choices[1].id == "Resume", "the life menu, with Resume")
 	assert(ctx.menu:choose("Resume"))

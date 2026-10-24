@@ -101,13 +101,17 @@ differ only in Shared.World.LookPlan. Full/low sources are identical; the
 authored Detail setting differs. Lighting/material settings are preserved.
 Every model uses the same updated observer with the look-method watcher mounted.
 
-These four models have not run natively at this checkpoint. Run them serially,
-with the same maximized viewport, foreground Studio and no UI snapshots/heavy
-local work during samples. Guard before Play, retain original PASS/FAIL, stop
-Play, guard after, then collect with --require-methods. Keep actual warnings and
-camera/weather/actor data. Match conditions before deriving paired results.
-The completed attempt3 is a separate, differently instrumented cohort.
+These four models subsequently ran serially: all36 workload samples and
+original PASS, both guards per run. See PAIR1.md and pair1-comparison.json/.md.
+The comparator records conditions_matched=false because of18 actual FOV
+deviations outside the original.01 tolerance. These descriptive observations
+do not establish a general gain. The exposed camera handover defect and its
+later targeted fix are in ../camera-handover; do not rewrite these old inputs.
+The completed attempt3 remains a separate, differently instrumented cohort.
 
-The first current full-tier workload is complete. Before/after pairs, low-tier
-native results,30-minute memory and broader device/comfort checks are pending.
+Full/low native coverage is complete for these pre-camera-fix fixtures. A
+qualified matched-lens comparison,30-minute memory and broader device/comfort
+checks remain pending. build.py --long-trace-seconds1800 prepares an unbound
+follow-up; it adds one observer module and requires its complete trace in the
+collector. It has compiled/strict-passed but has not executed natively yet.
 No production publication or general optimization claim follows from this harness.

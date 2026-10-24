@@ -1,0 +1,15 @@
+Pre-fix title suite, 2026-10-24, Windows Luau CLI.
+Source: SpiderCamera before restoring an unchanged selected lens.
+New assertions added to existing four integrated title-path checks.
+Terminal exit 1. TITLE passed=17 failed=4.
+
+Skip retained FieldOfView 55 (expected 65).
+Completed intro retained 46 (expected 65).
+Resume retained 50 (expected 65).
+Continue retained 46 (expected 65).
+
+This is a transcribed bounded summary of the original CLI output, not a raw log.
+Original failing temporary program: tmpke_vlx40.luau, lines68026/68056/68077/68115.
+Native corroboration: performance-matrix/pair1/*/native.json camera rows.
+The four native runs retained 52.891613,52.934273,52.905113,53.069653 degrees
+through all nine scenes despite the configured gameplay default65.

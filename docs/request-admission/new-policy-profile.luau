@@ -228,10 +228,14 @@ local function stepInner(self:any,j:any):boolean
  elseif j.phase=="write" then
   if not reserve(self,j) then return false end
   if not j.writeState then
+   -- Authorize issuing this callback on the worker's scoped coroutine. Roblox
+   -- may invoke UpdateAsync transforms on a different coroutine; the transform
+   -- therefore retains this exact live attempt, rather than a thread permit.
+   if not s.backend:permitted(j.held) then stop(self,j,"New dispatch scope ended");return false end
    local evidence:any={}
    evidence.transform=function(old:any):any
    evidence.rejected=nil
-   if not scope(self,j) or not s.backend:permitted(j.held) then evidence.rejected="New write scope ended";return nil end
+   if j.state~="pending" or j.writeState~=evidence or not scope(self,j) then evidence.rejected="New write scope ended";return nil end
    if same(old,j.marker.raw) then return old end
    if not same(old,j.raw) then evidence.rejected="selected rest changed before retirement";return nil end
    return j.marker.raw

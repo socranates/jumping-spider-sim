@@ -1,0 +1,12 @@
+{
+  "native-callback-before-fix": {
+    "path": "native-callback-before-fix-bundle.luau.gz",
+    "sha256": "b3677fe4215341fde65a9104666658afd9b525bab18a6cc8326cde4301c5502b",
+    "uncompressed_sha256": "513e57701d7e851a94d958fd9e55632ac03b68d8d935c07ea18a2333c9c60e62"
+  },
+  "native-callback-before-fix-2": {
+    "path": "native-callback-before-fix-2-bundle.luau.gz",
+    "sha256": "85237a132f281498a1506ccc405c9b44da50efb7abc62370805f42f7ca44c09b",
+    "uncompressed_sha256": "af90bdaa9b3742ff5258841c166c1ecfbe8c8cb9d2450f967ad1e8b5560d229c"
+  }
+}

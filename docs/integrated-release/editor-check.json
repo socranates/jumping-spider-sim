@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-23T22:02:16.465-05:00",
+  "method": "Native Studio screenshot of successful exact-byte source guard, followed by local Save to File",
+  "output": "[ISOLATED_PLAYER_GUARD] 274 normal_gameplay_fresh_test_keys_only_never_production",
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "sources": 274,
+  "guard_sha256": "5c26c1a8ba7d30e1416d160c210298e2b245845745b0aeb59a23e575915da05e",
+  "manifest_sha256": "0fcfb151814d36e0972a1b8bac5a179faa3066980673095b4ca7f695c78cc8fc",
+  "screenshot": "editor-guard.png",
+  "screenshot_sha256": "66b9415b4adc72ef49b382508d25b9db32809c22f54d9822203a655148019b09",
+  "saved_editor": "C:/Users/natha/claude-xfer/Windowsill-isolated-player-attempt3/VerifiedEditorBeforeUpload.rbxl",
+  "saved_editor_sha256": "507b851d0a5320094d423e67068c5c810a46532541f0eb88b77e6af5139b273d",
+  "source_identity_verified_in_studio": true,
+  "native_game_executed": false,
+  "uploaded": false,
+  "published": false
+}

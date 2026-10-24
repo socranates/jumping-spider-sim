@@ -1,0 +1,3 @@
+RIVAL contest rates over 6000 strikes: caught 0.400, sprang clear 0.322, counter-bite 0.278
+RIVAL feel: no taps tears free in 1.65 s; 2, 3, 3.5 a second tear free; 4 a second tears free (59 of 60 in 40 s); 5 a second wins in 5.6 to 9.8 s (mean 7.6); 5.5 in 4.6; 6 in 3.2; gentle idle 1.14 s, gentle 4 in 5.5 s, automatic grip alone 11.3 s, a 1 s lapse at 3 s costs 6.3 s
+RIVAL passed=2843 failed=0

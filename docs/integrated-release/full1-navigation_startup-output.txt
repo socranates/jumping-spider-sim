@@ -1,0 +1,4 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-1arhtxfh/run.luau:64812: client failed to load
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-1arhtxfh/run.luau:64812

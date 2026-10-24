@@ -1,0 +1,4 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-lolmgh2h/run.luau:67599: client failed to load: C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-lolmgh2h/run.luau:66489: C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-lolmgh2h/run.luau:66482: attempt to call missing method 'GetServerTimeNow' of table
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-lolmgh2h/run.luau:67599

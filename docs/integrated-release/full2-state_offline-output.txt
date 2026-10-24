@@ -1,0 +1,1 @@
+STATE_OFFLINE passed=8 failed=0

@@ -27,6 +27,12 @@ local function exitOf(drive: any): any
 	local exit: any = nil
 	local best = math.huge
 	local at = Mate.exitAt()
+ -- Sparse scenery waypoints may be metres from the authored exit (26 studs
+ -- in garden_b4). Prefer the actual supported floor point when in this region.
+ local face=drive.g and drive.g:faceAt(at,Vector3.yAxis)
+ if face~=nil and not drive.g:inKeepOut(at) then
+  return {pos=at-Vector3.yAxis*.31,up=Vector3.yAxis,face=face}
+ end
 	for _, w in drive.waypoints do
 		local d = (w.pos - at).Magnitude
 		if w.up.Y > 0.5 and d < best then exit, best = w, d end

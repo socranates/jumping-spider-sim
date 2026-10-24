@@ -1493,5 +1493,16 @@ case("mating binds sex; the male never makes a sac, including after skipped scen
  end
 end)
 
+case("the Preserve mate targets its authored exit, not a distant scenery waypoint",function()
+ local Map=require("../src/Shared/World/WorldMap");Map.use("preserve")
+ local at,region=Mate.arriveAt()
+ local m=Motor.new({world=sill,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,spawn=at,heading=Vector3.xAxis,
+  boundsMin=Vector3.new(-1000,-1000,-1000),boundsMax=Vector3.new(1000,1000,1000),probeParent=sill})
+ local d=MateDrive.new(m,function()return false end,region,Mate.roam())
+ check(d.exit~=nil and (d.exit.pos+Vector3.yAxis*.31-Mate.exitAt()).Magnitude<.01,"exit is reachable within the disappearance radius")
+ check(d.exit.face==d.drive.g:faceAt(Mate.exitAt(),Vector3.yAxis),"exit uses the actual support face")
+ d:destroy();Map.use("test_garden")
+end)
+
 print(`MATING passed={passed} failed={failed}`)
 if failed > 0 then error("mating checks failed") end

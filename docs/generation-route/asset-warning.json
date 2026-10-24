@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-10-24T14:28:10.843066+00:00",
+  "source": "https://economy.roblox.com/v2/assets/203785492/details",
+  "asset_id": 203785492,
+  "name": "Pop Close Sound",
+  "asset_type_id": 3,
+  "source_hits": [],
+  "status": "unresolved caller; no game-source occurrence",
+  "observations": "The warning is retained in native receipts. It also occurs in edit-mode startup before the fixture runs. Public metadata names a Sound asset; the warning does not identify the requesting instance or requested type.",
+  "limit": "Metadata and source absence do not prove the caller. No source replacement or asset edit justified; no asset bytes downloaded."
+}

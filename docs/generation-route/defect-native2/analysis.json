@@ -1,0 +1,8 @@
+{
+  "classification": "suspected defect disproved by ordinary fixed tick",
+  "new_game_source_changes": false,
+  "cli_output": "docs/generation-route/red.txt",
+  "cli_result": "CLIENT_MATING passed=29 failed=0 on unchanged SpiderClient, with an added seven-meal assertion after Carry and before any return",
+  "source": "SpiderClient.client.luau:2397 reapplies useGameRules before ordinary feeding and LifeLoop on each fixed tick. Carry constructs Growth in a UI callback between ticks; the observer emitted immediately in that callback. A later restore was correlated, not the cause of correction.",
+  "next": "Bound the new native observation to the ordinary rule-admission tick before any save return, and feed three real meals in each new generation to check no premature readiness. Preserve the original partial run and its interpretation history; no product fix justified."
+}

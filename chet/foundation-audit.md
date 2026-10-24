@@ -1,3 +1,31 @@
+Sex-path decision, 2026-10-24: the reproductive receipt below covers the default female in three difficulty modes, not both sexes. The male must not lay eggs or guard young. Nathan and Claude are discussing separate playthroughs; male progression remains an open design. Mating.woke currently has no sex gate, so the shared chain is a known male-route design gap.
+
+Latest reproductive-route supplement, 2026-10-24: test commit 3f6ed486,
+game sources identical to fa7367fb; ordinary evidence 5e9ac432e9933ed9,
+273 sources. docs/generation-route/ qualifies native run 1792852025863:
+Normal, Easy and Free each grow from fresh, court a live mate, mate, make an
+egg sac, pass two guard days, hatch and continue as a new spider. Normal's
+first seeded court was refused; the next was accepted with real rules active.
+90 full flies consumed through input taps: 62 growth, 19 adult refuels, nine
+newborn meals; nine moults/hardenings. Three guarded-family local returns
+preserve seeded hatching; three newborn local returns preserve 3/7 meals.
+Free's Follow-to-attached-newborn interval is 12.075 seconds. Both exact
+276-source guards pass, 0 CreatorErrors, six retained style/asset warnings,
+operation cleanup, Studio 21692 exited, immutable model unchanged. New full
+80-suite CI 40102350037 SUCCEEDED, including compile, strict, exports and
+runner cleanup. Qualification binds the current source/test, model/log and CI.
+An apparent three-meal reset was a disproved observer hypothesis: Carry runs
+between ticks, and existing fixed-tick code restores live rules before feeding.
+The added client assertion passes without a game change (CLIENT_MATING 29/0).
+The original stopped partial run and corrected analysis remain in the receipt.
+Captures, approaches and facing are scripted; clocks accelerated. This is local
+Studio/memory, not natural hunting/traversal, online storage/rejoin, physical
+devices or FPS proof. Asset 203785492 metadata was checked; caller unresolved,
+no occurrence in game sources. Warning evidence is retained, not erased.
+Private published version 14 still has 032b5985ac17eeb2. No publication,
+production/main/OneDrive/Godot/synced-source changes. Broader goal ACTIVE:
+continue natural attack/collision/content/device gaps and measured startup work.
+
 Latest feeding/progression supplement, 2026-10-24: source/test commit fa7367fb,
 ordinary evidence 5e9ac432e9933ed9, 273 sources. docs/life-route/ records and
 fixes a real input bug: the final Eat tap in the Crack also requested Rest,

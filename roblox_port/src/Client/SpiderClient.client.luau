@@ -373,6 +373,7 @@ end
 function saveState.invalidateRest()
  saveState.cancelBirthReturn()
  saveState.birth=nil;saveState.birthReturn=nil
+ saveState.restoreError=nil
  if saveState.localRestore then saveState.localRestore:cancel() end
  saveState.worldGeneration+=1
  if saveState.rest then saveState.rest:cancel() end
@@ -409,13 +410,6 @@ end
 -- One baseline at the beginning of a generation, through the ordinary private
 -- preparation/owned save path. This is not a free mid-life save. While pending,
 -- Back waits for the new baseline instead of loading the parent's last rest.
-function saveState.failBirth()
- local birth=saveState.birth
- if not birth then return end
- birth.failed=true
- if birth.returnResult then birth.returnResult.pending=nil;birth.returnResult.ok=false end
- hud:saveNotice("The new spider could not be kept. Find a home and rest to keep it; your earlier saved spider is unchanged.")
-end
 function saveState.keepBirth()
  local birth={generation=saveState.worldGeneration}
  saveState.birth=birth
@@ -1463,6 +1457,15 @@ M.title.always = function(): boolean return RunService:IsStudio() and Workspace:
 local function refreshMenu()
 	if menuStarted and menu:isShowing() and confirming == nil then openMenu(true) end
 end
+function saveState.failBirth()
+ local birth=saveState.birth
+ if not birth then return end
+ birth.failed=true
+ if birth.returnResult then birth.returnResult.pending=nil;birth.returnResult.ok=false end
+ local message="The new spider could not be kept. Find a home and rest to keep it; your earlier saved spider is unchanged."
+ saveState.restoreError=message;hud:saveNotice(message)
+ refreshMenu() -- replace a queued Back's preparation screen with the failure
+end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
 	for key in saveState.touched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
@@ -1544,6 +1547,7 @@ saveState.rest=require(script.Parent.SaveRestore).new({
  completed=function(stamp:any)
   local birth=saveState.birth
   local born=birth~=nil and birth.generation==stamp.generation
+  if born then saveState.restoreError=nil end
   life:finishCheckpoint(stamp.result,{ok=true,message=if born then "The new spider is kept for this visit." else M.LifeText.restKept(stamp.retreat,"Last rest kept.")..stamp.hungry})
   if born then
    saveState.birth=nil

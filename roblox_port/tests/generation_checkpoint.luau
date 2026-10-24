@@ -90,9 +90,11 @@ check(not child.ok and not child.pending and not waiting.pending and not waiting
 check(d.life.generation==1 and d.life.growth.lifeSeed==seed and d.saveState.birth.failed,"failed save keeps the child alive")
 check(d.currentStore()==source and Json.canonical(source.store.data)==before,"failed baseline never mutates parent/backup bytes")
 check(not d.saveState.beginLocalReturn(nil,"reset") and d.life.mating.stage=="none","Back after failure cannot reload parent")
+check(d.menu.line.Text~="Returning to the last rest" and string.find(d.menu.summary.Text,"The new spider could not be kept",1,true)~=nil,"failed queued Back replaces the preparation screen with readable failure feedback")
 -- An ordinary later rest provides recovery without another generation grant.
 local recover=d.life:makeCheckpoint();assert(awaitRest(recover,pump).ok)
 check(d.saveState.birth==nil and d.currentStore():loadBest().record.checkpoint_origin==nil,"successful later rest clears failed generation guard")
+check(d.saveState.restoreError==nil,"successful child rest clears the obsolete failure notice")
 d.returnToCheckpoint();check(awaitReturn(d,pump).ok and d.life.generation==1,"later child rest can be returned to normally")
 getfenv().warn=oldWarn
 check(#warnings==1 and string.find(warnings[1],"last rest preparation failed",1,true)~=nil,"only injected storage failure warns")
@@ -102,6 +104,7 @@ source,before=parent();child,seed=carry();d.returnToCheckpoint();waiting=d.saveS
 source.store:RemoveAsync("absent");pump()
 check(child.cancelled and not waiting.pending and not waiting.ok and d.saveState.birth.failed,"revision cancellation does not leave a pending return forever")
 check(d.life.generation==1 and d.life.growth.lifeSeed==seed and not d.saveState.beginLocalReturn(nil,"reset"),"cancelled baseline still guards against parent replay")
+check(d.menu.line.Text~="Returning to the last rest" and string.find(d.menu.summary.Text,"The new spider could not be kept",1,true)~=nil,"revision cancellation also removes the stale preparation screen")
 
 -- Superseding generation preparation with an ordinary rest may satisfy Back;
 -- the old worker cannot overwrite the newer child snapshot.

@@ -307,7 +307,7 @@ local function finiteVector(value: any): boolean
 	return finite(value.X) and finite(value.Y) and finite(value.Z)
 end
 
-local function checkWorld(roots: { [string]: any }, problems: { string }, legacyCompact: boolean?)
+local function checkWorld(roots: { [string]: any }, problems: { string }, legacyCompact: boolean?, sourceMap: any?)
  local pulse=Work.pulse()
 	local function bad(t: string) table.insert(problems, t) end
 	for _, name in Checkpoint.ROOTS do if pulse then pulse() end;
@@ -396,7 +396,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 			bad("garden: not a record of regions")
 		else
 			for id, entry in garden do if pulse then pulse() end;
-				local region = if type(id) == "string" then (if legacyCompact then CompactMigration.legacyRegion(id) else WorldMap.region(id)) else nil
+				local region = if type(id) == "string" then (if legacyCompact then CompactMigration.legacyRegion(id) else (sourceMap or WorldMap).region(id)) else nil
 				local kinds: any = if region ~= nil then Garden.bestiary(region) else nil
 				if legacyCompact and region~=nil and region.kind=="verge" then kinds={{kind="springtail"},{kind="housefly"}} end
 				-- (ROBLOX-116: or with woodlice or ambient bugs alone, as the hut garden's lawn has)
@@ -462,7 +462,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 end
 
 -- Every problem with `record` (an empty list for a good one), and the rebuilt world when it is good. Nothing live changes.
-function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.Decoded?)
+local function checkRecord(record: any, world: World, sourceMap: any?): ({ string }, ObjectRecord.Decoded?)
 	local problems: { string } = {}
 	local function bad(t: string) table.insert(problems, t) end
 	if type(record) ~= "table" then return { "not a checkpoint" }, nil end
@@ -480,10 +480,10 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	-- ROBLOX-94: which region the rest was kept in, and whether this is the world it was kept in.
 	local map, mapProblemList = mapRecord(record)
 	for _, text in mapProblemList do bad(text) end
-	local elsewhere = otherWorld(record)
-	local region = if elsewhere then nil else WorldMap.region(map.region)
+	local elsewhere = sourceMap == nil and otherWorld(record)
+	local region = if elsewhere then nil else (sourceMap or WorldMap).region(map.region)
 	if #mapProblemList == 0 and region == nil and not elsewhere then bad("the spider is in a region this world does not have") end
-	local moved = Checkpoint.worldMoved(record)
+	local moved = sourceMap == nil and Checkpoint.worldMoved(record)
 	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
 	if type(p) ~= "table" then
@@ -491,14 +491,14 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	else
 		local pos, n, h = vec(p.position), vec(p.normal), vec(p.heading)
 		if not pos then bad("the spider has no position")
-		elseif region ~= nil and not moved and not WorldMap.inBounds(pos, region.id) then
+		elseif region ~= nil and not moved and not (sourceMap or WorldMap).inBounds(pos, region.id) then
 			bad(if region.id == WorldMap.HOME then "the spider is outside the windowsill" else `the spider is outside {region.id}`) -- (a rest from another world is put back at the spawn: its position is not tested)
 		end
 		if not n or math.abs(n.Magnitude - 1) > 1e-3 then bad("the spider's surface normal is not a unit vector") end
 		if not h or math.abs(h.Magnitude - 1) > 1e-3 then bad("the spider's heading is not a unit vector") end
 		if not finite(p.gaze_pitch) or math.abs(p.gaze_pitch) > math.pi / 2 then bad("the spider's gaze is not a number") end
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
-		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and not elsewhere and WorldMap.retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
+		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and not elsewhere and (sourceMap or WorldMap).retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
 		-- The player block's retreat and the world record's are one answer written twice (capture writes both from the same lookup); a record where they differ was not made by a capture.
 		if type(record.world_map) == "table" and #mapProblemList == 0 and p.retreat_id ~= map.retreat then bad("the spider's retreat and the world record's retreat disagree") end
 	end
@@ -530,16 +530,32 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	local ok: boolean, err: any = pcall(function()
 		if CompactMigration.applies(map) then
 			CompactMigration.prepareRival(decoded)
-			checkWorld(roots,problems,true) -- Validate before retiring any old route ecology.
+			checkWorld(roots,problems,true,sourceMap) -- Validate before retiring any old route ecology.
 			if #problems==0 then
 				CompactMigration.apply(decoded)
-				checkWorld(roots,problems)
+				checkWorld(roots,problems,false,sourceMap)
 			end
-		else checkWorld(roots,problems) end
+		else checkWorld(roots,problems,false,sourceMap) end
 	end)
 	if not ok then bad("world: " .. tostring(err)) end
 	if #problems > 0 then return problems, nil end
 	return problems, decoded
+end
+
+function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.Decoded?)
+ return checkRecord(record,world,nil)
+end
+
+-- Inspection only: a private decoded graph validated in its recorded geometry.
+-- It cannot be passed to the ordinary prepared-rest commit closure by this API.
+-- An archive/projection/durable transition is still required before recovery.
+function Checkpoint.inspectRecorded(record: any, world: World): ({ string }, ObjectRecord.Decoded?)
+ if type(record)~="table" then return {"not a checkpoint"},nil end
+ local map,problems=mapRecord(record)
+ if #problems>0 then return problems,nil end
+ local view,why=WorldMap.recordedView(map.world,map.seed,map.revision,Work.pulse())
+ if not view then return {why or "unsupported recorded map"},nil end
+ return checkRecord(record,world,view)
 end
 
 -- Puts the world back as the record has it, or changes nothing. Returns true, or false and the problems.

@@ -666,6 +666,11 @@ playerGui.Name = "PlayerGui"
 playerGui.Parent = localPlayer
 -- What the smoke test drives: bound actions, render steps, and the client's test-place driver (its SilkPlayback hook).
 local client = { actions = {}, renderSteps = {}, studio = true, driver = nil :: any }
+-- Server-time API used by the ordinary Preserve save client. Tests may pin it;
+-- otherwise preserve the earlier stand-in's monotonic os.clock time base.
+function workspace.GetServerTimeNow(_self)
+ return if type(client.serverTime)=="number" then client.serverTime else os.clock()
+end
 client.scriptFolder = Instance.new("Folder")
 local playback = Instance.new("ModuleScript")
 playback.Name = "SilkPlayback"

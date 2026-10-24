@@ -3,7 +3,7 @@
 -- bounded checkpoint validation and deep copies; callbacks never receive owners.
 local Continuation={}
 Continuation.__index=Continuation
-export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean)->boolean,
+export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean,boolean?)->boolean,
  onLoaded:((any)->())?,onOffer:((string,any)->())?,onDecision:((any)->())?,
  onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?,offerWork:any?,recoveryVersion:number?,onProtectedSelected:((string,number)->boolean?)?}
 local function integer(n:any,max:number):boolean
@@ -17,7 +17,7 @@ function Continuation.new(cfg:Config):any
   serial=0,buffer={},bufferEpoch=nil,offerJobs={},offerQueue={},offerErrors={},offerCursor=0,lastLife=-1e9,lastRest=-1e9,lifeCursor=0,restCursor=0,refreshes={}},Continuation)
 end
 local function offerValue(self:any,mode:string,value:any):any
- if type(value)~="table" or not token(self,value.id) or type(value.protected)~="boolean" or not self.cfg.validate(mode,value.record,true) then return nil end
+ if type(value)~="table" or not token(self,value.id) or type(value.protected)~="boolean" or not self.cfg.validate(mode,value.record,true,value.protected) then return nil end
  return {id=value.id,record=self.cfg.copy(value.record),protected=value.protected}
 end
 function Continuation.offerInfo(self:any,mode:string):any

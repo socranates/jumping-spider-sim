@@ -57,9 +57,19 @@ function CaughtPanel.new(playerGui: Instance, onChoose: (string) -> (), name: st
  seconds=0,bound=false,chosen=false,selected=1,stickDown=false,action="WindowsillChoice"..gui.Name,look="card",scale=1,back=nil},CaughtPanel)
  self.hint.Visible=false
  self:setLook("card")
+ -- Recompute only when the engine's layout or safe viewport changes. Centering
+ -- overflowing content puts its first rows above CanvasPosition zero, where
+ -- the player cannot scroll back to them.
+ list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() self:_align() end)
+ box:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() self:_align() end)
  return self
 end
 function CaughtPanel.isShowing(self:any):boolean return self.showing end
+function CaughtPanel._align(self:any)
+ local height=self.box.AbsoluteWindowSize.Y
+ local fits=self.look=="title" and height>0 and self.list.AbsoluteContentSize.Y<=height
+ self.list.VerticalAlignment=if fits then Enum.VerticalAlignment.Center else Enum.VerticalAlignment.Top
+end
 function CaughtPanel.select(self:any, delta:number)
  if #self.buttons==0 then return end
  self.selected=(self.selected-1+delta)%#self.buttons+1
@@ -74,7 +84,7 @@ function CaughtPanel.setLook(self:any, look:string)
  self.summary.LayoutOrder=if title then 1000 else 3
  self.summary.TextColor3=if title then TitleText.SOFT else TitleText.INK
  self.sub.TextColor3=if title then TitleText.SOFT else TitleText.INK
- self.list.VerticalAlignment=if title then Enum.VerticalAlignment.Center else Enum.VerticalAlignment.Top
+ self:_align()
  self.constraint.MaxSize=Vector2.new(LOOKS[look].width,10000)
  pcall(function()
   self.line.FontFace=face(if title then Enum.FontWeight.Light else Enum.FontWeight.Regular,false)

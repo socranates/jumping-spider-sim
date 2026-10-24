@@ -330,7 +330,7 @@ local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the
 local saveState: any = { touched = {} :: { [string]: boolean }, applying = false, status = nil, reason = nil, sig = "", eye = 0.0, eyeCheck = os.clock(), broken = false, look = nil, worldGeneration=0 }
 -- Recovery entry owns this hold until its matching server grant. Menu visibility
 -- cannot release it, and an obsolete preparation cannot release a newer hold.
--- No recovery owner is installed by the current engine startup.
+-- The Preserve startup below installs its recovery owner before networking.
 function saveState.pauseRecovery(): any
  local token={};saveState.recoveryPause=token
  return {
@@ -1618,8 +1618,8 @@ saveState.clientConfig = {
 }
 saveClient = SaveClient.new(saveState.clientConfig)
 -- Trusted integration seam: factories are server-compatible modules supplied by
--- engine startup, never an attribute/remote/player setting. Ordinary startup
--- does not install recovery. Rebinding an already-started transport is refused.
+-- engine startup, never an attribute/remote/player setting. The Preserve binds
+-- below before transport starts. Rebinding a started transport is refused.
 function saveState.installRecovery(factories:any): (boolean,string?)
  if saveState.application or saveClient.phase~="searching" or saveClient.remotes~=nil or saveClient.bound.epoch~=nil then return false,"transport already started" end
  if type(factories)~="table" or type(factories.client)~="function" or type(factories.entry)~="function" then return false,"trusted factories required" end
@@ -1658,6 +1658,23 @@ function saveState.installRecovery(factories:any): (boolean,string?)
  saveState.application=app;saveClient=candidate
  return true,nil
 end
+-- The shipped Preserve installs recovery before any transport update. This is
+-- trusted startup code, not a player attribute or an opt-in diagnostic hook.
+if M.World.world=="preserve" then
+ local Replacement=require(script.Parent.ReplacementClientPrototype)
+ local Entry=require(script.Parent.RecoveryGameEntryPrototype)
+ local installed,problem=saveState.installRecovery({
+  client=function(cfg:any,options:any):any
+   cfg.now=function():number return Workspace:GetServerTimeNow() end
+   cfg.continuation=table.clone(cfg.continuation)
+   cfg.continuation.validate=require(script.Parent.RecoveryOfferValidation).new(cfg.continuation.validate)
+   return Replacement.new(cfg,options)
+  end,
+  entry=function(cfg:any):any return Entry.new(cfg) end,
+ })
+ assert(installed,problem)
+end
+
 saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()

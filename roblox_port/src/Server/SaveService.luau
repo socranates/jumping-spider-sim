@@ -77,7 +77,7 @@ end
 
 -- A player arrived: start their session (the load runs in its own thread) and wait for their hello.
 function SaveService.addPlayer(self: any, player: Player)
-	if self.entries[player] ~= nil then return end
+	if self.closing or self.entries[player] ~= nil then return end
 	self.counter += 1
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
@@ -127,11 +127,12 @@ function SaveService.addPlayer(self: any, player: Player)
   entry.owner,entry.session=owned,owned.session
  else entry.session=SaveSession.new(sessionConfig) end
  self.entries[player] = entry
-	self.cfg.spawn(function()
+	local launched,launchError=pcall(self.cfg.spawn,function()
+  entry.loadStarted=true
 		local ok, err = pcall(function() owner(entry):load() end)
 		if not ok then
 			log(self, "load raised: " .. tostring(err))
-			owner(entry):demote("load_failed", true)
+			if not entry.leaving and not entry.session.closed then owner(entry):demote("load_failed", true) end
 		end
 		entry.loaded = true
 		if entry.unsupported then
@@ -149,6 +150,18 @@ function SaveService.addPlayer(self: any, player: Player)
 		end
 		if entry.hello then sendTo(self, player, loadedMessage(entry)) end
 	end)
+ if not launched then
+  log(self,"load task launch failed: "..tostring(launchError))
+  if not entry.loadStarted then
+   entry.leaving=true
+   local target=owner(entry)
+   if target.cancelLoading then target:cancelLoading();target:load() else entry.session.closed=true end
+   entry.loaded=true
+   if entry.counted then entry.counted=false;self.departing-=1 end
+   if self.entries[player]==entry then self.entries[player]=nil end
+  end
+  error(launchError,0)
+ end
 end
 
 local function handle(self: any, entry: any, msg: any)
@@ -237,7 +250,11 @@ function SaveService.removePlayer(self: any, player: Player)
 	entry.leaving = true
 	entry.counted = true
 	self.departing += 1 -- BindToClose must also await a PlayerRemoving write already in flight.
-	if not entry.loaded then return end -- the loading thread finishes the job (see addPlayer)
+	if not entry.loaded then
+  local target=owner(entry)
+  if target.cancelLoading then target:cancelLoading() end
+  return -- the loading thread owns its provider drain and closed cleanup
+ end
 	local ok, err = pcall(function() owner(entry):flush() end)
 	entry.counted = false
 	self.departing -= 1
@@ -247,11 +264,14 @@ end
 -- About once a second: every session does its periodic work in its own thread (a slow store does not hold up the others).
 function SaveService.step(self: any)
 	for _, entry in self.entries do
-		if entry.loaded and not entry.leaving then
-			self.cfg.spawn(function()
+		if entry.loaded and not entry.leaving and not entry.working and not entry.session.busy then
+   entry.working=true
+			local launched,launchError=pcall(self.cfg.spawn,function()
 				local ok, err = pcall(function() owner(entry):step() end)
+    entry.working=false
 				if not ok then log(self, "step raised: " .. tostring(err)) end
 			end)
+   if not launched then entry.working=false;log(self,"step task launch failed: "..tostring(launchError)) end
 		end
 	end
 end
@@ -268,6 +288,10 @@ function SaveService.shutdown(self: any)
 			entry.counted = true
 			self.departing += 1
 		end
+  if not entry.loaded then
+   local target=owner(entry)
+   if target.cancelLoading then target:cancelLoading(deadline) end
+  end
 		if entry.loaded then
 			pending += 1
 			self.cfg.spawn(function()

@@ -1,13 +1,12 @@
 # Current foundation evidence and remaining work
 
-2026-10-23. Integration line: codex/save-continue. The candidate is published
-only to private Windowsill Save Tests as version 13. Local roblox_port/src remains byte-identical to
-bd67582b5d53473f067244fc1e2e1f94adde173b; that does not identify the current cloud
-version. Private13 has273 game sources and hashes in ../menu-overflow/README.md.
+2026-10-24. Integration line: codex/verified-integration. Normal roblox_port/src
+now contains273 sources matching the verified font candidate. The frozen
+224-source proof checkout remains at c457af12. Private test13 is published;
+this integration/font variant is not published or merged to main. Private13 has273 game sources and hashes in ../menu-overflow/README.md.
 The subsequent font-only candidate also has273 sources, model SHA256
 64a3ff7e865ce53d401569e8e12605ddff419028ccfd887d518e03e2514b0a6b;
-../touch-labels records its verified native component layout. It is not activated
-or published. Older audit reports retain their original evidence.
+../touch-labels records its verified native component layout. It is activated in this branch only, not published. Older audit reports retain their original evidence.
 
 The requested foundation audit, small-fix scope and later optimization goal
 remain open. The supplied audit prompt guides coverage; its old v48/v49 baseline
@@ -31,7 +30,7 @@ Island work and new rare content are not being added during this foundation pass
 | Data schema and world maps | DATA-CURRENT.md reconciles current record families, principal fields/readers/writers, bounds, ownership and compatibility; integrated-world/MAP.md indexes 1404 authored records across both worlds, full/low/far and collision streaming policies | Record reconciliation and current generator inventory complete at those scopes. Per-species graph semantics, exhaustive historical fixtures and native close visual/collision coverage remain |
 | Biology, strings, audio and captions | CONTENT-CURRENT.md records50 pages/body-text bounds; Luna source reconciliation; new opened MDC account confirms first-page chelicerae/size wording issue | First-page correction documented, not applied. Other49 pages not fully re-audited; UI strings, audible balance, asset permission/playback and captions not all verified |
 | Named audit deliverables | MAP.md, FINDINGS.md, PERFORMANCE.md, CODE-REVIEW.md, SECURITY.md, TESTS.md exist; current integrated map and this ledger supplement them | Presence is not current completeness. Historical content stays labelled; unfinished rows remain open |
-| Release, main and laptop sync | Exact models/guards and private version13 publication receipt; post-publication read-only ../private-player/production-after.txt/.png still confirms production published140; chet/save-continue.md is the operational handoff | Private test only. Cloud production source bytes not identified by UI. Main/laptop synchronization, production activation and final verdict remain |
+| Release, main and laptop sync | Exact models/guards and private version13 publication receipt; post-publication read-only ../private-player/production-after.txt/.png still confirms production published140; chet/save-continue.md is the operational handoff | Private test only. Cloud production source bytes not identified by UI. Normal source activation is complete in the integration worktree; main/laptop synchronization, production release and final verdict remain |
 
 The human's "Publish private test build" authorization has been fulfilled for
 existing private Windowsill Save Tests, place109879630247781. Two standalone

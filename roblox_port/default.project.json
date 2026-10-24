@@ -34,6 +34,12 @@
         "StreamingMinRadius": 96,
         "StreamingTargetRadius": 160,
         "StreamingIntegrityMode": "Disabled"
+      },
+      "$attributes": {
+        "World": "preserve",
+        "SelfTest": false,
+        "TestTarget": false,
+        "SaveWait": true
       }
     },
     "Lighting": {

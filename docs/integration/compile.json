@@ -1,0 +1,1367 @@
+[
+  {
+    "file": "src/Client/BirdBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/BugBodies.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/CatBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/CaughtPanel.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/CrabBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/FlyBodies.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/FrameProfile.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/HutLife.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/LivingWorld.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/LookStream.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/MateStage.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/MealPresentation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/NotebookArt.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/NotebookPanel.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/OldSkins.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/PerceptionHud.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/PerceptionStage.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/PondBodies.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/RareBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/RecoveryApplication.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/RecoveryGameEntryPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/RecoveryOfferValidation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/ReplacementClientPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SaveClient.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SaveContinuation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SaveRestore.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SelfTest.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SettingsPanel.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/Soundscape.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SpiderCamera.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SpiderClient.client.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SpiderEyes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SpiderHud.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/SpiderInput.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/StationMouseBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/TitleCard.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/TrainPass.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/WaspBody.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/WorldClient.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/WorldDetail.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Client/WorldShadows.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/First/Splash.client.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/First/SplashScreen.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/DataStoreBackend.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/Main.server.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/Persistence.server.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryAccountLifetimes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryCommitControllerPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryCurrentWriterPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryDeparturePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryEntryPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryIdlePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryNewLifePolicyPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryOfferReaderPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryPacketPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryPipelinePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryProfileAdmissionOptions.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryProfileOwnerPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryProgressBaselinePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryProgressWriterPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryProposalStorePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRawBackendPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryReadLeasePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRequestAdmission.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRestFormatPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRestWriterPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRoutineProgressPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryRuntimePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoverySaveLoopPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryServiceOwnerPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoverySessionRebindPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryStartup.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryStartupBudgetPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RecoveryTemplates.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/ReplacementOwnerPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/ReplacementServicePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RequestAdmissionFacade.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RequestAdmissionGate.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/RestCompression.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/SaveService.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Server/WorldFocus.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/AntMimic.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Appearances.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Catch.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Detail.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Eyes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Flora.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/FlyLook.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Graphics.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/MatingRules.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Meshes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/NotebookPages.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Peacock.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/RareSightings.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/RivalRules.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/SaveRules.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/SettingsSpec.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Species.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Surfaces.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Tarantula.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Wasp.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/WaspLook.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Data/Wear.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Breakaway.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/DayLight.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Dressing.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Lit.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Materials.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Patina.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Plants.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Scenery.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/Shapes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/SunPick.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/TestTarget.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Habitat/WindowsillLayout.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Learning/FieldNotebook.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Learning/NotebookWatch.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Ballooning.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Growth.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/LifeClock.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/LifeLoop.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/LifeSession.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Mating.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/MatingScene.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Nature.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/NeedsModel.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Nursery.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/RareDirector.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/RareLedger.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Life/Water.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/CameraMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/FocusState.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/InputState.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/InspectView.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/JumpInput.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/JumpMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/LineFraming.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/LockOn.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/SilkController.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/SpiderMotor.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/StickCarry.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/SupportMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/TetherMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Movement/TitleShots.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/Observation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/ObservationMemory.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/PerceptionMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/Sensor.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/SensorCore.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Perception/Signal.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/Checkpoint.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/CheckpointStore.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/CompactMigration.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/Json.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/MemoryBackend.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/ObjectRecord.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/OrdinaryRequestAdmission.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryArchivePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryArchiveStorePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryControllerPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryDestinationPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryEntryClientPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryLifePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryMealsPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryOperationAdmission.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryProgressPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoveryProgressReconcilePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoverySessionFencePrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RecoverySourceCollectorPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/ReplacementProtocolPrototype.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/RequestAdmissionFacade.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveEnvelope.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveIntent.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveObservation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveProgress.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveRest.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveScheduler.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveSession.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveStores.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Persistence/SaveWork.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/Bird.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/Cat.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/CrabSpider.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/Frog.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/Mate.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/MateDrive.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/RivalDisplay.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/RivalDrive.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/RivalGrip.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/RivalRoute.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/RivalSpider.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Predator/WaspDirector.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Ant.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Feeding.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Fly.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/FlyFlight.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/FlySenses.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Harvestman.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Ladybird.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Millipede.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PerchGraph.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PlantWalk.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyDirector.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyKinds.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyMath.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyPopulation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyRandom.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/PreyWorld.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Skater.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Snail.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/StationMouse.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Prey/Woodlouse.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/Anatomy.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/AntMimicPose.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/CatPose.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/DogGait.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/Idle.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/Living.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/PeacockDance.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/Setae.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/SpiderChoice.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/SpiderRig.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/Rig/TarantulaPose.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/AntMimicText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/BirdText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/CatText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/ContextPrompts.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/ControlText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/CrabText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/EyeOptics.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/FrogText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/Heard.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/HudLayout.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/InspectText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/LifeText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/MateText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/NotebookText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/PeacockText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/PerceptionShapes.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/PerceptionText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/PerceptionView.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/PreyText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/QuietHud.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/RivalText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/SaveText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/SettingsModel.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/SettingsNav.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/SettingsText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/TarantulaText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/TitleText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/WaspText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/UI/WaterText.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/AntForage.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/DogGround.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Environment.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Garden.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/GardenPocket.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Hut.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/LivedInSites.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/LookPlan.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Meadow.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/NavigationPreparation.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Pond.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Preserve.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/PreserveLook.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/PreserveTrain.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Region.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/StationAir.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/StationTerritory.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Verge.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/WorldBuild.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/WorldMap.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  },
+  {
+    "file": "src/Shared/World/Worlds.luau",
+    "exit_code": 0,
+    "diagnostic": ""
+  }
+]

@@ -164,6 +164,7 @@ function SpiderInput.bind(h: Handlers)
 		b.Name = action
 		b.Text = label
 		b.TextSize = textSize or 18
+		b.Font = Enum.Font.GothamMedium
 		b.TextWrapped = true
 		b.TextColor3 = Color3.new(1, 1, 1)
 		b.BackgroundColor3 = Color3.new(0.06, 0.06, 0.06)

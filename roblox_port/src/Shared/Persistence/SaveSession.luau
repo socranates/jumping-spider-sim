@@ -24,14 +24,13 @@ local SaveStores = require(script.Parent.SaveStores)
 local Json = require(script.Parent.Json)
 local SaveObservation = require(script.Parent.SaveObservation)
 local SaveIntent = require(script.Parent.SaveIntent)
+local Request = require(script.Parent.OrdinaryRequestAdmission)
 
 -- Rest observations that grant authority must bypass a provider's read cache.
 -- MemoryBackend and other providers without a cache retain their read contract.
 -- A failed fresh read is an error; it must never fall back to stale data.
 local function readCurrent(self: any, key: string): (boolean, any, string?)
- local fresh = self.backend.readFresh
- if type(fresh)=="function" then return fresh(self.backend,key) end
- return self.backend:read(key)
+ return Request.request(self,"readFresh",key,nil,nil)
 end
 
 local function canonical(v: any): string
@@ -49,6 +48,7 @@ export type Config = {
 	onDecision: ((any) -> ())?,
 	onStored: ((string,number,string,number) -> ())?,
 	onRefused: ((string,number,string,number,string) -> ())?,
+ admission: any?,
 }
 
 
@@ -61,7 +61,7 @@ function SaveSession.new(cfg: Config): any
 		sched:track("rest_" .. mode, SaveRules.REST_MIN_INTERVAL)
 		rkey[mode] = `{SaveRules.KEY_REST}{cfg.userId}_{mode}`
 	end
-	return setmetatable({
+	local self:any=setmetatable({
 		cfg = cfg, backend = cfg.backend, id = cfg.sessionId, now = cfg.now, pspec = cfg.progressSpec or SaveProgress.SPEC,
 		pkey = SaveRules.KEY_PROGRESS .. tostring(cfg.userId),
 		rkey = rkey,
@@ -83,6 +83,8 @@ function SaveSession.new(cfg: Config): any
 		lastStatus = "", lastReason = "",
 		counters = { requests = 0, writes = 0, rejected = 0 },
 	}, SaveSession)
+ if cfg.admission then Request.attach(self,cfg.admission) end
+ return self
 end
 
 local function log(self: any, text: string)
@@ -168,34 +170,44 @@ end
 -- ---------------------------------------------------------------- loading
 -- One try at reading the progress record and taking its lock. Returns a verdict:
 --   "ok" (held), "locked", "newer", "corrupt", "failed" (the store failed: class in .errClass), "config".
-local function attemptLock(self: any): (string, any)
+local function attemptLock(self: any): (string, any, number?)
 	local now = self.now()
 	local verdict = ""
 	local info: any = nil
-	self.sched:begin(nil, now)
-	self.counters.requests += 1
-	local ok, _, err = self.backend:update(self.pkey, function(old: any): any
-		local op = SaveEnvelope.open(self.pspec, old)
+local expected:string?=nil
+ local ok, value, err = Request.request(self,"update",self.pkey, function(old: any): any
+  now=self.now();expected=nil
+  if type(now)~="number" or now~=now or math.abs(now)==math.huge then return nil end
+  local op = SaveEnvelope.open(self.pspec, old)
 		info = op
 		verdict = op.status
 		if op.status == "newer" or op.status == "corrupt" or op.status == "invalid" then return nil end
 		if op.status == "missing" then
 			verdict = "ok"
-			return SaveEnvelope.make(self.pspec, SaveProgress.default(), now, nil, { lock = lockNow(self, now) })
+			local candidate=SaveEnvelope.make(self.pspec, SaveProgress.default(), now, nil, { lock = lockNow(self, now) })
+   expected=canonical(candidate);return candidate
 		end
 		if SaveEnvelope.heldByOther(op.lock, self.id, now, SaveRules.LOCK_STALE) then
 			verdict = "locked"
 			return nil
 		end
 		verdict = "ok"
-		return SaveEnvelope.withLock(old, lockNow(self, now))
-	end)
-	if not ok then
-		local class = SaveStores.classify(err)
-		return if class == "config" then "config" else "failed", { err = err, class = class }
-	end
-	if verdict == "invalid" then verdict = "corrupt" end
-	return verdict, info
+		local candidate=SaveEnvelope.withLock(old, lockNow(self, now));expected=canonical(candidate);return candidate
+end,nil)
+ if not ok then
+  local class=SaveStores.classify(err)
+  return if class=="config" then "config" else "failed",{err=err,class=class},nil
+ end
+ if verdict=="ok" then
+  local at=self.now();local lock=if type(value)=="table" then value.lock else nil
+  if not expected or expected=="" or canonical(value)~=expected or type(lock)~="table" or lock.session~=self.id
+   or type(lock.beat)~="number" or lock.beat~=lock.beat or type(at)~="number" or at~=at or at<lock.beat or at-lock.beat>=SaveRules.LOCK_STALE then
+   return "failed",{err="initial lease acknowledgement is not exact and fresh",class="service"},nil
+  end
+  return verdict,info,lock.beat
+ end
+ if verdict=="invalid" then verdict="corrupt" end
+ return verdict,info,nil
 end
 
 local function adoptStored(self: any, info: any)
@@ -243,8 +255,6 @@ function SaveSession.refreshOffer(self: any,mode: any): boolean
 end
 
 local function previewOne(self: any,mode: string)
- local now=self.now()
- self.sched:begin(nil,now);self.counters.requests+=1
  local ok,value,err=readCurrent(self,self.rkey[mode])
  if self.closed then return end -- departure can reach its deadline while a read yields
  if not ok then
@@ -278,8 +288,6 @@ local function readRests(self: any, maxReads: number?)
    if maxReads and reads>=maxReads then break end
    reads+=1;self.restReadCursor=index%#SaveRules.MODES+1
 			local ok, value, err = readCurrent(self,self.rkey[mode])
-			self.sched:begin(nil, self.now())
-			self.counters.requests += 1
    if self.closed or self.state~="active" or not self.lockHeld or self._loadSerial~=generation then return end
 			if not ok then
 				log(self, `could not read the {mode} rest: {tostring(err)}`)
@@ -333,19 +341,19 @@ local function readRests(self: any, maxReads: number?)
 end
 
 -- Loads the player's records. Yields (backend calls). Returns the state: "active" or "session".
-function SaveSession.load(self: any, deferRests: boolean?): (string,boolean?)
+local function loadOriginal(self: any, deferRests: boolean?): (string,boolean?)
 	if self.closed then return self.state,false end
  self._loadSerial=(self._loadSerial or 0)+1
  local ticket=self._loadSerial
 	revokeIntents(self,"revalidating")
-	local verdict, info = attemptLock(self)
+	local verdict, info, acquiredBeat = attemptLock(self)
  if self.closed or self._loadSerial~=ticket then return self.state,false end
 	local first = self.state == "loading"
 	if verdict == "ok" then
 		self.sched:abandon("release") -- a deliberate successful load owns the lease again
 		adoptStored(self, info)
 		self.state, self.reason, self.lockHeld, self.canRetry = "active", nil, true, false
-		self.sched:beat(self.now())
+		self.sched:beat(acquiredBeat)
 		self.restLoaded = {} -- read again: another session may have written a rest while this one could not
   self.restRetryAt=0
   self.restReloading=deferRests==true
@@ -372,9 +380,17 @@ function SaveSession.load(self: any, deferRests: boolean?): (string,boolean?)
 		self.state = "session"
 		self:demote("load_failed", true)
 	end
-	if self.closed or self._loadSerial~=ticket then return self.state,false end
-	if first or self.state == "active" then self:notify() end
+if self.closed or self._loadSerial~=ticket then return self.state,false end
+ if self.state=="active" and self.now()-self.sched.lastBeat>=SaveRules.LOCK_STALE then
+  self:demote("other_session",true);return self.state,false
+ end
+ if first or self.state == "active" then self:notify() end
 	return self.state,true
+end
+
+function SaveSession.load(self:any,deferRests:boolean?):(string,boolean?)
+ if self.ordinaryAdmission then return Request.load(self,loadOriginal,deferRests) end
+ return loadOriginal(self,deferRests)
 end
 
 -- ---------------------------------------------------------------- what the client gives and what is known
@@ -552,7 +568,6 @@ local function validateIntent(self: any,r: any)
   if r.kind=="new" then self.intents:changed(r,"rest_protected") else self.intents:readonly(r,"rest_protected");r.needsCheck=false end
   return
  end
- local now=self.now();self.sched:begin(nil,now);self.counters.requests+=1
  local ok,raw,err=readCurrent(self,self.rkey[mode])
  if self.closed or self.intents.requests[mode]~=r or self.state~="active" or not self.lockHeld then return end
  if not ok then
@@ -591,12 +606,12 @@ end
 -- Writes the progress (merged with what is stored). `release`: also let go of the lock. Returns true when it is stored.
 local function writeProgress(self: any, release: boolean): boolean
 	local now = self.now()
-	local version = self.sched:begin("progress", now)
-	self.counters.requests += 1
+	local version = self.sched.items.progress.version
 	local outcome = ""
 	local merged: any = nil
 	local newTime = now
-	local ok, _, err = self.backend:update(self.pkey, function(old: any): any
+	local ok, _, err = Request.request(self,"update",self.pkey, function(old: any): any
+  now=self.now()
 		outcome = ""
 		local op = SaveEnvelope.open(self.pspec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
@@ -612,7 +627,7 @@ local function writeProgress(self: any, release: boolean): boolean
 			return SaveEnvelope.withLock(old, lock) -- nothing new to say: only the lock moves (payload, checksum and backup untouched)
 		end
 		return SaveEnvelope.make(self.pspec, merged, newTime, old, { lock = lock })
-	end)
+	end,"progress")
 	if not ok then
 		local class = SaveStores.classify(err)
 		if class == "value" then
@@ -663,8 +678,7 @@ local function writeRest(self: any, mode: string): boolean
   return false
  end
  local now = self.now()
- local version = self.sched:begin(name, now)
-	self.counters.requests += 1
+ local version = self.sched.items[name].version
 	local spec = SaveRest.SPECS[mode]
 	local outcome = ""
 	local newTime = now
@@ -672,7 +686,8 @@ local function writeRest(self: any, mode: string): boolean
  local expectedRevision=self.restRevision[mode]
  local writtenRevision: string?=nil
  local observed: any=nil
-	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
+	local ok, _, err = Request.request(self,"update",self.rkey[mode], function(old: any): any
+  now=self.now()
 		outcome = ""
   observed=nil
   if self.offersEnabled and not intentAllows(self,mode,record,bound,tag) then outcome="intent_changed";return nil end
@@ -710,7 +725,7 @@ local function writeRest(self: any, mode: string): boolean
 		local made=SaveEnvelope.make(spec, record, newTime, old, { session = self.id })
   writtenRevision=made.checksum
   return made
-	end)
+	end,name)
 	if not ok then
   if bound and self.intents.requests[mode]==bound then
    if observed then bound.expected=observed end
@@ -772,10 +787,9 @@ end
 -- preserve the entire raw envelope and backup, changing only our own lock.
 local function releaseOwnedLock(self: any): boolean
 	local now = self.now()
-	local version = self.sched:begin("release", now)
-	self.counters.requests += 1
+	local version = self.sched.items.release.version
 	local released = false
-	local ok, _, err = self.backend:update(self.pkey, function(old: any): any
+	local ok, _, err = Request.request(self,"update",self.pkey, function(old: any): any
 		released = false -- UpdateAsync may invoke this callback more than once
 		if self.state ~= "session" then return nil end
 		local op = SaveEnvelope.open(self.pspec, old, false)
@@ -783,7 +797,7 @@ local function releaseOwnedLock(self: any): boolean
 		if type(op.lock) ~= "table" or op.lock.session ~= self.id then return nil end
 		released = true
 		return SaveEnvelope.withLock(old, nil)
-	end)
+	end,"release")
 	if not ok then
 		local class = SaveStores.classify(err)
 		local wait = self.sched:failed("release", now, class)
@@ -798,10 +812,9 @@ end
 -- Refreshes the lock when no write has done it lately.
 local function heartbeat(self: any)
 	local now = self.now()
-	self.sched:begin(nil, now)
-	self.counters.requests += 1
 	local outcome = ""
-	local ok, _, err = self.backend:update(self.pkey, function(old: any): any
+	local ok, _, err = Request.request(self,"update",self.pkey, function(old: any): any
+  now=self.now()
 		outcome = ""
 		local op = SaveEnvelope.open(self.pspec, old, false)
 		if op.status == "missing" then outcome = "missing"; return nil end
@@ -810,7 +823,7 @@ local function heartbeat(self: any)
 		if SaveEnvelope.heldByOther(op.lock, self.id, now, SaveRules.LOCK_STALE) then outcome = "locked"; return nil end
 		outcome = "ok"
 		return SaveEnvelope.withLock(old, lockNow(self, now))
-	end)
+	end,nil)
 	if not ok then
 		log(self, "heartbeat failed: " .. tostring(err))
 		self.sched:beat(now - SaveRules.HEARTBEAT + 5) -- try again in a few seconds
@@ -822,14 +835,25 @@ local function heartbeat(self: any)
 	elseif outcome == "corrupt" then self:demote("corrupt", false) end
 end
 
+local function capacity(self:any,now:number):boolean
+ return self.ordinaryAdmission~=nil or self.sched:budgetOk(now)
+end
+local function due(self:any,name:string,now:number):boolean
+ if not self.ordinaryAdmission then return self.sched:due(name,now) end
+ local item=self.sched.items[name];return item.dirty and now>=item.nextAt
+end
+local function beatDue(self:any,now:number):boolean
+ return now-self.sched.lastBeat>=SaveRules.HEARTBEAT and capacity(self,now)
+end
+
 -- One pass of the periodic work; the server calls it about once a second. Does at most one request per call. Returns whether it asked.
 local function stepInner(self: any): boolean
 	local now = self.now()
 	local did = true
 	if self.state == "session" then
 		if self.sched:isDirty("release") then
-			if self.sched:due("release", now) then releaseOwnedLock(self) else did = false end
-		elseif self.canRetry and now >= self.retryAt and self.sched:budgetOk(now) then
+			if due(self,"release",now) then releaseOwnedLock(self) else did = false end
+		elseif self.canRetry and now >= self.retryAt and capacity(self,now) then
 			self.retryAt = now + SaveRules.RETRY_LOAD
 			local wasReason = self.reason
 			local _,applied=self:load(true) -- one lock request; subsequent steps read the rest slots
@@ -843,12 +867,12 @@ local function stepInner(self: any): boolean
 		end
 	elseif self.state == "active" then
 		-- A failed rest read must not starve lock renewal for a live player.
-		if self.sched:due("progress", now) then
+		if due(self,"progress",now) then
 			writeProgress(self, false) -- also renews the lock
-		elseif self.sched:heartbeatDue(now) then
+		elseif beatDue(self,now) then
 			heartbeat(self)
 		elseif not SaveSession.restsLoaded(self) then
-			if now >= self.restRetryAt and self.sched:budgetOk(now) then
+			if now >= self.restRetryAt and capacity(self,now) then
 				local before: { [string]: any } = {}
     local beforeLoaded: {[string]:boolean} = {}
 				for _, mode in SaveRules.MODES do before[mode] = self.rests[mode];beforeLoaded[mode]=self.restLoaded[mode]==true end
@@ -869,7 +893,7 @@ local function stepInner(self: any): boolean
 			end
 		else
 			did = false
-			if self.offersEnabled and self.sched:budgetOk(now) then
+			if self.offersEnabled and capacity(self,now) then
 				for _,mode in SaveRules.MODES do
 					local r=self.intents.requests[mode]
 					if r and r.needsCheck and now>=(r.nextAt or 0) then validateIntent(self,r);did=true;break end
@@ -877,7 +901,7 @@ local function stepInner(self: any): boolean
 			end
 			if not did then
 				for _, mode in SaveRules.MODES do
-					if self.sched:due("rest_" .. mode, now) then
+					if due(self,"rest_"..mode,now) then
 						writeRest(self, mode)
 						did = true
 						break
@@ -888,7 +912,7 @@ local function stepInner(self: any): boolean
 	else
 		did = false
 	end
-	if not did and self.offersEnabled and (self.state=="session" or self.state=="active") and self.sched:budgetOk(now) then
+	if not did and self.offersEnabled and (self.state=="session" or self.state=="active") and capacity(self,now) then
 		for _,mode in SaveRules.MODES do
 			if self.previewPending[mode] and now>=(self.previewNextAt[mode] or 0) then
 				previewOne(self,mode);did=true;break -- at most one preview request per step
@@ -898,17 +922,39 @@ local function stepInner(self: any): boolean
 	return did
 end
 
-function SaveSession.step(self: any): boolean
+local function stepOriginal(self: any): boolean
 	if self.closed or self.busy then return false end
 	self.busy = true
 	local ok, did = pcall(stepInner, self)
 	self.busy = false
 	if not ok then
-		log(self, "step failed: " .. tostring(did))
+if (did::any)~=Request.ABORT then log(self,"step failed: "..tostring(did)) end
 		return false
 	end
 	if not self.closed then self:notify() end
 	return did :: boolean
+end
+
+local function workDue(self:any,now:number):boolean
+ if self.state=="session" then
+  if self.sched:isDirty("release") then if due(self,"release",now) then return true end
+  elseif self.canRetry and now>=self.retryAt then return true end
+ elseif self.state=="active" then
+  if due(self,"progress",now) or beatDue(self,now) then return true end
+  if not self:restsLoaded() then if now>=self.restRetryAt then return true end
+  else
+   if self.offersEnabled then for _,r in self.intents.requests do if r.needsCheck and now>=(r.nextAt or 0) then return true end end end
+   for _,mode in SaveRules.MODES do if due(self,"rest_"..mode,now) then return true end end
+  end
+ end
+ if self.offersEnabled and (self.state=="active" or self.state=="session") then
+  for _,mode in SaveRules.MODES do if self.previewPending[mode] and now>=(self.previewNextAt[mode] or 0) then return true end end
+ end
+ return false
+end
+function SaveSession.step(self:any):boolean
+ if self.ordinaryAdmission then return Request.step(self,stepOriginal,workDue) end
+ return stepOriginal(self)
 end
 
 -- The state to hand the client: progress, the rests found, and the status.
@@ -923,7 +969,7 @@ function SaveSession.snapshot(self: any): any
 end
 
 -- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.
-function SaveSession.flush(self: any, deadline: number?)
+local function flushOriginal(self: any, deadline: number?)
 	if self.closed or self.flushing then return end
 	self.flushing = true
 	local sleep = self.cfg.sleep
@@ -978,6 +1024,10 @@ function SaveSession.flush(self: any, deadline: number?)
 	end
 	self.closed, self.flushing = true, false
 	self:notify()
+end
+
+function SaveSession.flush(self:any,deadline:number?)
+ if self.ordinaryAdmission then Request.flush(self,flushOriginal,deadline) else flushOriginal(self,deadline) end
 end
 
 return SaveSession

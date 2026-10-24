@@ -66,7 +66,23 @@ function LookPlan.records(region: WorldMap.Region, level: Level, tier: string?):
 	local key = region.id .. "/" .. tostring(region.seed) .. "/" .. level .. (if backdrop and level == "far" and tier == "low" then "/low" else "")
 	local cached = recordsCache[key]
 	if cached ~= nil then return cached end
-	local all = Region.decor(region)
+	-- All detail levels are read-only views of one seeded decoration list.
+	-- Generating again for low/far wastes CPU and keeps duplicate record tables.
+	local fullKey = region.id .. "/" .. tostring(region.seed) .. "/full"
+	local all = recordsCache[fullKey]
+	if all == nil and tier == "low" and level ~= "full" then
+		-- The phone tier retains only its base records. Far low views use those
+		-- same records; full detail is generated later only if actually requested.
+		local lowKey = region.id .. "/" .. tostring(region.seed) .. "/low"
+		all = recordsCache[lowKey]
+		if all == nil then
+			all = {}
+			for _, d in Region.decor(region) do if not d.full then table.insert(all, d) end end
+			recordsCache[lowKey] = all
+		end
+	elseif all == nil then
+		all = Region.decor(region); recordsCache[fullKey] = all
+	end
 	local out: { Garden.Drawn } = {}
 	if level == "full" then
 		out = all

@@ -1,3 +1,7 @@
+> Superseded pause status: Nathan resumed work after Claude's updated review. Read
+> `docs/mating-fixes/README.md` and the latest `chet/save-continue.md` header for
+> completed mating fixes, exact successful CI and the instar design still under discussion.
+
 # Quick review for Claude — pause point, 2026-10-24
 
 Nathan asked for a short Claude review before Chet resumes. This is a review handoff, not a request to redesign or implement the next changes. Return findings and any design decisions to Nathan; he will bring them back to Chet.

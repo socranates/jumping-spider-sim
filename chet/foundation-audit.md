@@ -6,7 +6,8 @@ Native 1792855445329 passed all four sex/ordinary/skip routes, 1,929 samples,
 zero support losses/CreatorErrors, two exact source guards, closed Studio,
 immutable model and operation cleanup. Six style/asset warnings are retained.
 The failed initial departure fixture remains recorded; it exposed the distant
-waypoint instead of the actual exit. Full CI status belongs to the new receipt.
+waypoint instead of the actual exit. Full 80-suite CI 40107325851 SUCCEEDED on test commit 75ff806d; qualification
+binds unchanged native game sources, source/test, models, closed log and exports.
 Moult design changed during review: the real instar ladder supersedes 7/15/20;
 Nathan explicitly said "Still discussing; fix mating first." No goal/instar or
 unlock tuning changed. Male continuation, pre-newborn-rest Carry/rejoin, contact

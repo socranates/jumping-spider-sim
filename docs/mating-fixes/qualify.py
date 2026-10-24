@@ -1,6 +1,6 @@
 """Bind native contact receipts, ordinary exports and final exact-head CI."""
 from pathlib import Path
-import hashlib,json,subprocess,urllib.request,datetime
+import ast,hashlib,json,subprocess,urllib.request,datetime
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 COMMIT='75ff806d7775fb76fa2f2fc0eee6a23bfdfb5626';NATIVE_COMMIT='fdf88814bac93f722ab3451e75d9e28fb4aea4bd';RUN=40107325851
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -26,6 +26,8 @@ assert 'CLIENT_MATING passed=29 failed=0'in (H/'focused.txt').read_text()
 assert {(r['player_sex'],r['skipped'])for r in n['routes']}=={(s,k)for s in ['female','male']for k in [False,True]}
 assert sum(r['samples']for r in n['routes'])==1929
 assert all(r['min_gap']>=r['radius']and r['lost_support']==0 and r['exit_gap']<1.5 for r in n['routes'])
+suite_lists=[node for node in ast.walk(ast.parse((PORT/'tests/run.py').read_text(encoding='utf-8')))if isinstance(node,ast.List)and len(node.elts)==80 and all(isinstance(e,ast.Constant)and isinstance(e.value,str)and e.value.endswith('.luau')for e in node.elts)]
+assert len(suite_lists)==1,'default suite inventory changed'
 def get(url):
  request=urllib.request.Request(url,headers={'User-Agent':'Windowsill-receipt-qualification'})
  return json.load(urllib.request.urlopen(request,timeout=30))

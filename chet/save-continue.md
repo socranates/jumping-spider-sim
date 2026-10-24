@@ -46,6 +46,11 @@ Integration code7f7eeead passed Linux CI40067737217: compile, strict, all suites
 normal/test exports and runner regressions. docs/integration/github-ci.json
 records public API steps; exact Linux assertion counts are not inferred from
 status. The later notebook commit has a separate CI cohort.
+Content commit094a0e0a is pushed to github/codex/verified-integration. Its CI
+run40068699284 is LIVE at this checkpoint; inspect completion before reporting
+that newer run green. Focused local checks have completed; no local test or
+Studio/Player session remains active. Final committed-byte checks matched both
+models, notebook evidence and the preserved baseline log/build receipt hashes.
 Normal branch activation is not main/production/laptop synchronization.
 
 ## Completed evidence, correctly scoped

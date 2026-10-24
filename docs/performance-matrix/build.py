@@ -6,7 +6,7 @@ import argparse,hashlib,json,subprocess,xml.etree.ElementTree as ET,zlib
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 TOOLS=Path('C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools')
 sha=lambda b:hashlib.sha256(b).hexdigest()
-p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);p.add_argument('--playback-source',type=Path,default=H/'playback.luau');a=p.parse_args()
 assert a.long_trace_seconds==0 or 60<=a.long_trace_seconds<=3600
 out=a.out.resolve();assert out.parent.is_dir() and not out.exists();out.mkdir()
 revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
@@ -20,7 +20,7 @@ probe=probe.replace('ORDINARY_FRAME_','MATRIX_FRAME_').replace('"InstanceCount"}
 probe=probe.replace('p50_ms=percentile(.5),','mean_ms=s.duration/math.max(1,s.frames)*1000,p50_ms=percentile(.5),')
 assert 'mean_ms=s.duration/'in probe and 'DataReceiveKbps'in probe
 source['Client/MatrixProbe.luau']=probe.encode()
-source['Client/MatrixPlayback.luau']=(H/'playback.luau').read_bytes()
+source['Client/MatrixPlayback.luau']=a.playback_source.read_bytes()
 if a.long_trace_seconds:
  source['Client/MatrixLongTrace.luau']=(H/'long-trace.luau').read_bytes()
  anchor=b'  local final=inspect("finish")'

@@ -1,0 +1,88 @@
+{
+  "id": 40076549675,
+  "head_sha": "863f188bed43d534451baea223f76d698c36206f",
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/40076549675",
+  "updated_at": "2026-10-24T08:18:16Z",
+  "jobs": [
+    {
+      "id": 120821003483,
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:34Z",
+          "completed_at": "2026-10-24T08:03:35Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:35Z",
+          "completed_at": "2026-10-24T08:03:40Z"
+        },
+        {
+          "name": "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:40Z",
+          "completed_at": "2026-10-24T08:03:42Z"
+        },
+        {
+          "name": "Every module compiles",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:42Z",
+          "completed_at": "2026-10-24T08:03:42Z"
+        },
+        {
+          "name": "Strict types",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:42Z",
+          "completed_at": "2026-10-24T08:03:45Z"
+        },
+        {
+          "name": "All suites",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:03:45Z",
+          "completed_at": "2026-10-24T08:18:13Z"
+        },
+        {
+          "name": "Normal and self-test exports",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:18:13Z",
+          "completed_at": "2026-10-24T08:18:14Z"
+        },
+        {
+          "name": "Runner failure and cleanup regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:18:14Z",
+          "completed_at": "2026-10-24T08:18:14Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:18:14Z",
+          "completed_at": "2026-10-24T08:18:14Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-24T08:18:14Z",
+          "completed_at": "2026-10-24T08:18:14Z"
+        }
+      ]
+    }
+  ],
+  "limits": "Public API status/step outcomes; no exact assertion counts inferred."
+}

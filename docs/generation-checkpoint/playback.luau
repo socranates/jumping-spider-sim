@@ -40,6 +40,9 @@ return function(d:any)
   diagnostic=assert(RS:WaitForChild("NormalStartupDiagnostic",90))
   connection=diagnostic.Report.OnClientEvent:Connect(function(ticket:any,value:any) replies[ticket]=value end)
   waitFor(function():boolean return WS:GetAttribute("SaveStartupReady")==true and d.saveClient.newLifeEnabled and not d.saveClient:offerPending() and Players.LocalPlayer:GetAttribute("TitleReady")==true end)
+  -- This fixture starts with synthetic adult parents rather than earning
+  -- adulthood by moulting. Supply its corresponding prior Easy unlock too.
+  d.session.finishedMain=true
   for _,case in {{mode="main",easy=false,choice="Carry"},{mode="main",easy=true,choice="Carry"},{mode="free",easy=false,choice="Follow"}} do
    fresh(case.mode,case.easy)
    local life=d.life

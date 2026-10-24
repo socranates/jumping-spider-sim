@@ -1,0 +1,2 @@
+# Preserve the actual receipt/log bytes across Windows and cloud checkouts.
+*.txt -text

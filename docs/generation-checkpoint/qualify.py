@@ -54,6 +54,8 @@ w=read(H/'windows-full-receipt.json')
 assert w['exit_code']==0 and w['suite_count']==84 and w['source_test_commit']==COMMIT
 assert w['command'][1]=='roblox_port/tests/run.py' and len(w['command'])==3
 assert sha((H/'windows-full.txt').read_bytes())==w['log_sha256']
+committed_log=subprocess.check_output(['git','show','HEAD:docs/generation-checkpoint/windows-full.txt'],cwd=ROOT)
+assert sha(committed_log)==w['log_sha256'],'Git must preserve the raw log bytes'
 prefixes=('GENERATION_CHECKPOINT passed=','GENERATION_NETWORK passed=','CHECKPOINT passed=','LOCAL_REST_CLIENT passed=','LOCAL_RETURN passed=','MATING passed=','CLIENT_MATING passed=')
 selected=[line for line in (H/'windows-full.txt').read_text(encoding='utf-8').splitlines()if line.startswith(prefixes)]
 assert len(selected)==7

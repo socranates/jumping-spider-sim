@@ -1,4 +1,4 @@
-# Current integration handoff — 2026-10-24
+# Current integration handoff â€” 2026-10-24
 
 Goal ACTIVE. Work in C:/Users/natha/windowsill-verified-integration,
 branch codex/verified-integration. This is a normal Git worktree from c457af12.
@@ -35,9 +35,10 @@ test. Never publish TheWindowsillTests.rbxlx. Neither export is a new native
 execution or online-storage proof. Standard source/build/test is portable;
 historical native collectors still need their original laptop snapshots/logs.
 
-Integration changes are NOT committed or pushed yet. Next: finish/record the
-live standard full run, verify exports against promotion/native identity,
-finish current docs/CI, commit/push to github, and inspect Linux checks.
+Integration code is committed/pushed as7f7eeead. Linux CI40067737217 has
+passed compilation/strict and is running all suites. Next: finish/record the
+live standard Windows run, inspect Linux completion/exports, and commit the
+current result/handoff records.
 Normal branch activation is not main/production/laptop synchronization.
 
 ## Completed evidence, correctly scoped

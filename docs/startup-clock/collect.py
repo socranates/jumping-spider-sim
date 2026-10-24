@@ -24,6 +24,9 @@ assert not any(x['kind']=='FAIL'for x in events)and one('PASS')['unbound']
 ready=one('READY');assert ready['title_ready']and ready['save_ready']and ready['navigation']=='ready'
 cleanup=one('CLEANUP');assert cleanup['active']==cleanup['scopes']==cleanup['focus_lost']==0 and not cleanup['life_started']
 first=one('FIRST');summary=one('SUMMARY');assert summary['frames']>=60 and summary['wall_seconds']>=10
+if m.get('exercise_decor'):
+ assert all(one('DECOR_EXERCISE').values())
+ restored=one('DECOR_RESTORED');assert restored['parts']>0 and restored['window_closed']and restored['collision_ready']and not restored['life_started']
 assert summary['raw_after_first']['n']==summary['callback_after_first']['n']==summary['frames']-1
 marks=[x['value']for x in events if x['kind']=='MARK']
 required=['client-enter','direct-imports-done','world-client-begin','world-client-end','module-table-done','spider-rig-begin','spider-rig-end',

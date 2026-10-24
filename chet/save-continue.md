@@ -1,5 +1,30 @@
 # Current integration handoff â€” 2026-10-24
 
+Latest completed continuation: optional-Decor startup fix, ordinary evidence
+105c83862d500f43, 273 sources, source/test commit c8054893. Read
+docs/startup-clock/README.md and qualification.json first. Deep2 measured
+essential home collision ready at 0.485 s followed by 4,777 ms waiting on
+optional Decor. The fix retains all essential waits and binds late leaf/sash
+visuals without resetting fall or window state. Current Windows qualification
+1022/0, compile 273/273, strict 0, runner 5/5, both source-exact exports. Full
+Linux CI 40084424435 completed successfully at c8054893: all 79 suites plus
+every step. Three guarded current Studio cohorts complete; deliberate full/low
+visual replacement restores 12/6 leaf pieces, saved fall/open state and
+collision, with zero CreatorErrors and retained warnings. All editors are
+stopped and closed, immutable hashes unchanged. No new publication.
+
+Client hooks now install at 0.525 s in the ordinary observation instead of
+5.541 s in deep2, but title still takes 11.283 s. Separate 2.46 s/1.24 s engine
+callback gaps occur before the first completed game render frame. Do not
+claim those pauses fixed, a causal overall speed percentage or gameplay FPS.
+Next investigate engine/instance-arrival timing before changing another
+simulation budget, and qualify a matched-view performance pair. The wider
+audit, natural-life, whole-map and physical-phone work remains open. Goal
+ACTIVE. Current fixes are pushed only to github/codex/verified-integration.
+The previous private 13 authorization is already fulfilled; do not use it
+as permission to republish this different candidate. Preserve OneDrive,
+frozen Godot, synced sources, old failed cohorts and original QA actors.
+
 Goal ACTIVE. Work in C:/Users/natha/windowsill-verified-integration,
 branch codex/verified-integration. This is a normal Git worktree from c457af12.
 The app's worktree helper could not use the non-Git project mirror. The frozen

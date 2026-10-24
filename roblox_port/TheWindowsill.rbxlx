@@ -4682,18 +4682,44 @@ local Breakaway={}
 Breakaway.__index=Breakaway
 Breakaway.RESET=8
 Breakaway.FALL=0.7
+-- Only the small leaf-tip subtree is scanned, at most four times per second.
+-- Polling also handles children arriving after their streamed parent, without
+-- retaining listeners or parts from an old Decor tree.
+Breakaway.DECOR_INTERVAL=0.25
 function Breakaway.new(world: Instance, decor: Instance?): any
  local part=world:FindFirstChild("leaf_tip")
- local pieces={}
+ local self=setmetatable({pieces={},decor=nil,decorClock=Breakaway.DECOR_INTERVAL,transparency=if part and part:IsA("BasePart") then part.Transparency else 0,part=part,home=if part and part:IsA("BasePart") then part.CFrame else CFrame.identity,
+  left=0,elapsed=0,last=nil},Breakaway)
+ self:syncDecor(decor,0,false)
+ return self
+end
+function Breakaway.syncDecor(self: any,decor: Instance?,dt: number,reduced: boolean)
+ self.decorClock+=math.max(0,dt)
+ if decor==self.decor and self.decorClock<Breakaway.DECOR_INTERVAL then return end
+ self.decor,self.decorClock=decor,0
  local pilea=if decor then decor:FindFirstChild("Pilea") else nil
  local tip=if pilea then pilea:FindFirstChild("leaf_tip") else nil
+ local old={}
+ for _,entry in self.pieces do old[entry.part]=entry end
+ local pieces={}
+ local changed=false
  if tip then
   for _,p in tip:GetDescendants() do
-   if p:IsA("BasePart") then table.insert(pieces,{part=p,frame=p.CFrame,transparency=p.Transparency}) end
+   if p:IsA("BasePart") then
+    local entry=old[p]
+    if entry==nil then entry={part=p,frame=p.CFrame,transparency=p.Transparency};changed=true end
+    table.insert(pieces,entry);old[p]=nil
+   end
   end
  end
- return setmetatable({pieces=pieces,transparency=if part and part:IsA("BasePart") then part.Transparency else 0,part=part,home=if part and part:IsA("BasePart") then part.CFrame else CFrame.identity,
-  left=0,elapsed=0,last=nil},Breakaway)
+ for p,entry in old do
+  p.CFrame,p.Transparency=entry.frame,entry.transparency
+  changed=true
+ end
+ if changed then
+  self.pieces=pieces
+  self:draw(reduced) -- preserve the current fall/restore state on late visuals
+ end
 end
 function Breakaway.valid(record: any): boolean
  return record==nil or (type(record)=="table" and type(record.left)=="number" and record.left==record.left and record.left>=0 and record.left<=Breakaway.RESET)
@@ -54439,8 +54465,13 @@ end
 -- The sill's Decor's raised sash (its bottom rail and its top), hidden while the sash is down and shown again when it is up.
 local function raisedSash(self: any, show: boolean)
 	local decor = self.decor
-	if decor == nil then return end
-	local wall = decor:FindFirstChild("Wall")
+	local wall = if decor then decor:FindFirstChild("Wall") else nil
+	local rail = if wall then wall:FindFirstChild("SashRail") else nil
+	local top = if wall then wall:FindFirstChild("SashTop") else nil
+	-- Streamed-out/replaced visuals must not retain a hidden-state reference.
+	for p, transparency in self.hidden do
+		if p ~= rail and p ~= top then (p :: BasePart).Transparency = transparency; self.hidden[p] = nil end
+	end
 	if wall == nil then return end
 	for _, name in { "SashRail", "SashTop" } do
 		local p = wall:FindFirstChild(name)
@@ -54454,6 +54485,13 @@ local function raisedSash(self: any, show: boolean)
 			end
 		end
 	end
+end
+
+-- Decor (and its two sash parts) may arrive after construction or be replaced.
+-- Reconcile only the visual state; never recreate collision or replay opening.
+function HutLife.bindDecor(self: any, decor: Instance?)
+	self.decor = decor
+	raisedSash(self, self.open)
 end
 
 -- The sash down: the gap filled, drawn as the lowered sash's glass over its bottom rail.
@@ -63849,6 +63887,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
 	-- where it comes down is streamed in before the spiderling stands there)
 	M.World:update(if mateLegs.ride ~= nil and mateLegs.ride.at ~= nil then mateLegs.ride.at else motor.pos, rig.root, nil, frameDt, motor.pos+motor.vel*DT)
+	breakaway:syncDecor(M.World.decor,frameDt,setting("ReducedMotion")==true)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -66397,7 +66436,6 @@ end
 
 -- Shared essential-world arrival deadline; failure stops construction before any motor exists. Decor is best effort.
 WorldClient.PIECES_WAIT = 30
-WorldClient.DECOR_WAIT = 10
 -- The focus report (ROBLOX-95): sent when the spider is more than this many studs from where it last reported, or this many seconds after the last report.
 WorldClient.REPORT_MOVE = 8
 WorldClient.REPORT_EVERY = 2
@@ -66462,11 +66500,11 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
    if not part:IsA("BasePart") then unavailable(piece.id.." collision part") end
   end
  end
- if streaming and decor==nil then decor=ws:WaitForChild("Decor",WorldClient.DECOR_WAIT) end
+ -- Optional visuals arrive independently; only essential collision gates startup.
  pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)
 
 	return setmetatable({
-		map = m, player = player, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
+		map = m, player = player, workspace = ws, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
 		home = home.id, region = home,
 		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
 		homeMin = home.bounds[1], homeMax = home.bounds[2],
@@ -66637,6 +66675,7 @@ end
 -- ROBLOX-108: the looks of the regions outside the window, made on this client at its tier ("full" or "low") near the spider from now on (Client/LookStream; each
 -- `update` follows the spider). In a place with only the sill straight in the workspace (the box worlds) there is nothing to draw and nothing is made.
 function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
+	self.decor = ws:FindFirstChild("Decor")
 	if self.root == self.sill then return nil end
 	self.looks = LookStream.new(ws, tier, self.root, self.map)
 	-- (ROBLOX-115) in the preserve, the trains beyond the north fence, with the looks
@@ -66655,6 +66694,8 @@ end
 -- the region it is in has arrived whole (warned about once if not). `nextPosition`
 -- keeps the fixed-tick destination hold live even on a render without a tick.
 function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?, nextPosition: Vector3?)
+	self.decor = self.workspace:FindFirstChild("Decor")
+	if self.hut ~= nil then self.hut:bindDecor(self.decor) end
 	self.region = self.map.at(pos) or self.region
 	-- A render can contain no fixed tick. Keep a refused destination waiting on
 	-- those frames too, rather than clearing the hold just because here is ready.
@@ -66945,7 +66986,7 @@ return WorldShadows
   <Item class="Workspace" referent="296">
     <Properties>
       <string name="Name">Workspace</string>
-      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADIwZjIyMDBkNzlhOWU0NDgIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
+      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADEwNWM4Mzg2MmQ1MDBmNDMIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
       <bool name="StreamingEnabled">true</bool>

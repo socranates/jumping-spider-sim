@@ -120,6 +120,90 @@ startup contract:42 passed/1 failed, specifically the unwanted Decor wait.
 late-decor-red.txt runs three new visual-state regressions against052550ef:
 0 passed/3 failed. late-decor-green.txt records3 passed/0 failed on the fix.
 check-late-decor.py documents that bounded selection; the ordinary full suite
-still includes these tests. fix-checks/ records the separate current Windows
-qualification as it completes. No current native result or speed gain is
-claimed until the subsequent guarded cohort is collected.
+still includes these tests. fix-checks/ records the completed separate current
+Windows qualification. Subsequent guarded engine cohorts are recorded below.
+
+### Current Windows qualification
+
+fix-checks/receipt.json completes all four affected suites: world_client46/0,
+world355/0, checkpoint594/0, client_smoke27/0; total1022/0. All273 game
+sources compile, strict checking exits0 with only tool-registration notices,
+five runner checks pass, and both source-exact enabled exports are produced.
+Current ordinary evidence is105c83862d500f43. This is a targeted Windows
+run; the independent full Linux CI and native cohorts are separate.
+
+### First fixed-source ordinary startup
+
+Run1792836499548 is retained in full-late1/, SHA256:
+d8b5da9ec05b60fd6afa180a50ffe7ed38a041f98950ffce9ad0255c96517c37.
+Stage:C:/Users/natha/claude-xfer/Windowsill-startup-clock-full-late1.
+It was built before the source commit; its original-source hashes are the
+four-module fix subsequently committed atc8054893, not unchanged052550ef
+despite that preparation revision in the manifest. Native guards check all
+276 actual staged sources rather than relying on that revision label.
+
+Home collision is ready at0.373797s; construction ends at0.373990s and
+client hooks at0.524820s. There is no Decor wait. Title/navigation/save is
+ready at11.282828s, then ten seconds of ordinary title complete normally.
+Both source guards pass, zero CreatorErrors, six retained warnings, no focus
+loss, life or active save work. Editor18096 is stopped and closed without
+saving temporary state; the original file hash is unchanged.
+
+The engine still has2458.55ms and1236.70ms callback intervals before a
+completed game render callback, now after the client hooks were installed.
+The next615.74ms interval has only one completed game frame. The fix removes
+the proven optional dependency but does not cure these pauses. Neither the
+constructor reduction nor the varying end-to-end title timings establish a
+general startup-speed percentage or steady gameplay FPS improvement.
+
+Separate exercise-decor fixtures deliberately stream out/replace optional
+visuals through the actual render binding while title holds the life. They
+are functional engine checks, not performance measurements. full1 was never
+played: a harmless embedded-directive warning and native float comparison
+were corrected in preparation full2/low1 before execution.
+
+### Completed native visual-binding qualification
+
+| Cohort | Run | Restored original leaf pieces | Source guards | Script errors | Retained warnings |
+|---|---|---:|---:|---:|---:|
+| decor-full2 | 1792836687456 | 12 | 2 | 0 | 10 |
+| decor-low1 | 1792836910420 | 6 | 2 | 0 | 6 |
+
+Both fixtures complete ordinary startup, keep the life paused at title, then
+remove/replace only optional Decor. The actual game render binding discovers
+the missing root, late Pilea, leaf-tip descendants and sash parts. A saved
+fall is maintained, an open window does not replay, the original transforms
+are restored without drift, and the original closed window/ready collision
+returns before completion. The original 12/6 leaf pieces also show the normal
+full/low detail distinction was retained in these arrivals. This does not
+qualify every optional low-tier effect under an arbitrarily delayed/replaced
+root; the existing asynchronous WorldDetail arrival policy is unchanged.
+
+Each fixture finishes with no life started, no focus loss, and zero active
+save work/scopes. All 276 sources compile/type-check, native pre/post guards
+pass and immutable file hashes match after closing both editors without
+saving temporary state. PID 25456 and 16796 are no longer live. Full2 model:
+4c501f0584964eb79c5703d24342a09955987dbb82eebda9d7c3931f0b01ea2b.
+Low1 model:
+eecee83a9eec5d1d960e8ae576084facec0a3a781f80b4d6de336b913b349ab4.
+Warnings are the retained Studio CornerRadius style-cast warnings and
+asset 203785492 type mismatch, including pre-Play occurrences. No warnings
+are silently reclassified as script failures or erased.
+
+### Completed source CI and handoff boundary
+
+GitHub run 40084424435, job 120844312920, succeeds at exact source/test commit
+c80548933395eed5f7ccdd227af70210d49cd03f on 2026-10-24T10:16:47Z. All 79
+suites, compile, strict types, exports and runner checks pass. github-ci.json
+retains primary API metadata; no Linux assertion count is inferred. The later
+evidence/export commit contains no further game-source or test changes.
+summarize.py checks matching 273 original-source hashes across all three
+current native cohorts and retains qualification.json. All 269 game modules
+outside the four changed modules match the deep2 baseline exactly after
+newline normalization. Schemas, geometry, ecology and controls are preserved.
+
+This candidate is pushed on codex/verified-integration and remains unpublished.
+Private test 13 and production 140 retain their previous release evidence; the
+earlier private-test authorization was fulfilled. Current standalone Player,
+real-store rejoin, physical-phone, every natural life, whole-map clipping and
+matched-view FPS proof are not inferred. The engine startup gaps remain open.

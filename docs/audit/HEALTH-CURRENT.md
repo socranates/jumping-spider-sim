@@ -1,5 +1,22 @@
 # Current foundation evidence and remaining work
 
+Latest supplement, 2026-10-24: ordinary candidate 105c83862d500f43, 273 sources,
+source/test commit c8054893. ../startup-clock/README.md and qualification.json
+record a proven 4,777 ms optional-Decor wait after essential home collision was
+ready. Construction now returns without that cosmetic dependency; late leaf
+and sash binding preserves current fall/open state and collision. The original
+shared essential-collision deadline and startup failure policy are unchanged.
+Windows targeted checks 1022/0, compile 273/273, strict 0, runner 5/5 and exact
+exports pass. Full Linux CI 40084424435 succeeds: all 79 suites and all steps.
+Three current native cohorts complete both 276-source guards and cleanup,
+zero CreatorErrors. Full/low deliberate optional-visual replacement restores
+12/6 original leaf pieces and the correct physical window. Source hashes
+match the current candidate; all 269 other game modules match the prior cohort.
+No new publication occurred. The dependency fix is qualified, while separate
+2.46 s/1.24 s engine callback gaps before the first completed game frame remain
+unresolved. No general startup/FPS gain, phone, whole-map or natural-life
+qualification follows. The earlier cohorts below retain their exact scope.
+
 2026-10-24. Integration line: codex/verified-integration. Normal roblox_port/src
 now contains273 sources imported from the verified font candidate. A later
 generator-driven notebook correction and subsequent camera lens handover fix

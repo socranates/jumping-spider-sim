@@ -1,0 +1,2 @@
+checkpoint: 17948 characters, 87 tables
+CHECKPOINT passed=594 failed=0

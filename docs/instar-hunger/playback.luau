@@ -66,6 +66,9 @@ return function(d:any)
    for stage=1,g:adultStage() do
     if d.life.resting then tap("Cancel");waitFor(function():boolean return not d.life.resting end)end
     local goal=g:mealGoal()
+    -- Synthetic swallowed food must refuel the ordinary reserve as well as
+    -- credit growth; otherwise this accelerated fixture starves artificially.
+    d.needs:grantEnergy(1,`instar-fixture:{case.adult}:{case.mode}:{stage}`)
     d.life.mealFood=goal*Growth.FLY_FOOD
     waitFor(function():boolean return g.ready end,5)
     local prior=d.life.checkpointResult

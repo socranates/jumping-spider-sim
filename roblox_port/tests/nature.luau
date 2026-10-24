@@ -453,22 +453,22 @@ end)
 -- ----------------------------------------------------------------------------------------------------------------- courtship
 
 local OPEN = Vector3.new(10, 0.31, 8)
-local function courtWorld(energy: number, seed: number?): any
+local function courtWorld(energy: number, seed: number?, sex: string?): any
 	local needs = NeedsModel.new(true, false)
 	needs.energy = energy
 	local life = LifeLoop.new(needs, nil)
 	life.growth.stage = Growth.ADULT
 	life.mating = Mating.normalize({ stage = "none", ready_day = 2, mates = 1, visits = 1, visit_day = 3 })
 	local mate = Mate.new()
-	mate.sex, mate.scale, mate.state = "female", 1, "attend"
+	mate.sex, mate.scale, mate.state = Mate.opposite(sex or "male"), 1, "attend"
 	mate.position, mate.previous = OPEN + Vector3.new(2, 0, 0), OPEN + Vector3.new(2, 0, 0)
 	life.mate = mate
-	return { life = life, needs = needs, seed = seed or 914 }
+	return { life = life, needs = needs, seed = seed or 914, sex = sex or "male" }
 end
 local function courtSnap(w: any, nature: boolean?, at: Vector3?, heading: Vector3?, moving: boolean?): any
 	local p = at or OPEN
 	return { position = p, previous = p, heading = heading or Vector3.xAxis, up = Vector3.yAxis, grounded = true, moving = moving == true, airborne = false, onLine = false,
-		striking = false, holding = false, safe = false, day = 3, hour = 9, resting = false, wasp = false, sex = "male", seed = w.seed, nature = nature,
+		striking = false, holding = false, safe = false, day = 3, hour = 9, resting = false, wasp = false, sex = w.sex, seed = w.seed, nature = nature,
 		blocked = function() return false end }
 end
 -- Courts until the mate decides (or 30 s pass): the events of the tick it decided, or {}.
@@ -520,7 +520,7 @@ case("the quality of a court and the spider's condition set the odds; the number
 	m.court_near = 16
 end)
 
-case("a full meter is no longer a mating in the standard rules: the mate refuses at the odds, by its own draw, and the chain after an accepted court is the old one", function()
+case("a full meter is no longer a mating in the standard rules: the mate refuses at the odds, by its own draw, and only the female continues into egg care", function()
 	-- The old game: without nature's rules every full meter is the pair.
 	local plain = courtWorld(0.5)
 	local ev = court(plain, nil)
@@ -571,7 +571,7 @@ case("a full meter is no longer a mating in the standard rules: the mate refuses
 	-- The same world, the same decision; another seed, another.
 	local a, b = courtWorld(0.7, 5), courtWorld(0.7, 5)
 	check(table.concat(court(a, true), ",") == table.concat(court(b, true), ","), "the same world, the same decision")
-	-- An accepted court goes on as it always did: the scene, the parting, the sac.
+	-- An accepted court keeps its bound sex through the scene and parting.
 	local ok
 	for seed = 1, 50 do
 		local t = courtWorld(0.85, seed)
@@ -586,7 +586,14 @@ case("a full meter is no longer a mating in the standard rules: the mate refuses
 		if mated then break end
 	end
 	check(mated and L.mating.stage == "mated", "then mated")
-	check(Mating.woke(L, 4) == "sac" and L.mating.stage == "sac", "and the next morning's sleep makes the sac")
+	check(Mating.woke(L, 4) == "" and L.mating.stage == "mated" and not Mating.hasSac(L.mating), "the male's next morning never makes a sac")
+ local female=courtWorld(.85,ok.seed,"female")
+ check(table.find(court(female,true),"courted")~=nil,"the corresponding female court is accepted under the same rules")
+ for _=1,60*20 do
+  Mating.tick(female.life,DT,courtSnap(female,true))
+  if female.life.mating.stage=="mated"then break end
+ end
+ check(female.life.mating.player_sex=="female" and Mating.woke(female.life,4)=="sac", "the female still makes her sac after accepted court and parting")
 end)
 
 case("the rival may cut in on a court: a seeded level of the meter, only if it is free and near the mate then", function()

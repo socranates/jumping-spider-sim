@@ -18,7 +18,7 @@ assert set(events)=={'CAPABILITY','STREAM_START','STREAM_STOP'}
 assert all(events['CAPABILITY'][k]for k in ['accessible','compatible','ready'])
 assert events['STREAM_START']['accepted']and events['STREAM_STOP']['accepted']
 assert events['STREAM_STOP']['before']['Active']and events['STREAM_STOP']['before']['RecordedSizeKb']>0
-(H/'capture-output.txt').write_text('\n'.join(lines)+'\n')
+(H/'capture-output.txt').write_bytes(('\n'.join(lines)+'\n').encode())
 for name in ['compile.txt','strict.txt']:(H/name).write_bytes((stage/name).read_bytes())
 failed=Path('C:/Users/natha/claude-xfer/Windowsill-startup-stream-full1/strict.txt')
 (H/'sdk-strict-first.txt').write_bytes(failed.read_bytes())
@@ -32,5 +32,5 @@ receipt=dict(raw_path=str(raw),raw_bytes=raw.stat().st_size,raw_sha256=sha(raw.r
  sdk_docs_commit='23573b949ed027fdf8820f969bea525b96c357cc',wasmtime_version='38.0.0',
  staged_compile_sources=277,strict_sources=276,strict_sdk_excluded=True,published=False,
  limits='One local Studio file stream. Additional SDK module replicated but not imported by game scripts. It is loaded in Edit before capture. Closed scopes and incomplete frames do not prove exhaustive exclusive CPU attribution. No ordinary game source change or Player/mobile performance claim.')
-(H/'capture.json').write_text(json.dumps(receipt,indent=2)+'\n')
+(H/'capture.json').write_bytes((json.dumps(receipt,indent=2)+'\n').encode())
 print(json.dumps({k:receipt[k]for k in ['raw_bytes','raw_sha256','model_sha256','matched_ordinary_sources']}))

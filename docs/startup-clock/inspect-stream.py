@@ -23,7 +23,7 @@ try:
     paused=f.isPaused,incomplete=f.isIncomplete))
  top=sorted(frames,key=lambda x:x['duration_ms'],reverse=True)[:25]
  out=Path(__file__).parent/'stream-full1/frame-index.json'
- out.write_text(json.dumps(dict(segments=segments,top=top,frames=frames),indent=2)+'\n')
+ out.write_bytes((json.dumps(dict(segments=segments,top=top,frames=frames),indent=2)+'\n').encode())
  print(json.dumps(dict(segments=segments,top=top),indent=2),flush=True)
 finally:
  session.Dispose();mp.Dispose()

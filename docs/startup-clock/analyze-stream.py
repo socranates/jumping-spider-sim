@@ -65,5 +65,5 @@ try:
  record=dict(raw_path=str(raw),raw_sha256=hashlib.sha256(raw.read_bytes()).hexdigest(),
   raw_bytes=raw.stat().st_size,frames=results,
   limits='One local Studio startup file stream including Edit/Play transitions and post-PASS UI. Source includes an unused replicated LibMP wrapper loaded in Edit before capture. Incomplete frame logs and stack underflows prevent exhaustive attribution; inclusive scopes overlap and waits are not exclusive CPU.')
- (H/('scope-labels.json'if labels_only else 'scope-analysis.json')).write_text(json.dumps(record,indent=2)+'\n')
+ (H/('scope-labels.json'if labels_only else 'scope-analysis.json')).write_bytes((json.dumps(record,indent=2)+'\n').encode())
 finally:session.Dispose();mp.Dispose()

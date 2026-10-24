@@ -291,6 +291,21 @@ function PreyWorld.escape(self: any, f: any): any
 	return self.home
 end
 
+-- A new spider does not inherit the parent's jaws or unfinished strike. Keep
+-- the world and conserved meal ledger; releasing prey awards no food/refund.
+function PreyWorld.releaseHeld(self:any)
+ local feeding=self.home.feeding
+ local held=feeding.held
+ feeding:cancel();feeding.held=nil;feeding.struggling=false;feeding.tap=false;feeding.swallow=0
+ if held then
+  local director=self:escape(held)
+  held.freeUntil=director.now+PreyWorld.FREE_S
+ end
+ self.home.strikeEnd=self.home.tick-1
+ self.home.previousMode="attached"
+ self.strikeEnd=-1;self.strikeMode="attached";self.strikeFrom=nil
+end
+
 -- (ROBLOX-101) A prey that got out of the jaws by its own trick cannot be struck again for this long (seconds): it leaves from the spider's mouth while the
 -- strike that took it may still be open, and a slip that is caught again on the same tick would be no slip.
 PreyWorld.FREE_S = 0.5

@@ -1,0 +1,8 @@
+BIRTH_RETURN generation=nil mating=hatched seed=221295793 wanted_seed=1012807691
+FAIL client_mating: Carry on: the next generation is a spiderling again in the crack, the days go on, the toast says so, the notebook and the look are kept, saves work
+    C:/Users/natha/AppData/Local/Temp/tmpak0y9l4b.luau:68469: return before the newborn's first rest must keep the newborn
+BIRTH_REPRO passed=10 failed=1
+C:/Users/natha/AppData/Local/Temp/tmpak0y9l4b.luau:68493: newborn return regression
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpak0y9l4b.luau:68493

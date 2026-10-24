@@ -359,7 +359,20 @@ end
 -- rest), and free play.
 local stores = {main=newStore(), free=newStore(), easy=newStore()}
 local checkpoints = stores.main
+function saveState.cancelBirthReturn():boolean
+ local waiting=saveState.birth and saveState.birth.returnResult or saveState.birthReturn and saveState.birthReturn.result
+ if not waiting then return false end
+ if waiting then waiting.pending=nil;waiting.cancelled=true;waiting.ok=false end
+ if saveState.birth then saveState.birth.returnResult=nil;saveState.birth.returnRequested=nil end
+ saveState.birthReturn=nil
+ return true
+end
+function saveState.birthReturning():boolean
+ return saveState.birthReturn~=nil or saveState.birth~=nil and saveState.birth.returnRequested~=nil and not saveState.birth.failed
+end
 function saveState.invalidateRest()
+ saveState.cancelBirthReturn()
+ saveState.birth=nil;saveState.birthReturn=nil
  if saveState.localRestore then saveState.localRestore:cancel() end
  saveState.worldGeneration+=1
  if saveState.rest then saveState.rest:cancel() end
@@ -383,6 +396,7 @@ life.save = function(): LifeLoop.CheckpointResult
 		warn("[Windowsill] checkpoint: " .. tostring(err))
 		return { ok = false, message = M.LifeText.KEEP_FAILED }
 	end
+ if saveState.birth and saveState.birth.result==nil then record.checkpoint_origin="generation_start" end
  local slot: string="main"
  for name,st in stores :: {[string]:any} do if st==checkpoints then slot=name end end
  local result:LifeLoop.CheckpointResult={ok=false,message="",pending=true}
@@ -391,6 +405,23 @@ life.save = function(): LifeLoop.CheckpointResult
  saveState.rest:begin(record,{mode=slot,source=checkpoints,revision=checkpoints.store.revision,
   generation=saveState.worldGeneration,result=result,hungry=hungry,retreat=record.world_map.retreat})
  return result
+end
+-- One baseline at the beginning of a generation, through the ordinary private
+-- preparation/owned save path. This is not a free mid-life save. While pending,
+-- Back waits for the new baseline instead of loading the parent's last rest.
+function saveState.failBirth()
+ local birth=saveState.birth
+ if not birth then return end
+ birth.failed=true
+ if birth.returnResult then birth.returnResult.pending=nil;birth.returnResult.ok=false end
+ hud:saveNotice("The new spider could not be kept. Find a home and rest to keep it; your earlier saved spider is unchanged.")
+end
+function saveState.keepBirth()
+ local birth={generation=saveState.worldGeneration}
+ saveState.birth=birth
+ local result=life:makeCheckpoint()
+ birth.result=result
+ if not result.pending and not result.ok then saveState.failBirth() end
 end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
 local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
@@ -794,7 +825,7 @@ end
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?, selectedSlot: string?): boolean
  if offered==nil and saveState.application and saveState.application:held() then return false end
- if offered==nil and next(checkpoints.store.data)~=nil then
+ if offered==nil and (saveState.birth~=nil or next(checkpoints.store.data)~=nil) then
   return saveState.beginLocalReturn(nil,"reset")
  end
  if saveState.restore then saveState.restore:cancel() end
@@ -869,6 +900,7 @@ local function applyRules()
  life.growth:useInstarRules(needs.gentle)
 end
 local function closeScreens()
+ saveState.cancelBirthReturn()
  if saveState.localRestore then saveState.localRestore:cancel() end
  if saveState.restore then saveState.restore:cancel() end
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
@@ -1158,6 +1190,9 @@ end
 -- ride's end (mateLegs.follow): the spiderling begins where the wind set it down, and the life keeps where (`start_zone`, `start_region`); without it, the hut's crack.
 function mateLegs.carryOn(landed: any?)
  saveState.invalidateRest()
+ M.World.prey:releaseHeld()
+ RivalSpider.tearFree(life.rival);rivalLegs.grip=rivalLegs.Grip.new(needs)
+ M.meal:reset()
  local generation,day=mateLegs.Mating.carryOn(life,needs,prey.feeding.mealsFinished)
  life.start_zone=if landed~=nil then landed.zone else nil
  life.start_region=if landed~=nil then landed.region else nil
@@ -1179,6 +1214,7 @@ function mateLegs.carryOn(landed: any?)
  hud:toast(mateLegs.Text.generationToast(generation,day,if landed~=nil then landed.place else nil),false)
  if landed~=nil then mateLegs.say(mateLegs.Text.landed(landed.place));book:addEntry("eggs_and_wind",day,mateLegs.Text.rideEntry(day,landed.place)) end
  if saveClient~=nil then saveClient:markDirty() end
+ saveState.keepBirth()
 end
 local openMenu: (boolean?) -> ()
 local openSettings: (string?) -> ()
@@ -1189,7 +1225,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   saveState.application:render();return
  end
  if choice=="CancelRestore" then
-  if saveState.localRestore.job then saveState.cancelLocalReturn(false) else saveState.restore:cancel();openMenu(true) end
+  if saveState.localRestore.job or saveState.birthReturning() then saveState.cancelLocalReturn(false) else saveState.restore:cancel();openMenu(true) end
   return
  end
  if choice=="Notebook" then openNotebook("menu");return end
@@ -1263,7 +1299,7 @@ end
 -- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
 openMenu=function(renderOnly: boolean?)
  if saveState.application and saveState.application:busy() then saveState.application:render();return end
- if (saveState.restore and saveState.restore.job) or (saveState.localRestore and saveState.localRestore.job) then
+ if (saveState.restore and saveState.restore.job) or (saveState.localRestore and saveState.localRestore.job) or saveState.birthReturning() then
   menu:showChoices("Returning to the last rest","Preparing the saved spider. Your current spider stays until this finishes.","",{{id="CancelRestore",text="Cancel"}},true,"CancelRestore")
   return
  end
@@ -1501,11 +1537,18 @@ saveState.rest=require(script.Parent.SaveRestore).new({
   if saveClient then saveClient:endRestPreparation(stamp.mode,stamp.result,false,false) end
  end,
  failed=function(stamp:any,problem:any)
+  if saveState.birth and saveState.birth.generation==stamp.generation then saveState.failBirth() end
   if saveClient then saveClient:endRestPreparation(stamp.mode,stamp.result,false,false) end
   if life:finishCheckpoint(stamp.result,{ok=false,message=M.LifeText.KEEP_FAILED}) then warn("[Windowsill] last rest preparation failed: "..tostring(problem)) end
  end,
  completed=function(stamp:any)
-  life:finishCheckpoint(stamp.result,{ok=true,message=M.LifeText.restKept(stamp.retreat,"Last rest kept.")..stamp.hungry})
+  local birth=saveState.birth
+  local born=birth~=nil and birth.generation==stamp.generation
+  life:finishCheckpoint(stamp.result,{ok=true,message=if born then "The new spider is kept for this visit." else M.LifeText.restKept(stamp.retreat,"Last rest kept.")..stamp.hungry})
+  if born then
+   saveState.birth=nil
+   if birth.returnRequested then saveState.birthReturn={generation=stamp.generation,mode=birth.returnRequested.mode,action=birth.returnRequested.action,result=birth.returnResult} end
+  end
   if session.ended and lastEnd~=nil and panel:isShowing() then presentEnd(true) end
   refreshMenu()
  end,
@@ -1521,12 +1564,28 @@ function saveState.localReturnScreen(stamp:any,resume:boolean?)
  else openMenu(true) end
 end
 function saveState.cancelLocalReturn(resume:boolean?)
+ if saveState.cancelBirthReturn() then
+  if resume then closeScreens() else openMenu(true) end
+  return
+ end
  local j=saveState.localRestore.job
  if not j then return end
  saveState.localRestore:cancel()
  saveState.localReturnScreen(j.stamp,resume)
 end
-function saveState.beginLocalReturn(mode:string?,action:string):boolean
+function saveState.beginLocalReturn(mode:string?,action:string,queuedResult:any?):boolean
+ local birth=saveState.birth
+ if birth then
+  if birth.failed then
+   hud:saveNotice("The new spider has not been kept yet. Find a home and rest before returning.")
+   return false
+  end
+  birth.returnRequested={mode=mode,action=action}
+  birth.returnResult=birth.returnResult or {pending=true,ok=false}
+  saveState.localReturnResult=birth.returnResult
+  panel:hide();controls:clear();dropAll();setHudShown(false);openMenu(true)
+  return true
+ end
  if saveState.application and saveState.application:beforeWorldChoice() then return false end
  if saveState.application and saveState.application:held() then return false end
  local slot=mode
@@ -1534,7 +1593,7 @@ function saveState.beginLocalReturn(mode:string?,action:string):boolean
  if not slot or (slot=="easy" and not session.finishedMain) then return false end
  if saveState.restore then saveState.restore:cancel() end
  local source=stores[slot]
- local token={pending=true,ok=false}
+ local token=queuedResult or {pending=true,ok=false}
  saveState.localRestore:begin(nil,{mode=slot,source=source,revision=source.store.revision,activeStore=checkpoints,
   activeRevision=checkpoints.store.revision,generation=saveState.worldGeneration,result=token,
   action=action,fromEnd=panel:isShowing() and session.ended and lastEnd~=nil})
@@ -1776,6 +1835,17 @@ function saveState.frame()
   local token=life._checkpointPending
   if token then life:finishCheckpoint(token,{ok=false,message=M.LifeText.KEEP_FAILED}) end
   saveState.rest:cancel();warn("[Windowsill] local rest preparation: "..tostring(restError))
+  saveState.failBirth()
+ end
+ -- A source revision can revoke private work without throwing. Do not leave
+ -- Back waiting forever, or let it fall back to the parent's still-valid rest.
+ if saveState.birth and saveState.birth.result and saveState.birth.result.cancelled and not saveState.rest.job and not saveState.birth.failed then saveState.failBirth() end
+ local birthReturn=saveState.birthReturn
+ if birthReturn then
+  saveState.birthReturn=nil
+  if birthReturn.generation~=saveState.worldGeneration or not saveState.beginLocalReturn(birthReturn.mode,birthReturn.action,birthReturn.result) then
+   birthReturn.result.pending=nil;birthReturn.result.cancelled=true;birthReturn.result.ok=false
+  end
  end
 	saveState.settleLook()
 	if saveState.broken then return end
@@ -1785,7 +1855,7 @@ end
 
 controls = SpiderInput.bind({
 	blocked = function(): boolean return (rivalLegs.navigation ~= nil and rivalLegs.navigation.status ~= "ready") or modal() or M.title:holding() end, -- Loading and the intro own the controls.
-	menu = function() if saveState.application and saveState.application:held() then openMenu(true) elseif saveState.localRestore.job then saveState.cancelLocalReturn(true) elseif settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
+	menu = function() if saveState.application and saveState.application:held() then openMenu(true) elseif saveState.localRestore.job or saveState.birthReturning() then saveState.cancelLocalReturn(true) elseif settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
 	focus = function(phase: string)

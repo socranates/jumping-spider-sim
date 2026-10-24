@@ -474,6 +474,7 @@ local function checkRecord(record: any, world: World, sourceMap: any?): ({ strin
 		return { `made by a newer version of the game (schema {sv}; this one reads up to {Checkpoint.SCHEMA_VERSION})` }, nil
 	end
 	if record.kind ~= Checkpoint.KIND then bad("not a retreat checkpoint") end
+	if record.checkpoint_origin~=nil and record.checkpoint_origin~="generation_start" then bad("unknown checkpoint origin") end
 	if record.game ~= Checkpoint.GAME then bad("not a checkpoint of this game") end
 	if record.content_revision ~= Checkpoint.CONTENT_REVISION then bad(`made for another windowsill ({tostring(record.content_revision)})`) end
 	if not finite(record.snapshot_tick) or record.snapshot_tick < 0 then bad("the tick is not a number") end
@@ -536,6 +537,16 @@ local function checkRecord(record: any, world: World, sourceMap: any?): ({ strin
 				checkWorld(roots,problems,false,sourceMap)
 			end
 		else checkWorld(roots,problems,false,sourceMap) end
+		if record.checkpoint_origin=="generation_start" then
+			local l=roots.life
+			if type(l)~="table" or not finite(l.generation) or l.generation<1 or l.generation%1~=0
+				or l.resting~=false or l.asleep~=false or l.lifeOver~=false
+				or l.growth.stage~=0 or l.growth.fedSinceMoult~=0 or l.growth.ready~=false
+				or l.growth.moultingHoursLeft~=0 or l.growth.softHoursLeft~=0
+				or type(l.mating)~="table" or l.mating.stage~="none" then
+				bad("generation start does not describe a newborn")
+			end
+		end
 	end)
 	if not ok then bad("world: " .. tostring(err)) end
 	if #problems > 0 then return problems, nil end
@@ -614,6 +625,7 @@ local function apply(record: any, world: World, decoded: ObjectRecord.Decoded): 
 	life.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
 	life:applyLight()
 	life:showNotice(if moved then "Returned to your last rest, but the world has changed since you rested, so you stand where a life begins in it. Everything else is as you left it."
+		elseif record.checkpoint_origin=="generation_start" then "Returned to the beginning of this spider's life."
 		else "Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true, {}
 end

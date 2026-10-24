@@ -473,6 +473,35 @@ case("growth schema 3 restores a moult, migrates old saves and rejects damage at
  end
 end)
 
+case("a generation-start checkpoint is a living newborn, never a renamed parent rest",function()
+ local Mating=require("../src/Shared/Life/Mating")
+ local SaveRest=require("../src/Shared/Persistence/SaveRest")
+ local w=newWorld()
+ for _=1,10 do tick(w) end
+ w.life.growth:useInstarRules(false,123,true)
+ w.life.mating=Mating.normalize({stage="hatched",sac_day=4,guard_day=2,hatch_day=6,hatch_hour=7,brood=9,mates=1})
+ Mating.carryOn(w.life,w.needs,0)
+ local record=assert(Checkpoint.capture(w,0));record.checkpoint_origin="generation_start"
+ check(#Checkpoint.check(record,w)==0 and #SaveRest.check("main",record)==0,"client and server accept a genuine newborn baseline")
+ check(Checkpoint.restore(record,w) and w.life.notice=="Returned to the beginning of this spider's life.","newborn restore uses the right notice")
+ local function field(r,root,key,value)
+  local o=r.world.objects[r.world.roots.life["$o"]]
+  if root=="growth" then for _,e in o.e do if e[1]=="growth" then o=r.world.objects[e[2]["$o"]];break end end end
+  for _,e in o.e do if e[1]==key then e[2]=value;return end end
+  error("fixture field missing: "..key)
+ end
+ local unchanged=fingerprint(w)
+ for _,row in {{"life","generation",0},{"life","generation",1.5},{"life","resting",true},{"life","asleep",true},{"life","lifeOver",true},
+  {"growth","stage",1},{"growth","fedSinceMoult",.3},{"growth","ready",true},{"growth","moultingHoursLeft",1},{"growth","softHoursLeft",1}} do
+  local bad=Json.copy(record);field(bad,row[1],row[2],row[3])
+  check(not Checkpoint.restore(bad,w) and fingerprint(w)==unchanged,"invalid newborn "..row[2].." refused without changing the world")
+ end
+ local bad=Json.copy(record);bad.checkpoint_origin="rest_that_looks_like_a_birth"
+ check(not Checkpoint.restore(bad,w) and fingerprint(w)==unchanged,"unknown origin refused atomically")
+ local legacy=Json.copy(record);legacy.checkpoint_origin=nil
+ check(Checkpoint.restore(legacy,w),"ordinary pre-origin checkpoint still loads")
+end)
+
 case("mixed prey keeps the fruit profile across a rest",function()
  local w=newWorld()
  w.prey.mixed=true

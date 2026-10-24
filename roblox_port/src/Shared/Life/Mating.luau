@@ -299,6 +299,8 @@ function Mating.carryOn(life: any, needs: any, mealsFinished: number?): (number,
 	life.grantedSeen = needs.grantedTotal
 	life.mealFood = nil
 	life.lifeOver = false
+	life.resting=false;life.asleep=false;life.restSeconds=0
+	life.checkpointDue=false;life.morningText=""
 	needs.energy = Rules.freshEnergy
 	needs.rest = 1.0
 	needs.starvingHours, needs.starvingStreakH = 0.0, 0.0

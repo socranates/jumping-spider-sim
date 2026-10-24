@@ -214,6 +214,9 @@ check("ballooning through the real client: the card offers Follow one and Stay a
 	for _, c in panel.choices or {} do table.insert(ids, c.id) end
 	assert(table.concat(ids, ",") == "Follow,Carry", "the card's two ways on: " .. table.concat(ids, ","))
 	local chose = false
+	local workClock=0
+	local workOptions=driver.saveState.rest.cfg.workOptions
+	driver.saveState.rest.cfg.workOptions={budget=.001,maxSeconds=1000,now=function() workClock+=.0001;return workClock end}
 	for _ = 1, 600 do if panel:choose("Follow") then chose = true; break end; frame(1 / 60) end
 	assert(chose, "Follow one could not be chosen")
 	assert(mateLegs.phase == "ride" and mateLegs.ride ~= nil and mateLegs.ride.zone == zone and mateLegs.ride.region == region, `the ride to {zone} / {region} began ({mateLegs.phase})`)
@@ -234,6 +237,18 @@ check("ballooning through the real client: the card offers Follow one and Stay a
 	local told = false
 	for _, e in driver.notebook:entriesFor("eggs_and_wind") do if string.find(e.text, "the wind set it down", 1, true) then told = true end end
 	assert(told, "the notebook's dated line says where the wind set it down")
+	local seed=life.growth.lifeSeed
+	local entries=#driver.notebook:entriesFor("eggs_and_wind")
+	driver.returnToCheckpoint()
+	local result=require("./studio/AwaitReturn")(driver,function() frame(0) end)
+	assert(result and result.ok,"Back before the landed child's first rest completes")
+	for _=1,3 do frame(1/60) end
+	local born=driver.currentStore():loadBest()
+	assert(born.ok and born.record.checkpoint_origin=="generation_start" and born.record.world_map.region==region and born.record.world_map.retreat=="","landing checkpoint keeps the actual region without inventing a home")
+	assert(Mating.generation(life)==generation+1 and life.growth.lifeSeed==seed and life.start_zone==zone and life.start_region==region,"Follow return keeps exact child and landing origin")
+	assert((driver.motor.pos-spawn).Magnitude<1 and driver.world.region.id==region and driver.motor.mode=="attached" and not life.resting,"Follow return lands supported at the drawn destination")
+	assert(#driver.notebook:entriesFor("eggs_and_wind")==entries and mateLegs.phase=="" and not panel:isShowing(),"Follow return never repeats hatching or landing entries")
+	driver.saveState.rest.cfg.workOptions=workOptions
 end)
 
 print("SELFTEST_PRESERVE passed=" .. passed .. " failed=" .. failed)

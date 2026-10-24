@@ -560,6 +560,9 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	local legs = d.mateLegs
 	local look = d.appearance()
 	local oldRig = d.rig()
+	local workClock=0
+	local workOptions=d.saveState.rest.cfg.workOptions
+	d.saveState.rest.cfg.workOptions={budget=.001,maxSeconds=1000,now=function() workClock+=.0001;return workClock end}
 	assert(d.caughtPanel:choose("Carry"), "the button works")
 	frames(3)
 	assert(life.generation == 1 and life.growth.stage == 0 and not life.growth:isAdult(), `generation 1, a young juvenile again: {life.generation}`)
@@ -576,6 +579,24 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	assert(string.find(find("SpiderPrompts", "Day").Text, "Generation 2", 1, true) ~= nil, `the day line: "{find("SpiderPrompts", "Day").Text}"`)
 	assert(workspace:FindFirstChild("Family"):FindFirstChild("EggSac") == nil, "the old sac is gone")
 	assert(d.notebook:isOpen("eggs_and_wind") and d.notebook:isOpen("bold_jumper"), "the notebook is the player's own: kept")
+	-- Before the child's first rest, Back must wait for its baseline, never
+	-- replay the parent's hatch-morning checkpoint. Exercise the actual queue.
+	local seed=life.growth.lifeSeed
+	local entries=#d.notebook:entriesFor("eggs_and_wind")
+	assert(d.saveState.birth and d.saveState.birth.result.pending,"generation baseline prepares privately across frames")
+	d.returnToCheckpoint()
+	local waiting=d.saveState.localReturnResult
+	assert(waiting.pending and d.saveState.birth.returnRequested,"Back queues behind the child's pending baseline")
+	life.generation=77 -- prove a return really applies, rather than ignoring Back
+	assert(awaitReturn(d,function() frame(0) end).ok and not waiting.pending,"queued return completes once")
+	frames(3)
+	assert(life.generation==1 and life.mating.stage=="none" and life.growth.lifeSeed==seed,"Back before first rest preserves the exact newborn")
+	assert(not life.resting and not life.asleep and life.growth.stage==0,"the child does not inherit the parent's rest")
+	assert(#d.notebook:entriesFor("eggs_and_wind")==entries and legs.phase=="" and not d.caughtPanel:isShowing(),"return neither re-hatches nor repeats the notebook")
+	local born=d.currentStore():loadBest()
+	assert(born.ok and born.record.checkpoint_origin=="generation_start","the committed baseline identifies the child's beginning")
+	assert(#require("../src/Shared/Persistence/SaveRest").check("main",born.record)==0,"the server accepts the generation baseline")
+	d.saveState.rest.cfg.workOptions=workOptions
 	-- The sill goes on: it moves, saves, and a rest keeps this generation.
 	local p0 = d.motor.pos
 	key("Forward", true); frames(30); key("Forward", false); frames(2)

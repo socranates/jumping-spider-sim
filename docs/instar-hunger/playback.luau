@@ -96,6 +96,9 @@ return function(d:any)
    emit("ADULT",{adult=case.adult,mode=case.mode,skins=#g.exuviae,seed=g.lifeSeed})
   end
   local player=Players.LocalPlayer
+  d.life:stopRest();d.place(Vector3.new(2,.31,6),Vector3.yAxis);d.world:refocus()
+  waitFor(function():boolean return not d.world.playerLoading and d.motor.mode=="attached"end)
+  d.camera:snap()
   for _,food in {1,.55,.1} do
    d.needs.energy=food;player:SetAttribute("HungerDisplay","veil");pause(3)
    local edge=d.hud.hungerEdges[1]

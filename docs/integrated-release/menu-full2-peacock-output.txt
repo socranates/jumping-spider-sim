@@ -1,0 +1,2 @@
+PEACOCK card lines (the longest of every display key and pad style): keyboard 10, gamepad 10, touch 10
+PEACOCK passed=272 failed=0

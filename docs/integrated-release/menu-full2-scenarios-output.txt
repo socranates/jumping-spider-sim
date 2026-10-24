@@ -1,0 +1,13 @@
+  1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+  2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+  3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+  5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+  7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+  8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+  9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+  10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+  the let-down past the wall: skin 0.310 from Studio's place, 0.310 with the engine's miss, on the soil after 118.9 s
+  the tangent touch: 0.753 studs a second exact, 0.753 with a touch on every sweep (360 let pass), 0.000 without the rule (360 stops, 4.111 taken off)
+BOXWORLD passed=21 failed=0

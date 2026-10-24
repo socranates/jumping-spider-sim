@@ -33,3 +33,24 @@ uncertain generalizations are still real limitations. Not every player-facing
 UI string, creature dimension, caption, alternate input label or Reduced Motion
 path has been newly reviewed on the current candidate. Those remaining scopes
 stay explicit in [HEALTH-CURRENT.md](HEALTH-CURRENT.md).
+
+## Confirmed first-page wording issue - 2026-10-24
+
+Current `bold_jumper` text calls the conspicuous green-blue structures "fangs".
+The opened [Missouri Department of Conservation species account](https://mdc.mo.gov/discover-nature/field-guide/bold-jumper)
+distinguishes the iridescent basal chelicerae from the actual, less-visible
+fangs. Its size section also reaches three-quarters of an inch for females
+(about19mm), beyond this page's approximate6-15mm range. These are small
+educational wording corrections to carry through the generator's TEXT_FIXES,
+retaining the frozen original in godotText and preserving the original source
+reference fixture. Proposed wording: "Adults are about 6 to 19 millimetres
+long" and "shining green-blue mouthparts, called chelicerae".
+
+This is a confirmed finding, **not an applied or published correction**.
+The current font-only candidate has unchanged notebook bytes. Its visual
+verification takes precedence before assembling another candidate. The source
+account was opened and read; the Edwards2004 PDF search result was located but
+its direct web open failed on size (14.5MB). Penn State's direct open returned
+403. Neither is claimed as a full primary-paper reading. The MDC page alone
+supports the distinction and the reported upper size, without borrowing its
+other claims for this page or implying a full50-page audit.

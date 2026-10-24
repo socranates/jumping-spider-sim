@@ -1,0 +1,5 @@
+RIVALNAV perf: 5400 ticks, 2.00 rays/tick, 900 thinks, 4 plans, 0 replans, 0 resets, 7933 ticks/s of CPU shim time
+RIVALNAV places to patrol to: sill 105, outer_sill 18, house_wall 13, bed_a 79
+RIVALNAV the preserve: the rival in 15 minutes crossed 3 seams and walked 4 of its roam's regions (the garden's 16 cells, ROBLOX-119: and the path, the bench patch and the meadow's edge); 8 places reached
+RIVALNAV the meadow's edge: in 10 minutes the rival walked 3 regions (2 crossings), 77 studs from where it began, in pad_c3, its record good true
+RIVALNAV passed=581 failed=0

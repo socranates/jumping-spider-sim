@@ -1,0 +1,3 @@
+LEGACY_MAIN_GENTLE selected_slot_kept=true next_rest_same_slot=true easy_bytes_retained=true ending_offer_same_slot=true new_lives_select_own_slots=true
+RECOVERY_ENTRY_HOLD actual_adoption=true generation_increment=1 menu_hidden=true stale_release_refused=true explicit_current_release_resumes=true
+LOCAL_RETURN passed=41 failed=0

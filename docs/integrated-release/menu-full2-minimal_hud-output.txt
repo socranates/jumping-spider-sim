@@ -1,0 +1,1 @@
+MINIMAL passed=81 failed=0

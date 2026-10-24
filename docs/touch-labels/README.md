@@ -1,4 +1,4 @@
-# Touch label candidate: native layout check pending
+# Touch label font fix verified locally
 
 2026-10-23. This follows the private version 13 Player captures in
 ../private-player. Those captures show Creep and Cancel wrapping inside words,
@@ -11,7 +11,7 @@ handlers, input-source tracking, text, button sizes, positions, visibility and
 settings are unchanged. No font scaling or minimum-text-size setting added.
 
 The original qualified/published candidate is unchanged. This candidate is
-unpublished, unactivated, and **not yet a verified visual fix**.
+unpublished and unactivated. Its local native label layout is now verified.
 
 - Derivation: prepare.py, derivation.json and spider-input.luau.
 - Clean model: C:/Users/natha/claude-xfer/Windowsill-touch-font-attempt1/TheWindowsill-candidate.rbxlx.
@@ -22,22 +22,47 @@ unpublished, unactivated, and **not yet a verified visual fix**.
   **1489 passed / 0 failed** in touch-font1-receipt.json under
   ../integrated-release. This targeted run is not the full 78-suite repeat.
 
-Next: after the published candidate's separate menu-full2 CLI process finishes,
-open this clean model locally in Studio. Execute its guard.luau while stopped:
-273 exact sources, Game/Place 0, no diagnostics, normal SelfTest=false. Play;
-execute native-check.luau in the **client** command bar. It requires the actual
-runtime buttons to have the candidate font, then compares cloned buttons with
-Legacy/candidate fonts at normal/short sizes and contextual label variants.
-It records real TextBounds/TextFits and checks for unwanted extra rows rather
-than accepting a wrapped word just because it technically fits the button.
+The private13 candidate's second complete CLI run finished before Studio opened.
+Both complete runs have78 suites/468967 top-level passes/0, verified in
+../audit/current-cli-qualification.json. They belong to that earlier source
+snapshot; the font variant's relevant cohort is the1489 above.
+
+Local Studio run1792818447500 checked all16 actual runtime buttons' fonts, then
+rendered80 cloned cases:40 Legacy and40 candidate, normal/short button sizes,
+default and contextual labels. **Candidate40/40; Legacy13 failures.** Real
+TextBounds/TextFits and same-string unrestricted-width glyph measurements
+detect extra rows without confusing deliberate newlines or arrow fallback.
+Legacy failures span Cancel, Choose, Creep, Display, Focus, Lock and Recenter.
+See native-comparison.png and the complete native-font.json/native-output.txt.
 
 The comparison GUI is a temporary local fixture, not game code. It never
-changes actual action bindings, widgets or saved settings. Retain its original
-TOUCH_FONT_NATIVE JSON and a screenshot; inspect any failure before calling the
-fix verified. Stop Play, rerun the model guard, and close this unpublished
-editor. Do not publish it, claim a physical-phone test, or measure performance
-while another heavy job is running. No new unit test was added for this small
-presentation change; native layout is the relevant remaining evidence.
+changes actual action bindings, widgets or saved settings. The initial large
+single-message log was truncated near1KB; it is not the qualification input.
+The fixture was corrected to emit bounded per-row records and rerun on the
+same model. All80 rows,16 live-button records, BEGIN/END and before/after273
+source guards are retained from the original log. No reconstructed missing
+data or tally-only qualification. The initial display-only reframe is retained
+separately in show-result.luau.
+
+The overlay was removed; an ordinary New Life click reached the spider and0/7
+meal counter (ordinary-entry.png). Actual touch controls were not enabled on
+this Studio desktop; they were not forced visible. The clone comparison is a
+native component layout check, not a physical-phone/controller comfort test.
+Play stopped with Shift+F5. Postguard passed at00:12:14; Game/Place remained0
+and all273 source bytes unchanged. Studio4880 closed without saving temporary
+editor state; the original model hash remains unchanged. No Rojo or upload.
+
+This unbound editor cannot use DataStore. The log retains40 CreatorWarnings:
+1 initial store-unavailable,32 local config-load,1 session-only,2 inherited
+asset203785492 type and4 StyleRule warnings;0 CreatorErrors. The repeated
+no-API warnings are not a successful storage test. Studio private memory was
+about3.6GB; accessibility temporarily returned no data during gameplay.
+Cause was not established. No FPS, memory-leak or startup-stall fix is inferred.
+No new unit test was added for this small presentation change.
+
+Recheck: `python docs/touch-labels/collect.py --check` binds exact model/source
+diff, all targeted outputs, bounded native rows and screenshots. The original
+full log remains local and is bound by hash; unrelated log data is not copied.
 
 The private published version remains 13 and production remains 140. Earlier
 standalone startup gaps and broader audit limits remain in HEALTH-CURRENT.md.

@@ -1,0 +1,3 @@
+STATION physical parts=391 regions=51
+STATION wasp circuit visited=14/16
+STATION passed=32883 failed=0

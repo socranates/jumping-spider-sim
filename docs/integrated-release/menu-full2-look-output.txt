@@ -1,0 +1,10 @@
+look: full 707 parts (504 hairs, 8 shells, 195 other), low 265 (134 hairs, 2 shells, 129 other)
+look: peacock spider full 119 parts, low 80
+look: ant-mimicking spider full 79 parts, low 69
+look: Mexican redknee full 146 parts, low 84; Greenbottle blue full 148 parts (36 bristles), low 84
+look: tolerance, first spider, full: hairs within 6.68e-04 studs, 9.99e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 91.6 percent of the parts moved
+look: tolerance, first spider, low (as the mate is drawn): hairs within 6.68e-04 studs, 9.62e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 94.8 percent of the parts moved
+look: tolerance, redknee, full: hairs within 1.80e-04 studs, 9.92e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 90.8 percent of the parts moved
+look: rival full 622 parts, low 211
+look: the male mate, low (living) 270 parts
+LOOK passed=1442 failed=0

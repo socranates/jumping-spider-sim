@@ -1,0 +1,11 @@
+2026-10-24T16:49:14.864Z,51.864803,15f4,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:49:14.866Z,51.866798,15f4,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:49:14.866Z,51.866798,15f4,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:49:14.866Z,51.866798,15f4,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T16:49:29.038Z,66.038223,1688,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T16:50:13.994Z,110.994659,1c88,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only
+2026-10-24T16:50:30.483Z,127.483231,435c,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T16:51:03.729Z,160.729294,6e38,6,Info [FLog::CreatorOutput] [GENERATION_CHECKPOINT_QUEUED] 1792860629562 {"choice":"Carry","y":0.3100000023841858,"x":-25.5,"seed":641956903,"z":6,"mode":"main","easy":false}
+2026-10-24T16:51:04.213Z,161.213776,6c98,6,Info [FLog::CreatorOutput] [GENERATION_CHECKPOINT_RETURNED] 1792860629562 {"choice":"Carry","distance":0,"attached":true,"entries":0,"generation":1,"mode":"main","seed":641956903,"easy":false}
+2026-10-24T16:51:04.219Z,161.219742,6c98,6,Info [FLog::CreatorOutput] [GENERATION_CHECKPOINT_FAIL] 1792860629562 {"problem":"Players.socranates.PlayerScripts.Client.MatrixPlayback:30: assertion failed!\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:30 function fresh\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:44\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:38\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2889\n"}
+2026-10-24T16:52:11.631Z,228.631226,1c88,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only

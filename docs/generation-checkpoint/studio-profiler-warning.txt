@@ -1,0 +1,10 @@
+Pre-Play Studio warning; the stack names MaterialManager React profiling.
+2026-10-24T17:10:28.523Z,65.523300,7254,6,Warning [FLog::CreatorWarning] Warning: debug.profileEnd() - No active profile annotation. At: Stack Begin
+Script 'MaterialManager.MaterialManager.Packages._Index.ReactReconciler.ReactReconciler.RobloxReactProfiling', Line 65 - function profileend
+Script 'MaterialManager.MaterialManager.Packages._Index.ReactReconciler.ReactReconciler.RobloxReactProfiling', Line 168 - function profileRootAfterYielding
+Script 'MaterialManager.MaterialManager.Packages._Index.ReactReconciler.ReactReconciler.ReactFiberWorkLoop.new', Line 841
+Script 'MaterialManager.MaterialManager.Packages._Index.ReactReconciler.ReactReconciler.SchedulerWithReactIntegration.new', Line 237
+Script 'MaterialManager.MaterialManager.Packages._Index.Scheduler.Scheduler.Scheduler', Line 377 - function unstable_runWithPriority
+Script 'MaterialManager.MaterialManager.Packages._Index.ReactReconciler.ReactReconciler.SchedulerWithReactIntegration.new', Line 165 - function runWithPriority
+Script 'MaterialManager.Mate
+2026-10-24T17:11:23.373Z,120.373070,34f4,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only

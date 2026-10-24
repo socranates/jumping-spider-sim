@@ -1,0 +1,2 @@
+BIRTH_FAILURE_UI	Returning to the last rest	menu	true	failed	true	queued	false	return_pending	nil
+GENERATION_CHECKPOINT passed=28 failed=0

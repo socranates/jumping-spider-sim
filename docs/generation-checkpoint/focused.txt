@@ -1,0 +1,8 @@
+Selected summaries from the complete windows-full.txt run.
+GENERATION_CHECKPOINT passed=31 failed=0
+GENERATION_NETWORK passed=9 failed=0
+LOCAL_RETURN passed=41 failed=0
+LOCAL_REST_CLIENT passed=17 failed=0
+CHECKPOINT passed=621 failed=0
+CLIENT_MATING passed=29 failed=0
+MATING passed=773 failed=0

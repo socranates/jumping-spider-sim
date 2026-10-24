@@ -1,0 +1,10 @@
+{
+  "passed": false,
+  "reason": "Synthetic adult fixture did not supply the prior Easy unlock; the second fresh call was correctly refused. Normal Carry and immediate Back succeeded. No game source changed for correction.",
+  "source_commit": "ba6b39894dc39e3ff37ec226037ebf516b114366",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T164823Z_Studio_F9089_last.log",
+  "log_sha256": "66d30f2417ac4a4ebb20febeb6e8cdf02d447287f3124aa161b39da8e3939bf5",
+  "studio_pid": 8716,
+  "studio_exited": true,
+  "model_unchanged": true
+}

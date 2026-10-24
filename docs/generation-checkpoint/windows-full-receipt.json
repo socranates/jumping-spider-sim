@@ -1,0 +1,14 @@
+{
+  "source_test_commit": "a3527650fe925c52e66ee337fa9c7f51c868248c",
+  "command": [
+    "python",
+    "roblox_port/tests/run.py",
+    "C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools/luau/luau.exe"
+  ],
+  "started_at": "2026-10-24T17:08:58.683253+00:00",
+  "finished_at": "2026-10-24T17:32:23.205573+00:00",
+  "exit_code": 0,
+  "log_sha256": "5d0a9176fc4d4ae2d2d8ec3282e505901a2a6aae3586669652771b0f7205aa70",
+  "suite_count": 84,
+  "platform": "Windows plain Luau CLI with shim; not native Roblox evidence"
+}

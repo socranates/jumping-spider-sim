@@ -1,0 +1,90 @@
+GENERATION_CHECKPOINT passed=28 failed=0
+GENERATION_NETWORK passed=9 failed=0
+HUNGER_VEIL passed=230 failed=0
+INSTARS early=1527/10000 passed=10806 failed=0
+RIG_HAIR_CACHE cases=14 frames=560 part_comparisons=143800 lookat_before=47280 lookat_after=29120 worst_position=0 worst_axis=1.6846514078731632e-15 worst_size=0
+RIG_HAIR_CACHE passed=29 failed=0
+RECOVERY_APPLICATION passed=31 failed=0
+RECOVERY_TEMPLATES passed=56 failed=0
+JSON_ENCODING passed=20716 failed=0
+LEGACY_MAIN_GENTLE selected_slot_kept=true next_rest_same_slot=true easy_bytes_retained=true ending_offer_same_slot=true new_lives_select_own_slots=true
+RECOVERY_ENTRY_HOLD actual_adoption=true generation_increment=1 menu_hidden=true stale_release_refused=true explicit_current_release_resumes=true
+LOCAL_RETURN passed=41 failed=0
+LOCAL_REST_CLIENT passed=17 failed=0
+LOCAL_REST passed=33 failed=0
+SAVE_OFFERS passed=99 failed=0
+SAVE_RESTORE passed=24 failed=0
+SAVE_WORK passed=39 failed=0
+CONTINUATION_MENU passed=41 failed=0
+SAVE_CONTINUATION passed=260 failed=0
+SAVE_INTENT passed=57 failed=0
+SAVE_OBSERVATION passed=50 failed=0
+[Windowsill] navigation startup: C:/Users/natha/AppData/Local/Temp/tmp9x45snw6.luau:68082: synthetic controller navigation failure
+NAVIGATION_STARTUP passed=15 failed=0
+SAVE_NOTICE passed=53 failed=0
+OUTDOOR_RESET passed=45 failed=0
+REST_COMPRESSION passed=57 failed=0
+REST_STORAGE full_world_chars=3195572 regions=266
+REST_STORAGE passed=14 failed=0
+FOUNDATION passed=4 failed=0 avoided_scans=2000
+RARE passed=265 failed=0
+SPAWN passed=20 failed=0
+MEALS passed=92 failed=0
+fuzz: 402 body hairs, 80 leg hairs, 32 white
+SUMMARY passed=196 failed=0
+PERCEPTION passed=4669 failed=0
+SENSOR passed=507 failed=0
+PREY feel: fruit fly idle 1.68 s, 2 taps/s won 60/60, 4 taps/s 1.00 s; house fly idle 1.15 s, 4 taps/s 4.61 s
+PREY feel (ROBLOX-96): gnat idle 1.94 s, aphid idle 2.34 s
+PREY feel (ROBLOX-101): crane fly idle 0.99 s, won 33/60 at 4 taps/s and 60/60 at 6; house fly 60/60 at 4
+PREY passed=1668 failed=0
+LIFE passed=20922 failed=0
+checkpoint: 17948 characters, 87 tables
+CHECKPOINT passed=621 failed=0
+WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+WASP passed=16884 failed=0
+GAZE passed=74 failed=0
+PRESENTATION passed=11 failed=0
+  1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+  2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+  3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+  5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+  7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+  8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+  9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+  10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+  the let-down past the wall: skin 0.310 from Studio's place, 0.310 with the engine's miss, on the soil after 118.9 s
+  the tangent touch: 0.753 studs a second exact, 0.753 with a touch on every sweep (360 let pass), 0.000 without the rule (360 stops, 4.111 taken off)
+BOXWORLD passed=21 failed=0
+CLIENT passed=27 failed=0
+PERCEPTION_CLIENT passed=1 failed=0
+CLIENT_ANT passed=3 failed=0
+CLIENT_RIVAL passed=9 failed=0
+CLIENT_MATING passed=29 failed=0
+look: full 707 parts (504 hairs, 8 shells, 195 other), low 265 (134 hairs, 2 shells, 129 other)
+look: peacock spider full 119 parts, low 80
+look: ant-mimicking spider full 79 parts, low 69
+look: Mexican redknee full 146 parts, low 84; Greenbottle blue full 148 parts (36 bristles), low 84
+look: tolerance, first spider, full: hairs within 6.68e-04 studs, 9.99e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 91.6 percent of the parts moved
+look: tolerance, first spider, low (as the mate is drawn): hairs within 6.68e-04 studs, 9.62e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 94.8 percent of the parts moved
+look: tolerance, redknee, full: hairs within 1.80e-04 studs, 9.92e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 90.8 percent of the parts moved
+look: rival full 622 parts, low 211
+look: the male mate, low (living) 270 parts
+LOOK passed=1442 failed=0
+IDLE passed=5719 failed=0
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 1261 parts at full detail, 363 at low (view 45 items at full), dust 7 -> 2.8 per second
+world: the looks outside the window (full/low): outer_sill 116/39, house_wall 127/69, bed_a 466/113, wall_west 93/59, wall_west_upper 73/66, wall_upper 49/28, eaves_west 46/31, eaves 149/42, shrub_west_a 260/80, shrub_west_b 260/80, shrub_west_c 260/80, shrub_west_d 260/80, shrub_west_e 260/80, shrub_west_f 260/80, shrub_west_g 260/80, shrub_west_h 260/80, shrub_west_i 260/80, shrub_west_j 260/80, kitchen_counter 83/19, kitchen_floor 34/10
+WORLD passed=355 failed=0
+FLIES passed=283 failed=0
+EYES passed=231 failed=0
+HUD passed=103 failed=0
+PEACOCK card lines (the longest of every display key and pad style): keyboard 10, gamepad 10, touch 10
+PEACOCK passed=272 failed=0
+ANTMIMIC passed=89 failed=0
+TARANTULA passed=86 failed=0
+CONTINUING passed=145 failed=0
+GROWTH passed=574 failed=0

@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "source_commit": "06a5e57d0a210814c059d71fe8673e7fc8131eac",
+  "run": "1792860890644",
+  "events": [
+    {
+      "kind": "QUEUED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:55:27.907Z",
+      "data": {
+        "choice": "Carry",
+        "y": 0.3100000023841858,
+        "x": -25.5,
+        "seed": 611613677,
+        "z": 6,
+        "mode": "main",
+        "easy": false
+      }
+    },
+    {
+      "kind": "RETURNED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:55:28.413Z",
+      "data": {
+        "choice": "Carry",
+        "distance": 0,
+        "attached": true,
+        "entries": 0,
+        "generation": 1,
+        "mode": "main",
+        "seed": 611613677,
+        "easy": false
+      }
+    },
+    {
+      "kind": "QUEUED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:55:54.634Z",
+      "data": {
+        "choice": "Carry",
+        "y": 0.3100000023841858,
+        "x": -25.5,
+        "seed": 1706604297,
+        "z": 6,
+        "mode": "main",
+        "easy": true
+      }
+    },
+    {
+      "kind": "RETURNED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:55:55.099Z",
+      "data": {
+        "choice": "Carry",
+        "distance": 0,
+        "attached": true,
+        "entries": 0,
+        "generation": 1,
+        "mode": "main",
+        "seed": 1706604297,
+        "easy": true
+      }
+    },
+    {
+      "kind": "QUEUED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:56:33.325Z",
+      "data": {
+        "choice": "Follow",
+        "zone": "hut_garden",
+        "y": -84.29000091552734,
+        "x": -130,
+        "seed": 1774537329,
+        "z": -185,
+        "mode": "free",
+        "region": "garden_b1",
+        "easy": false
+      }
+    },
+    {
+      "kind": "RETURNED",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:56:33.828Z",
+      "data": {
+        "choice": "Follow",
+        "zone": "hut_garden",
+        "distance": 0,
+        "attached": true,
+        "entries": 1,
+        "generation": 1,
+        "region": "garden_b1",
+        "mode": "free",
+        "seed": 1774537329,
+        "easy": false
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:56:33.945Z",
+      "data": {
+        "lockReleased": true,
+        "active": 0,
+        "requests": 28,
+        "gate": {
+          "actors": 1,
+          "history": 10,
+          "reserved": 0,
+          "started": 0,
+          "read": 10,
+          "write": 9,
+          "queued": 0,
+          "scopes": 0
+        },
+        "archives": 0,
+        "starts": 28,
+        "owners": [
+          {
+            "epoch": ":1792860889:1",
+            "closed": false
+          }
+        ],
+        "rests": {
+          "R_qa_normal_startup_easy": "b7b50ec21f92a3ed",
+          "R_qa_normal_startup_main": "6d74fecb12dde52a",
+          "R_qa_normal_startup_free": "cd1a7a15246d1126"
+        },
+        "optionsCreated": 12,
+        "optionsDestroyed": 12,
+        "ready": true
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792860890644",
+      "utc": "2026-10-24T16:56:33.945Z",
+      "data": []
+    }
+  ],
+  "returns": 3,
+  "source_guards": 2,
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T16:53:44.568Z,31.568216,5a5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:53:44.568Z,31.568216,5a5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:53:44.568Z,31.568216,5a5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:53:44.568Z,31.568216,5a5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T16:53:55.187Z,42.187626,1c44,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T16:54:54.693Z,101.693321,6250,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "model_sha256": "7bd224b8b1451b8afaa0e0f3c1cd755195e40767e9499f83c3182afc4231b7e3",
+  "model_unchanged": true,
+  "log_sha256": "9b80e3940e04d1206ebb0913e606a0a127c91e281fc7cff44a91ae9b47043ac0",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T165313Z_Studio_EDBA4_last.log",
+  "studio_pid": 27444,
+  "studio_exited": true,
+  "published": false,
+  "limits": "Synthetic adult parents, prior Easy unlock, hatch records and safe initial placement. Ordinary Carry/Follow, wind ride, landing, asynchronous local storage and queued Back run in Studio with unbound yielding-memory storage. Not natural reproduction, online DataStore durability, performance or device comfort."
+}

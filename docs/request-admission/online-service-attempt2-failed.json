@@ -1,0 +1,18 @@
+{
+  "run": "1792799053157",
+  "terminal": "failed",
+  "reason": "Protected New Main refused after successful recovery and replacement; precise worker reason unavailable in original snapshot",
+  "archive_complete": true,
+  "original_exact": {
+    "main": true,
+    "free": true,
+    "easy": true
+  },
+  "options_created": 121,
+  "options_destroyed": 121,
+  "online_verified": false,
+  "actual_rejoin_verified": false,
+  "published": false,
+  "output_sha256": "6d159883eea2a0fb69c7daced36b835994b7d720ae5495db5a13651f4dc1fd58",
+  "stop_note": "Stopped after held failure. Departure diagnostic encountered digest(nil) for an absent proposal and left its verification scope open; not counted as product departure failure."
+}

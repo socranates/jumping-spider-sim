@@ -1,0 +1,12 @@
+{
+  "run": "1792799622833",
+  "terminal": "failed",
+  "reason": "New retirement transform refused with New write scope ended",
+  "worker_phase": "write",
+  "session_state": "active",
+  "exact_retained_failure_reopened": true,
+  "online_verified": false,
+  "published": false,
+  "output_sha256": "16146787ac0642f4b46fb724bc3eebe64e7d1f6491668085f8a453fbc2b0c105",
+  "stop_note": "Stopped after diagnostic reproduction; partial suite does not satisfy final all-three-fresh-rest proof."
+}

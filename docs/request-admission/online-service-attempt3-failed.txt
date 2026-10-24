@@ -1,0 +1,6 @@
+2026-10-23T23:53:48.836Z,1067.836182,5d78,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_CLIENT_BEGIN] 1792799622833 clock_scale=1 real_remotes=true codec=engine
+2026-10-23T23:53:49.613Z,1068.613525,1fc0,6,Info [FLog::CreatorOutput] [ONLINE_SERVICE_PARTIAL_SOURCE] 1792799622833 qa_3cb3b30963a84dc6 exact_retained_failure_no_reset
+2026-10-23T23:53:49.614Z,1068.614502,1fc0,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_SERVER_BEGIN] 1792799622833 clock_scale=1 storage=WindowsillTest_v1 online=true codec=engine
+2026-10-23T23:53:58.373Z,1077.373413,1fc0,6,Warning [FLog::CreatorWarning] Warning: [NEW_APP_NATIVE_CLIENT_FAIL] 1792799622833 Players.socranates.PlayerScripts.Client.SilkPlayback:94: native application held failure: the previous saved spider could not be kept safely
+2026-10-23T23:53:58.419Z,1077.419556,1fc0,6,Info [FLog::CreatorOutput] [ONLINE_SERVICE_FAILURE_DETAIL] 1792799622833 {"detail":{"busy":true,"closed":false,"jobPhase":"write","jobProblem":"New write scope ended","jobState":"refused","leaseState":"pending","requestState":"pending","sessionState":"active"},"gate":{"actors":1,"history":52,"queued":0,"read":52,"reserved":0,"scopes":1,"started":1,"write":3},"providerActive":1} nil
+2026-10-23T23:55:49.642Z,1188.642700,1fc0,6,Info [FLog::CreatorOutput] [ONLINE_SERVICE_PLAYER_REMOVING] 1792799622833 qa_3cb3b30963a84dc6 1

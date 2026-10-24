@@ -1,0 +1,30 @@
+{
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-online-admission-a1f042e-attempt1\\model6\\Windowsill-online-service.rbxlx",
+  "place_sha256": "ef1b51cb4dcd8d1df33d0edd9e3220f7256b8ddd58e49d4677e2a6432308a737",
+  "manifest_sha256": "e9e413188fe0c331d5aac7f2e0e7d4bbbe5d84aedba2867ad2c75a246f03d349",
+  "guard_sha256": "e3461e94dadb6ba16946055176b08852c789890d22aaa71e791a3baa3e46ada3",
+  "scripts": 273,
+  "production_untouched": 220,
+  "private_targets": 51,
+  "production_overrides": [
+    "Server/SaveService.luau",
+    "Shared/Persistence/Checkpoint.luau",
+    "Shared/Persistence/SaveSession.luau",
+    "Shared/World/WorldMap.luau"
+  ],
+  "diagnostics": {
+    "docs/request-admission/online-service-client.luau": "a57160698b5c086df57a9334d0e700ad3d17642fd85e6e6f4f1e956e2e3df1da",
+    "docs/request-admission/online-service-server.server.luau": "9f7a4832ab9e3fc3772cd27ecc7f4de6e23e3bb642b702465f8d869285f46799"
+  },
+  "production_persistence_disabled": true,
+  "memory_store": false,
+  "engine_codec": true,
+  "clock_scale": 1,
+  "executed": false,
+  "native_verified": false,
+  "online_verified": false,
+  "published": false,
+  "universe": 10771634917,
+  "place_id": 109879630247781
+}

@@ -1,0 +1,21 @@
+{
+  "run": "1792800470163",
+  "terminal": "passed",
+  "phase": "retained-failure-through-New-and-actual-leave",
+  "client_checks": 52,
+  "server_checks": 18,
+  "options_created": 188,
+  "options_destroyed": 188,
+  "sdk_starts": 222,
+  "remaining_scopes": 0,
+  "provider_active": 0,
+  "lock_released": true,
+  "state": "await_rejoin",
+  "all_three_modes_stored": true,
+  "original_archives_retained": true,
+  "online_initial_departure_verified": true,
+  "actual_rejoin_verified": false,
+  "published": false,
+  "output_sha256": "4ef2fe7c765ab78038b5d33716de80d2856f5eb62f7724a0c519222b93b56a2b",
+  "manifest_sha256": "1576bd55a2c13f3dc89916cdb1829048d0ee59c94e513a0f47c7be0b6ec9b309"
+}

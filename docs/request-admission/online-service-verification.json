@@ -1,0 +1,33 @@
+{
+  "private_commit": "866d217b497fc1f3b06dc305b9fac017792151dc",
+  "production_source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "universe": 10771634917,
+  "place": 109879630247781,
+  "store": "WindowsillTest_v1",
+  "synthetic_actor": "qa_3cb3b30963a84dc6",
+  "runs": [
+    {
+      "run": "1792800470163",
+      "client_checks": 52,
+      "server_checks": 18,
+      "options_destroyed": 188,
+      "sdk_starts": 222,
+      "state": "await_rejoin"
+    },
+    {
+      "run": "1792800884543",
+      "client_checks": 15,
+      "server_checks": 24,
+      "options_destroyed": 32,
+      "sdk_starts": 37,
+      "state": "done"
+    }
+  ],
+  "manifest_sha256": "1576bd55a2c13f3dc89916cdb1829048d0ee59c94e513a0f47c7be0b6ec9b309",
+  "real_leave_rejoin_verified": true,
+  "retained_failure_resumed_without_reset": true,
+  "normal_startup_installed": false,
+  "published": false,
+  "goal_complete": false,
+  "scope": "Unpublished local Studio, real storage, real clock and remotes; not public-server or general performance qualification"
+}

@@ -1,0 +1,7 @@
+{
+  "gate_sha256": "8baa35a43481bd4a1f44751c7a244ec595bf8be220b0cc23263fcd022eb76257",
+  "helper_sha256": "0a80f4d4c52b935683e7f9ff2b08f27b8b98ca8a5c11883a73cf801be3db6538",
+  "bundle_sha256": "3a5aa8cb3ec014ffbde314f147eb2ba6d1b6a34e9865511082fd41ed9731bb9a",
+  "exit_code": 0,
+  "scope": "diagnostic bootstrap only; not full CLI cohort or online qualification"
+}

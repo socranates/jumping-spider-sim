@@ -1,0 +1,11 @@
+{
+  "run": "1792798756166",
+  "terminal": "failed",
+  "reason": "Diagnostic helper called nonexistent Gate.enqueue before dispatch",
+  "output_sha256": "40502a4f52bedcfa16d23efc7722c104a9abd8f01995c274ef81f2f9338151c9",
+  "manifest_sha256": "245c5fb3af34824afda7dd4c5b22115227c228627dbd0ea9c2b4cde5944d65b8",
+  "sdk_starts": 0,
+  "online_verified": false,
+  "actual_rejoin_verified": false,
+  "published": false
+}

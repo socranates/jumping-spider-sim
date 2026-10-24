@@ -1,0 +1,13 @@
+2026-10-23T23:38:47.411Z,166.411255,3cb0,6,Info [FLog::CreatorOutput] [ONLINE_SERVICE_GUARD] bd67582b5d53473f067244fc1e2e1f94adde173b 273 isolated_test_store never_production do_not_publish
+2026-10-23T23:39:16.700Z,195.700287,1fc0,6,Error [FLog::CreatorError] Error: ServerScriptService.Server.NewApplicationNative:163: ServerScriptService.Server.NewApplicationNative:149: attempt to call missing method 'enqueue' of table
+2026-10-23T23:39:16.700Z,195.700287,1fc0,6,Info [FLog::CreatorOutput] Info: Stack Begin
+2026-10-23T23:39:16.702Z,195.702301,1fc0,6,Info [FLog::CreatorOutput] Info: Script 'ServerScriptService.Server.NewApplicationNative', Line 163 - function fresh
+2026-10-23T23:39:16.702Z,195.702301,1fc0,6,Info [FLog::CreatorOutput] Info: Script 'ServerScriptService.Server.NewApplicationNative', Line 166
+2026-10-23T23:39:16.702Z,195.702301,1fc0,6,Info [FLog::CreatorOutput] Info: Stack End
+2026-10-23T23:39:16.704Z,195.704300,1fc0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-23T23:39:16.706Z,195.706314,1fc0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-23T23:39:18.304Z,197.304413,3cb0,6,Info [FLog::CreatorOutput] [NEW_APP_NATIVE_CLIENT_BEGIN] 1792798756166 clock_scale=1 real_remotes=true codec=engine
+2026-10-23T23:39:21.901Z,200.901779,3b2c,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-23T23:40:35.362Z,274.362305,16ac,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|61061
+2026-10-23T23:40:35.364Z,274.364288,16ac,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|61061
+2026-10-23T23:40:35.847Z,274.847687,5d78,6,Warning [FLog::CreatorWarning] Warning: [Rojo-Warn] Disconnected from an error: WebSocket error: 400 - Failed ws recv - err: 56 "Error", curlErrBuf: "Recv failure: An existing connection was forcibly closed by the remote host."

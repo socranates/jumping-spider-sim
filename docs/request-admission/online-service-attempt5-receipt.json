@@ -1,0 +1,23 @@
+{
+  "run": "1792800884543",
+  "terminal": "passed",
+  "phase": "actual-rejoin-restore-save-and-leave",
+  "client_checks": 15,
+  "server_checks": 24,
+  "options_created": 32,
+  "options_destroyed": 32,
+  "sdk_starts": 37,
+  "remaining_scopes": 0,
+  "provider_active": 0,
+  "lock_released": true,
+  "state": "done",
+  "actual_rejoin_verified": true,
+  "ordinary_restore_digest_matched": true,
+  "other_current_slots_unchanged": true,
+  "original_archives_retained": true,
+  "published": false,
+  "transport_port_override": 34872,
+  "editor_restart_before_rejoin": true,
+  "output_sha256": "77676c8ba1edeb066e2d76f831258954bde838364c8b9707fe9db977ef45dcd7",
+  "manifest_sha256": "1576bd55a2c13f3dc89916cdb1829048d0ee59c94e513a0f47c7be0b6ec9b309"
+}

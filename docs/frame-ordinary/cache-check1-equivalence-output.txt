@@ -1,0 +1,3 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-scenery-cache-18ayly_p/run.luau:45262: attempt to modify a readonly table
+stacktrace:
+C:/Users/natha/AppData/Local/Temp/windowsill-scenery-cache-18ayly_p/run.luau:45262

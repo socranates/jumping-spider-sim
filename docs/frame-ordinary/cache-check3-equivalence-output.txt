@@ -1,0 +1,2 @@
+SCENERY_CACHE	2167	passed	0	failed	regions	267	old_generations	801	new_generations	267
+SCENERY_PHONE_CACHE	1602	passed	0	failed	regions	267	low_far_generations	267	upgrade_generations	267

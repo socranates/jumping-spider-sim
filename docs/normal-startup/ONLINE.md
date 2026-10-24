@@ -111,6 +111,11 @@ truncated JSON instead of silently accepting incomplete evidence. Expected Kick
 errors are actual test departures; Stop cannot qualify them. Existing production
 asset-load warnings and the prior tests' output must be reported separately.
 
+Subsequent frame testing also observed warning 203785492 in a clean unbound
+model before Play. It is therefore a Studio/environment warning rather than
+evidence that the downloaded test world's authored geometry caused it. Its
+precise Studio/plugin source has not been established.
+
 This is local Studio with actual online storage, not a published-server,
 controller/comfort, phone, audio or sustained-FPS qualification. Do not add its
 counts to the separate 289821-check CLI result or prior memory fixtures.

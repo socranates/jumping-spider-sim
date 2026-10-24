@@ -1,0 +1,4425 @@
+{
+  "run": "1792809011121",
+  "complete": true,
+  "events": [
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 37,
+        "name": "SceneTriangleCount",
+        "mean": 7.4,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.02227695845067501,
+        "name": "HeartbeatTime",
+        "mean": 0.008842280630778987,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.0005612657987512648,
+        "name": "PhysicsStepTime",
+        "mean": 0.0002750363782979548,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 53397,
+        "name": "InstanceCount",
+        "mean": 32748.6,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 4,
+        "name": "SceneDrawcallCount",
+        "mean": 0.8,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.5100743770599365,
+        "name": "FrameTime",
+        "mean": 0.10201487541198731,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.00715259974822402,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.001430519949644804,
+        "n": 5
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "max": 0.0033496799878776073,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.0006699359975755215,
+        "n": 5
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10756,
+        "phase": "world-client-begin",
+        "t": 4.970670399998198,
+        "dt_ms": 2376.0581016540527,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 5.0116948841605335e-05,
+          "InstanceCount": 51160,
+          "PhysicsStepTime": 0.00023805550881661475,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.02188432775437832,
+          "InstanceCount": 51646,
+          "PhysicsStepTime": 0.00032527584698982537,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.02227695845067501,
+          "InstanceCount": 53397,
+          "PhysicsStepTime": 0.0005612657987512648,
+          "SceneTriangleCount": 37,
+          "SceneDrawcallCount": 4,
+          "RenderGPUFrameTime": 0.0033496799878776073,
+          "RenderCPUFrameTime": 0.00715259974822402,
+          "FrameTime": 0.5100743770599365
+        },
+        "sample": "client-startup",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10722,
+        "phase": "world-client-begin",
+        "t": 2.9763338999910047,
+        "dt_ms": 2177.177667617798,
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0,
+          "InstanceCount": 4007,
+          "PhysicsStepTime": 0.00025058473693206906,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 5.0116948841605335e-05,
+          "InstanceCount": 51160,
+          "PhysicsStepTime": 0.00023805550881661475,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.02188432775437832,
+          "InstanceCount": 51646,
+          "PhysicsStepTime": 0.00032527584698982537,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10629,
+        "phase": "world-client-begin",
+        "t": 0.3660321999923326,
+        "dt_ms": 523.6960649490356,
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0,
+          "InstanceCount": 3533,
+          "PhysicsStepTime": 0,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0,
+          "InstanceCount": 4007,
+          "PhysicsStepTime": 0.00025058473693206906,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "client-startup",
+        "heap_kb": 10849,
+        "phase": "world-client-begin",
+        "t": 5.088395799990394,
+        "dt_ms": 133.5456669330597,
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.02188432775437832,
+          "InstanceCount": 51646,
+          "PhysicsStepTime": 0.00032527584698982537,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0,
+          "RenderCPUFrameTime": 0,
+          "FrameTime": 0
+        },
+        "sample": "client-startup",
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.02227695845067501,
+          "InstanceCount": 53397,
+          "PhysicsStepTime": 0.0005612657987512648,
+          "SceneTriangleCount": 37,
+          "SceneDrawcallCount": 4,
+          "RenderGPUFrameTime": 0.0033496799878776073,
+          "RenderCPUFrameTime": 0.00715259974822402,
+          "FrameTime": 0.5100743770599365
+        },
+        "sample": "client-startup",
+        "index": 4
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "navigation": "pending",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 0,
+          "ended": false
+        },
+        "seconds": 5.230524281039834,
+        "over50": 4,
+        "heap_growth_kb": 10942,
+        "p95_ms": 2376.0581016540527,
+        "render_worst_ms": 0,
+        "frames": 5,
+        "p50_ms": 523.6960649490356,
+        "render_frames": 0,
+        "render_mean_ms": 0,
+        "sample": "client-startup",
+        "wall_seconds": 5.304231299989624,
+        "over100": 4,
+        "p99_ms": 2376.0581016540527,
+        "worst_ms": 2376.0581016540527,
+        "over33": 4
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 2185,
+        "t": 7.999915396794677e-07,
+        "name": "client-enter",
+        "delta": 7.999915396794677e-07
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 9678,
+        "t": 0.3132259999983944,
+        "name": "module-table",
+        "delta": 0.3132252000068547
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 10059,
+        "t": 0.331150300000445,
+        "name": "world-client-begin",
+        "delta": 0.017924300002050586
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 10859,
+        "t": 5.120591600003536,
+        "name": "world-client-end",
+        "delta": 4.789441300003091
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 11315,
+        "t": 5.151488100003917,
+        "name": "module-table-complete",
+        "delta": 0.03089650000038091
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 11343,
+        "t": 5.15494249999756,
+        "name": "spider-rig-begin",
+        "delta": 0.0034543999936431646
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 12331,
+        "t": 5.179741899992223,
+        "name": "spider-rig-end",
+        "delta": 0.024799399994662963
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 12670,
+        "t": 5.204853999995976,
+        "name": "looks-begin",
+        "delta": 0.025112100003752857
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 12744,
+        "t": 5.215669900004286,
+        "name": "looks-end",
+        "delta": 0.010815900008310564
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 12824,
+        "t": 5.229246499991859,
+        "name": "animal-bodies-begin",
+        "delta": 0.01357659998757299
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 13069,
+        "t": 5.243225799989887,
+        "name": "animal-bodies-end",
+        "delta": 0.013979299998027273
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 13107,
+        "t": 5.3007979999965755,
+        "name": "client-ready-to-render",
+        "delta": 0.057572200006688945
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792809011121",
+      "value": {
+        "heap_kb": 13115,
+        "t": 5.301603500003694,
+        "name": "client-constructed",
+        "delta": 0.0008055000071180984
+      }
+    },
+    {
+      "kind": "COUNTERS",
+      "run": "1792809011121",
+      "value": {
+        "unavailable": []
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 15.730700004496612,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "mean_ms": 9.630358689550864
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.16929999401327223,
+        "name": "save",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.06747948758017558
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 10.402200001408346,
+        "name": "looks",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.037792307698496876
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 8.829700003843755,
+        "name": "spider rig",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.025869515683685042
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 8.949199997005053,
+        "name": "other rigs",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.025570370386914478
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.457100007333793,
+        "name": "sound",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.02483475784687564
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 6.807999990996905,
+        "name": "light",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.020466666626200038
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.879600008483976,
+        "name": "shadows",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.01676837610050325
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 4.753699991852045,
+        "name": "fly bodies",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.013576068353581845
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.05610000516753644,
+        "name": "other",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.006856695212227455
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.070100003038533,
+        "name": "prey",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.005897720806377587
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.8541999995941296,
+        "name": "hud",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.00395527067381963
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.2950000091223046,
+        "name": "rival",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0036894587154481613
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.2782999983755872,
+        "name": "wasp",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0036418803372523854
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2364999963901937,
+        "name": "camera",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0010284900242738702
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.17939999816007912,
+        "name": "world",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0007356125400388386
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.07069999992381781,
+        "name": "poses",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0002726495758155387
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.07259999983943999,
+        "name": "panels",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.00022621080743684898
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.06880000000819564,
+        "name": "motor",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.0001960113960347454
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.06289999873843044,
+        "name": "percepts",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.00017920227560806393
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.028399997972883284,
+        "name": "lock button",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.00012079772852531015
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.02379999205004424,
+        "name": "frame",
+        "sample": "startup-to-menu",
+        "mean_ms": 0.00011282050126415287
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.030399998649954796,
+        "name": "mating",
+        "sample": "startup-to-menu",
+        "mean_ms": 8.660968276340397e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.01920000067912042,
+        "name": "bug bodies",
+        "sample": "startup-to-menu",
+        "mean_ms": 7.378915523807718e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.025300003471784294,
+        "name": "senses",
+        "sample": "startup-to-menu",
+        "mean_ms": 7.207978197089542e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.00999998883344233,
+        "name": "lines",
+        "sample": "startup-to-menu",
+        "mean_ms": 5.384614927285587e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.016999998479150236,
+        "name": "nature",
+        "sample": "startup-to-menu",
+        "mean_ms": 4.843304410014312e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.00790000194683671,
+        "name": "perception hud",
+        "sample": "startup-to-menu",
+        "mean_ms": 3.874644357180408e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.004699992132373154,
+        "name": "appearance",
+        "sample": "startup-to-menu",
+        "mean_ms": 2.4501403775119203e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0033999967854470015,
+        "name": "eyes",
+        "sample": "startup-to-menu",
+        "mean_ms": 1.652421797240986e-05
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0031999952625483274,
+        "name": "lock",
+        "sample": "startup-to-menu",
+        "mean_ms": 9.116795619795804e-06
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 53,
+        "name": "SceneTriangleCount",
+        "mean": 14.618233618233619,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 0.021970322355628014,
+        "name": "HeartbeatTime",
+        "mean": 0.0023169712565820717,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 0.0005332024884410203,
+        "name": "PhysicsStepTime",
+        "mean": 0.0001731497545746829,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 55666,
+        "name": "InstanceCount",
+        "mean": 55525.988603988604,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 6,
+        "name": "SceneDrawcallCount",
+        "mean": 5.227920227920228,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 4.622869968414307,
+        "name": "FrameTime",
+        "mean": 0.0316210870559399,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 0.06408730149269104,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.005019292612148825,
+        "n": 351
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "max": 0.009340169839560986,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.0023152538405418225,
+        "n": 351
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "calls": 2,
+        "worst_ms": 2.82389999483712,
+        "mean_ms": 2.700099998037331,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "calls": 2,
+        "worst_ms": 0.01069999416358769,
+        "mean_ms": 0.006449998181778938,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "calls": 1,
+        "worst_ms": 7.769999996526167,
+        "mean_ms": 7.769999996526167,
+        "name": "replan"
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 13134,
+        "phase": "startup-to-menu",
+        "t": 5.3309090999973705,
+        "dt_ms": 239.4562065601349,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.02227695845067501,
+          "InstanceCount": 53397,
+          "PhysicsStepTime": 0.0005612657987512648,
+          "SceneTriangleCount": 37,
+          "SceneDrawcallCount": 4,
+          "RenderGPUFrameTime": 0.0033496799878776073,
+          "RenderCPUFrameTime": 0.00715259974822402,
+          "FrameTime": 0.5100743770599365
+        },
+        "sample": "startup-to-menu",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.021970322355628014,
+          "InstanceCount": 55199,
+          "PhysicsStepTime": 0.0005332024884410203,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0005074799992144108,
+          "RenderCPUFrameTime": 0.005998299922794104,
+          "FrameTime": 4.622869968414307
+        },
+        "sample": "startup-to-menu",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.021797198802232742,
+          "InstanceCount": 55216,
+          "PhysicsStepTime": 0.0005065423902124166,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0008243999909609556,
+          "RenderCPUFrameTime": 0.06408730149269104,
+          "FrameTime": 0.11398839950561523
+        },
+        "sample": "startup-to-menu",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 13613,
+        "phase": "startup-to-menu",
+        "t": 5.409275999991223,
+        "dt_ms": 80.40054887533188,
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.021970322355628014,
+          "InstanceCount": 55199,
+          "PhysicsStepTime": 0.0005332024884410203,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0005074799992144108,
+          "RenderCPUFrameTime": 0.005998299922794104,
+          "FrameTime": 4.622869968414307
+        },
+        "sample": "startup-to-menu",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.021797198802232742,
+          "InstanceCount": 55216,
+          "PhysicsStepTime": 0.0005065423902124166,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0008243999909609556,
+          "RenderCPUFrameTime": 0.06408730149269104,
+          "FrameTime": 0.11398839950561523
+        },
+        "sample": "startup-to-menu",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.02150595560669899,
+          "InstanceCount": 55258,
+          "PhysicsStepTime": 0.00048121524741873145,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0006184399826452136,
+          "RenderCPUFrameTime": 0.02733909897506237,
+          "FrameTime": 0.27609220147132874
+        },
+        "sample": "startup-to-menu",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 8.171000008587725,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 15360,
+        "phase": "startup-to-menu",
+        "t": 5.52793969999766,
+        "dt_ms": 64.94513899087906,
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.02150595560669899,
+          "InstanceCount": 55258,
+          "PhysicsStepTime": 0.00048121524741873145,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0006184399826452136,
+          "RenderCPUFrameTime": 0.02733909897506237,
+          "FrameTime": 0.27609220147132874
+        },
+        "sample": "startup-to-menu",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.021229982376098633,
+          "InstanceCount": 55269,
+          "PhysicsStepTime": 0.0004571544995997101,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.009340169839560986,
+          "RenderCPUFrameTime": 0.029205400496721268,
+          "FrameTime": 0.046424500644207
+        },
+        "sample": "startup-to-menu",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.02107582800090313,
+          "InstanceCount": 55282,
+          "PhysicsStepTime": 0.00048433031770400703,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.0025146999396383762,
+          "RenderCPUFrameTime": 0.01829630136489868,
+          "FrameTime": 0.07747980207204819
+        },
+        "sample": "startup-to-menu",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 8.202100012567826,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 16076,
+        "phase": "startup-to-menu",
+        "t": 5.582393399992725,
+        "dt_ms": 58.17375332117081,
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.021229982376098633,
+          "InstanceCount": 55269,
+          "PhysicsStepTime": 0.0004571544995997101,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.009340169839560986,
+          "RenderCPUFrameTime": 0.029205400496721268,
+          "FrameTime": 0.046424500644207
+        },
+        "sample": "startup-to-menu",
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.02107582800090313,
+          "InstanceCount": 55282,
+          "PhysicsStepTime": 0.00048433031770400703,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.0025146999396383762,
+          "RenderCPUFrameTime": 0.01829630136489868,
+          "FrameTime": 0.07747980207204819
+        },
+        "sample": "startup-to-menu",
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.02077254094183445,
+          "InstanceCount": 55300,
+          "PhysicsStepTime": 0.00046011380618438125,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.007685850374400616,
+          "RenderCPUFrameTime": 0.04690079763531685,
+          "FrameTime": 0.0583404004573822
+        },
+        "sample": "startup-to-menu",
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 9.611600005882792,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 4
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 14461,
+        "phase": "startup-to-menu",
+        "t": 5.459964499998023,
+        "dt_ms": 51.02170631289482,
+        "index": 5
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.021797198802232742,
+          "InstanceCount": 55216,
+          "PhysicsStepTime": 0.0005065423902124166,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0008243999909609556,
+          "RenderCPUFrameTime": 0.06408730149269104,
+          "FrameTime": 0.11398839950561523
+        },
+        "sample": "startup-to-menu",
+        "index": 5
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.02150595560669899,
+          "InstanceCount": 55258,
+          "PhysicsStepTime": 0.00048121524741873145,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.0006184399826452136,
+          "RenderCPUFrameTime": 0.02733909897506237,
+          "FrameTime": 0.27609220147132874
+        },
+        "sample": "startup-to-menu",
+        "index": 5
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.021229982376098633,
+          "InstanceCount": 55269,
+          "PhysicsStepTime": 0.0004571544995997101,
+          "SceneTriangleCount": 0,
+          "SceneDrawcallCount": 0,
+          "RenderGPUFrameTime": 0.009340169839560986,
+          "RenderCPUFrameTime": 0.029205400496721268,
+          "FrameTime": 0.046424500644207
+        },
+        "sample": "startup-to-menu",
+        "index": 5
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 9.199899999657646,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 5
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 33473,
+        "phase": "startup-to-menu",
+        "t": 11.517233999999007,
+        "dt_ms": 44.03295740485191,
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.00039861653931438923,
+          "InstanceCount": 55533,
+          "PhysicsStepTime": 0.00016044583753682673,
+          "SceneTriangleCount": 53,
+          "SceneDrawcallCount": 6,
+          "RenderGPUFrameTime": 0.0024896699469536543,
+          "RenderCPUFrameTime": 0.0038997000083327293,
+          "FrameTime": 0.016234200447797775
+        },
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0004787606012541801,
+          "InstanceCount": 55666,
+          "PhysicsStepTime": 0.00015242354129441082,
+          "SceneTriangleCount": 53,
+          "SceneDrawcallCount": 6,
+          "RenderGPUFrameTime": 0.0018955100094899535,
+          "RenderCPUFrameTime": 0.0035660997964441776,
+          "FrameTime": 0.017475299537181854
+        },
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 3.2598999969195575,
+        "name": "sound",
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 5.879600008483976,
+        "name": "shadows",
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 8.829700003843755,
+        "name": "spider rig",
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 10.402200001408346,
+        "name": "looks",
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.7017999925883487,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 6
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "startup-to-menu",
+        "heap_kb": 19159,
+        "phase": "startup-to-menu",
+        "t": 5.87724229999003,
+        "dt_ms": 41.24759882688522,
+        "index": 7
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.01958061195909977,
+          "InstanceCount": 55508,
+          "PhysicsStepTime": 0.00035828998079523444,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.00209280988201499,
+          "RenderCPUFrameTime": 0.004567100200802088,
+          "FrameTime": 0.02922300063073635
+        },
+        "sample": "startup-to-menu",
+        "index": 7
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.019909432157874107,
+          "InstanceCount": 55517,
+          "PhysicsStepTime": 0.0003403754672035575,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.0009959599701687694,
+          "RenderCPUFrameTime": 0.005817699711769819,
+          "FrameTime": 0.026956899091601372
+        },
+        "sample": "startup-to-menu",
+        "index": 7
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.019618188962340355,
+          "InstanceCount": 55535,
+          "PhysicsStepTime": 0.0003233567113056779,
+          "SceneTriangleCount": 5,
+          "SceneDrawcallCount": 5,
+          "RenderGPUFrameTime": 0.0024038897827267647,
+          "RenderCPUFrameTime": 0.005517700221389532,
+          "FrameTime": 0.041244398802518845
+        },
+        "sample": "startup-to-menu",
+        "index": 7
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 9.069299994735047,
+        "name": "navigation startup",
+        "sample": "startup-to-menu",
+        "index": 7
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 0.016666666666666666,
+          "ended": false
+        },
+        "seconds": 6.443776864558458,
+        "over50": 5,
+        "heap_growth_kb": 21920,
+        "p95_ms": 21.081816405057907,
+        "render_worst_ms": 34.91349999967497,
+        "frames": 351,
+        "p50_ms": 16.984257847070694,
+        "render_frames": 351,
+        "render_mean_ms": 9.890052707095702,
+        "sample": "startup-to-menu",
+        "wall_seconds": 6.267529099990497,
+        "over100": 1,
+        "p99_ms": 58.17375332117081,
+        "worst_ms": 239.4562065601349,
+        "over33": 10
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 6.5242000127909705,
+        "name": "spider rig",
+        "sample": "home",
+        "mean_ms": 2.088247668169984
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.6874999894062057,
+        "name": "sound",
+        "sample": "home",
+        "mean_ms": 0.7295795051179528
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.4747999957762659,
+        "name": "hud",
+        "sample": "home",
+        "mean_ms": 0.35863488814530803
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.5412999966647476,
+        "name": "camera",
+        "sample": "home",
+        "mean_ms": 0.3558491653757798
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.449400006909855,
+        "name": "light",
+        "sample": "home",
+        "mean_ms": 0.34293874504054567
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 9.91259999864269,
+        "name": "senses",
+        "sample": "home",
+        "mean_ms": 0.31234029904910016
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.897099999245256,
+        "name": "prey",
+        "sample": "home",
+        "mean_ms": 0.21524807126204998
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.573999998276122,
+        "name": "other rigs",
+        "sample": "home",
+        "mean_ms": 0.21512406432249723
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 8.683899999596179,
+        "name": "wasp",
+        "sample": "home",
+        "mean_ms": 0.2113040874762569
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.9022000051336363,
+        "name": "fly bodies",
+        "sample": "home",
+        "mean_ms": 0.19069671853938475
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.7161999858217314,
+        "name": "rival",
+        "sample": "home",
+        "mean_ms": 0.12513321829096788
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 4.151399989495985,
+        "name": "looks",
+        "sample": "home",
+        "mean_ms": 0.09407921731315187
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.3678999966941774,
+        "name": "motor",
+        "sample": "home",
+        "mean_ms": 0.07694271750442273
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.7053000008454546,
+        "name": "world",
+        "sample": "home",
+        "mean_ms": 0.07628854344385555
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.673100003041327,
+        "name": "save",
+        "sample": "home",
+        "mean_ms": 0.07207328720235684
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.7402999908663332,
+        "name": "life",
+        "sample": "home",
+        "mean_ms": 0.05576540036400417
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.48990000505000353,
+        "name": "percepts",
+        "sample": "home",
+        "mean_ms": 0.05023667259623281
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3634000022429973,
+        "name": "poses",
+        "sample": "home",
+        "mean_ms": 0.02622245256998134
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.8053000055951998,
+        "name": "mating",
+        "sample": "home",
+        "mean_ms": 0.020530051478036243
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.6382999999914318,
+        "name": "nature",
+        "sample": "home",
+        "mean_ms": 0.019123028269065485
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2845999988494441,
+        "name": "lock button",
+        "sample": "home",
+        "mean_ms": 0.015220091959421894
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.19360000442247838,
+        "name": "frame",
+        "sample": "home",
+        "mean_ms": 0.012524985742074838
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.19570000586099923,
+        "name": "bug bodies",
+        "sample": "home",
+        "mean_ms": 0.01176983276662236
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.23639999562874436,
+        "name": "other",
+        "sample": "home",
+        "mean_ms": 0.011579735242042135
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.0632999910740182,
+        "name": "shadows",
+        "sample": "home",
+        "mean_ms": 0.006547553036037552
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3662999952211976,
+        "name": "panels",
+        "sample": "home",
+        "mean_ms": 0.005710995825791434
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.08289999095723033,
+        "name": "lines",
+        "sample": "home",
+        "mean_ms": 0.004758318663249302
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.11390000872779638,
+        "name": "lock",
+        "sample": "home",
+        "mean_ms": 0.004389119240622613
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.01820000761654228,
+        "name": "appearance",
+        "sample": "home",
+        "mean_ms": 0.003965285083718135
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.030700000934302807,
+        "name": "perception hud",
+        "sample": "home",
+        "mean_ms": 0.0035911917858169975
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.04730001091957092,
+        "name": "eyes",
+        "sample": "home",
+        "mean_ms": 0.0026259642540330842
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 191623,
+        "name": "SceneTriangleCount",
+        "mean": 184937.55728267127,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 0.0009172325953841209,
+        "name": "HeartbeatTime",
+        "mean": 0.0003930697151970185,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 0.000427989725722,
+        "name": "PhysicsStepTime",
+        "mean": 0.0001543769580078589,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 58347,
+        "name": "InstanceCount",
+        "mean": 58329.268278641335,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 101,
+        "name": "SceneDrawcallCount",
+        "mean": 87.3293033966609,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 0.040753599256277084,
+        "name": "FrameTime",
+        "mean": 0.017270312950156616,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 0.029291300103068352,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.0069381301639795685,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "max": 0.024794599041342735,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.006750160881313327,
+        "n": 1737
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "calls": 4,
+        "worst_ms": 4.103700004634447,
+        "mean_ms": 3.252700000302866,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "calls": 1737,
+        "worst_ms": 0.6203999946592376,
+        "mean_ms": 0.0053301094894479175,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "home",
+        "heap_kb": 27859,
+        "phase": "home",
+        "t": 35.40631229999417,
+        "dt_ms": 40.23256152868271,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0004510044236667454,
+          "InstanceCount": 58335,
+          "PhysicsStepTime": 8.27752155601047e-05,
+          "SceneTriangleCount": 181158,
+          "SceneDrawcallCount": 82,
+          "RenderGPUFrameTime": 0.008870179764926434,
+          "RenderCPUFrameTime": 0.014436699450016022,
+          "FrameTime": 0.027244700118899345
+        },
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0004787449142895639,
+          "InstanceCount": 58335,
+          "PhysicsStepTime": 7.863645441830158e-05,
+          "SceneTriangleCount": 181162,
+          "SceneDrawcallCount": 82,
+          "RenderGPUFrameTime": 0.009531309828162193,
+          "RenderCPUFrameTime": 0.01599320024251938,
+          "FrameTime": 0.032483700662851334
+        },
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0005050983745604753,
+          "InstanceCount": 58335,
+          "PhysicsStepTime": 7.470463606296107e-05,
+          "SceneTriangleCount": 181162,
+          "SceneDrawcallCount": 82,
+          "RenderGPUFrameTime": 0.009345919825136662,
+          "RenderCPUFrameTime": 0.021325500681996346,
+          "FrameTime": 0.040753599256277084
+        },
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.0048000112874433,
+        "name": "senses",
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.8077999993693084,
+        "name": "sound",
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 5.560999998124316,
+        "name": "spider rig",
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 2.122300022165291,
+        "name": "camera",
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.0282000002916902,
+        "name": "wasp",
+        "sample": "home",
+        "index": 1
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "simulation_seconds": 30.016666666666225,
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 30.29999999999956,
+          "ended": false
+        },
+        "seconds": 30.009391153231263,
+        "over50": 0,
+        "heap_growth_kb": 149,
+        "p95_ms": 21.83845452964306,
+        "render_worst_ms": 19.479700000374578,
+        "frames": 1737,
+        "p50_ms": 16.95624180138111,
+        "render_frames": 1737,
+        "render_mean_ms": 5.719040875130365,
+        "sample": "home",
+        "wall_seconds": 30.012570899998536,
+        "over100": 0,
+        "p99_ms": 31.254727393388748,
+        "worst_ms": 40.23256152868271,
+        "over33": 10
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 39.05930000473745,
+        "name": "looks",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 39.05930000473745
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.8449999954318628,
+        "name": "motor",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 2.8449999954318628
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.645999993546866,
+        "name": "bug bodies",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 2.645999993546866
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.3882999958004802,
+        "name": "spider rig",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 2.3882999958004802
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.824899998609908,
+        "name": "fly bodies",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 1.824899998609908
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.5739999944344163,
+        "name": "sound",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 1.5739999944344163
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.31550000130664557,
+        "name": "hud",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.31550000130664557
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2145999897038564,
+        "name": "prey",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.2145999897038564
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2111999929184094,
+        "name": "shadows",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.2111999929184094
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.19800000882241875,
+        "name": "light",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.19800000882241875
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.18109999655280262,
+        "name": "wasp",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.18109999655280262
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.16220001270994544,
+        "name": "camera",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.16220001270994544
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.12589999823831022,
+        "name": "world",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.12589999823831022
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.1247000036528334,
+        "name": "rival",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.1247000036528334
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.07650000043213367,
+        "name": "save",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.07650000043213367
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.051799986977130175,
+        "name": "life",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.051799986977130175
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.04780000017490238,
+        "name": "other rigs",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.04780000017490238
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.04619998799171299,
+        "name": "other",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.04619998799171299
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.045900000259280205,
+        "name": "percepts",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.045900000259280205
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.03330000618007034,
+        "name": "panels",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.03330000618007034
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.03189999551977962,
+        "name": "senses",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.03189999551977962
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.020700012100860476,
+        "name": "nature",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.020700012100860476
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.01920000067912042,
+        "name": "poses",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.01920000067912042
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.015900004655122757,
+        "name": "mating",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.015900004655122757
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.013900003978051245,
+        "name": "lock button",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.013900003978051245
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.010400006431154907,
+        "name": "frame",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.010400006431154907
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.004899993655271828,
+        "name": "appearance",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.004899993655271828
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0041000021155923605,
+        "name": "lines",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.0041000021155923605
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.00340001133736223,
+        "name": "perception hud",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.00340001133736223
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0023000029614195228,
+        "name": "lock",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.0023000029614195228
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0022999884095042944,
+        "name": "eyes",
+        "sample": "garden_a1-arrival",
+        "mean_ms": 0.0022999884095042944
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 185463,
+        "name": "SceneTriangleCount",
+        "mean": 185463,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 0.0005010939203202724,
+        "name": "HeartbeatTime",
+        "mean": 0.0005010939203202724,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 7.367970829363912e-05,
+        "name": "PhysicsStepTime",
+        "mean": 7.367970829363912e-05,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 58339,
+        "name": "InstanceCount",
+        "mean": 58339,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 91,
+        "name": "SceneDrawcallCount",
+        "mean": 91,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 0.01757490076124668,
+        "name": "FrameTime",
+        "mean": 0.01757490076124668,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 0.0062951999716460705,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.0062951999716460705,
+        "n": 1
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "max": 0.007299589924514294,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.007299589924514294,
+        "n": 1
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "calls": 1,
+        "worst_ms": 10.041699992143549,
+        "mean_ms": 10.041699992143549,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "calls": 1,
+        "worst_ms": 0.001600012183189392,
+        "mean_ms": 0.001600012183189392,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1-arrival",
+        "calls": 1,
+        "worst_ms": 28.884500003186986,
+        "mean_ms": 28.884500003186986,
+        "name": "replan"
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 30.316666666666226,
+          "ended": false
+        },
+        "seconds": 0.015280979685485363,
+        "over50": 0,
+        "heap_growth_kb": 6351,
+        "p95_ms": 15.280979685485363,
+        "render_worst_ms": 52.301199990324676,
+        "frames": 1,
+        "p50_ms": 15.280979685485363,
+        "render_frames": 1,
+        "render_mean_ms": 52.301199990324676,
+        "sample": "garden_a1-arrival",
+        "wall_seconds": 0.06619689999206457,
+        "over100": 0,
+        "p99_ms": 15.280979685485363,
+        "worst_ms": 15.280979685485363,
+        "over33": 0
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.43080001079943,
+        "name": "spider rig",
+        "sample": "garden_a1",
+        "mean_ms": 2.1320348732504653
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.399000004515983,
+        "name": "sound",
+        "sample": "garden_a1",
+        "mean_ms": 0.6573468167580743
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 7.477799998014234,
+        "name": "light",
+        "sample": "garden_a1",
+        "mean_ms": 0.4678688451654317
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.2946000060765073,
+        "name": "hud",
+        "sample": "garden_a1",
+        "mean_ms": 0.40028743636892766
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.0769999973708764,
+        "name": "camera",
+        "sample": "garden_a1",
+        "mean_ms": 0.318190140877588
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.1853999933227897,
+        "name": "bug bodies",
+        "sample": "garden_a1",
+        "mean_ms": 0.30400518341068655
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.280099998344667,
+        "name": "wasp",
+        "sample": "garden_a1",
+        "mean_ms": 0.2263186476521299
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.2219999955268577,
+        "name": "other rigs",
+        "sample": "garden_a1",
+        "mean_ms": 0.2243157745991558
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.5350999892689288,
+        "name": "motor",
+        "sample": "garden_a1",
+        "mean_ms": 0.14952760570990842
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.1550000053830445,
+        "name": "rival",
+        "sample": "garden_a1",
+        "mean_ms": 0.122988844949516
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3217000048607588,
+        "name": "prey",
+        "sample": "garden_a1",
+        "mean_ms": 0.0852225354174152
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.302400003420189,
+        "name": "world",
+        "sample": "garden_a1",
+        "mean_ms": 0.0851407887587901
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.8557999972254038,
+        "name": "save",
+        "sample": "garden_a1",
+        "mean_ms": 0.07805949303282189
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.38519999361597,
+        "name": "life",
+        "sample": "garden_a1",
+        "mean_ms": 0.057167718318146724
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.093999992823228,
+        "name": "looks",
+        "sample": "garden_a1",
+        "mean_ms": 0.05023267606279852
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.16400001186411828,
+        "name": "senses",
+        "sample": "garden_a1",
+        "mean_ms": 0.03950242223677186
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.30180001340340823,
+        "name": "percepts",
+        "sample": "garden_a1",
+        "mean_ms": 0.03877909885207847
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3321999975014478,
+        "name": "poses",
+        "sample": "garden_a1",
+        "mean_ms": 0.026494873094070757
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.23700000019744039,
+        "name": "nature",
+        "sample": "garden_a1",
+        "mean_ms": 0.02132309867154387
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2690999972401187,
+        "name": "mating",
+        "sample": "garden_a1",
+        "mean_ms": 0.020067436673061947
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.23659999715164304,
+        "name": "lock button",
+        "sample": "garden_a1",
+        "mean_ms": 0.0154731268863338
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.06979999307077378,
+        "name": "frame",
+        "sample": "garden_a1",
+        "mean_ms": 0.01274208433296479
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3186999965691939,
+        "name": "other",
+        "sample": "garden_a1",
+        "mean_ms": 0.012585690087625678
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.29070000164210796,
+        "name": "fly bodies",
+        "sample": "garden_a1",
+        "mean_ms": 0.010592732283378571
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.051399998483248055,
+        "name": "panels",
+        "sample": "garden_a1",
+        "mean_ms": 0.005956056337593727
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.39060000563040376,
+        "name": "shadows",
+        "sample": "garden_a1",
+        "mean_ms": 0.005745915466473556
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.044800006435252726,
+        "name": "lines",
+        "sample": "garden_a1",
+        "mean_ms": 0.004859211228289444
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.05780000356025994,
+        "name": "appearance",
+        "sample": "garden_a1",
+        "mean_ms": 0.004367492896255473
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.07309998909477144,
+        "name": "lock",
+        "sample": "garden_a1",
+        "mean_ms": 0.003902084672902252
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.05099999543745071,
+        "name": "perception hud",
+        "sample": "garden_a1",
+        "mean_ms": 0.0038523379136139236
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.020699997548945248,
+        "name": "eyes",
+        "sample": "garden_a1",
+        "mean_ms": 0.0025790424043522545
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 185462,
+        "name": "SceneTriangleCount",
+        "mean": 165033.24788732393,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 0.000796066306065768,
+        "name": "HeartbeatTime",
+        "mean": 0.00042663946627265393,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 0.00043952459236606956,
+        "name": "PhysicsStepTime",
+        "mean": 0.0001573184531062766,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 58327,
+        "name": "InstanceCount",
+        "mean": 58317.560563380284,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 89,
+        "name": "SceneDrawcallCount",
+        "mean": 50.668732394366195,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 0.06829220056533813,
+        "name": "FrameTime",
+        "mean": 0.01693805189934415,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 0.01952820084989071,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.007671798760937133,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "max": 0.023685690015554428,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.011714439859325198,
+        "n": 1775
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "calls": 4,
+        "worst_ms": 4.906000001938082,
+        "mean_ms": 3.391500002180692,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "calls": 1775,
+        "worst_ms": 0.2851000026566908,
+        "mean_ms": 0.004289070239395533,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "heap_kb": 36746,
+        "phase": "garden_a1",
+        "t": 41.98871049999434,
+        "dt_ms": 67.82490015029907,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007411918486468494,
+          "InstanceCount": 57852,
+          "PhysicsStepTime": 6.64959370624274e-05,
+          "SceneTriangleCount": 127122,
+          "SceneDrawcallCount": 55,
+          "RenderGPUFrameTime": 0.009098189882934093,
+          "RenderCPUFrameTime": 0.006928300019353628,
+          "FrameTime": 0.06826139986515045
+        },
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007540034712292254,
+          "InstanceCount": 57964,
+          "PhysicsStepTime": 6.317113729892299e-05,
+          "SceneTriangleCount": 133866,
+          "SceneDrawcallCount": 53,
+          "RenderGPUFrameTime": 0.0069132898934185505,
+          "RenderCPUFrameTime": 0.013944199308753014,
+          "FrameTime": 0.03532560169696808
+        },
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007163033005781472,
+          "InstanceCount": 58230,
+          "PhysicsStepTime": 6.001258225296624e-05,
+          "SceneTriangleCount": 135426,
+          "SceneDrawcallCount": 53,
+          "RenderGPUFrameTime": 0.0093715600669384,
+          "RenderCPUFrameTime": 0.008943300694227219,
+          "FrameTime": 0.06829220056533813
+        },
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 3.5891000006813556,
+        "name": "looks",
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.6685000009601936,
+        "name": "spider rig",
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.0815999703481793,
+        "name": "camera",
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 5.080799994175322,
+        "name": "wasp",
+        "sample": "garden_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "heap_kb": 35272,
+        "phase": "garden_a1",
+        "t": 41.89258879999397,
+        "dt_ms": 67.75485724210739,
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0005010939203202724,
+          "InstanceCount": 58339,
+          "PhysicsStepTime": 7.367970829363912e-05,
+          "SceneTriangleCount": 185463,
+          "SceneDrawcallCount": 91,
+          "RenderGPUFrameTime": 0.007299589924514294,
+          "RenderCPUFrameTime": 0.0062951999716460705,
+          "FrameTime": 0.01757490076124668
+        },
+        "sample": "garden_a1",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0006753182387910783,
+          "InstanceCount": 57647,
+          "PhysicsStepTime": 6.999572360655293e-05,
+          "SceneTriangleCount": 185462,
+          "SceneDrawcallCount": 89,
+          "RenderGPUFrameTime": 0.008745119906961918,
+          "RenderCPUFrameTime": 0.006454200018197298,
+          "FrameTime": 0.016981100663542747
+        },
+        "sample": "garden_a1",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007411918486468494,
+          "InstanceCount": 57852,
+          "PhysicsStepTime": 6.64959370624274e-05,
+          "SceneTriangleCount": 127122,
+          "SceneDrawcallCount": 55,
+          "RenderGPUFrameTime": 0.009098189882934093,
+          "RenderCPUFrameTime": 0.006928300019353628,
+          "FrameTime": 0.06826139986515045
+        },
+        "sample": "garden_a1",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "garden_a1",
+        "heap_kb": 37006,
+        "phase": "garden_a1",
+        "t": 42.04725370000233,
+        "dt_ms": 57.95132368803024,
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007540034712292254,
+          "InstanceCount": 57964,
+          "PhysicsStepTime": 6.317113729892299e-05,
+          "SceneTriangleCount": 133866,
+          "SceneDrawcallCount": 53,
+          "RenderGPUFrameTime": 0.0069132898934185505,
+          "RenderCPUFrameTime": 0.013944199308753014,
+          "FrameTime": 0.03532560169696808
+        },
+        "sample": "garden_a1",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007163033005781472,
+          "InstanceCount": 58230,
+          "PhysicsStepTime": 6.001258225296624e-05,
+          "SceneTriangleCount": 135426,
+          "SceneDrawcallCount": 53,
+          "RenderGPUFrameTime": 0.0093715600669384,
+          "RenderCPUFrameTime": 0.008943300694227219,
+          "FrameTime": 0.06829220056533813
+        },
+        "sample": "garden_a1",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007303993334062397,
+          "InstanceCount": 58327,
+          "PhysicsStepTime": 5.701195550500415e-05,
+          "SceneTriangleCount": 134972,
+          "SceneDrawcallCount": 53,
+          "RenderGPUFrameTime": 0.008140459656715393,
+          "RenderCPUFrameTime": 0.00751330005005002,
+          "FrameTime": 0.05590590089559555
+        },
+        "sample": "garden_a1",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 3.7254000053508207,
+        "name": "looks",
+        "sample": "garden_a1",
+        "index": 3
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.5297000063583255,
+        "name": "spider rig",
+        "sample": "garden_a1",
+        "index": 3
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "simulation_seconds": 30.06666666666496,
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 60.38333333333119,
+          "ended": false
+        },
+        "seconds": 30.067333397455513,
+        "over50": 3,
+        "heap_growth_kb": 2712,
+        "p95_ms": 18.906641751527786,
+        "render_worst_ms": 17.053699993994087,
+        "frames": 1775,
+        "p50_ms": 16.9313196092844,
+        "render_frames": 1775,
+        "render_mean_ms": 5.587530084369167,
+        "sample": "garden_a1",
+        "wall_seconds": 30.018876599991927,
+        "over100": 0,
+        "p99_ms": 24.530302733182907,
+        "worst_ms": 67.82490015029907,
+        "over33": 3
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 25.042900000698864,
+        "name": "looks",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 6.879799999296665
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 3.7081000045873225,
+        "name": "spider rig",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 1.8366833392065018
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.7804000051692128,
+        "name": "hud",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.3714166644689006
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.5069000035291538,
+        "name": "sound",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.3471500046240787
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.14519999967887998,
+        "name": "world",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.10094999985691781
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.10409999231342226,
+        "name": "bug bodies",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.07449999975506216
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.09300000965595245,
+        "name": "save",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.07316666839566703
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.268599993432872,
+        "name": "panels",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.06781666403791557
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.2778000052785501,
+        "name": "shadows",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.05053333491863062
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.08759999764151871,
+        "name": "light",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.03736666743255531
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.12339999375399202,
+        "name": "camera",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.03641666262410581
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.06859999848529696,
+        "name": "other rigs",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.03456666551452751
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.03270000161137432,
+        "name": "poses",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.028133331701004256
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.04810000245925039,
+        "name": "other",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.02241666758588205
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.014699995517730713,
+        "name": "lock button",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.011066666047554463
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.017999991541728377,
+        "name": "fly bodies",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.008816665892178813
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.005900001269765198,
+        "name": "appearance",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.004383335181046277
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.006099988240748644,
+        "name": "lines",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.0039999989288238185
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.004299989086575806,
+        "name": "perception hud",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.003216662056123217
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.003000008291564882,
+        "name": "eyes",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.0021666710381396115
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.012499993317760527,
+        "name": "frame",
+        "sample": "pond_a1-arrival",
+        "mean_ms": 0.0020833322196267545
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 165530,
+        "name": "SceneTriangleCount",
+        "mean": 86338.16666666667,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 0.0008331681601703167,
+        "name": "HeartbeatTime",
+        "mean": 0.0007043016181948284,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 0.00020955597574356943,
+        "name": "PhysicsStepTime",
+        "mean": 0.00019029597994328165,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 58318,
+        "name": "InstanceCount",
+        "mean": 57660.666666666664,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 51,
+        "name": "SceneDrawcallCount",
+        "mean": 35.166666666666664,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 0.0624690018594265,
+        "name": "FrameTime",
+        "mean": 0.031667450132469334,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 0.014108899980783463,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.008326283190399408,
+        "n": 6
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "max": 0.01279939990490675,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.010922193372001251,
+        "n": 6
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "calls": 6,
+        "worst_ms": 3.9829000015743077,
+        "mean_ms": 3.33275000108794,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "calls": 6,
+        "worst_ms": 0.0020000006770715117,
+        "mean_ms": 0.0016333336437431474,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "calls": 1,
+        "worst_ms": 21.00120000250172,
+        "mean_ms": 21.00120000250172,
+        "name": "replan"
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "heap_kb": 40399,
+        "phase": "pond_a1-arrival",
+        "t": 72.03526710000006,
+        "dt_ms": 62.559835612773895,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007915097521618009,
+          "InstanceCount": 57354,
+          "PhysicsStepTime": 0.00018595436995383352,
+          "SceneTriangleCount": 46934,
+          "SceneDrawcallCount": 30,
+          "RenderGPUFrameTime": 0.01279939990490675,
+          "RenderCPUFrameTime": 0.006908899638801813,
+          "FrameTime": 0.049730099737644196
+        },
+        "sample": "pond_a1-arrival",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0007519342470914125,
+          "InstanceCount": 57474,
+          "PhysicsStepTime": 0.00017665665654931217,
+          "SceneTriangleCount": 46934,
+          "SceneDrawcallCount": 30,
+          "RenderGPUFrameTime": 0.011172140017151833,
+          "RenderCPUFrameTime": 0.014108899980783463,
+          "FrameTime": 0.025068599730730057
+        },
+        "sample": "pond_a1-arrival",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007143375696614385,
+          "InstanceCount": 57661,
+          "PhysicsStepTime": 0.00016782381862867624,
+          "SceneTriangleCount": 46551,
+          "SceneDrawcallCount": 25,
+          "RenderGPUFrameTime": 0.010551920160651207,
+          "RenderCPUFrameTime": 0.008058399893343449,
+          "FrameTime": 0.0624690018594265
+        },
+        "sample": "pond_a1-arrival",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 2.5473999994574115,
+        "name": "looks",
+        "sample": "pond_a1-arrival",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1-arrival",
+        "heap_kb": 40212,
+        "phase": "pond_a1-arrival",
+        "t": 71.95462599999155,
+        "dt_ms": 48.36150258779526,
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0004562393296509981,
+          "InstanceCount": 58318,
+          "PhysicsStepTime": 0.0002060436236206442,
+          "SceneTriangleCount": 165530,
+          "SceneDrawcallCount": 51,
+          "RenderGPUFrameTime": 0.010460840538144112,
+          "RenderCPUFrameTime": 0.007685000076889992,
+          "FrameTime": 0.016900699585676193
+        },
+        "sample": "pond_a1-arrival",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0008331681601703167,
+          "InstanceCount": 57222,
+          "PhysicsStepTime": 0.0001957414351636544,
+          "SceneTriangleCount": 165530,
+          "SceneDrawcallCount": 51,
+          "RenderGPUFrameTime": 0.011793849989771843,
+          "RenderCPUFrameTime": 0.006627799943089485,
+          "FrameTime": 0.017367299646139145
+        },
+        "sample": "pond_a1-arrival",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0007915097521618009,
+          "InstanceCount": 57354,
+          "PhysicsStepTime": 0.00018595436995383352,
+          "SceneTriangleCount": 46934,
+          "SceneDrawcallCount": 30,
+          "RenderGPUFrameTime": 0.01279939990490675,
+          "RenderCPUFrameTime": 0.006908899638801813,
+          "FrameTime": 0.049730099737644196
+        },
+        "sample": "pond_a1-arrival",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 25.042900000698864,
+        "name": "looks",
+        "sample": "pond_a1-arrival",
+        "index": 2
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 3.158200008329004,
+        "name": "spider rig",
+        "sample": "pond_a1-arrival",
+        "index": 2
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 60.38333333333119,
+          "ended": false
+        },
+        "seconds": 0.18791103269904852,
+        "over50": 1,
+        "heap_growth_kb": 2776,
+        "p95_ms": 62.559835612773895,
+        "render_worst_ms": 29.857300003641285,
+        "frames": 6,
+        "p50_ms": 21.051807329058647,
+        "render_frames": 6,
+        "render_mean_ms": 9.996650000781907,
+        "sample": "pond_a1-arrival",
+        "wall_seconds": 0.18798550000065006,
+        "over100": 0,
+        "p99_ms": 62.559835612773895,
+        "worst_ms": 62.559835612773895,
+        "over33": 2
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 5.405600008089095,
+        "name": "spider rig",
+        "sample": "pond_a1",
+        "mean_ms": 2.1924402232102365
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.9224999996367842,
+        "name": "sound",
+        "sample": "pond_a1",
+        "mean_ms": 0.7436443017808689
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.178299993625842,
+        "name": "hud",
+        "sample": "pond_a1",
+        "mean_ms": 0.43215050291160756
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.0440999903948978,
+        "name": "camera",
+        "sample": "pond_a1",
+        "mean_ms": 0.3341217878045041
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.1967000066069886,
+        "name": "other rigs",
+        "sample": "pond_a1",
+        "mean_ms": 0.2348007824107375
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.9409999911440536,
+        "name": "wasp",
+        "sample": "pond_a1",
+        "mean_ms": 0.2031339106947319
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.7922999939182773,
+        "name": "world",
+        "sample": "pond_a1",
+        "mean_ms": 0.15203541918825514
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 2.262499983771704,
+        "name": "prey",
+        "sample": "pond_a1",
+        "mean_ms": 0.14814871525770448
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.7427999953506514,
+        "name": "motor",
+        "sample": "pond_a1",
+        "mean_ms": 0.14464134061331835
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 6.025199996656738,
+        "name": "light",
+        "sample": "pond_a1",
+        "mean_ms": 0.13900357536749144
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.9406999888597056,
+        "name": "rival",
+        "sample": "pond_a1",
+        "mean_ms": 0.12082212280050211
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.6722999969497323,
+        "name": "save",
+        "sample": "pond_a1",
+        "mean_ms": 0.07780837982843562
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.32339998870156705,
+        "name": "percepts",
+        "sample": "pond_a1",
+        "mean_ms": 0.060336871460267456
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.20349999249447137,
+        "name": "life",
+        "sample": "pond_a1",
+        "mean_ms": 0.053592681614539
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 4.148400010308251,
+        "name": "looks",
+        "sample": "pond_a1",
+        "mean_ms": 0.0393209497505466
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3188999980920926,
+        "name": "senses",
+        "sample": "pond_a1",
+        "mean_ms": 0.038536256980788296
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.1519999970914796,
+        "name": "fly bodies",
+        "sample": "pond_a1",
+        "mean_ms": 0.0363993295208244
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.1907000007340685,
+        "name": "bug bodies",
+        "sample": "pond_a1",
+        "mean_ms": 0.023966815759032423
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.3112999984296039,
+        "name": "poses",
+        "sample": "pond_a1",
+        "mean_ms": 0.022772569862953985
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.13859999307896942,
+        "name": "nature",
+        "sample": "pond_a1",
+        "mean_ms": 0.020414804325987947
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.1019000046653673,
+        "name": "mating",
+        "sample": "pond_a1",
+        "mean_ms": 0.01911720674447247
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.1323999895248562,
+        "name": "lock button",
+        "sample": "pond_a1",
+        "mean_ms": 0.015901955042630124
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.12100000458303839,
+        "name": "frame",
+        "sample": "pond_a1",
+        "mean_ms": 0.013065027886307045
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.09079999290406704,
+        "name": "other",
+        "sample": "pond_a1",
+        "mean_ms": 0.012824469183860399
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 1.06229999801144,
+        "name": "shadows",
+        "sample": "pond_a1",
+        "mean_ms": 0.005953687260398257
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.036299999919719994,
+        "name": "panels",
+        "sample": "pond_a1",
+        "mean_ms": 0.005767206596691868
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.04199999966658652,
+        "name": "lines",
+        "sample": "pond_a1",
+        "mean_ms": 0.005012346350642535
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.03600001218728721,
+        "name": "appearance",
+        "sample": "pond_a1",
+        "mean_ms": 0.004279217886017875
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.025299988919869065,
+        "name": "perception hud",
+        "sample": "pond_a1",
+        "mean_ms": 0.0038568155892718813
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.0481999886687845,
+        "name": "lock",
+        "sample": "pond_a1",
+        "mean_ms": 0.0037125140014260634
+      }
+    },
+    {
+      "kind": "PART",
+      "run": "1792809011121",
+      "value": {
+        "worst_ms": 0.028599999495781958,
+        "name": "eyes",
+        "sample": "pond_a1",
+        "mean_ms": 0.002615028017073058
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 173666,
+        "name": "SceneTriangleCount",
+        "mean": 133426.2156424581,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 0.0007934485329315066,
+        "name": "HeartbeatTime",
+        "mean": 0.00041952067723545873,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 0.00040294823702424765,
+        "name": "PhysicsStepTime",
+        "mean": 0.00016001888827670187,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 58337,
+        "name": "InstanceCount",
+        "mean": 58336.82960893855,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 73,
+        "name": "SceneDrawcallCount",
+        "mean": 67.7268156424581,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 0.06445089727640152,
+        "name": "FrameTime",
+        "mean": 0.016765158161958005,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 0.016718899831175804,
+        "name": "RenderCPUFrameTime",
+        "mean": 0.00755550447232272,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "max": 0.02217794954776764,
+        "name": "RenderGPUFrameTime",
+        "mean": 0.0114731964301422,
+        "n": 1790
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "calls": 3,
+        "worst_ms": 3.9151000091806054,
+        "mean_ms": 2.881766670422318,
+        "name": "work"
+      }
+    },
+    {
+      "kind": "METHOD",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "calls": 1790,
+        "worst_ms": 0.20029999723192304,
+        "mean_ms": 0.004364357361772915,
+        "name": "dew"
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792809011121",
+      "value": {
+        "sample": "pond_a1",
+        "heap_kb": 41381,
+        "phase": "pond_a1",
+        "t": 72.20881689999078,
+        "dt_ms": 62.706612050533295,
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "previous",
+        "values": {
+          "HeartbeatTime": 0.0007246839231811464,
+          "InstanceCount": 58274,
+          "PhysicsStepTime": 0.00022694685321766883,
+          "SceneTriangleCount": 138762,
+          "SceneDrawcallCount": 67,
+          "RenderGPUFrameTime": 0.013648750260472298,
+          "RenderCPUFrameTime": 0.011108099482953548,
+          "FrameTime": 0.02727529965341091
+        },
+        "sample": "pond_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "current",
+        "values": {
+          "HeartbeatTime": 0.0006884497706778347,
+          "InstanceCount": 58337,
+          "PhysicsStepTime": 0.00021559950255323201,
+          "SceneTriangleCount": 133567,
+          "SceneDrawcallCount": 69,
+          "RenderGPUFrameTime": 0.00855014007538557,
+          "RenderCPUFrameTime": 0.009361200034618378,
+          "FrameTime": 0.02382490038871765
+        },
+        "sample": "pond_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_ENGINE",
+      "run": "1792809011121",
+      "value": {
+        "when": "next",
+        "values": {
+          "HeartbeatTime": 0.0006540272734127939,
+          "InstanceCount": 58337,
+          "PhysicsStepTime": 0.00020481953106354922,
+          "SceneTriangleCount": 133566,
+          "SceneDrawcallCount": 68,
+          "RenderGPUFrameTime": 0.01217562984675169,
+          "RenderCPUFrameTime": 0.016718899831175804,
+          "FrameTime": 0.06445089727640152
+        },
+        "sample": "pond_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 1.3398000010056421,
+        "name": "looks",
+        "sample": "pond_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792809011121",
+      "value": {
+        "ms": 2.0564000005833805,
+        "name": "spider rig",
+        "sample": "pond_a1",
+        "index": 1
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792809011121",
+      "value": {
+        "extra": {
+          "save_status": "saved",
+          "simulation_seconds": 30.016666666664968,
+          "navigation": "ready",
+          "loading": false,
+          "save_phase": "idle",
+          "simulation": 90.39999999999615,
+          "ended": false
+        },
+        "seconds": 30.00963021069765,
+        "over50": 1,
+        "heap_growth_kb": -10537,
+        "p95_ms": 18.740784376859665,
+        "render_worst_ms": 15.139299997827038,
+        "frames": 1790,
+        "p50_ms": 16.930963844060898,
+        "render_frames": 1790,
+        "render_mean_ms": 5.310196815702125,
+        "sample": "pond_a1",
+        "wall_seconds": 30.00906219999888,
+        "over100": 0,
+        "p99_ms": 21.05247974395752,
+        "worst_ms": 62.706612050533295,
+        "over33": 1
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792809011121",
+      "value": {
+        "online": false,
+        "cat_enabled": true,
+        "ordinary_ui": true,
+        "storage": "yielding-memory"
+      }
+    }
+  ],
+  "server_marks": [
+    {
+      "at": 1792809010.467782,
+      "heap_kb": 7722,
+      "name": "storage-begin",
+      "clock": 65.1310933999921
+    },
+    {
+      "at": 1792809010.470842,
+      "heap_kb": 7749,
+      "name": "storage-end",
+      "clock": 65.13414929999271
+    },
+    {
+      "at": 1792809010.47178,
+      "heap_kb": 7759,
+      "name": "main-modules-begin",
+      "clock": 65.13508739999088
+    },
+    {
+      "at": 1792809010.488302,
+      "heap_kb": 8102,
+      "name": "main-modules-end",
+      "clock": 65.15160810000089
+    },
+    {
+      "at": 1792809010.49192,
+      "heap_kb": 8105,
+      "name": "decor-begin",
+      "clock": 65.15522709999641
+    },
+    {
+      "at": 1792809010.515017,
+      "heap_kb": 9271,
+      "name": "decor-end",
+      "clock": 65.17832379999163
+    },
+    {
+      "at": 1792809010.524966,
+      "heap_kb": 9272,
+      "name": "hidden-plan-begin",
+      "clock": 65.18827379999857
+    },
+    {
+      "at": 1792809010.529071,
+      "heap_kb": 10013,
+      "name": "physical-world-begin",
+      "clock": 65.19237859999703
+    },
+    {
+      "at": 1792809010.603185,
+      "heap_kb": 10897,
+      "name": "physical-world-end",
+      "clock": 65.26649259999976
+    },
+    {
+      "at": 1792809010.633229,
+      "heap_kb": 10896,
+      "name": "templates-begin",
+      "clock": 65.29653639999742
+    },
+    {
+      "at": 1792809010.667675,
+      "heap_kb": 11590,
+      "name": "templates-end",
+      "clock": 65.33098169999721
+    },
+    {
+      "at": 1792809010.668031,
+      "heap_kb": 11591,
+      "name": "composition-begin",
+      "clock": 65.33133770000131
+    }
+  ],
+  "output_sha256": "494341b73559f3b729a699e5bb81a7e9df228e7180e22cc8e44d6dc51bc5f391",
+  "model": "C:\\Users\\natha\\claude-xfer\\Windowsill-ordinary-frames-attempt5",
+  "manifest_sha256": "6af16bc15c66b101bc58de1029870cf48df8270ccb07e379b3400920889b5f88",
+  "model_sha256": "ec9c9362e734d05a80e32550c9f927f98ad7ca53834b10ba12f96550093b16cd",
+  "source_count": 276,
+  "production_activated": false,
+  "published": false
+}

@@ -1,0 +1,523 @@
+{
+  "inputs": {
+    "docs/frame-ordinary/attempt3-receipt.json": "91f525a87960d96bb42742af1d77099efb659f8b6aeb1e8678a9f9a820811b1b",
+    "docs/frame-ordinary/attempt3-output.txt": "6d80bfaf5b78e1bef46210deefc314c928734d8fb411aa21c50dffa28dc01fb0",
+    "docs/frame-ordinary/attempt5-receipt.json": "6b41dccf43558133208bf812e6dbc5094191ece66d109fec7e7ee54c3f882157",
+    "docs/frame-ordinary/attempt5-output.txt": "494341b73559f3b729a699e5bb81a7e9df228e7180e22cc8e44d6dc51bc5f391",
+    "docs/frame-ordinary/cache-check3-checks.json": "23fc43a27b4d05230144aa6b004b064f64bb89e558d3626332f50d580a01cf48",
+    "docs/frame-ordinary/cache-check3-equivalence-output.txt": "5fa40c95ff64963f47faafa88d5fc268ec0dbde84cb2581be174683cf003ac93",
+    "docs/frame-ordinary/cache-check3-worldmap-output.txt": "efc6b885ff1178c68525c69c0c8d5dc468f117f86e1089b49b801d19ca244b85",
+    "docs/frame-ordinary/cache-check3-world_client-output.txt": "a3a42ffa62c751cede82653fd7277cfe43cdacbb75eaf0a0dd47e5fb7284c55c",
+    "docs/frame-ordinary/cache-check3-preserve-output.txt": "b59dcfe644ec27f3a0de6a86e036ecec770a75b0fc5b42195b9e4bd1df00d96a",
+    "docs/frame-ordinary/cache-check3-compact_layout-output.txt": "b267ed6c79ee9988e860f3d30ed78ec7aed9a66b22fe170fd9d87d0ad5842386",
+    "docs/frame-ordinary/probe.luau": "d086e362f225c2a9ee22c509a5502e09db06a5306a7e23fee59001b278acaad1",
+    "docs/frame-ordinary/playback.luau": "1a9d2301b4fc8f14cfe46577f4e30536fb691e2c0765435f2c2d88e89d5c1e89",
+    "docs/frame-ordinary/look-plan.luau": "e49d19ea7df37fe5250e7a018e92cd104274dd94172b8a783a9df24f5415033c",
+    "docs/frame-ordinary/prepare.py": "bbd6ca2c2cc8b3d68a1468be6db81030bbd23a05ec554a8fd34c5f38d522a138",
+    "docs/frame-ordinary/build.py": "94c9603602f1fe55654f0aa73b173cadd903474955bdf1f750ea17eb4594381e",
+    "docs/frame-ordinary/check-cache.py": "6a56488e1c70bc617ef4532e89665433e4f7fd031643da025357275c9845bb66",
+    "docs/frame-ordinary/cache-checks.luau": "0a2701fa64a49b4613a99613534f574663663b50c4d91ae50be4819160ae3fd1",
+    "docs/frame-ordinary/phone-checks.luau": "e67bc24b8e8d8b49838b1bb889cbaf34770fa510b045a34ea91d6f8110de3393",
+    "docs/frame-ordinary/collect.py": "4fb54d1237be6482b631ef345ad19bcd4ebf90a982b1d4909b5c7d9b71991f0a"
+  },
+  "changed_game_sources": [
+    "ReplicatedStorage.Shared.World.LookPlan"
+  ],
+  "regions": 267,
+  "before_generation_calls": 801,
+  "after_generation_calls": 267,
+  "equivalence_checks": 2167,
+  "phone_checks": 1602,
+  "runs": [
+    {
+      "prefix": "attempt3",
+      "run": "1792808267392",
+      "samples": {
+        "client-startup": {
+          "frames": 6,
+          "seconds": 4.388930633664131,
+          "worst_ms": 1677.1519184112549,
+          "over50": 4,
+          "render_mean_ms": 0,
+          "render_worst_ms": 0
+        },
+        "startup-to-menu": {
+          "frames": 341,
+          "seconds": 6.337315337732434,
+          "worst_ms": 223.13562035560608,
+          "over50": 4,
+          "render_mean_ms": 9.925447213716117,
+          "render_worst_ms": 37.949099991237745
+        },
+        "home": {
+          "frames": 1758,
+          "seconds": 30.005928302183747,
+          "worst_ms": 51.21523141860962,
+          "over50": 1,
+          "render_mean_ms": 5.181655403570232,
+          "render_worst_ms": 16.39620000787545
+        },
+        "garden_a1-arrival": {
+          "frames": 1,
+          "seconds": 0.016358012333512306,
+          "worst_ms": 16.358012333512306,
+          "over50": 0,
+          "render_mean_ms": 59.12969999189954,
+          "render_worst_ms": 59.12969999189954
+        },
+        "garden_a1": {
+          "frames": 1761,
+          "seconds": 30.06469476222992,
+          "worst_ms": 84.63416993618011,
+          "over50": 3,
+          "render_mean_ms": 5.499085973921665,
+          "render_worst_ms": 16.575000001466833
+        },
+        "pond_a1-arrival": {
+          "frames": 5,
+          "seconds": 0.16849679313600063,
+          "worst_ms": 59.25619229674339,
+          "over50": 2,
+          "render_mean_ms": 12.2346199961612,
+          "render_worst_ms": 33.53709999646526
+        },
+        "pond_a1": {
+          "frames": 1768,
+          "seconds": 30.03036188520491,
+          "worst_ms": 62.59898096323013,
+          "over50": 1,
+          "render_mean_ms": 5.3161534502430285,
+          "render_worst_ms": 15.337800010456704
+        }
+      },
+      "methods": [
+        {
+          "sample": "startup-to-menu",
+          "calls": 2,
+          "worst_ms": 3.260299999965355,
+          "mean_ms": 3.0732499944861047,
+          "name": "work"
+        },
+        {
+          "sample": "startup-to-menu",
+          "calls": 2,
+          "worst_ms": 0.018699996871873736,
+          "mean_ms": 0.010250005288980901,
+          "name": "dew"
+        },
+        {
+          "sample": "startup-to-menu",
+          "calls": 1,
+          "worst_ms": 6.8325000029290095,
+          "mean_ms": 6.8325000029290095,
+          "name": "replan"
+        },
+        {
+          "sample": "home",
+          "calls": 4,
+          "worst_ms": 3.9560000004712492,
+          "mean_ms": 3.0365749989869073,
+          "name": "work"
+        },
+        {
+          "sample": "home",
+          "calls": 1758,
+          "worst_ms": 0.4501999937929213,
+          "mean_ms": 0.0048261092193938575,
+          "name": "dew"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 9.82970000768546,
+          "mean_ms": 9.82970000768546,
+          "name": "work"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 0.0016999983927235007,
+          "mean_ms": 0.0016999983927235007,
+          "name": "dew"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 35.85739999834914,
+          "mean_ms": 35.85739999834914,
+          "name": "replan"
+        },
+        {
+          "sample": "garden_a1",
+          "calls": 4,
+          "worst_ms": 4.985999999917112,
+          "mean_ms": 3.3800499950302765,
+          "name": "work"
+        },
+        {
+          "sample": "garden_a1",
+          "calls": 1761,
+          "worst_ms": 0.2486000012140721,
+          "mean_ms": 0.0041141398838091345,
+          "name": "dew"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 5,
+          "worst_ms": 5.005500002880581,
+          "mean_ms": 3.742519998922944,
+          "name": "work"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 5,
+          "worst_ms": 0.0020000006770715117,
+          "mean_ms": 0.0016799982404336333,
+          "name": "dew"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 1,
+          "worst_ms": 23.58349999121856,
+          "mean_ms": 23.58349999121856,
+          "name": "replan"
+        },
+        {
+          "sample": "pond_a1",
+          "calls": 4,
+          "worst_ms": 4.27440000930801,
+          "mean_ms": 3.2620500023767818,
+          "name": "work"
+        },
+        {
+          "sample": "pond_a1",
+          "calls": 1768,
+          "worst_ms": 0.23450001026503742,
+          "mean_ms": 0.004164592898398115,
+          "name": "dew"
+        }
+      ],
+      "server_marks": [
+        {
+          "at": 1792808266.871849,
+          "heap_kb": 7739,
+          "name": "storage-begin",
+          "clock": 52.66417019999062
+        },
+        {
+          "at": 1792808266.874356,
+          "heap_kb": 7766,
+          "name": "storage-end",
+          "clock": 52.66667779999261
+        },
+        {
+          "at": 1792808266.875292,
+          "heap_kb": 7775,
+          "name": "main-modules-begin",
+          "clock": 52.66761399999086
+        },
+        {
+          "at": 1792808266.891411,
+          "heap_kb": 8119,
+          "name": "main-modules-end",
+          "clock": 52.68373239999346
+        },
+        {
+          "at": 1792808266.893044,
+          "heap_kb": 8122,
+          "name": "decor-begin",
+          "clock": 52.68536550000135
+        },
+        {
+          "at": 1792808266.909668,
+          "heap_kb": 9279,
+          "name": "decor-end",
+          "clock": 52.7019900999876
+        },
+        {
+          "at": 1792808266.916151,
+          "heap_kb": 9279,
+          "name": "hidden-plan-begin",
+          "clock": 52.70847449998837
+        },
+        {
+          "at": 1792808266.91994,
+          "heap_kb": 9124,
+          "name": "physical-world-begin",
+          "clock": 52.71226299999398
+        },
+        {
+          "at": 1792808266.984223,
+          "heap_kb": 9904,
+          "name": "physical-world-end",
+          "clock": 52.7765456999914
+        },
+        {
+          "at": 1792808267.012236,
+          "heap_kb": 9905,
+          "name": "templates-begin",
+          "clock": 52.80455779998738
+        },
+        {
+          "at": 1792808267.042911,
+          "heap_kb": 12433,
+          "name": "templates-end",
+          "clock": 52.83523399999831
+        },
+        {
+          "at": 1792808267.043223,
+          "heap_kb": 12433,
+          "name": "composition-begin",
+          "clock": 52.835544299989124
+        }
+      ]
+    },
+    {
+      "prefix": "attempt5",
+      "run": "1792809011121",
+      "samples": {
+        "client-startup": {
+          "frames": 5,
+          "seconds": 5.230524281039834,
+          "worst_ms": 2376.0581016540527,
+          "over50": 4,
+          "render_mean_ms": 0,
+          "render_worst_ms": 0
+        },
+        "startup-to-menu": {
+          "frames": 351,
+          "seconds": 6.443776864558458,
+          "worst_ms": 239.4562065601349,
+          "over50": 5,
+          "render_mean_ms": 9.890052707095702,
+          "render_worst_ms": 34.91349999967497
+        },
+        "home": {
+          "frames": 1737,
+          "seconds": 30.009391153231263,
+          "worst_ms": 40.23256152868271,
+          "over50": 0,
+          "render_mean_ms": 5.719040875130365,
+          "render_worst_ms": 19.479700000374578
+        },
+        "garden_a1-arrival": {
+          "frames": 1,
+          "seconds": 0.015280979685485363,
+          "worst_ms": 15.280979685485363,
+          "over50": 0,
+          "render_mean_ms": 52.301199990324676,
+          "render_worst_ms": 52.301199990324676
+        },
+        "garden_a1": {
+          "frames": 1775,
+          "seconds": 30.067333397455513,
+          "worst_ms": 67.82490015029907,
+          "over50": 3,
+          "render_mean_ms": 5.587530084369167,
+          "render_worst_ms": 17.053699993994087
+        },
+        "pond_a1-arrival": {
+          "frames": 6,
+          "seconds": 0.18791103269904852,
+          "worst_ms": 62.559835612773895,
+          "over50": 1,
+          "render_mean_ms": 9.996650000781907,
+          "render_worst_ms": 29.857300003641285
+        },
+        "pond_a1": {
+          "frames": 1790,
+          "seconds": 30.00963021069765,
+          "worst_ms": 62.706612050533295,
+          "over50": 1,
+          "render_mean_ms": 5.310196815702125,
+          "render_worst_ms": 15.139299997827038
+        }
+      },
+      "methods": [
+        {
+          "sample": "startup-to-menu",
+          "calls": 2,
+          "worst_ms": 2.82389999483712,
+          "mean_ms": 2.700099998037331,
+          "name": "work"
+        },
+        {
+          "sample": "startup-to-menu",
+          "calls": 2,
+          "worst_ms": 0.01069999416358769,
+          "mean_ms": 0.006449998181778938,
+          "name": "dew"
+        },
+        {
+          "sample": "startup-to-menu",
+          "calls": 1,
+          "worst_ms": 7.769999996526167,
+          "mean_ms": 7.769999996526167,
+          "name": "replan"
+        },
+        {
+          "sample": "home",
+          "calls": 4,
+          "worst_ms": 4.103700004634447,
+          "mean_ms": 3.252700000302866,
+          "name": "work"
+        },
+        {
+          "sample": "home",
+          "calls": 1737,
+          "worst_ms": 0.6203999946592376,
+          "mean_ms": 0.0053301094894479175,
+          "name": "dew"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 10.041699992143549,
+          "mean_ms": 10.041699992143549,
+          "name": "work"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 0.001600012183189392,
+          "mean_ms": 0.001600012183189392,
+          "name": "dew"
+        },
+        {
+          "sample": "garden_a1-arrival",
+          "calls": 1,
+          "worst_ms": 28.884500003186986,
+          "mean_ms": 28.884500003186986,
+          "name": "replan"
+        },
+        {
+          "sample": "garden_a1",
+          "calls": 4,
+          "worst_ms": 4.906000001938082,
+          "mean_ms": 3.391500002180692,
+          "name": "work"
+        },
+        {
+          "sample": "garden_a1",
+          "calls": 1775,
+          "worst_ms": 0.2851000026566908,
+          "mean_ms": 0.004289070239395533,
+          "name": "dew"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 6,
+          "worst_ms": 3.9829000015743077,
+          "mean_ms": 3.33275000108794,
+          "name": "work"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 6,
+          "worst_ms": 0.0020000006770715117,
+          "mean_ms": 0.0016333336437431474,
+          "name": "dew"
+        },
+        {
+          "sample": "pond_a1-arrival",
+          "calls": 1,
+          "worst_ms": 21.00120000250172,
+          "mean_ms": 21.00120000250172,
+          "name": "replan"
+        },
+        {
+          "sample": "pond_a1",
+          "calls": 3,
+          "worst_ms": 3.9151000091806054,
+          "mean_ms": 2.881766670422318,
+          "name": "work"
+        },
+        {
+          "sample": "pond_a1",
+          "calls": 1790,
+          "worst_ms": 0.20029999723192304,
+          "mean_ms": 0.004364357361772915,
+          "name": "dew"
+        }
+      ],
+      "server_marks": [
+        {
+          "at": 1792809010.467782,
+          "heap_kb": 7722,
+          "name": "storage-begin",
+          "clock": 65.1310933999921
+        },
+        {
+          "at": 1792809010.470842,
+          "heap_kb": 7749,
+          "name": "storage-end",
+          "clock": 65.13414929999271
+        },
+        {
+          "at": 1792809010.47178,
+          "heap_kb": 7759,
+          "name": "main-modules-begin",
+          "clock": 65.13508739999088
+        },
+        {
+          "at": 1792809010.488302,
+          "heap_kb": 8102,
+          "name": "main-modules-end",
+          "clock": 65.15160810000089
+        },
+        {
+          "at": 1792809010.49192,
+          "heap_kb": 8105,
+          "name": "decor-begin",
+          "clock": 65.15522709999641
+        },
+        {
+          "at": 1792809010.515017,
+          "heap_kb": 9271,
+          "name": "decor-end",
+          "clock": 65.17832379999163
+        },
+        {
+          "at": 1792809010.524966,
+          "heap_kb": 9272,
+          "name": "hidden-plan-begin",
+          "clock": 65.18827379999857
+        },
+        {
+          "at": 1792809010.529071,
+          "heap_kb": 10013,
+          "name": "physical-world-begin",
+          "clock": 65.19237859999703
+        },
+        {
+          "at": 1792809010.603185,
+          "heap_kb": 10897,
+          "name": "physical-world-end",
+          "clock": 65.26649259999976
+        },
+        {
+          "at": 1792809010.633229,
+          "heap_kb": 10896,
+          "name": "templates-begin",
+          "clock": 65.29653639999742
+        },
+        {
+          "at": 1792809010.667675,
+          "heap_kb": 11590,
+          "name": "templates-end",
+          "clock": 65.33098169999721
+        },
+        {
+          "at": 1792809010.668031,
+          "heap_kb": 11591,
+          "name": "composition-begin",
+          "clock": 65.33133770000131
+        }
+      ]
+    }
+  ],
+  "production_activated": false,
+  "published": false,
+  "startup_gap_fixed": false,
+  "goal_complete": false
+}

@@ -1,0 +1,102 @@
+worldmap: from the parked focus, the sill's farthest box corner is 57.8 studs, the outer sill's 55.5 (always sent: 96)
+worldmap: sill: from anywhere on it, its farthest box is 61.8 studs away (nearest point or centre, the farther), 69.8 from a focus 8 behind
+worldmap: outer_sill: from anywhere on it, its farthest box is 44.1 studs away (nearest point or centre, the farther), 52.1 from a focus 8 behind
+worldmap: house_wall: from anywhere on it, its farthest box is 112.7 studs away (nearest point or centre, the farther), 120.7 from a focus 8 behind
+worldmap: bed_a: from anywhere on it, its farthest box is 59.1 studs away (nearest point or centre, the farther), 67.1 from a focus 8 behind
+worldmap: wall_west: from anywhere on it, its farthest box is 88.5 studs away (nearest point or centre, the farther), 96.5 from a focus 8 behind
+worldmap: wall_west_upper: from anywhere on it, its farthest box is 93.1 studs away (nearest point or centre, the farther), 101.1 from a focus 8 behind
+worldmap: wall_upper: from anywhere on it, its farthest box is 120.2 studs away (nearest point or centre, the farther), 128.2 from a focus 8 behind
+worldmap: eaves_west: from anywhere on it, its farthest box is 96.4 studs away (nearest point or centre, the farther), 104.4 from a focus 8 behind
+worldmap: eaves: from anywhere on it, its farthest box is 136.5 studs away (nearest point or centre, the farther), 144.5 from a focus 8 behind
+worldmap: shrub_west_a: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+worldmap: shrub_west_b: from anywhere on it, its farthest box is 101.2 studs away (nearest point or centre, the farther), 109.2 from a focus 8 behind
+worldmap: shrub_west_c: from anywhere on it, its farthest box is 98.3 studs away (nearest point or centre, the farther), 106.3 from a focus 8 behind
+worldmap: shrub_west_d: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+worldmap: shrub_west_e: from anywhere on it, its farthest box is 98.1 studs away (nearest point or centre, the farther), 106.1 from a focus 8 behind
+worldmap: shrub_west_f: from anywhere on it, its farthest box is 98.8 studs away (nearest point or centre, the farther), 106.8 from a focus 8 behind
+worldmap: shrub_west_g: from anywhere on it, its farthest box is 111.6 studs away (nearest point or centre, the farther), 119.6 from a focus 8 behind
+worldmap: shrub_west_h: from anywhere on it, its farthest box is 100.6 studs away (nearest point or centre, the farther), 108.6 from a focus 8 behind
+worldmap: shrub_west_i: from anywhere on it, its farthest box is 97.2 studs away (nearest point or centre, the farther), 105.2 from a focus 8 behind
+worldmap: shrub_west_j: from anywhere on it, its farthest box is 100.1 studs away (nearest point or centre, the farther), 108.1 from a focus 8 behind
+worldmap: kitchen_counter: from anywhere on it, its farthest box is 128.7 studs away (nearest point or centre, the farther), 136.7 from a focus 8 behind
+worldmap: kitchen_floor: from anywhere on it, its farthest box is 143.0 studs away (nearest point or centre, the farther), 151.0 from a focus 8 behind
+worldmap: sill to outer_sill: within 10 studs of the seam (330 places), the 1 boxes of outer_sill on the seam are at most 19.2 studs away, the rest 34.6
+worldmap: sill to wall_upper: within 10 studs of the seam (679 places), the 3 boxes of wall_upper on the seam are at most 85.2 studs away, the rest 92.9
+worldmap: sill to kitchen_counter: within 10 studs of the seam (744 places), the 3 boxes of kitchen_counter on the seam are at most 77.3 studs away, the rest 88.1
+worldmap: outer_sill to sill: within 10 studs of the seam (159 places), the 3 boxes of sill on the seam are at most 36.8 studs away, the rest 50.7
+worldmap: outer_sill to house_wall: within 10 studs of the seam (371 places), the 3 boxes of house_wall on the seam are at most 61.7 studs away, the rest 0.0
+worldmap: house_wall to outer_sill: within 10 studs of the seam (59 places), the 1 boxes of outer_sill on the seam are at most 39.2 studs away, the rest 56.3
+worldmap: house_wall to bed_a: within 10 studs of the seam (7 places), the 1 boxes of bed_a on the seam are at most 36.6 studs away, the rest 60.2
+worldmap: house_wall to wall_upper: within 10 studs of the seam (57 places), the 1 boxes of wall_upper on the seam are at most 65.2 studs away, the rest 110.4
+worldmap: house_wall to wall_west: within 10 studs of the seam (34 places), the 1 boxes of wall_west on the seam are at most 66.4 studs away, the rest 49.9
+worldmap: house_wall to shrub_west_a: within 10 studs of the seam (3 places), the 1 boxes of shrub_west_a on the seam are at most 70.4 studs away, the rest 110.5
+worldmap: bed_a to house_wall: within 10 studs of the seam (300 places), the 1 boxes of house_wall on the seam are at most 53.4 studs away, the rest 109.3
+worldmap: bed_a to shrub_west_a: within 10 studs of the seam (133 places), the 1 boxes of shrub_west_a on the seam are at most 69.4 studs away, the rest 111.1
+worldmap: wall_west to house_wall: within 10 studs of the seam (276 places), the 2 boxes of house_wall on the seam are at most 85.0 studs away, the rest 118.6
+worldmap: wall_west to wall_west_upper: within 10 studs of the seam (43 places), the 1 boxes of wall_west_upper on the seam are at most 73.7 studs away, the rest 100.2
+worldmap: wall_west to shrub_west_a: within 10 studs of the seam (44 places), the 1 boxes of shrub_west_a on the seam are at most 71.3 studs away, the rest 106.3
+worldmap: wall_west_upper to wall_upper: within 10 studs of the seam (216 places), the 1 boxes of wall_upper on the seam are at most 52.5 studs away, the rest 110.7
+worldmap: wall_west_upper to wall_west: within 10 studs of the seam (43 places), the 1 boxes of wall_west on the seam are at most 65.7 studs away, the rest 88.1
+worldmap: wall_west_upper to eaves_west: within 10 studs of the seam (43 places), the 1 boxes of eaves_west on the seam are at most 47.8 studs away, the rest 100.1
+worldmap: wall_upper to house_wall: within 10 studs of the seam (23 places), the 1 boxes of house_wall on the seam are at most 10.6 studs away, the rest 75.9
+worldmap: wall_upper to wall_west_upper: within 10 studs of the seam (65 places), the 1 boxes of wall_west_upper on the seam are at most 70.2 studs away, the rest 59.5
+worldmap: wall_upper to sill: within 10 studs of the seam (48 places), the 6 boxes of sill on the seam are at most 65.8 studs away, the rest 67.3
+worldmap: wall_upper to eaves: within 10 studs of the seam (23 places), the 1 boxes of eaves on the seam are at most 47.8 studs away, the rest 107.7
+worldmap: wall_upper to kitchen_counter: within 10 studs of the seam (12 places), the 1 boxes of kitchen_counter on the seam are at most 21.6 studs away, the rest 119.8
+worldmap: eaves_west to wall_west_upper: within 10 studs of the seam (167 places), the 1 boxes of wall_west_upper on the seam are at most 74.7 studs away, the rest 95.2
+worldmap: eaves_west to eaves: within 10 studs of the seam (149 places), the 2 boxes of eaves on the seam are at most 65.7 studs away, the rest 107.8
+worldmap: eaves to wall_upper: within 10 studs of the seam (20 places), the 1 boxes of wall_upper on the seam are at most 63.6 studs away, the rest 109.5
+worldmap: eaves to eaves_west: within 10 studs of the seam (11 places), the 1 boxes of eaves_west on the seam are at most 48.9 studs away, the rest 104.0
+worldmap: shrub_west_a to bed_a: within 10 studs of the seam (51 places), the 1 boxes of bed_a on the seam are at most 45.1 studs away, the rest 70.6
+worldmap: shrub_west_a to house_wall: within 10 studs of the seam (4 places), the 1 boxes of house_wall on the seam are at most 62.2 studs away, the rest 118.9
+worldmap: shrub_west_a to wall_west: within 10 studs of the seam (15 places), the 1 boxes of wall_west on the seam are at most 62.0 studs away, the rest 86.6
+worldmap: shrub_west_a to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 64.6 studs away, the rest 108.5
+worldmap: shrub_west_a to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 107.5
+worldmap: shrub_west_b to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 64.6 studs away, the rest 95.0
+worldmap: shrub_west_b to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 102.9
+worldmap: shrub_west_c to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 65.8 studs away, the rest 103.1
+worldmap: shrub_west_c to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 64.6 studs away, the rest 105.6
+worldmap: shrub_west_c to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 65.8 studs away, the rest 107.2
+worldmap: shrub_west_d to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 65.8 studs away, the rest 108.6
+worldmap: shrub_west_d to shrub_west_c: within 10 studs of the seam (143 places), the 1 boxes of shrub_west_c on the seam are at most 64.6 studs away, the rest 104.7
+worldmap: shrub_west_d to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 107.8
+worldmap: shrub_west_e to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 102.6
+worldmap: shrub_west_e to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 64.6 studs away, the rest 104.4
+worldmap: shrub_west_e to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 120.0
+worldmap: shrub_west_f to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 107.5
+worldmap: shrub_west_f to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 64.6 studs away, the rest 92.6
+worldmap: shrub_west_f to shrub_west_h: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 101.4
+worldmap: shrub_west_g to shrub_west_e: within 10 studs of the seam (103 places), the 1 boxes of shrub_west_e on the seam are at most 68.5 studs away, the rest 95.0
+worldmap: shrub_west_g to shrub_west_h: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_h on the seam are at most 64.6 studs away, the rest 107.3
+worldmap: shrub_west_g to shrub_west_i: within 10 studs of the seam (117 places), the 1 boxes of shrub_west_i on the seam are at most 69.4 studs away, the rest 108.8
+worldmap: shrub_west_h to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 105.8
+worldmap: shrub_west_h to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 64.6 studs away, the rest 118.8
+worldmap: shrub_west_h to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 65.8 studs away, the rest 92.1
+worldmap: shrub_west_i to shrub_west_g: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 118.6
+worldmap: shrub_west_i to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 64.6 studs away, the rest 99.5
+worldmap: shrub_west_j to shrub_west_h: within 10 studs of the seam (58 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 108.8
+worldmap: shrub_west_j to shrub_west_i: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_i on the seam are at most 64.6 studs away, the rest 97.7
+worldmap: kitchen_counter to sill: within 10 studs of the seam (578 places), the 1 boxes of sill on the seam are at most 41.2 studs away, the rest 71.5
+worldmap: kitchen_counter to wall_upper: within 10 studs of the seam (248 places), the 1 boxes of wall_upper on the seam are at most 68.2 studs away, the rest 126.7
+worldmap: kitchen_counter to kitchen_floor: within 10 studs of the seam (227 places), the 1 boxes of kitchen_floor on the seam are at most 46.3 studs away, the rest 104.7
+worldmap: kitchen_floor to kitchen_counter: within 10 studs of the seam (6 places), the 1 boxes of kitchen_counter on the seam are at most 15.7 studs away, the rest 94.7
+worldmap: on the wall's face over the bed, the soil below is at most 81.9 studs down (89.9 from a lagging focus); the whole bed is in everywhere below y -17.8
+worldmap: from the stone's front edge, the soil below is 90.7 studs from the spider or from its focus 8 studs back over the stone
+worldmap: the looks at the sill's spawn: 1469 parts at full, 497 at low
+worldmap: the looks at the outer sill: 1469 parts at full, 497 at low
+worldmap: the looks at halfway down the wall: 1475 parts at full, 497 at low
+worldmap: the looks at the wall's foot: 1475 parts at full, 497 at low
+worldmap: the looks at the bed's stone: 1483 parts at full, 487 at low
+worldmap: the looks at the gutter: 1496 parts at full, 466 at low
+worldmap: the looks at the window's glass, outside: 1496 parts at full, 476 at low
+worldmap: the looks at the kitchen's counter, by the toaster: 1469 parts at full, 497 at low
+worldmap: the looks at the kitchen's floor: 1475 parts at full, 497 at low
+worldmap: the looks at the wall west: 1498 parts at full, 493 at low
+worldmap: the looks at the drainpipe's swan neck: 1496 parts at full, 476 at low
+worldmap: the looks at the bushes by the bed and the house: 1483 parts at full, 487 at low
+worldmap: the looks at where four chunks meet: 1494 parts at full, 499 at low
+worldmap: the looks at the bushes' middle: 1493 parts at full, 423 at low
+worldmap: the looks at the far corner of the bushes: 1403 parts at full, 343 at low
+worldmap: the walk at full: at most 1496 parts, 56 changes
+worldmap: the walk at low: at most 499 parts, 35 changes
+WORLDMAP passed=2077 failed=0

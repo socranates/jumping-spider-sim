@@ -89,4 +89,5 @@ fix. No new upload, main merge or laptop synchronization is claimed. Follow
 audit and release decision. Linux CI40067737217 succeeded for integration code
 7f7eeead: compilation, strict, all suites, exports and five runner regressions.
 github-ci.json retains public API status/steps. Exact Linux assertion counts are
-not inferred from job status. A later notebook commit has its own CI cohort.
+not inferred from job status. Notebook commit094a0e0a also passed all configured
+Linux CI checks in run40068699284; notebook-github-ci.json retains that result.

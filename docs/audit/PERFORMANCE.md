@@ -1,5 +1,13 @@
 # Performance audit
 
+Current2026-10-24 extension: [completed full-tier workload](../performance-matrix/RESULTS.md)
+records nine native samples, active pond and a three-region walk ending attached/live.
+Its means range16.78–20.96ms, with one workload frame over50ms. This is an
+unpublished current-candidate observation; the before/after and low-tier native
+pairs remain pending. Four consistently instrumented comparison models are
+prepared. The v51 baseline/candidate observations below retain their original
+scope and must not be conflated with this later source cohort.
+
 Baseline: v51, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`, place 140, evidence `d9ddc5e0ed43d301`.
 Candidate: `5ee048a791da5fa4f5b99aac53d9769bcd358845`, evidence `c7af2726574c44cc`, branch `codex/foundation-audit`.
 

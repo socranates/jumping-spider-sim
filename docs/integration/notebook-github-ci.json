@@ -1,0 +1,101 @@
+{
+  "run_id": 40068699284,
+  "head_sha": "094a0e0a5beeeacf526ef796960fc82411dfc323",
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/40068699284",
+  "observed_at": "2026-10-24T06:20:23.3297785Z",
+  "jobs": [
+    {
+      "id": 120797275541,
+      "name": "checks",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-24T06:03:45Z",
+      "completed_at": "2026-10-24T06:17:15Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-24T06:03:46Z",
+          "completed_at": "2026-10-24T06:03:47Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-24T06:03:47Z",
+          "completed_at": "2026-10-24T06:03:52Z"
+        },
+        {
+          "name": "Toolchain (Luau 0.743, luau-lsp 1.70.1, Rojo 7.7.1)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-24T06:03:52Z",
+          "completed_at": "2026-10-24T06:03:53Z"
+        },
+        {
+          "name": "Every module compiles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-24T06:03:53Z",
+          "completed_at": "2026-10-24T06:03:54Z"
+        },
+        {
+          "name": "Strict types",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-24T06:03:54Z",
+          "completed_at": "2026-10-24T06:03:57Z"
+        },
+        {
+          "name": "All suites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-24T06:03:57Z",
+          "completed_at": "2026-10-24T06:17:10Z"
+        },
+        {
+          "name": "Normal and self-test exports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-24T06:17:10Z",
+          "completed_at": "2026-10-24T06:17:11Z"
+        },
+        {
+          "name": "Runner failure and cleanup regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-24T06:17:11Z",
+          "completed_at": "2026-10-24T06:17:11Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-24T06:17:11Z",
+          "completed_at": "2026-10-24T06:17:11Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-24T06:17:11Z",
+          "completed_at": "2026-10-24T06:17:11Z"
+        }
+      ]
+    }
+  ],
+  "limits": "Public API confirms all configured checks succeeded. Exact Linux assertion counts, native play, devices and publication are separate."
+}

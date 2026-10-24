@@ -47,11 +47,47 @@ normal/test exports and runner regressions. docs/integration/github-ci.json
 records public API steps; exact Linux assertion counts are not inferred from
 status. The later notebook commit has a separate CI cohort.
 Content commit094a0e0a is pushed to github/codex/verified-integration. Its CI
-run40068699284 is LIVE at this checkpoint; inspect completion before reporting
-that newer run green. Focused local checks have completed; no local test or
-Studio/Player session remains active. Final committed-byte checks matched both
+run40068699284 completed success for all configured checks, including all suites
+and both exports; docs/integration/notebook-github-ci.json retains public API
+steps. Exact Linux assertion counts are not inferred. Final committed-byte checks matched both
 models, notebook evidence and the preserved baseline log/build receipt hashes.
 Normal branch activation is not main/production/laptop synchronization.
+
+## Current native performance checkpoint
+
+docs/performance-matrix/RESULTS.md records completed current full-tier run
+1792823359752: all nine workload samples PASS, both276-source native guards,
+save cleanup,0 CreatorErrors/8 retained warnings. Means16.78–20.96ms; only one
+workload frame over50ms (windy meadow56.29ms). Pond proof includes an on-screen
+frog at5.010studs and one active damselfly. The garden walk crossed150.125studs
+through garden_a1/a2/a3, ended attached/live, mean17.20ms/max36.14ms,0>50ms.
+Liveness/loading were checked each Heartbeat; every intermediate motor mode
+was not recorded. Continuous support/fall logging is still unproved.
+Viewport1360x436; fixed weather clocks and scripted Free play fixtures, not
+natural lives, online storage or physical phones. Startup worst1.650s remains.
+Short Lua-heap deltas do not prove30-minute stability.
+
+Earlier pilots are retained with their failures: attempt1 omitted the displayed
+New offer ID (intentional refusal, fixture mistake); attempt2 assigned camera
+yaw before place()/snap(), then walked west instead of the intended east route.
+Its222.3stud west walk ended attached/live through three regions, but its requested
+route failed. The pond view also needed moving from pond_a1 to the frog's actual
+support. Attempt3 corrected those, logged camera/actor conditions and passed.
+
+The first complete cohort did not mount the optional look-method watcher.
+Four formal pair1 models now include it consistently and are statically
+qualified in pair1-builds.json (all276 compile/strict; one LookPlan source
+difference before/after, identical sources across tiers). They have NOT run
+natively. Next run serially:
+C:/Users/natha/claude-xfer/Windowsill-matrix-after-full-pair1/Windowsill-matrix.rbxlx
+C:/Users/natha/claude-xfer/Windowsill-matrix-before-full-pair1/Windowsill-matrix.rbxlx
+C:/Users/natha/claude-xfer/Windowsill-matrix-after-low-pair1/Windowsill-matrix.rbxlx
+C:/Users/natha/claude-xfer/Windowsill-matrix-before-low-pair1/Windowsill-matrix.rbxlx
+For each: source guard before, F5, original completion, Shift+F5, click stopped
+command bar before Ctrl+Return postguard, then collect.py --require-methods.
+Do not snapshot UI/run heavy local commands during samples. All owned Studio/
+Player/CLI sessions are stopped now. The ordinary game sources/exports and
+production/saves were unchanged by this benchmark work. Goal remains ACTIVE.
 
 ## Completed evidence, correctly scoped
 

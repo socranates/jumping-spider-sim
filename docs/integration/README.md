@@ -23,7 +23,7 @@ not a new native execution. Five runner infrastructure checks and143
 selected normal-path checks passed. The standard Windows command then completed
 all79 suites with468979 top-level passes and0 failures (exit0). full-cli.txt and
 full-cli-receipt.json retain the ordered summaries and exact input/model hashes.
-collect_full.py --exit-code0 --check revalidated that completed output before
+collect_full.py --exit-code 0 --check revalidated that completed output before
 any later source edits; use the receipt's cohort when interpreting this result.
 
 ## Normal commands

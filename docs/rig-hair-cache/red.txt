@@ -1,0 +1,6 @@
+C:/Users/natha/AppData/Local/Temp/tmp39vmty8s.luau:742: missing bundled module: Appearances
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmp39vmty8s.luau:742 function __index
+C:/Users/natha/AppData/Local/Temp/tmp39vmty8s.luau:2006
+C:/Users/natha/AppData/Local/Temp/tmp39vmty8s.luau:3635

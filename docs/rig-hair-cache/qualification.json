@@ -1,0 +1,20 @@
+{
+  "evidence_id": "032b5985ac17eeb2",
+  "source_commit": "dd21210557990e0c0040b8028a714201de12e9d2",
+  "source_count": 273,
+  "matched_original_source_hashes": 273,
+  "changed_game_modules": [
+    "Shared/Rig/SpiderRig.luau"
+  ],
+  "frozen_reference_sha256": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20",
+  "native_checks": 28,
+  "native_comparisons": 143800,
+  "compile_passed": 273,
+  "strict_diagnostics": 0,
+  "runner_passed": 5,
+  "local_targeted_passed": 11247,
+  "model_sha256": "b0a761a85267ff5f6aa515fe58b31149a1270ca0136867a7d38b8adae0c86f7b",
+  "native_passed": true,
+  "published": false,
+  "limits": "Operation-saving and native fixture equivalence only; no paired FPS or broad audit completion."
+}

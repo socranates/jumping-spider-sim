@@ -1,0 +1,2 @@
+RIG_HAIR_CACHE cases=14 frames=560 part_comparisons=143800 lookat_before=47280 lookat_after=29120 worst_position=0 worst_axis=1.6846514078731632e-15 worst_size=0
+RIG_HAIR_CACHE passed=29 failed=0

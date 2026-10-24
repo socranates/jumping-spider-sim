@@ -8,7 +8,7 @@ import argparse,hashlib,json,subprocess,xml.etree.ElementTree as ET,zlib
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 TOOLS=Path('C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools')
 sha=lambda b:hashlib.sha256(b).hexdigest()
-p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);p.add_argument('--playback-source',type=Path,default=H/'playback.luau');p.add_argument('--seam-group',choices=['northern','hut_perimeter']);p.add_argument('--startup-clock',action='store_true');p.add_argument('--exercise-decor',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);p.add_argument('--playback-source',type=Path,default=H/'playback.luau');p.add_argument('--seam-group',choices=['northern','hut_perimeter']);p.add_argument('--startup-clock',action='store_true');p.add_argument('--exercise-decor',action='store_true');p.add_argument("--rig-hair-checks",action="store_true");a=p.parse_args()
 assert not a.exercise_decor or a.startup_clock
 assert not a.startup_clock or(a.variant=='after'and a.seam_group is None and not a.long_trace_seconds and a.playback_source.resolve()==(ROOT/'docs/startup-clock/playback.luau').resolve())
 assert a.long_trace_seconds==0 or 60<=a.long_trace_seconds<=3600
@@ -99,7 +99,11 @@ assert persistence.count(old)==1
 persistence=persistence.replace(old,old+';require(script.Parent.NormalStartupDiagnosticStorage).observe(composition)')
 assert 'DataStoreService'not in persistence and ':GetDataStore('not in persistence and 'GetRequestBudgetForRequestType'not in persistence
 source['Server/Persistence.server.luau']=persistence.encode()
-source_count=276+(1 if a.long_trace_seconds else 0)
+if a.rig_hair_checks:
+ assert a.variant=='after'and not a.startup_clock and a.playback_source.resolve()==(ROOT/'docs/rig-hair-cache/playback.luau').resolve()
+ source['Shared/Rig/RigHairReference.luau']=(PORT/'tests/rig_hair_reference.luau').read_bytes()
+ source['Client/RigHairChecks.luau']=(PORT/'tests/studio/rig_hair_checks.luau').read_bytes()
+source_count=276+(1 if a.long_trace_seconds else 0)+(2 if a.rig_hair_checks else 0)
 assert len(source)==source_count and not any('SilkPlayback'in k for k in source)
 for rel,data in source.items():
  f=out/'src'/rel;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(data)
@@ -140,5 +144,6 @@ if a.seam_group:guard='assert(workspace:GetAttribute("SeamGroup")=='+json.dumps(
 guard+='for _,r in expected do local it=game;for n in string.gmatch(r[1],"[^.]+")do it=assert(it:FindFirstChild(n),r[1])end;local s=string.gsub(it.Source,"\\r\\n","\\n");local x,y=1,0;for i=1,#s do x=(x+string.byte(s,i))%65521;y=(y+x)%65521 end;assert(#s==r[2] and y*65536+x==r[3],r[1])end;assert(not game.ServerScriptService.Server.Persistence.Disabled);print("[MATRIX_GUARD]",'+str(source_count)+',"'+a.variant+'","'+a.tier+'","unbound memory_only")'
 (out/'guard.luau').write_bytes((guard+'\n').encode())
 manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,startup_waits=a.startup_clock,startup_engine_phases=a.startup_clock,decor_nonblocking=True,exercise_decor=a.exercise_decor,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones. Decor exercise deliberately changes optional geometry after the title observation; that cohort is not a performance benchmark.')
+manifest['rig_hair_checks']=a.rig_hair_checks
 (out/'manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode())
 print(json.dumps(dict(place=str(place),sha256=manifest['place_sha256'],sources=source_count,variant=a.variant,tier=a.tier)),flush=True)

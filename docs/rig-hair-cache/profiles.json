@@ -1,0 +1,37 @@
+{
+  "captures": [
+    {
+      "kind": "client",
+      "raw_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\microprofile-20261024-071325.html",
+      "raw_sha256": "888607172885a232e5a64ef7f9ca552204769203bc3a093e149d5f43b729f3a5",
+      "raw_bytes": 835693,
+      "summary_download": "C:\\Users\\natha\\Downloads\\client_summary (1).json",
+      "summary_sha256": "02591f3fab24833226d6494b060e2d0de0bf1e516de97c3676cc3e634ebf04d9",
+      "frames": 128,
+      "marker_aggregate_frames": 60,
+      "marker_download": "C:\\Users\\natha\\Downloads\\client (1).csv",
+      "marker_sha256": "2695d00a561d01ea1e8577481c90414a57c6954131d0b38a87641f8d80778ccf",
+      "aggregate_marker_rows": 2163,
+      "limits": "Post-PASS local Studio rainy-garden endpoint; native profiler/console UI interaction nearby. Not a paired performance benchmark or an isolated production server. Marker CSV aggregate window differs from dump frame count."
+    },
+    {
+      "kind": "server",
+      "raw_path": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\log_C6C23_microprofile_20261024-070906.html",
+      "raw_sha256": "90c2f3d7a2a08611224b341484edb7ef563e1bcb7931b0e31e3c1fd5c0b7f833",
+      "raw_bytes": 2675831,
+      "summary_download": "C:\\Users\\natha\\Downloads\\server_summary (1).json",
+      "summary_sha256": "c5a2add9ef2b17f738b0989cf3f03c97a16ed7a798674303e0ec587f7b812096",
+      "frames": 60,
+      "marker_aggregate_frames": 60,
+      "marker_download": "C:\\Users\\natha\\Downloads\\server (1).csv",
+      "marker_sha256": "cc5568d81d07c8ba3fba70d16a9f5bcf329d9057fe1b1710cfe6e5e44a2b6262",
+      "aggregate_marker_rows": 2242,
+      "limits": "Post-PASS local Studio rainy-garden endpoint; native profiler/console UI interaction nearby. Not a paired performance benchmark or an isolated production server. Marker CSV aggregate window differs from dump frame count."
+    }
+  ],
+  "fresh_server_request": true,
+  "server_isolation_qualified": false,
+  "native_run": "1792843345517",
+  "published": false,
+  "limits": "Fresh unpaused Server-tab request and later paused client dump in the same local Studio process. Frame summaries differ but several timer totals/maxima repeat exactly; aggregate independence is not established. Scope timers nest and aliases overlap; Sleep is not busy CPU. Do not sum labels or attribute end-to-end savings."
+}

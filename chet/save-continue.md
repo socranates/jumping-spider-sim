@@ -1,3 +1,13 @@
+Current continuation: read docs/rig-hair-cache/README.md first. Ordinary source
+is now evidence032b5985ac17eeb2 atdd212105; only SpiderRig changes from the
+previous candidate. Fixed local hair turns are cached, with native143,800-part
+comparison/28checks/both guards/zero errors and11,247 local targeted checks.
+Normal273 compile/strict, runner5/5 and exact exports pass. Full80-suite CI
+40093189495 is running: finish and record its result before claiming success.
+Fresh unpaused Server-tab capture succeeded; both raw traces still include
+local Studio client/render work. No dedicated-server or paired FPS claim.
+All agent Studio/profiler viewers and temporary HTTP process are closed.
+Unpublished; prior private13 authorization is fulfilled. Broad audit ACTIVE.
 # Current integration handoff â€” 2026-10-24
 
 Latest completed measurement pass: docs/performance-matrix/PAIR2.md and

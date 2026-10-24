@@ -1,0 +1,7 @@
+C:/Users/natha/AppData/Local/Temp/tmp3j10i9pf.luau:66540: rig hair cache checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp3j10i9pf.luau:66540
+FAIL rig hair cache: one lookAt removed per updated leg hair: 0 of 18160
+RIG_HAIR_CACHE cases=14 frames=560 part_comparisons=143800 lookat_before=47280 lookat_after=47280 worst_position=0 worst_axis=0 worst_size=0
+RIG_HAIR_CACHE passed=28 failed=1

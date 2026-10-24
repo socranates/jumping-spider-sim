@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-10-24T12:20:49.2083444Z",
+  "studio_pid": 25460,
+  "studio_pid_absent": true,
+  "http_pid": 11080,
+  "http_pid_absent": true,
+  "model_sha256": "b0a761a85267ff5f6aa515fe58b31149a1270ca0136867a7d38b8adae0c86f7b",
+  "model_unchanged": true,
+  "temporary_viewer_tabs_closed": true,
+  "published": false
+}

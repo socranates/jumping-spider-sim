@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "source_count": 278,
+  "source_guards": 2,
+  "creator_errors": 0,
+  "model_sha256": "b0a761a85267ff5f6aa515fe58b31149a1270ca0136867a7d38b8adae0c86f7b",
+  "manifest_sha256": "8b288a2ce5e7f9176f603ee6da57055c020b8276ab51227dc03c6455f1ed5120",
+  "native_output_sha256": "2a80b7975073a0dddac42d4e918450e69b97bdd2b609b9abf68e1b40c7844ad3",
+  "result": {
+    "failed": 0,
+    "passed": 28,
+    "metrics": {
+      "worstSize": 0,
+      "frames": 560,
+      "legHairFrames": 18160,
+      "worstPosition": 0,
+      "worstAxis": 1.0264509455737425e-06,
+      "cases": 14,
+      "parts": 143800
+    }
+  },
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T115926Z_Studio_C6C23_last.log",
+  "run": "1792843345517",
+  "warnings": [
+    "2026-10-24T12:00:51.419Z,85.419662,6584,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:00:51.420Z,85.420670,6584,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:00:51.420Z,85.420670,6584,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:00:51.420Z,85.420670,6584,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T12:01:02.444Z,96.444954,1b20,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T12:02:29.371Z,183.371841,3214,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "limits": "Isolated old/new native geometry fixture. Profiler interaction follows PASS. No paired FPS, dedicated server, physical phone, whole-map or production save qualification."
+}

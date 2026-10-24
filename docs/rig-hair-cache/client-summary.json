@@ -1,0 +1,1392 @@
+{
+  "num_frames": 128,
+  "num_frames_jobs_heavy": 128,
+  "num_frames_rendering_heavy": 0,
+  "num_frames_gpu_heavy": 0,
+  "cpu_time_median": 18.721374500000024,
+  "gpu_time_median": 18.641406500000016,
+  "gpu_time_ext_median": 18.034999999999997,
+  "cpu_time_mean": 20.6136970546875,
+  "gpu_time_mean": 20.589439390625007,
+  "gpu_time_ext_mean": 18.52765624999999,
+  "cpu_time_max": 121.019318,
+  "gpu_time_max": 116.48638899999997,
+  "gpu_time_ext_max": 25.68,
+  "cpu_time_stddev": 12.598419707001442,
+  "gpu_time_stddev": 11.8111189639984,
+  "gpu_time_ext_stddev": 1.6482706298833143,
+  "cpu_top_by_total_time": [
+    {
+      "name": "Runtime::Sleep",
+      "total": 8822.238281
+    },
+    {
+      "name": "Qt::$Event",
+      "total": 1151.432983
+    },
+    {
+      "name": "Render::Perform",
+      "total": 637.312073
+    },
+    {
+      "name": "Runtime::Thread (FG)",
+      "total": 465.070343
+    },
+    {
+      "name": "Render::PrepareBound",
+      "total": 435.709442
+    },
+    {
+      "name": "Render::PreRender",
+      "total": 361.493744
+    },
+    {
+      "name": "Render::fireBindToRenderStepCallbacks",
+      "total": 341.105957
+    },
+    {
+      "name": "Script::Script_SpiderClient",
+      "total": 337.068481
+    },
+    {
+      "name": "Render::Present",
+      "total": 332.03598
+    },
+    {
+      "name": "Jobs::TS::JobStep",
+      "total": 253.601349
+    },
+    {
+      "name": "Jobs::TS::ArbiterStep",
+      "total": 250.160583
+    },
+    {
+      "name": "Render::Scene",
+      "total": 218.15062
+    },
+    {
+      "name": "Render::waitOnGpu",
+      "total": 217.781631
+    },
+    {
+      "name": "Render::waitUntilCompleted",
+      "total": 217.680756
+    },
+    {
+      "name": "LuaBridge::$namecall",
+      "total": 169.199234
+    },
+    {
+      "name": "Render::SceneUpdater::computeLightingPerform",
+      "total": 113.942497
+    },
+    {
+      "name": "Render::VisibleQuery",
+      "total": 105.719246
+    },
+    {
+      "name": "Render::ShadowMapSystem::updatePerform",
+      "total": 96.969421
+    },
+    {
+      "name": "Render::CullJob",
+      "total": 94.529716
+    },
+    {
+      "name": "Render::queryOcclusion",
+      "total": 81.336784
+    },
+    {
+      "name": "Jobs::Heartbeat(Heartbeat;Game)",
+      "total": 79.934967
+    },
+    {
+      "name": "Render::Prepare",
+      "total": 79.775658
+    },
+    {
+      "name": "Jobs::Heartbeat",
+      "total": 79.365005
+    },
+    {
+      "name": "Render::PrepareStandalone",
+      "total": 68.456245
+    },
+    {
+      "name": "Systems::process",
+      "total": 62.053066
+    },
+    {
+      "name": "Systems::task()",
+      "total": 61.304581
+    },
+    {
+      "name": "Shadows::drawFrustums",
+      "total": 58.756351
+    },
+    {
+      "name": "Script::GC",
+      "total": 58.645164
+    },
+    {
+      "name": "Render::Prepare2dWindow",
+      "total": 55.991985
+    },
+    {
+      "name": "Heartbeat::RunService.Heartbeat",
+      "total": 53.82634
+    },
+    {
+      "name": "Render::SceneUpdater::UpdatePrepare",
+      "total": 51.895844
+    },
+    {
+      "name": "Runtime::Thread (BG)",
+      "total": 51.857967
+    },
+    {
+      "name": "Render::UpdateView",
+      "total": 46.554062
+    },
+    {
+      "name": "Render::SceneUpdater::updateInstancedClusters2",
+      "total": 45.779633
+    },
+    {
+      "name": "UI::fillGuiVertices",
+      "total": 45.141457
+    },
+    {
+      "name": "Systems::waitUntilEmpty",
+      "total": 43.832409
+    },
+    {
+      "name": "Jobs::LuaGc(Default;Game)",
+      "total": 43.373413
+    },
+    {
+      "name": "Render::RenderView",
+      "total": 42.050335
+    },
+    {
+      "name": "Render::updateRenderQueue",
+      "total": 39.449436
+    },
+    {
+      "name": "Shadows::depthPass",
+      "total": 39.161339
+    },
+    {
+      "name": "Shadows::buildFrustums",
+      "total": 37.432091
+    },
+    {
+      "name": "Shadows::ShadowObjectDirectional",
+      "total": 36.779987
+    },
+    {
+      "name": "telem::perfdata_v2_sendphase",
+      "total": 29.818707
+    },
+    {
+      "name": "LuaBridge::$newindex",
+      "total": 27.576132
+    },
+    {
+      "name": "Shadows::Fill tiled casters",
+      "total": 27.523657
+    },
+    {
+      "name": "Memory::HeapCategoryWalkLive",
+      "total": 26.612144
+    },
+    {
+      "name": "Jobs::Simulation(Simulation;Game)",
+      "total": 24.773779
+    },
+    {
+      "name": "Jobs::Simulation",
+      "total": 24.366875
+    },
+    {
+      "name": "Render::LightGridCPU::updateChunksAsyncTask",
+      "total": 22.777678
+    },
+    {
+      "name": "Network::WsClient::workerThreadProcess",
+      "total": 22.645544
+    },
+    {
+      "name": "Jobs::Allocate Bandwidth and Run Senders(Network_MegaOutgoing;Game)",
+      "total": 21.969612
+    },
+    {
+      "name": "Jobs::Allocate Bandwidth and Run Senders",
+      "total": 21.681887
+    },
+    {
+      "name": "Render::updateLightingAsyncTask",
+      "total": 21.253109
+    },
+    {
+      "name": "Script::Script_SchedulerHostConfig.default",
+      "total": 20.406887
+    },
+    {
+      "name": "Jobs::TS::Step",
+      "total": 20.067177
+    },
+    {
+      "name": "Shadows::updateFrustumRenderQueue",
+      "total": 19.935875
+    },
+    {
+      "name": "Jobs::ScriptContextTaskQueue(Render;DefaultArbiter)",
+      "total": 19.258961
+    },
+    {
+      "name": "Runtime::Sched",
+      "total": 17.519161
+    },
+    {
+      "name": "Jobs::Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+      "total": 15.211497
+    },
+    {
+      "name": "LuaBridge::$index",
+      "total": 14.959353
+    },
+    {
+      "name": "Jobs::Replicator ProcessPackets",
+      "total": 14.924905
+    },
+    {
+      "name": "Heartbeat::heartbeatInternal",
+      "total": 14.63774
+    },
+    {
+      "name": "Render::lightingUpdateChunkGlobal",
+      "total": 14.508482
+    },
+    {
+      "name": "Render::LightGridCPU::updatePerform",
+      "total": 13.745697
+    },
+    {
+      "name": "Shadows::renderShadowQueue",
+      "total": 13.471869
+    },
+    {
+      "name": "Network::processPacket",
+      "total": 13.165917
+    },
+    {
+      "name": "Network::Dispatch Data Senders",
+      "total": 13.097099
+    },
+    {
+      "name": "Render::DefaultPass",
+      "total": 13.048793
+    },
+    {
+      "name": "Render::uploadBufferData",
+      "total": 11.368865
+    },
+    {
+      "name": "Physics::physicsSteppedTotal",
+      "total": 10.669114
+    },
+    {
+      "name": "Physics::physicsStepped",
+      "total": 10.555728
+    },
+    {
+      "name": "Network::Data Senders",
+      "total": 10.293774
+    },
+    {
+      "name": "Render::Id_Opaque",
+      "total": 10.253153
+    },
+    {
+      "name": "Render::TextureManager2::processPendingRequests",
+      "total": 10.007121
+    },
+    {
+      "name": "MicroProfiler::FrameCheck",
+      "total": 9.634796
+    },
+    {
+      "name": "Jobs::Sound(Default;Game)",
+      "total": 9.191108
+    },
+    {
+      "name": "Render::Pass2d",
+      "total": 9.088655
+    },
+    {
+      "name": "UI::TextRender::render",
+      "total": 8.862251
+    },
+    {
+      "name": "Jobs::Sound",
+      "total": 8.792821
+    },
+    {
+      "name": "Script::delayedThreads",
+      "total": 8.694114
+    },
+    {
+      "name": "Render::lightingUploadChunk",
+      "total": 8.654428
+    },
+    {
+      "name": "Physics::RaycastBroadphase",
+      "total": 8.514185
+    },
+    {
+      "name": "Render::Pass3dAdorn",
+      "total": 8.188213
+    },
+    {
+      "name": "Sound::FMOD::Output::mix",
+      "total": 7.997141
+    },
+    {
+      "name": "Jobs::Net PacketReceive(Network_ReceiveIncoming;Game)",
+      "total": 7.975128
+    },
+    {
+      "name": "Jobs::Net PacketReceive",
+      "total": 7.715779
+    },
+    {
+      "name": "Render::LightGridCPU::updateChunkOccupancy",
+      "total": 7.581591
+    },
+    {
+      "name": "Render::RenderWorkspaceAdorns",
+      "total": 7.380318
+    },
+    {
+      "name": "Network::HttpClientReq",
+      "total": 7.33081
+    },
+    {
+      "name": "Jobs::WaitingHybridScriptsJob(Default;Game)",
+      "total": 7.123425
+    },
+    {
+      "name": "ShadowMap::Id_Opaque",
+      "total": 7.113564
+    },
+    {
+      "name": "Input::ProcessInput",
+      "total": 7.079717
+    },
+    {
+      "name": "Jobs::WaitingHybridScriptsJob",
+      "total": 6.593665
+    },
+    {
+      "name": "Render::Id_Transparent",
+      "total": 6.527283
+    },
+    {
+      "name": "Physics::gameStepped",
+      "total": 6.376671
+    },
+    {
+      "name": "RbxTransport::BasePacketSender.processPendingTx",
+      "total": 6.222713
+    },
+    {
+      "name": "telem::perfdata_v2",
+      "total": 6.130319
+    },
+    {
+      "name": "Render::Pass2d/PlayerGui",
+      "total": 6.088024
+    },
+    {
+      "name": "UI::Process GuiEffect",
+      "total": 5.998093
+    },
+    {
+      "name": "Jobs::TS::Reschedule",
+      "total": 5.945329
+    },
+    {
+      "name": "Render::StandardAdorns",
+      "total": 5.86601
+    },
+    {
+      "name": "Script::Script_RobloxReactProfiling",
+      "total": 5.751801
+    },
+    {
+      "name": "Render::Scene2D",
+      "total": 5.655149
+    },
+    {
+      "name": "Jobs::Replicator GC Job(Network_MegaOutgoing;Game)",
+      "total": 5.634497
+    },
+    {
+      "name": "Physics::workspaceOnHeartbeat",
+      "total": 5.533394
+    },
+    {
+      "name": "Jobs::Replicator GC Job",
+      "total": 5.474617
+    },
+    {
+      "name": "MicroProfiler::ThreadLoop",
+      "total": 5.394818
+    },
+    {
+      "name": "Render::sortObjects",
+      "total": 4.916311
+    },
+    {
+      "name": "Runtime::Spawn (FG)",
+      "total": 4.587834
+    },
+    {
+      "name": "Render::Profiler",
+      "total": 4.56064
+    },
+    {
+      "name": "Shadows::Get shadow casters",
+      "total": 4.531572
+    },
+    {
+      "name": "Shadows::getPotentialShadowCasters",
+      "total": 4.498035
+    },
+    {
+      "name": "Script::Script_Plugin",
+      "total": 4.388343
+    },
+    {
+      "name": "Render::DOF",
+      "total": 4.199678
+    },
+    {
+      "name": "Render::queryFrustumOrdered",
+      "total": 4.179558
+    },
+    {
+      "name": "Jobs::RenderJob(PostRender;Game)",
+      "total": 4.139387
+    },
+    {
+      "name": "Jobs::Write Marshalled(NotOrderDependent;Game)",
+      "total": 3.926632
+    },
+    {
+      "name": "Render::lightingUpdateChunkSkylight",
+      "total": 3.900339
+    },
+    {
+      "name": "Render::RenderSteppedInternal",
+      "total": 3.870199
+    },
+    {
+      "name": "Shadows::Precise culling",
+      "total": 3.810581
+    },
+    {
+      "name": "Shadows::Perform culling",
+      "total": 3.799749
+    },
+    {
+      "name": "Network::Dispatch StreamJob",
+      "total": 3.795019
+    },
+    {
+      "name": "MicroProfiler::Draw",
+      "total": 3.670329
+    },
+    {
+      "name": "QtUIThread::UI Task Run",
+      "total": 3.641244
+    },
+    {
+      "name": "ShadowMap::Id_Transparent",
+      "total": 3.603847
+    },
+    {
+      "name": "Render::Clouds",
+      "total": 3.568626
+    },
+    {
+      "name": "Render::updateTerrainPerform",
+      "total": 3.498526
+    },
+    {
+      "name": "Render::RunService.RenderStepped",
+      "total": 3.335259
+    },
+    {
+      "name": "Sound::updateFmod",
+      "total": 3.23137
+    },
+    {
+      "name": "Render::UpdateUILayouts",
+      "total": 3.161452
+    },
+    {
+      "name": "Physics::RunService.Stepped",
+      "total": 3.104097
+    },
+    {
+      "name": "Render::DepthPrePass",
+      "total": 3.005831
+    },
+    {
+      "name": "Render::copySkylight",
+      "total": 2.899488
+    },
+    {
+      "name": "Render::SceneUpdater::computeLightingPrepare",
+      "total": 2.863125
+    },
+    {
+      "name": "Network::StreamJob",
+      "total": 2.7755
+    },
+    {
+      "name": "Render::UITextureRenderer::compositeUITextures",
+      "total": 2.677584
+    },
+    {
+      "name": "Render::UI",
+      "total": 2.666312
+    },
+    {
+      "name": "Script::Script_ChatMain",
+      "total": 2.601161
+    },
+    {
+      "name": "Render::LightGridCPU::updatePrepare",
+      "total": 2.535109
+    },
+    {
+      "name": "Jobs::Streaming Solver V2(Network_StreamingSolver;Game)",
+      "total": 2.428336
+    },
+    {
+      "name": "Runtime::Yield (BG)",
+      "total": 2.364318
+    },
+    {
+      "name": "Runtime::Close (FG)",
+      "total": 2.358466
+    },
+    {
+      "name": "MicroProfiler::Detailed View",
+      "total": 2.277654
+    },
+    {
+      "name": "telem::sessionTracking_v2",
+      "total": 2.249007
+    },
+    {
+      "name": "Jobs::InstanceObjectManager Job(Network_ObjectManager;Game)",
+      "total": 2.222294
+    },
+    {
+      "name": "Physics::updateVisuallySleeping",
+      "total": 2.213366
+    },
+    {
+      "name": "Render::WaitForLock",
+      "total": 2.163784
+    },
+    {
+      "name": "Network::StreamingSolverV2",
+      "total": 2.148747
+    },
+    {
+      "name": "Shadows::horizontalBlur",
+      "total": 2.088967
+    },
+    {
+      "name": "Render::updateWaterMaterialConstants",
+      "total": 2.031683
+    },
+    {
+      "name": "Jobs::PerformanceControlMultiResourceOrchestratorJob(Default;DefaultA",
+      "total": 2.009789
+    },
+    {
+      "name": "Physics::worldStep",
+      "total": 1.963546
+    },
+    {
+      "name": "Script::Script_StarterScript",
+      "total": 1.944168
+    },
+    {
+      "name": "Network::Dispatch ISR Prep And Send",
+      "total": 1.929649
+    },
+    {
+      "name": "Render::Glow",
+      "total": 1.923045
+    },
+    {
+      "name": "Network::RakNetUpdate",
+      "total": 1.909148
+    },
+    {
+      "name": "Network::InstanceObjectManager",
+      "total": 1.839799
+    },
+    {
+      "name": "Tasks::AsyncTask",
+      "total": 1.790019
+    },
+    {
+      "name": "Render::Pass2d/SoftwareCursor",
+      "total": 1.761142
+    },
+    {
+      "name": "MemProfStorage::mappedFileFlush",
+      "total": 1.754007
+    },
+    {
+      "name": "Network::deserializeBufferedPackets",
+      "total": 1.748667
+    },
+    {
+      "name": "Jobs::Distributed Physics Ownership(Default;Game)",
+      "total": 1.738657
+    },
+    {
+      "name": "Render::InstanceGlob",
+      "total": 1.646902
+    },
+    {
+      "name": "Shadows::Sort",
+      "total": 1.642504
+    },
+    {
+      "name": "Jobs::LuauTelemetry(Default;Game)",
+      "total": 1.640561
+    },
+    {
+      "name": "Jobs::Distributed Physics Ownership",
+      "total": 1.632204
+    },
+    {
+      "name": "Jobs::Write Marshalled",
+      "total": 1.59525
+    },
+    {
+      "name": "Script::Script_Persistence",
+      "total": 1.589218
+    },
+    {
+      "name": "Render::renderHighlightIdPass",
+      "total": 1.561833
+    },
+    {
+      "name": "Shadows::Filter cascade casters",
+      "total": 1.557424
+    },
+    {
+      "name": "FroxelGrid::cullLights",
+      "total": 1.548226
+    },
+    {
+      "name": "Render::Octree::maintenance",
+      "total": 1.530531
+    },
+    {
+      "name": "Sound::stepInstances",
+      "total": 1.48033
+    },
+    {
+      "name": "Physics::stepAnimation",
+      "total": 1.479849
+    },
+    {
+      "name": "Shadows::verticalBlur",
+      "total": 1.46006
+    },
+    {
+      "name": "Physics::SpatialFilter::filterStep",
+      "total": 1.454549
+    },
+    {
+      "name": "Physics::applyJointTransforms",
+      "total": 1.433336
+    },
+    {
+      "name": "Network::Gather From Uncollected Regions",
+      "total": 1.41506
+    },
+    {
+      "name": "Render::DebugAndEditAdorns",
+      "total": 1.413166
+    },
+    {
+      "name": "Runtime::Yield (FG)",
+      "total": 1.412825
+    },
+    {
+      "name": "Physics::AnimatorParallelManager::stepAll",
+      "total": 1.397805
+    },
+    {
+      "name": "Render::AdvSky",
+      "total": 1.392625
+    },
+    {
+      "name": "Network::deserializePacket",
+      "total": 1.372044
+    },
+    {
+      "name": "Jobs::DebuggerConnectionJob(NotOrderDependent;Game)",
+      "total": 1.351182
+    },
+    {
+      "name": "Jobs::Video(Default;Game)",
+      "total": 1.307836
+    },
+    {
+      "name": "GameplayNet::UpdatePlayerLocations",
+      "total": 1.283446
+    },
+    {
+      "name": "Script::resumeParallelWaitingScripts",
+      "total": 1.28035
+    },
+    {
+      "name": "Jobs::ClearUnusedLuaRefsJob(NotOrderDependent;Game)",
+      "total": 1.273226
+    },
+    {
+      "name": "Physics::applyDeferredTerrainChanges",
+      "total": 1.238236
+    },
+    {
+      "name": "Render::updateTerrainPrepare",
+      "total": 1.228176
+    },
+    {
+      "name": "Jobs::TimerTickerJob(Default;DefaultArbiter)",
+      "total": 1.212214
+    },
+    {
+      "name": "Render::VertexStreamer::renderPrepare",
+      "total": 1.209669
+    },
+    {
+      "name": "Network::ISRSendStep",
+      "total": 1.202344
+    },
+    {
+      "name": "Network::deserializeClientItem",
+      "total": 1.191422
+    },
+    {
+      "name": "Render::Pass2d/CoreGui",
+      "total": 1.159318
+    },
+    {
+      "name": "Jobs::HttpRbxApiJob(NotOrderDependent;Game)",
+      "total": 1.131923
+    },
+    {
+      "name": "Render::endBatcher",
+      "total": 1.112455
+    },
+    {
+      "name": "Render::DownSample",
+      "total": 1.077435
+    },
+    {
+      "name": "Script::::DevConsoleMaster",
+      "total": 1.048366
+    },
+    {
+      "name": "Network::Refresh Tracked Location",
+      "total": 1.04503
+    },
+    {
+      "name": "RakNet::RakPeer::ProcessNetworkPacket",
+      "total": 1.027284
+    },
+    {
+      "name": "Network::HttpClientTC",
+      "total": 1.018857
+    },
+    {
+      "name": "Physics::updatePhysicsInstructions",
+      "total": 1.017595
+    },
+    {
+      "name": "Network::contentProviderOnHeartbeat",
+      "total": 1.013587
+    },
+    {
+      "name": "GizmoManager::processGizmos",
+      "total": 0.994799
+    },
+    {
+      "name": "Jobs::RenderJob",
+      "total": 0.974669
+    },
+    {
+      "name": "Render::CullableSceneUpdate",
+      "total": 0.943607
+    },
+    {
+      "name": "Systems::addTaskMulti",
+      "total": 0.939388
+    },
+    {
+      "name": "UI::TweenService",
+      "total": 0.928447
+    },
+    {
+      "name": "Script::Script_main",
+      "total": 0.912906
+    },
+    {
+      "name": "Runtime::Await (FG)",
+      "total": 0.905691
+    },
+    {
+      "name": "Render::MeshManager::processPendingRequests",
+      "total": 0.865772
+    },
+    {
+      "name": "Runtime::Await (BG)",
+      "total": 0.830581
+    },
+    {
+      "name": "Render::fitIntoMeshesBudget",
+      "total": 0.820612
+    },
+    {
+      "name": "Telemetry::Event::send",
+      "total": 0.811733
+    },
+    {
+      "name": "Render::TextureAtlas::upload",
+      "total": 0.794839
+    },
+    {
+      "name": "Render::FrameRateManager::submitCurrentFrame",
+      "total": 0.778567
+    },
+    {
+      "name": "Render::ColorCorrection",
+      "total": 0.771934
+    },
+    {
+      "name": "MicroProfiler::Clear",
+      "total": 0.769479
+    },
+    {
+      "name": "Render::CopyTexture::Skylight",
+      "total": 0.769027
+    },
+    {
+      "name": "Physics::interpolateNetworkedAssemblies",
+      "total": 0.768918
+    },
+    {
+      "name": "Physics::notifyMovingAssembliesAndPrimMovementCallbacks",
+      "total": 0.761904
+    },
+    {
+      "name": "Script::deferredThreads",
+      "total": 0.760531
+    },
+    {
+      "name": "Runtime::Split",
+      "total": 0.748647
+    },
+    {
+      "name": "UI::updateGenericTweens",
+      "total": 0.722334
+    },
+    {
+      "name": "Network::Update and allocate bandwidth",
+      "total": 0.709298
+    },
+    {
+      "name": "MicroProfiler::Accumulate",
+      "total": 0.707735
+    },
+    {
+      "name": "Runtime::Close (BG)",
+      "total": 0.706102
+    },
+    {
+      "name": "MicroProfiler::CPUFreq",
+      "total": 0.683737
+    },
+    {
+      "name": "Heartbeat::proximityPromptOnHeartbeat",
+      "total": 0.676383
+    },
+    {
+      "name": "Shadows::Spatial culling",
+      "total": 0.673787
+    },
+    {
+      "name": "Render::SpawnCullJobs",
+      "total": 0.662815
+    },
+    {
+      "name": "Jobs::Network Disconnect Clean Up(Network_DisconnectCleanUp;Game)",
+      "total": 0.656894
+    },
+    {
+      "name": "Input::NullTool::onMouseHover",
+      "total": 0.650771
+    },
+    {
+      "name": "Render::queryFrustum",
+      "total": 0.646132
+    },
+    {
+      "name": "Shadows::Sort cascade casters",
+      "total": 0.627024
+    },
+    {
+      "name": "Script::Script_CoreScripts/ExperienceChatMain",
+      "total": 0.602715
+    },
+    {
+      "name": "Render::Reproject",
+      "total": 0.586272
+    },
+    {
+      "name": "Render::UpSample",
+      "total": 0.583176
+    },
+    {
+      "name": "Slim::SlimController2::updatePrepare",
+      "total": 0.579509
+    },
+    {
+      "name": "D3D11::commitChanges",
+      "total": 0.577945
+    },
+    {
+      "name": "Physics::buildClientRegion3d",
+      "total": 0.560681
+    },
+    {
+      "name": "Jobs::Network Quality Processor(NotOrderDependent;Game)",
+      "total": 0.55989
+    },
+    {
+      "name": "Network::asyncHttpQueueOnHeartbeat",
+      "total": 0.550852
+    },
+    {
+      "name": "Jobs::CollectionServiceJob(Default;Game)",
+      "total": 0.548767
+    },
+    {
+      "name": "Script::Script_CoreScripts/BulkPurchaseApp",
+      "total": 0.548507
+    },
+    {
+      "name": "Jobs::ThumbnailFetchJob(Default;DefaultArbiter)",
+      "total": 0.54535
+    },
+    {
+      "name": "Sound::FMOD::updateStreams",
+      "total": 0.543938
+    },
+    {
+      "name": "Jobs::SlimReplicationTaskQueue(Default;DefaultArbiter)",
+      "total": 0.538687
+    },
+    {
+      "name": "Script::Script_SettingsHub",
+      "total": 0.49987
+    }
+  ],
+  "gpu_top_by_total_time": [
+    {
+      "name": "GPU::Scene",
+      "total": 1144.083374
+    },
+    {
+      "name": "GPU::Id_Opaque",
+      "total": 368.952881
+    },
+    {
+      "name": "GPU::Depth of Field",
+      "total": 245.787949
+    },
+    {
+      "name": "GPU::Shadows",
+      "total": 242.583237
+    },
+    {
+      "name": "GPU::DOF",
+      "total": 217.847321
+    },
+    {
+      "name": "GPU::Convert into EVSM and HBlur",
+      "total": 129.581711
+    },
+    {
+      "name": "GPU::Bokeh Blur",
+      "total": 107.788986
+    },
+    {
+      "name": "GPU::EVSM VBlur",
+      "total": 82.184418
+    },
+    {
+      "name": "GPU::Clouds",
+      "total": 80.876877
+    },
+    {
+      "name": "GPU::CloudsComp",
+      "total": 46.626579
+    },
+    {
+      "name": "GPU::DepthPrePass",
+      "total": 41.00581
+    },
+    {
+      "name": "GPU::Resolve Depth of Field Full Resolution",
+      "total": 40.156319
+    },
+    {
+      "name": "GPU::Glow",
+      "total": 33.80093
+    },
+    {
+      "name": "GPU::depthPass",
+      "total": 30.526609
+    },
+    {
+      "name": "GPU::ColorCorrection",
+      "total": 27.83407
+    },
+    {
+      "name": "GPU::DownSample",
+      "total": 24.220819
+    },
+    {
+      "name": "GPU::ResolveColor",
+      "total": 21.3281
+    },
+    {
+      "name": "GPU::Downsample & mask 1/4th or 1/2 width",
+      "total": 20.974279
+    },
+    {
+      "name": "GPU::Software Depth Resolve",
+      "total": 20.77364
+    },
+    {
+      "name": "GPU::Linearize Depth to color target",
+      "total": 18.1644
+    },
+    {
+      "name": "GPU::MSAA",
+      "total": 16.984289
+    },
+    {
+      "name": "GPU::Extract Alpha and spread width wise",
+      "total": 15.401919
+    },
+    {
+      "name": "GPU::Id_ScreenOnTopOfBlur",
+      "total": 13.429279
+    },
+    {
+      "name": "GPU::renderShadowQueue",
+      "total": 13.23601
+    },
+    {
+      "name": "GPU::Generate Reflection",
+      "total": 11.77473
+    },
+    {
+      "name": "GPU::Copy Color Full Resolution",
+      "total": 11.45308
+    },
+    {
+      "name": "GPU::Reproject",
+      "total": 11.000549
+    },
+    {
+      "name": "GPU::UpSample",
+      "total": 9.530869
+    },
+    {
+      "name": "GPU::Downsample & mask 1/4th or 1/2 ",
+      "total": 8.89932
+    },
+    {
+      "name": "GPU::Scene2D",
+      "total": 8.540689
+    },
+    {
+      "name": "GPU::Id_Screen",
+      "total": 8.53861
+    },
+    {
+      "name": "GPU::Id_Transparent",
+      "total": 7.20361
+    },
+    {
+      "name": "GPU::renderHighlightIdPass",
+      "total": 7.17196
+    },
+    {
+      "name": "GPU::Id_HighlightPass",
+      "total": 7.13916
+    },
+    {
+      "name": "GPU::Spread vertical ",
+      "total": 6.66244
+    },
+    {
+      "name": "GPU::Edge Fatten",
+      "total": 6.36144
+    },
+    {
+      "name": "GPU::CopyTexture::Skylight",
+      "total": 5.13556
+    },
+    {
+      "name": "GPU::Id_Glass",
+      "total": 3.0306
+    },
+    {
+      "name": "GPU::Profiler",
+      "total": 2.73202
+    },
+    {
+      "name": "GPU::AdvSky",
+      "total": 1.87708
+    },
+    {
+      "name": "GPU::FroxelGrid",
+      "total": 1.50796
+    },
+    {
+      "name": "GPU::Cull",
+      "total": 1.4832
+    },
+    {
+      "name": "GPU::InstanceGlob",
+      "total": 0.91176
+    },
+    {
+      "name": "GPU::computeUploadFull",
+      "total": 0.88156
+    },
+    {
+      "name": "GPU::UI",
+      "total": 0.38396
+    },
+    {
+      "name": "GPU::depthCachePass",
+      "total": 0.0246
+    },
+    {
+      "name": "GPU::OpaqueWithAlphaDepthPass",
+      "total": 0.01532
+    },
+    {
+      "name": "GPU::Scroll_1",
+      "total": 0.01292
+    },
+    {
+      "name": "GPU::TextureCompositor::render",
+      "total": 0.01276
+    },
+    {
+      "name": "GPU::Scroll_3",
+      "total": 0.01244
+    },
+    {
+      "name": "GPU::Scroll_2",
+      "total": 0.0118
+    },
+    {
+      "name": "GPU::EnvMap",
+      "total": 0.01116
+    },
+    {
+      "name": "GPU::Id_GlassTint",
+      "total": 0.01104
+    },
+    {
+      "name": "GPU::AlwaysOnTopAdorns",
+      "total": 0.01096
+    },
+    {
+      "name": "GPU::clearShadowAtlas",
+      "total": 0
+    },
+    {
+      "name": "GPU::Sky",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_Terrain",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_OpaqueCasters",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_OpaqueWithAlpha",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_Decals",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_OpaqueAdorns",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_Water",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_TransparentCasters",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_AlwaysOnTopAdorns",
+      "total": 0
+    },
+    {
+      "name": "GPU::Id_AlwaysOnTop",
+      "total": 0
+    },
+    {
+      "name": "GPU::UITextureRenderer::renderJob",
+      "total": 0
+    },
+    {
+      "name": "GPU::GuiScene",
+      "total": 0
+    },
+    {
+      "name": "GPU::PrefilterSpecular",
+      "total": 0
+    },
+    {
+      "name": "GPU::IndoorSkybox",
+      "total": 0
+    },
+    {
+      "name": "GPU::CopyTexture::LightMap",
+      "total": 0
+    },
+    {
+      "name": "GPU::blurRender",
+      "total": 0
+    },
+    {
+      "name": "GPU::ParticleLighting",
+      "total": 0
+    },
+    {
+      "name": "GPU::Scroll_0",
+      "total": 0
+    },
+    {
+      "name": "GPU::Scroll",
+      "total": 0
+    }
+  ],
+  "cpu_by_max_time": [
+    {
+      "name": "Runtime::Sleep",
+      "max": 247.118851
+    },
+    {
+      "name": "Qt::$Event",
+      "max": 25.521774
+    },
+    {
+      "name": "Runtime::Thread (FG)",
+      "max": 19.318331
+    },
+    {
+      "name": "Render::Perform",
+      "max": 18.422819
+    },
+    {
+      "name": "Jobs::TS::JobStep",
+      "max": 16.694403
+    },
+    {
+      "name": "Jobs::TS::ArbiterStep",
+      "max": 16.593191
+    },
+    {
+      "name": "Render::Present",
+      "max": 13.838662
+    },
+    {
+      "name": "Jobs::Replicator ProcessPackets(Network_ProcessIncoming;Game)",
+      "max": 12.535637
+    },
+    {
+      "name": "Jobs::Replicator ProcessPackets",
+      "max": 12.530146
+    },
+    {
+      "name": "Network::processPacket",
+      "max": 12.473062
+    }
+  ],
+  "gpu_by_max_time": [
+    {
+      "name": "GPU::Scene",
+      "max": 24.357019
+    },
+    {
+      "name": "GPU::Id_Opaque",
+      "max": 9.82858
+    },
+    {
+      "name": "GPU::Shadows",
+      "max": 9.170589
+    },
+    {
+      "name": "GPU::Depth of Field",
+      "max": 5.89371
+    },
+    {
+      "name": "GPU::DOF",
+      "max": 5.26196
+    }
+  ],
+  "general_info": {
+    "PlaceId": 0
+  },
+  "display_context": {
+    "Build": "Studio",
+    "Version": "744",
+    "DisplaySize": "1360 x 549",
+    "DrawSize": "1360 x 549",
+    "QualityLevel": "19 (auto)"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "status": "preparation_failed",
+  "compiled_sources": 276,
+  "strict_exit_code": 1,
+  "reason": "Observer dereferenced optional Map.at result",
+  "executed": false,
+  "published": false,
+  "folder": "C:\\Users\\natha\\claude-xfer\\Windowsill-legacy-startup-attempt1",
+  "strict_sha256": "fa72b1c46836d141a0799b35b411bcb037f08cb15d98f53016bc69be494f61ff",
+  "observer_sha256": "b154e260b65d85093114fe429a8ffaf5083e6c49a5bf60e4bc0d0225b1f80fd3"
+}

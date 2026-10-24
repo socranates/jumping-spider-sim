@@ -1,0 +1,22 @@
+{
+  "run": "1792805748207",
+  "terminal": "failed",
+  "result": {
+    "offers_pending": false,
+    "checks": 13,
+    "title_ready": true,
+    "problem": "Players.socranates.PlayerScripts.Client.NormalStartupObserver:11: legacy meal books were not namespaced/preserved\nPlayers.socranates.PlayerScripts.Client.NormalStartupObserver:11\nPlayers.socranates.PlayerScripts.Client.NormalStartupObserver:33\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2787\n",
+    "menu_choices": [
+      "RecoveryExit"
+    ],
+    "application_phase": "playing",
+    "stage": "main-entry",
+    "client_phase": "ready"
+  },
+  "model_sha256": "2b579fd86e36c96849a39d136f74a6be56154942aaa4578748f47672ea662083",
+  "source_count": 276,
+  "output_sha256": "f1d19727978557d209ec4a054111a092c54499bc7cc52e277c82ec3422d0e931",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T013425Z_Studio_64DAF_last.log",
+  "real_storage": false,
+  "published": false
+}

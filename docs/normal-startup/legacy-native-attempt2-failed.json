@@ -1,0 +1,17 @@
+{
+  "run": "1792805493116",
+  "terminal": "failed",
+  "result": {
+    "problem": "Players.socranates.PlayerScripts.Client.NormalStartupObserver:11: legacy Continue menu choice missing: main\nPlayers.socranates.PlayerScripts.Client.NormalStartupObserver:11\nPlayers.socranates.PlayerScripts.Client.NormalStartupObserver:33\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2787\n",
+    "checks": 7,
+    "application_phase": "idle",
+    "stage": "main-offer",
+    "client_phase": "ready"
+  },
+  "model_sha256": "eeead5c4163e4f5ddfc118bc5af7ba71efbdb8442e126023460393f22ecc2c2b",
+  "source_count": 276,
+  "output_sha256": "34f5fb9e6ff00f952e66bf00cda67a69b2ab49aec355e4228b88ba48d1942639",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T013009Z_Studio_2FB11_last.log",
+  "real_storage": false,
+  "published": false
+}

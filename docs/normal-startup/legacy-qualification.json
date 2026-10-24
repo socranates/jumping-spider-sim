@@ -1,0 +1,20 @@
+{
+  "full_checks": 289821,
+  "full_failures": 0,
+  "legacy_checks": 36,
+  "legacy_modes": 3,
+  "typed_targets": 56,
+  "native_run": "1792805987861",
+  "native_checks": 47,
+  "backend_starts": 245,
+  "options_destroyed": 208,
+  "original_archives_exact": true,
+  "ordinary_ui": true,
+  "closed_owners": 3,
+  "storage": "yielding-memory",
+  "source_only_change_from_failed_native": "diagnostic readiness, archive namespace and publication checks",
+  "studio_output_supplement_bound": true,
+  "real_storage_verified": false,
+  "published": false,
+  "goal_complete": false
+}

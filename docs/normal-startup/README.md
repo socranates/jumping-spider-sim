@@ -1,5 +1,9 @@
 # Ordinary startup candidate: not enabled
 
+The latest **56-target legacy-validation candidate** is documented in
+[LEGACY.md](LEGACY.md), with its own checker/derivation and qualification. The
+54-target ordinary candidate below remains intact as the preceding proof.
+
 This private candidate connects the previously qualified save/recovery service
 through the actual Persistence and SpiderClient entry points. No production
 source, main branch, live place, OneDrive project or frozen Godot project changed.

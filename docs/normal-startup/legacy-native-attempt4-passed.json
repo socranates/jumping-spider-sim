@@ -1,0 +1,97 @@
+{
+  "run": "1792805987861",
+  "terminal": "passed",
+  "result": {
+    "real_storage": false,
+    "snapshot": {
+      "lockReleased": true,
+      "originalExact": {
+        "easy": true,
+        "main": true,
+        "free": true
+      },
+      "active": 0,
+      "archiveComplete": true,
+      "optionsDestroyed": 208,
+      "gate": {
+        "actors": 1,
+        "history": 151,
+        "reserved": 0,
+        "started": 0,
+        "read": 151,
+        "write": 20,
+        "queued": 0,
+        "scopes": 0
+      },
+      "requests": 245,
+      "rests": {
+        "R_qa_normal_startup_easy": "a65e3a070f082e30",
+        "R_qa_normal_startup_main": "8d11cab7b328d1d4",
+        "R_qa_normal_startup_free": "c0bc7f716cdade4e"
+      },
+      "archives": 8,
+      "starts": 245,
+      "owners": [
+        {
+          "epoch": ":1792805982:1",
+          "closed": true
+        },
+        {
+          "epoch": ":1792806043:2",
+          "closed": true
+        },
+        {
+          "epoch": ":1792806049:3",
+          "closed": true
+        }
+      ],
+      "optionsCreated": 208,
+      "expected": {
+        "free": {
+          "day": 3,
+          "food": 0.25,
+          "elapsed": 120,
+          "meal": "legacy_meal_free",
+          "stage": 1,
+          "energy": 0.75
+        },
+        "main": {
+          "day": 3,
+          "food": 0.25,
+          "elapsed": 120,
+          "meal": "legacy_meal_main",
+          "stage": 1,
+          "energy": 0.75
+        },
+        "easy": {
+          "day": 3,
+          "food": 0.25,
+          "elapsed": 120,
+          "meal": "legacy_meal_easy",
+          "stage": 1,
+          "energy": 0.75
+        }
+      },
+      "originalUnchanged": {
+        "easy": false,
+        "main": false,
+        "free": false
+      },
+      "ready": true
+    },
+    "ordinary_ui": true,
+    "checks": 47
+  },
+  "model_sha256": "28f462298cf925e947c6c5839a3cde82f5703b099e26ffe7eab42b50cc42a23d",
+  "source_count": 276,
+  "output_sha256": "97292b129f2d7c131df2437be60d480d8b3e1e4ac72872c3ac79e1c17b247993",
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T013822Z_Studio_74C84_last.log",
+  "supplement": {
+    "path": "legacy-native-attempt4-studio-output.txt",
+    "sha256": "ac6104c6a2bd63aa58d68a54f35c3dba31ac5167c639ae0e033acf268479e921",
+    "raw_log_sha256": "8a75baf504b6782f9ad39abf200f5e32ab8924d5ee36e8df9ac6dfc3636d4423",
+    "reason": "Roblox log truncated terminal JSON; complete Studio Output retained"
+  },
+  "real_storage": false,
+  "published": false
+}

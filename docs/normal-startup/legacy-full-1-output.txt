@@ -1,0 +1,391 @@
+RECOVERY_MEALS passed=49 failed=0 suspensions=7
+RECOVERY_LIFE passed=360 failed=0 suspensions=130
+RECOVERY_DESTINATION passed=72 failed=0 outside_flies=6 populated_regions=3
+RECOVERY_PROGRESS passed=62 failed=0 suspensions=21
+RECOVERY_PACKET passed=38 failed=0 wide_progress_chars=19363
+RECOVERY_PROPOSAL_STORE passed=79 failed=0
+RECOVERY_REST_WRITER passed=117 failed=0 suspensions=2616
+RECOVERY_PROGRESS_WRITER passed=182 failed=0
+RECOVERY_COMMIT_CONTROLLER completed_requests=31 simulated_seconds=186
+RECOVERY_COMMIT_CONTROLLER passed=4836 failed=0
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER cold_reads=2 archive_requests=22 commit_requests=31
+RECOVERY_OFFER_READER passed=1711 failed=0 suspensions=4388
+RECOVERY_SESSION_REBIND passed=1373 failed=0
+RECOVERY_PIPELINE cold_compressed=false requests=58 simulated_seconds=365
+RECOVERY_PIPELINE cold_compressed=true requests=58 simulated_seconds=365
+RECOVERY_PIPELINE passed=12362 failed=0
+RECOVERY_DEPARTURE passed=3407 failed=0
+RECOVERY_IDLE passed=14134 failed=0
+RECOVERY_RUNTIME passed=11963 failed=0
+RECOVERY_REST_FORMAT passed=82 failed=0 suspensions=1107
+RECOVERY_CURRENT_WRITER passed=1127 failed=0
+RECOVERY_ENTRY passed=10322 failed=0
+RECOVERY_SAVE_LOOP passed=22489 failed=0
+RECOVERY_REJOIN visit=main compressed=false requests=20 simulated_seconds=72
+RECOVERY_REJOIN visit=main compressed=true requests=20 simulated_seconds=72
+RECOVERY_REJOIN visit=free compressed=false requests=20 simulated_seconds=72
+RECOVERY_REJOIN visit=free compressed=true requests=20 simulated_seconds=72
+RECOVERY_REJOIN visit=easy compressed=false requests=20 simulated_seconds=72
+RECOVERY_REJOIN visit=easy compressed=true requests=20 simulated_seconds=72
+RECOVERY_REJOIN passed=42700 failed=0
+RECOVERY_STARTUP case=healthy requests=19 simulated_seconds=17 startup_requests=19
+RECOVERY_STARTUP case=low requests=20 simulated_seconds=72 startup_requests=0
+RECOVERY_STARTUP case=unknown requests=20 simulated_seconds=72 startup_requests=0
+RECOVERY_STARTUP passed=1382 failed=0
+RECOVERY_RETIREMENT passed=17253 failed=0
+RECOVERY_FRESH_LIFE passed=19194 failed=0
+RECOVERY_ARCHIVE_REUSE slot=free archive_requests=8 archive_simulated_seconds=63
+RECOVERY_ARCHIVE_REUSE slot=easy archive_requests=8 archive_simulated_seconds=63
+RECOVERY_ARCHIVE_REUSE slot=free archive_requests=8 archive_simulated_seconds=63
+RECOVERY_ARCHIVE_REUSE passed=19110 failed=0
+RECOVERY_SERVICE_OWNER passed=2853 failed=0
+RECOVERY_ACTUAL_GAME startup capture=true navigation=ready loading=false motor=attached
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=main scene=rest real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=main scene=courted real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=main scene=hatched real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=free scene=rest real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=free scene=courted real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=free scene=hatched real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=easy scene=rest real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=easy scene=courted real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=579 entries=3 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME mode=easy scene=hatched real_adoption=true generation_delta=1 applied_once=true menu_hidden_hold=true actual_server_grant=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=preparing/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=held/entering now=568 entries=1 problem=nil adapter=entry cancelled; current world remains held
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=held/entering now=567 entries=1 problem=nil adapter=ended/different entry scene refused
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=held/entering now=567 entries=1 problem=nil adapter=synthetic actual-adoption preparation refusal
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=held/entering now=567 entries=1 problem=nil adapter=selection changed during adoption
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/recovered now=574 entries=2 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=held/entering now=567 entries=1 problem=nil adapter=unexpected adoption generation/choice
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=granted/recovered now=574 entries=2 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME legacy_main_gentle=true same_physical_slot=true actual_rest_stored=true easy_unchanged=true
+RECOVERY_ACTUAL_GAME phase=nil/discovering now=201 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=nil/offered now=205 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/recovering now=206 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entry_required now=508 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=selected/entering now=509 entries=0 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/entering now=567 entries=1 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME phase=applied/recovered now=574 entries=2 problem=nil adapter=nil
+RECOVERY_ACTUAL_GAME deadline_callback_before_update_refused=true
+RECOVERY_ACTUAL_GAME passed=1012 failed=0
+RECOVERY_PROFILE mode=main one_session=true fresh_selection=true matching_pipeline=true entry_granted=true
+RECOVERY_PROFILE mode=free one_session=true fresh_selection=true matching_pipeline=true entry_granted=true
+RECOVERY_PROFILE mode=easy one_session=true fresh_selection=true matching_pipeline=true entry_granted=true
+RECOVERY_PROFILE_OWNER passed=10177 failed=0
+RECOVERY_PROFILE_SERVICE mode=main three_offers=true same_session=true apply_once=true actual_grant=true stored_ack=true other_slots_unchanged=true
+RECOVERY_PROFILE_SERVICE mode=free three_offers=true same_session=true apply_once=true actual_grant=true stored_ack=true other_slots_unchanged=true
+RECOVERY_PROFILE_SERVICE mode=easy three_offers=true same_session=true apply_once=true actual_grant=true stored_ack=true other_slots_unchanged=true
+RECOVERY_PROFILE_SERVICE passed=3141 failed=0
+SESSION_REPLACEMENT mode=main old_closed=true fresh_epoch=true no_auto_choice=true final_progress=true originals_unchanged=true late_old_refused=true
+SESSION_REPLACEMENT mode=free old_closed=true fresh_epoch=true no_auto_choice=true final_progress=true originals_unchanged=true late_old_refused=true
+SESSION_REPLACEMENT mode=easy old_closed=true fresh_epoch=true no_auto_choice=true final_progress=true originals_unchanged=true late_old_refused=true
+SESSION_REPLACEMENT passed=2735 failed=0
+SERVER_TEMPLATE_RECOVERY mode=main authored_geometry=true actual_entry=true stored_rest=true replacement=true cache_unchanged=true
+SERVER_TEMPLATE_RECOVERY mode=free authored_geometry=true actual_entry=true stored_rest=true replacement=true cache_unchanged=true
+SERVER_TEMPLATE_RECOVERY mode=easy authored_geometry=true actual_entry=true stored_rest=true replacement=true cache_unchanged=true
+SERVER_TEMPLATE_RECOVERY passed=513 failed=0
+RECOVERY_APPLICATION_GAME mode=main actual_menu=true actual_callbacks=true held_until_grant_or_exit=true closed_owner_before_fresh_menu=true
+RECOVERY_APPLICATION_GAME mode=free actual_menu=true actual_callbacks=true held_until_grant_or_exit=true closed_owner_before_fresh_menu=true
+RECOVERY_APPLICATION_GAME mode=easy actual_menu=true actual_callbacks=true held_until_grant_or_exit=true closed_owner_before_fresh_menu=true
+RECOVERY_APPLICATION_GAME read_invariants=185 every_read_checked=true
+RECOVERY_APPLICATION_GAME passed=65 failed=0
+PROTECTED_NEW mode=main original_archived=true marker_verified=true old_closed=true real_new_credential=true normal_rest_stored=true
+PROTECTED_NEW mode=free original_archived=true marker_verified=true old_closed=true real_new_credential=true normal_rest_stored=true
+PROTECTED_NEW mode=easy original_archived=true marker_verified=true old_closed=true real_new_credential=true normal_rest_stored=true
+PROTECTED_NEW passed=6695 failed=0
+NEW_APPLICATION mode=main actual_menu=true original_retained=true old_closed=true explicit_fresh_choice=true writable=true normal_rest_stored=true
+NEW_APPLICATION mode=free actual_menu=true original_retained=true old_closed=true explicit_fresh_choice=true writable=true normal_rest_stored=true
+NEW_APPLICATION mode=easy actual_menu=true original_retained=true old_closed=true explicit_fresh_choice=true writable=true normal_rest_stored=true
+NEW_APPLICATION passed=82 failed=0
+NEW_APPLICATION_FAILURE passed=40 failed=0
+WORKER_ADMISSION_CASE	actual-reader-zero-budget-retains-one-request	57
+WORKER_ADMISSION_CASE	actual-pending-reader-all-seven-fresh-reads	4
+WORKER_ADMISSION_CASE	actual-reader-retries-only-provider-failures	24
+WORKER_ADMISSION_CASE	actual-reader-cancel-deadline-and-visit-close	16
+WORKER_ADMISSION_CASE	route-change-during-budget-query-refuses-provider	3
+WORKER_ADMISSION_CASE	yielded-provider-cancel-and-visit-debt	7
+WORKER_ADMISSION_CASE	legacy-debt-validation-and-exact-rolling-boundary	12
+WORKER_ADMISSION_CASE	actual-reader-thrown-provider-keeps-backoff	4
+WORKER_ADMISSION passed=127 failed=0 groups=8
+BRIDGE_CASE	job-cap-and-backend-error-tuple	4
+BRIDGE_CASE	transform-retry-lifetime-fences	3
+BRIDGE_CASE	committed-write-cancelled-before-ack	5
+BRIDGE_CASE	pending-identity-and-method-capture	3
+BRIDGE_CASE	counter-replacement-and-invalid-account-scope	2
+BRIDGE_CASE	thrown-provider-is-a-counted-retryable-failure	3
+ADMISSION_BRIDGE passed=20 failed=0 groups=6
+ENTRY_ADMISSION mode=main actual_runtime=true client_applied=true fresh_final_reads=true granted_once=true
+ENTRY_ADMISSION mode=free actual_runtime=true client_applied=true fresh_final_reads=true granted_once=true
+ENTRY_ADMISSION mode=easy actual_runtime=true client_applied=true fresh_final_reads=true granted_once=true
+ENTRY_ADMISSION_CASE	all-modes-hold-until-final-fresh-witnesses	225
+ENTRY_ADMISSION_CASE	cancelled-entry-and-expired-wait-never-read	16
+ENTRY_ADMISSION_CASE	lease-transform-and-evidence-survive-capacity-waits	26
+ENTRY_ADMISSION_CASE	ambiguous-renewal-reprobes-without-payload-change	4
+ENTRY_ADMISSION_CASE	cancellation-during-committed-renewal-drains-owner	6
+ENTRY_ADMISSION_CASE	lease-expiry-or-route-change-refuses-queued-provider	9
+ENTRY_ADMISSION_CASE	lease-renews-while-client-application-is-delayed	30
+ENTRY_ADMISSION_CASE	changed-final-rest-after-capacity-wait-refuses-grant	25
+ENTRY_ADMISSION passed=341 failed=0 groups=8
+DISPATCH_GUARD passed=9 failed=0 groups=2
+ARCHIVE_ADMISSION_CASE	cold-archive-retains-child-state-and-exact-accounting	264
+ARCHIVE_ADMISSION_CASE	collector-failure-backoff-and-budget-wait-are-distinct	139
+ARCHIVE_ADMISSION_CASE	changed-unselected-source-refuses-before-publication	50
+ARCHIVE_ADMISSION_CASE	parent-cap-closes-all-child-operations	20
+ARCHIVE_ADMISSION_CASE	committed-publication-cancellation-keeps-debt-and-drains	132
+ARCHIVE_ADMISSION_CASE	completed-original-reuse-is-read-only-except-lease	123
+ARCHIVE_ADMISSION_CASE	blocked-renewal-allows-cpu-and-independent-reads	100
+ARCHIVE_ADMISSION_CASE	repository-running-marker-blocks-reentrant-step	99
+ARCHIVE_ADMISSION passed=927 failed=0 groups=8
+OPERATION_CASE	waiting-then-atomic-parent-child-and-marker	25
+OPERATION_CASE	counter-cap-change-during-scheduler-bookkeeping	3
+OPERATION_CASE	explicit-raw-adapter-without-rebinding-session	3
+OPERATION_CASE	callback-retry-and-late-committed-result-fenced	2
+OPERATION_CASE	duplicate-rows-and-marker-counter-alias-refused	4
+NESTED_OPERATION passed=37 failed=0 groups=5
+TYPED_HISTORY passed=740 failed=0 groups=2
+COMMIT_ADMISSION cold_compressed=false read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=false read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=false requests=52 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION cold_compressed=true read_only_archive=true requests=43 exact_raw_target=true gameplay_grant=false
+COMMIT_ADMISSION_CASE	cold-plain-compressed-and-archive-policies	1118
+COMMIT_ADMISSION_CASE	selected-rest-readback-wait-does-not-repeat-cas	266
+COMMIT_ADMISSION_CASE	ambiguous-m1-rest-and-progress-writes-require-readback	558
+COMMIT_ADMISSION_CASE	root-cap-and-deadline-close-nested-work	66
+COMMIT_ADMISSION_CASE	cancel-committed-raw-rest-drains-without-rebind	147
+COMMIT_ADMISSION_CASE	resume-reuses-exact-m1-and-immutable-originals	233
+COMMIT_ADMISSION_CASE	foreign-final-lease-cannot-verify-commit	167
+COMMIT_ADMISSION_CASE	deferred-rebind-witness-is-fresh-and-held-on-change	176
+COMMIT_ADMISSION_CASE	queued-final-lease-must-execute-and-ack-current-owner	249
+COMMIT_ADMISSION passed=2980 failed=0 groups=9
+COMMIT_PROFILE_CASE	free	211
+COMMIT_PROFILE_CASE	easy	211
+COMMIT_PROFILE passed=422 failed=0 groups=2
+SAVING_ADMISSION_CASE	all-modes-progress-checkpoint-and-idle-lease	6615
+SAVING_ADMISSION_CASE	queued-progress-keeps-later-player-choice-and-debounce	1994
+SAVING_ADMISSION_CASE	rest-readback-and-final-witness-waits-never-ack-early	7242
+SAVING_ADMISSION_CASE	ambiguous-progress-and-rest-acks-require-fresh-readback	3827
+SAVING_ADMISSION_CASE	captured-checkpoint-not-starved-by-later-notebook-progress	1880
+SAVING_ADMISSION_CASE	queued-cancel-and-foreign-owner-never-publish-stored-receipt	3519
+SAVING_ADMISSION_CASE	yielded-progress-retains-newer-player-choice	1840
+SAVING_ADMISSION_CASE	committed-rest-cancel-drains-before-account-replacement	1742
+SAVING_ADMISSION_CASE	typed-progress-does-not-reenter-old-aggregate-limiter	1752
+SAVING_ADMISSION_CASE	thrown-provider-keeps-progress-readback-retry-and-cap	1750
+SAVING_ADMISSION_CASE	queued-current-rest-cap-and-deadline-cleanup	5199
+SAVING_ADMISSION passed=37360 failed=0 groups=11
+LIFECYCLE_NEW_CASE	all-modes-preserve-original-before-retirement	898
+LIFECYCLE_NEW_CASE	continued-new-reuses-exact-originals-and-proposal	284
+LIFECYCLE_NEW_CASE	queued-retirement-and-readback-keep-exact-cas	561
+LIFECYCLE_NEW_CASE	lost-retirement-ack-probes-before-retry	540
+LIFECYCLE_NEW_CASE	queued-new-cancel-selection-change-and-cap	84
+LIFECYCLE_NEW_CASE	cancel-suspended-committed-retirement-withholds-result-and-drains	234
+LIFECYCLE_NEW_CASE	verified-new-departure-cancels-queued-maintenance-first	245
+LIFECYCLE_NEW passed=2846 failed=0 groups=7
+LIFECYCLE_DEPARTURE_CASE	closed-departure-merges-and-releases-all-source-variants	838
+LIFECYCLE_DEPARTURE_CASE	unlocked-readback-waits-without-another-write	356
+LIFECYCLE_DEPARTURE_CASE	ambiguous-departure-read-failure-and-callback-retry	1288
+LIFECYCLE_DEPARTURE_CASE	foreign-ownership-expiry-and-provider-cap-refuse-closed	54
+LIFECYCLE_DEPARTURE_CASE	suspended-committed-departure-expires-and-drains	316
+LIFECYCLE_DEPARTURE passed=2852 failed=0 groups=5
+LIFECYCLE_RECOVERED_CASE	all-modes-retire-fresh-marker-and-closed-departure	5331
+LIFECYCLE_RECOVERED_CASE	unresolved-aba-progress-is-reconciled-by-typed-departure	3464
+LIFECYCLE_RECOVERED_CASE	Runtime-flush-deadline-cancels-queued-departure	1721
+LIFECYCLE_RECOVERED_CASE	returning-retired-offer-binds-fresh-writer-and-lease	1757
+LIFECYCLE_RECOVERED passed=12273 failed=0 groups=4
+HELD_ADMISSION_CASE	all-terminal-phases-maintain-only-the-owned-lock	8638
+HELD_ADMISSION_CASE	stable-renewal-evidence-and-callback-replay-across-wait	62
+HELD_ADMISSION_CASE	ambiguous-renewal-reprobes-with-provider-backoff	76
+HELD_ADMISSION_CASE	queued-probe-expiry-foreign-owner-and-route-loss-refuse	54
+HELD_ADMISSION_CASE	cancel-suspended-committed-renewal-drains-account	12
+HELD_ADMISSION_CASE	explicit-retry-cancels-queued-idle-and-uses-shared-pipeline	354
+HELD_ADMISSION_CASE	closed-departure-stops-held-route-and-preserves-local-choices	316
+HELD_ADMISSION passed=9512 failed=0 groups=7
+HELD_RUNTIME_CASE	actual-Runtime-cancel-holds-maintains-and-departs-through-one-lane	207
+HELD_RUNTIME passed=207 failed=0 groups=1
+ORDINARY_CASE	synchronous-load-waits-without-fake-attempts	11
+ORDINARY_CASE	polled-write-retains-newer-choice-and-logical-version	104
+ORDINARY_CASE	native-yield-is-not-resumed-by-polling	76
+ORDINARY_CASE	ordinary-preview-and-intent-validation-wait-without-grant	46
+ORDINARY_CASE	flush-cancels-admission-and-closes-with-exact-progress	5
+ORDINARY_CASE	expired-acquisition-ack-and-slow-rest-load-do-not-grant-active	4
+ORDINARY_CASE	retry-load-after-ambiguous-acquisition-uses-existing-step-context	82
+ORDINARY_CASE	credentialed-rest-wait-keeps-receipt-and-fences-expired-ownership	104
+ORDINARY_CASE	closed-load-during-capacity-wait-never-invents-a-record	2
+ORDINARY_CASE	late-native-load-result-is-discarded-after-close	3
+ORDINARY_CASE	shared-gate-allows-another-actors-read-while-write-is-blocked	5
+ORDINARY_CASE	reentrant-close-after-load-notification-does-not-deadlock	2
+ORDINARY_CASE	flush-drains-native-write-before-preserving-newer-choice	4
+ORDINARY_CASE	quiet-polling-does-not-allocate-driver-stacks	122
+ORDINARY_CASE	post-attachment-startup-wrapper-is-refused-before-provider	2
+ORDINARY_CASE	coarse-clock-wait-can-span-several-timer-quanta	11
+ORDINARY_SESSION passed=583 failed=0 groups=16
+ORDINARY_RUNTIME_CASE	main	374
+ORDINARY_RUNTIME_CASE	free	374
+ORDINARY_RUNTIME_CASE	easy	374
+ORDINARY_RUNTIME passed=1122 failed=0 groups=3
+PROFILE_ADMISSION_CASE	profile-discovery-waits-and-keeps-caller-options	153
+PROFILE_ADMISSION_CASE	fresh-selection-entry-and-saving-main	673
+PROFILE_ADMISSION_CASE	fresh-selection-entry-and-saving-free	673
+PROFILE_ADMISSION_CASE	fresh-selection-entry-and-saving-easy	673
+PROFILE_ADMISSION_CASE	post-accept-switch-hold-uses-the-shared-lane	1017
+PROFILE_ADMISSION_CASE	profile-bind-drains-an-ordinary-admission-suspension	133
+PROFILE_ADMISSION_CASE	suspended-profile-read-drains-before-a-new-choice	118
+PROFILE_ADMISSION_CASE	protected-new-factory-inherits-lane-after-rebind	430
+PROFILE_ADMISSION_CASE	a-factory-without-admission-refuses-before-begin	84
+PROFILE_ADMISSION_CASE	conflicting-profile-dependencies-refuse-before-storage	2
+PROFILE_ADMISSION passed=3956 failed=0 groups=10
+ACCOUNT_SERVICE_CASE	initial-owner-and-normal-removal-use-one-account-lane	15
+ACCOUNT_SERVICE_CASE	cancel-capacity-wait-before-any-storage-start	5
+ACCOUNT_INITIAL_CLEANUP	{"logs":[],"phase":"verify","requests":3,"result":{"gameplayAuthorized":false,"initialLoadCancelled":true,"leaseReleased":true,"progressPreserved":false,"sessionClosed":true},"started":4}	nil
+ACCOUNT_SERVICE_CASE	cancel-after-initial-commit-drains-and-releases-only-the-lock	12
+ACCOUNT_SERVICE_CASE	cancel-before-initial-transform-cannot-create-or-change-progress	6
+ACCOUNT_SERVICE_CASE	cancel-suspended-initial-rest-discards-it-and-cleans-owned-lock	13
+ACCOUNT_SERVICE_CASE	closed-cleanup-waits-for-capacity-without-fake-attempts	17
+ACCOUNT_SERVICE_CASE	ambiguous-cleanup-write-probes-before-another-write	9
+ACCOUNT_SERVICE_CASE	foreign-lock-at-cleanup-is-never-released-or-overwritten	6
+ACCOUNT_SERVICE_CASE	cleanup-deadline-retains-uncertain-lock-and-never-fakes-release	10
+ACCOUNT_SERVICE_CASE	removal-cancels-queued-normal-work-and-preserves-latest-progress	13
+ACCOUNT_SERVICE_CASE	another-actors-read-can-pass-a-blocked-write	24
+ACCOUNT_SERVICE_CASE	loaded-multi-actor-shutdown-closes-both-scopes	22
+ACCOUNT_SERVICE_CASE	failed-constructor-retains-complete-legacy-debt-for-rejoin	15
+ACCOUNT_SERVICE_CASE	oversized-legacy-history-refuses-instead-of-truncating	4
+ACCOUNT_SERVICE_CASE	cancelling-history-lookup-does-not-forgive-known-debt	3
+ACCOUNT_SERVICE_CASE	actual-replacement-keeps-account-debt-and-originals-main	155
+ACCOUNT_SERVICE_CASE	actual-replacement-keeps-account-debt-and-originals-free	155
+ACCOUNT_SERVICE_CASE	actual-replacement-keeps-account-debt-and-originals-easy	155
+ACCOUNT_SERVICE_CASE	lost-replacement-control-packets-do-not-create-extra-scopes	164
+ACCOUNT_SERVICE_CASE	failed-replacement-factory-closes-its-new-scope-without-fallback	140
+ACCOUNT_SERVICE_CASE	late-initial-constructor-cannot-replace-a-rejoined-account	14
+ACCOUNT_SERVICE_CASE	shutdown-revokes-an-unreturned-constructor	3
+ACCOUNT_SERVICE_CASE	rejoin-waits-for-cancelled-native-acquisition-and-cleanup	23
+ACCOUNT_SERVICE_CASE	shutdown-drains-a-native-initial-load-on-its-own-engine-task	10
+ACCOUNT_SERVICE_CASE	shutdown-deadline-revokes-a-still-pending-native-provider	6
+ACCOUNT_SERVICE_CASE	removing-an-unstarted-load-task-does-not-start-storage	4
+ACCOUNT_SERVICE_CASE	shutdown-cancels-a-deferred-load-after-addPlayer-returned	3
+ACCOUNT_SERVICE_CASE	one-service-step-task-per-actor-can-be-queued	24
+ACCOUNT_SERVICE_CASE	pending-native-ordinary-work-does-not-spawn-redundant-workers	16
+ACCOUNT_SERVICE_CASE	initial-task-launch-failure-closes-scope-without-departure-leak	5
+ACCOUNT_SERVICE_CASE	step-launch-failure-releases-only-its-actor-dispatch-slot	13
+ACCOUNT_SERVICE_CASE	post-constructor-startup-wrapper-is-refused-before-registration	4
+ACCOUNT_SERVICE_CASE	actual-protected-new-and-fresh-checkpoint-main	128
+ACCOUNT_SERVICE_CASE	actual-protected-new-and-fresh-checkpoint-free	128
+ACCOUNT_SERVICE_CASE	actual-protected-new-and-fresh-checkpoint-easy	128
+ACCOUNT_ADMISSION_TIMEOUT	{"canRetry":true,"closed":false,"elapsed":120.0249999999545,"starts":0,"state":"session"}	nil
+ACCOUNT_SERVICE_CASE	initial-admission-expiry-is-retryable-without-fake-provider-failure	14
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-session-id	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-progress-key	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-account	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-provider	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-scheduler	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-observations	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-intents	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-load	15
+ACCOUNT_SERVICE_CASE	ordinary-replacement-drain-fences-pipeline	15
+ACCOUNT_SERVICE_CASE	ordinary-normal-replacement-main	51
+ACCOUNT_SERVICE_CASE	ordinary-normal-replacement-free	51
+ACCOUNT_SERVICE_CASE	ordinary-normal-replacement-easy	51
+ACCOUNT_SERVICE_CASE	legacy-incoming-protected-validation-main	12
+ACCOUNT_SERVICE_CASE	legacy-incoming-protected-validation-free	12
+ACCOUNT_SERVICE_CASE	legacy-incoming-protected-validation-easy	12
+ACCOUNT_SERVICE passed=1790 failed=0 groups=51

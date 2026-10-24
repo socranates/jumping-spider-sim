@@ -559,6 +559,7 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	assert(d.caughtPanel:choose("Carry"), "the button works")
 	frames(3)
 	assert(life.generation == 1 and life.growth.stage == 0 and not life.growth:isAdult(), `generation 1, a young juvenile again: {life.generation}`)
+	assert(life.growth:mealGoal() == 7 and life.growth.gameRules == true, "Carry on keeps the live seven-meal first moult before any save return")
 	assert(life.mating.stage == "none" and life.mate.state == "away" and legs.phase == "", "the cycle is new")
 	assert(life.clock.day == 6, "the days of the sill go on")
 	assert(math.abs(d.needs.energy - Rules.freshEnergy) < 0.05, `a fresh reserve ({d.needs.energy})`)

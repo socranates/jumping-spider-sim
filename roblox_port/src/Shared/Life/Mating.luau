@@ -68,6 +68,13 @@ function Mating.sexOf(appearanceId: string): string
 	return "female"
 end
 
+-- Sex is bound to the accepted court, not a changeable appearance. Missing sex in old
+-- reproductive saves retains their female interpretation; pre-court records stay unbound.
+function Mating.boundSex(m: any): string?
+ if m==nil or m.stage==nil or m.stage=="none" then return nil end
+ return m.player_sex or "female"
+end
+
 -- Is the spider ready to mate: full-grown (Growth's last stage) and well fed.
 function Mating.eligible(growth: any, energy: number): boolean
 	return growth ~= nil and growth:isAdult() and energy >= Rules.energyMin - 1e-9
@@ -127,7 +134,7 @@ end
 function Mating.woke(life: any, day: number): string
 	local m = Mating.normalize(life.mating or Mating.new())
 	life.mating = m
-	if m.stage ~= "mated" then return "" end
+	if m.stage ~= "mated" or Mating.boundSex(m) ~= "female" then return "" end
 	m.stage, m.sac_day, m.guard_day = "sac", day, 1
 	return "sac"
 end
@@ -225,6 +232,7 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 	elseif event == "courted" and s.nature == true and not Mating.accepts(life, mate, s, events) then
 		-- (ROBLOX-106: refused; Mating.accepts has sent the mate off and said why)
 	elseif event == "courted" then
+		m.player_sex = s.sex or Mate.opposite(mate.sex or "male")
 		m.stage = "courted"
 		table.insert(events, "courted")
 		-- ROBLOX-91: the rival is already winding up or lunging as the meter fills (the caller says so in `s.rivalThreat`): the scene would hold the player in the open, so it is skipped
@@ -267,6 +275,7 @@ function Mating.skip(life: any, force: boolean?): { string }
 	if Mate.skip(mate, force) ~= "mated" then return {} end
 	local m = Mating.normalize(life.mating or Mating.new())
 	life.mating = m
+	if m.player_sex == nil then m.player_sex = Mate.opposite(mate.sex or "male") end
 	m.stage = "mated"
 	return { "mated" }
 end
@@ -313,6 +322,8 @@ function Mating.problems(m: any): { string }
 	if (m.guard_day or 0) > Rules.guardDays then bad("more guard days than there are") end
 	if (m.brood or 0) > 64 then bad("a brood that large") end
 	local stage = m.stage or "none"
+	if m.player_sex ~= nil and m.player_sex ~= "male" and m.player_sex ~= "female" then bad("invalid played sex") end
+	if m.player_sex == "male" and (stage == "sac" or stage == "guarding" or stage == "hatched") then bad("a male cannot lay eggs or guard a brood") end
 	if stage == "sac" and ((m.sac_day or 0) < 1 or m.guard_day ~= 1) then bad("a new sac with no morning, or not on its first guard day") end
 	if stage == "guarding" and ((m.sac_day or 0) < 1 or (m.guard_day or 0) < 2) then bad("a guarded sac with no morning, or before its second guard day") end
 	if stage == "hatched" and ((m.hatch_day or 0) < 1 or (m.brood or 0) < 1) then bad("a hatching with no day or no brood") end

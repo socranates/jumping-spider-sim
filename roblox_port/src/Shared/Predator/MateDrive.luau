@@ -37,7 +37,7 @@ end
 function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?): any
 	local drive = RivalDrive.new(motor, blocked, region, roam)
 	return setmetatable({
-		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false, player = {},
+		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false, player = {}, avoid = { steer = true },
 		proxy = { state = "dormant", position = motor.pos, previous = motor.pos, up = motor.up, heading = motor.heading, origin = motor.pos, leg = 0, elapsed = 0, notice = 0 },
 	}, MateDrive)
 end
@@ -62,7 +62,7 @@ function MateDrive.update(self: any, mate: any, dt: number, s: any)
 	end
 	-- Leaving: the one place it goes to is the exit; entering the state sets it once.
 	if state == "leaving" then
-		if not self.leaving and self.exit ~= nil and mapped == "patrol" then
+		if (not self.leaving or self.drive.goal == nil or self.drive.goalKey ~= "patrol") and self.exit ~= nil and mapped == "patrol" then
 			self.drive:_setGoal(self.exit, "patrol")
 			self.leaving = true
 		end
@@ -76,6 +76,16 @@ function MateDrive.update(self: any, mate: any, dt: number, s: any)
 	table.clear(player)
 	for k,v in s do player[k]=v end
 	player.courting, player.scene = nil, nil
+ local motor=self.drive.motor
+ motor.avoid=nil
+ if state~="away" and state~="pair" and s.grounded~=false and not s.airborne and not s.onLine and not s.wasp then
+  local avoid=self.avoid
+  avoid.pos,avoid.up,avoid.radius=s.position,s.up or Vector3.yAxis,s.bodyClearance or 1.15
+  if avoid.allowed==nil then avoid.allowed=function(at: Vector3): boolean
+   return self.drive.g~=nil and not self.drive.g:inKeepOut(at)
+  end end
+  motor.avoid=avoid
+ end
 	self.drive:update(proxy, dt, player)
 	mate.position, mate.up, mate.heading, mate.leg = proxy.position, proxy.up, proxy.heading, proxy.leg
 	if proxy.region ~= nil then mate.region = proxy.region end

@@ -251,5 +251,13 @@ for _,gentle in {false,true} do
  for _=1,13 do half:eat(Growth.FLY_FOOD/2) end
  check(not half.ready and half:eat(Growth.FLY_FOOD/2),"fourteen half meals count as seven whole flies")
 end
+-- A legacy save can have earned readiness below a later build's larger food goal.
+do
+ local old=Growth.new();old.stage=2;old:eat(.9)
+ local back=Growth.new();assert(back:load(old:toRecord()));back:useGameRules(false)
+ check(back.ready and back:mealGoal()>3,"legacy earned readiness survives increased tuning")
+ check(not back:eat(.15) and back.ready,"another half meal never cancels earned readiness or repeats its notice")
+ check(back:beginMoult(),"the preserved-ready spider can still moult")
+end
 print(`GROWTH passed={passed} failed={failed}`)
 if failed>0 then error("growth checks failed") end

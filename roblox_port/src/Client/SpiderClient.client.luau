@@ -579,7 +579,7 @@ local camSettings: any = {} -- the camera's settings, filled each frame (see the
 -- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
 -- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
 local function canChange(): boolean
-	return life.resting and not life.asleep and not life.growth:isMoulting()
+	return life.resting and not life.asleep and not life.growth:isMoulting() and mateLegs.Mating.boundSex(life.mating)==nil
 end
 -- The spider pick (ROBLOX-71): whether the player chose a spider this visit (only then is the choice sent to be saved), and the one way a choice is
 -- made, shared by the crack's key and the Settings row. One table: the client is at Luau's limit of 200 locals.
@@ -620,7 +620,7 @@ function spiderPick.occupied(): boolean
 end
 -- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack, and not while something has the spider. Answers the line the panel shows.
 function spiderPick.safe(): boolean
-	if spiderPick.occupied() then return false end
+	if mateLegs.Mating.boundSex(life.mating) ~= nil or spiderPick.occupied() then return false end
 	return SpiderChoice.safeToChange({
 		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
 		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
@@ -824,6 +824,12 @@ local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {str
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
+ -- A reproductive rest belongs to its saved sex, even if the account's latest
+ -- cosmetic choice is different. Older reproductive records default to female.
+ local boundSex=mateLegs.Mating.boundSex(life.mating)
+ if boundSex~=nil and mateLegs.Mating.sexOf(appearance)~=boundSex then
+  setAppearance(if boundSex=="male" then "maratus_volans_male" else "first_spider")
+ end
  needs:useGameRules()
  -- These seeded visitors do not serialize transient encounters in a rest.
  if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
@@ -958,6 +964,24 @@ local function showCaught() endLife("wasp") end
 -- ---------------------------------------------------------------- the mating cycle (ROBLOX-80)
 -- Display and the player's side of Life/Mating (which is the cycle itself). The events Mating.tick reports become notices; the hatching plays as a scene in the
 -- crack (about 26 s, the camera and the controls free); the ending card follows it, and Carry on makes the next generation.
+-- Bodies, not full leg spans, define partner clearance. Keep the intentional
+-- mating poses; ordinary approach and departure use their actual drawn sizes.
+function mateLegs.clearance(): number
+ local other=mateLegs.stage.rig
+ local length=if other~=nil then other:bodyLength() else rig:bodyLength()*(if life.mate then life.mate.scale or 1 else 1)
+ return math.max(.6,(rig:bodyLength()+length)*.425)
+end
+function mateLegs.avoidPartner()
+ motor.avoid=nil
+ local mate=life.mate
+ local drive=mateLegs.drive
+ if mate==nil or mate.state=="away" or mate.state=="pair" or drive==nil or drive.drive.motor.mode~="attached" then return end
+ mateLegs.playerAvoid=mateLegs.playerAvoid or {}
+ local avoid=mateLegs.playerAvoid
+ avoid.pos,avoid.up,avoid.radius=mate.position,mate.up or Vector3.yAxis,mateLegs.clearance()
+ motor.avoid=avoid
+end
+
 function mateLegs.say(text: string?)
  if text ~= nil and text ~= "" then life:showNotice(text);life.noticeSeconds=8 end
 end
@@ -2210,6 +2234,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
    end
 			local input = tickInput()
+   mateLegs.avoidPartner()
 			motor:tick(input)
 			M.Prof.lap("motor")
 			-- ROBLOX-106: moving costs energy (NeedsModel.move pays nothing in the gentle modes) and, in Normal, a leaf overhead and stillness hide the spider (Life/Nature).
@@ -2453,6 +2478,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              local ms=mateLegs.state
              table.clear(ms)
              for k,v in rivalState do ms[k]=v end -- (ROBLOX-92: the one table, filled again, not a clone of the rival's every tick)
+             ms.bodyClearance=mateLegs.clearance()
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
              if mateLegs.couple.active and wasp:isThreatening() then mateLegs.skip(true) end -- A resident's routine patrol does not cancel every scene.
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)

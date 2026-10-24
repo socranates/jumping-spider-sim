@@ -621,6 +621,53 @@ function Motor._backToSafety(self: any)
 	self:_event("out_of_bounds")
 end
 
+-- Optional partner body clearance, supplied afresh by the client/AI, never saved.
+-- Only coplanar attached walking participates. Air/silk motion and world queries
+-- retain their existing rules; no body is pushed or teleported out of overlap.
+function Motor._avoidStep(self: any, step: Vector3): Vector3
+ local other=self.avoid
+ if other==nil or other.up:Dot(self.up)<math.cos(math.rad(25)) then return step end
+ local delta=self.pos-other.pos
+ if math.abs(delta:Dot(self.up))>.25 then return step end
+ delta-=self.up*delta:Dot(self.up)
+ local radius=other.radius
+ local dist=delta.Magnitude
+ local normal=if dist>1e-6 then delta/dist else (if step.Magnitude>1e-6 then step.Unit else Vector3.xAxis)
+ local length=step.Magnitude
+ if length<1e-9 then return step end
+ -- AI walks round a stationary partner rather than waiting head-on forever.
+ -- Candidate side steps must have support and respect the route keep-out.
+ if other.steer and dist<radius+.5 and step:Dot(normal)<-length*.25 then
+  local side=normal:Cross(self.up)
+  for _,sign in {1,-1} do
+   local candidate=(side*sign+normal*.35).Unit*length
+   local at=self.pos+candidate
+   local below=self:_ray(at+self.up*.25,-self.up*(HEIGHT+.5))
+   if below and self:attachable(below) and below.Normal:Dot(self.up)>.95
+    and not self:_outOfBounds(at) and (other.allowed==nil or other.allowed(at)) then
+    step=candidate;break
+   end
+  end
+ end
+ -- Starting overlapped: allow escape/sideways motion but never further inward.
+ if dist<radius then
+  local inward=step:Dot(normal)
+  return if inward<0 then step-normal*inward else step
+ end
+ -- Swept circle contact, then tangent sliding. Endpoint-only tests tunnel on runs.
+ local a=step:Dot(step)
+ local b=delta:Dot(step)
+ local c=delta:Dot(delta)-radius*radius
+ local discriminant=b*b-a*c
+ if b>=0 or discriminant<0 then return step end
+ local t=(-b-math.sqrt(math.max(0,discriminant)))/a
+ if t<0 or t>1 then return step end
+ local first=step*math.max(0,t-1e-5)
+ local n=(delta+first).Unit
+ local rest=step-first
+ return first+rest-n*math.min(0,rest:Dot(n))
+end
+
 function Motor._tickAttached(self: any, input: TickInput)
 	local silk = self.silk
 	local preparing = self.preparing
@@ -662,7 +709,9 @@ function Motor._tickAttached(self: any, input: TickInput)
 	if input.run == true and not stalk and not silk.walk then speed *= Motor.RUN_MULTIPLIER end
 	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
-	local step = dir * speed * DT
+	local step = self:_avoidStep(dir * speed * DT)
+ if step.Magnitude<1e-9 then self.moving=false;self.intent=Vector3.zero;return end
+ dir=step.Unit
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))
 	if ahead and self:attachable(ahead) and SupportMath.angleTo(ahead.Normal, self.up) > math.rad(20) then

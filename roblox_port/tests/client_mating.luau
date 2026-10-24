@@ -468,6 +468,10 @@ check("the night's sleep in the crack makes the egg sac: drawn in the crack, in 
 	local Json = require("../src/Shared/Persistence/Json")
 	local text = Json.canonical(rec.record)
 	assert(string.find(text, '"sac"', 1, true) ~= nil, "the checkpoint holds the sac stage")
+ assert(not d.spiderPick.safe(), "a female sac prevents changing reproductive identity")
+ d.spiderPick.switch("maratus_volans_male") -- emulate an account cosmetic changed in another visit
+ d.returnToCheckpoint();awaitReturn(d,function() frame(0) end);frames(3)
+ assert(d.appearance()=="first_spider" and Mating.boundSex(life.mating)=="female" and Mating.hasSac(life.mating), "a female sac rest restores female identity despite the selected male cosmetic")
 	sleepThrough(d)
 	assert(life.clock.day == 5 and life.mating.stage == "guarding" and life.mating.guard_day == 2, `second guard day: {life.mating.stage}`)
 	assert(life.notice == MateText.GUARD_DAY or string.find(life.notice, "Morning", 1, true), `the notice: "{life.notice}"`)
@@ -994,7 +998,7 @@ check("a close look begun from the eye view gives way to the hatching, which can
 	frames(3)
 end)
 
-check("the Spider settings row is refused during the mating scene and the hatching, in its own words, like the close look; it works again after (ROBLOX-92)", function()
+check("the Spider settings row is refused during the mating scene and the hatching, in its own words, like the close look; the reproductive identity stays bound after parting", function()
 	local d = ClientStubs.driver
 	local life, legs = d.life, d.mateLegs
 	local mate = court(d, "male", false)
@@ -1012,7 +1016,9 @@ check("the Spider settings row is refused during the mating scene and the hatchi
 	legs.phase = ""
 	frames(3)
 	d.motor:cancelWalk()
-	assert(d.spiderPick.safe(), "(safe again)")
+	assert(not d.spiderPick.safe() and d.spiderPick.fromSettings("maratus_volans_male")==PeacockText.NOT_NOW, "parting does not permit changing the saved reproductive sex")
+	life.mating=Mating.new() -- fixture begins a different reproductive cycle
+	assert(d.spiderPick.safe(), "(safe in a new cycle)")
 	assert(d.spiderPick.fromSettings("maratus_volans_male") == PeacockText.changed("maratus_volans_male") and d.appearance() == "maratus_volans_male", "allowed after")
 	assert(d.spiderPick.fromSettings(before) == PeacockText.changed(before) and d.appearance() == before, "(back to the first spider)")
 	-- asleep and a wasp's visit are refused the same way
@@ -1137,6 +1143,7 @@ check("the mirror: a male player's female mate turns to face him, stays and turn
 	local k = 0
 	while legs.couple.active and k < 10 * 6 do wait(0.1); k += 1; life.clock.hour = 9.0 end
 	assert(not legs.couple.active and mate.state == "leaving" and mate.scene == false, "at fifteen seconds the scene and the pause end together")
+	assert(life.mating.player_sex=="male", "male identity is bound by the accepted court")
 	assert(life.notice == MateText.MATED, "the parting is told")
 	local list = d.notebook:entriesFor("eggs_and_wind")
 	assert(list[#list].text == MateText.entry(day, "female") and string.find(list[#list].text, "you went on", 1, true), `the line: "{list[#list].text}"`)
@@ -1155,6 +1162,10 @@ check("the mirror: a male player's female mate turns to face him, stays and turn
 	assert(cam.shot == nil and not life.resting, "(and it does not rest)")
 	second.elapsed = Rules.leaveSeconds
 	frames(3)
+ sleepThrough(d)
+ assert(life.mating.stage=="mated" and life.mating.player_sex=="male", "real male sleep never enters brood care")
+ assert(not Mating.hasSac(life.mating) and legs.stage.sac==nil, "no male egg sac is drawn")
+ assert(not string.find(statusText(),"Guarding",1,true), "no male guard prompt")
 end)
 
 check("a record returned to during the scene's world, a reset and a new life leave nothing of the scene behind", function()

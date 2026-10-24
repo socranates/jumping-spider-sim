@@ -635,6 +635,65 @@ case("the mate sees its own courtship without removing rival protections or safe
  d:destroy()
 end)
 
+case("partner body clearance stops inward walking, permits escape and preserves other support planes",function()
+ local w=newWorld();local d=legs(w);local m=d.drive.motor
+ local at=Vector3.new(-5,.31,-8);m:place(at,Vector3.yAxis,Vector3.xAxis)
+ local other=at+Vector3.xAxis*1.2
+ m.avoid={pos=other,up=Vector3.yAxis,radius=1.15}
+ local input=Motor.idleInput();input.wish=Vector3.xAxis;input.run=true
+ for _=1,120 do m:tick(input) end
+ check((m.pos-other).Magnitude>=1.15-1e-6 and (m.pos-at).Magnitude<.06,"a full speed run stops at partner, no tunnelling")
+ local contact=m.pos;input.wish=-Vector3.xAxis
+ for _=1,12 do m:tick(input) end
+ check((m.pos-contact).Magnitude>.5 and m.mode=="attached","outward walking stays free and attached")
+ m:place(at,Vector3.yAxis,Vector3.xAxis);m.avoid.pos=at+Vector3.xAxis*.5
+ input.wish=-Vector3.xAxis;for _=1,30 do m:tick(input) end
+ check((m.pos-m.avoid.pos).Magnitude>1.15,"overlap escapes at walking speed without a forced placement")
+ m:place(at,Vector3.yAxis,Vector3.zAxis);m.avoid.pos=at+Vector3.xAxis*1.15
+ input.wish=Vector3.zAxis;for _=1,10 do m:tick(input) end
+ check((m.pos-at).Magnitude>.4,"sideways motion remains available at contact")
+ m:place(at,Vector3.yAxis,Vector3.xAxis);m.avoid.pos=other;m.avoid.up=Vector3.xAxis
+ check((m:_avoidStep(Vector3.xAxis*3)-Vector3.xAxis*3).Magnitude<1e-9,"floor vs wall is not blocked by an unrelated plane")
+ m.avoid.up=Vector3.yAxis;m.avoid.pos=other+Vector3.yAxis
+ check((m:_avoidStep(Vector3.xAxis*3)-Vector3.xAxis*3).Magnitude<1e-9,"separate vertical floors are not blocked")
+ d:destroy()
+end)
+
+case("both mate sexes depart round the player after ordinary and skipped mating without losing the exit",function()
+ for _,sex in {"male","female"} do
+  for _,skip in {false,true} do
+   local w=newWorld();local d=legs(w);setClock(w,3,9)
+   local mate=Mate.new();mate.sex=sex;mate.state="pair";mate.scene=true
+   mate.position=Vector3.new(-5,.31,-7.5);mate.previous=mate.position;mate.elapsed=if skip then 5 else Mate.pairLength(mate)-DT
+   w.life.mate=mate;w.life.mating=Mating.new();w.life.mating.stage="courted"
+   local radius=if sex=="female" then .6 else 1.15
+   local playerMotor=Motor.new({world=sill,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,spawn=Vector3.zero,heading=-Vector3.xAxis,boundsMin=Layout.PLAY_BOUNDS_MIN,boundsMax=Layout.PLAY_BOUNDS_MAX,probeParent=sill})
+   playerMotor:place(mate.position+(Mate.exitAt()-mate.position).Unit*2,Vector3.yAxis,-Vector3.xAxis)
+   w.player.position=playerMotor.pos;w.player.previous=playerMotor.pos
+   if skip then Mating.skip(w.life,true) else walkTick(w) end
+   local minGap=math.huge;local inside=0;local ticks=0;local resets=d.drive.stats.resets
+   while mate.state~="away" and ticks<60*119 do
+    playerMotor.avoid={pos=mate.position,up=mate.up,radius=radius}
+    playerMotor:tick(Motor.idleInput())
+    w.player.previous,w.player.position=w.player.position,playerMotor.pos
+    local snap=snapshot(w);snap.bodyClearance=radius
+    local events=Mating.tick(w.life,DT,snap);d:update(mate,DT,snap)
+    minGap=math.min(minGap,(mate.position-playerMotor.pos).Magnitude)
+    if Layout.inRetreat(mate.position) then inside+=1 end
+    ticks+=1
+   end
+   check(minGap>=radius-.02,`{sex}/{tostring(skip)}: no body pass-through (gap {minGap})`)
+   check(mate.state=="away" and (mate.position-Mate.exitAt()).Magnitude<Rules.exitRadius+.1,`{sex}/{tostring(skip)}: reaches exit, not timeout`)
+   check(inside==0 and d.drive.motor.mode=="attached","departure stays supported and outside retreat")
+   -- Stuck handling can clear a goal; leaving must restore the exit rather than choose a patrol point.
+   mate.state="leaving";mate.elapsed=0;d.drive.goal=nil
+   local snap=snapshot(w);snap.wasp=true;d:update(mate,DT,snap);snap.wasp=false;d:update(mate,DT,snap)
+   check(d.drive.goal==d.exit or mate.state=="away","a cleared departure goal is the exit again")
+   playerMotor:destroy();d:destroy()
+  end
+ end
+end)
+
 case("the legs: it walks the sill, comes up to a spider it sees, stands facing it, leaves by the exit, never enters the crack", function()
 	local w = newWorld()
 	legs(w)
@@ -1409,6 +1468,29 @@ case("the grace is in the checkpoint's life; bad values are refused and an older
 	local life = rec.world.objects[rec.world.roots.life["$o"]]
 	for _, entry in life.e do check(entry[1] ~= "born" and entry[1] ~= "mealsBase", "a first-generation record has neither") end
 	check(#(Checkpoint.check(rec, plain)) == 0 and (select(2, Mating.grace(plain.life, 3))) == 3, "and means the sill's own")
+end)
+
+case("mating binds sex; the male never makes a sac, including after skipped scenes", function()
+ for _,sex in {"male","female"} do
+  for _,skip in {false,true} do
+   local w=withMate(sex,sex=="male");w.dancing=true
+   standNear(w,w.life.mate,2.5);run(w,8.5)
+   check(w.life.mating.player_sex==sex,"accepted court binds the played sex")
+   if skip then Mating.skip(w.life,true) else run(w,16) end
+   check(w.life.mating.stage=="mated","ordinary/skip both mate")
+   local event=Mating.woke(w.life,4)
+   check(event==(if sex=="female" then "sac" else ""),"only female wake lays eggs")
+   check(w.life.mating.stage==(if sex=="female" then "sac" else "mated"),"male has no brood-care stage")
+   check(#Mating.problems(w.life.mating)==0,"bound record is valid")
+  end
+ end
+ local legacy=Mating.normalize({stage="mated"})
+ check(Mating.woke({mating=legacy},4)=="sac","missing sex retains the old female save interpretation")
+ for _,stage in {"sac","guarding","hatched"} do
+  local invalid=Mating.new();invalid.player_sex="male";invalid.stage=stage
+  invalid.sac_day=4;invalid.guard_day=if stage=="sac" then 1 else 2;invalid.hatch_day=6;invalid.brood=10
+  check(#Mating.problems(invalid)>0,"male brood-care record is refused: "..stage)
+ end
 end)
 
 print(`MATING passed={passed} failed={failed}`)

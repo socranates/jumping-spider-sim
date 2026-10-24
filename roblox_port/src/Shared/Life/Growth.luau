@@ -63,7 +63,7 @@ function Growth.eat(self: any, energy: number): boolean
  if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end
  self.fedSinceMoult+=energy
  local before=self.ready
- self.ready=self.fedSinceMoult>=self:readyAt()-1e-9
+ self.ready=before or self.fedSinceMoult>=self:readyAt()-1e-9
  return self.ready and not before
 end
 function Growth.beginMoult(self: any): boolean

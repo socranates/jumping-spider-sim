@@ -36,7 +36,7 @@ local function freeze(t:any)
 end
 local CLOCK={day=true,hour=true,sleeping=true}
 local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true}
-local MATING={stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
+local MATING={player_sex=true,stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
  away_day=true,drive_offs=true,courts=true,rejections=true,cut_ins=true}
 local VISIT={id=true,serial=true,day=true,hour=true}
 local function whole(v:any,cap:number):boolean return type(v)=="number" and v==v and v>=0 and v<=cap and v%1==0 end

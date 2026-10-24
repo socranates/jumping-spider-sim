@@ -16,3 +16,4 @@ project.godot -text
 
 # Preserve the exact Windows qualification log bytes bound by its receipt.
 docs/integration/full-cli.txt -text
+docs/camera-handover/targeted.txt -text

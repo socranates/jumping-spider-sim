@@ -1,0 +1,17 @@
+{
+  "private_commit": "866d217b497fc1f3b06dc305b9fac017792151dc",
+  "private_inputs_committed": true,
+  "full_failed": 0,
+  "full_checks": 289497,
+  "callback_cases": 6,
+  "callback_service_checks": 2144,
+  "qualified_types": "native-callback-types-1-types.json",
+  "changed": [
+    "docs/request-admission/new-policy-profile.luau"
+  ],
+  "full_receipt_sha256": "725d62482d37537c06cd47e7ef7ad57e06a0c7427244dff2f3beb32509225bbc",
+  "callback_receipt_sha256": "b9945c70171fc6a00e3c82840d5fccbf83e75d6f588a144262eea1432c544e7a",
+  "counterexample_receipt_sha256": "84a88ac3057bbc8128510e9a734916acf0e8e3996bd6baceb3a55eed4011c737",
+  "online_verified": false,
+  "published": false
+}

@@ -20,8 +20,9 @@ function Session.begin(self: any, mode: string, easy: boolean): boolean
 	self.ended, self.summary, self.started = false, nil, true
 	return true
 end
-function Session.finishAdult(self: any, stage: number): boolean
-	if stage ~= 3 or self.mode ~= "main" or self.rules ~= "standard" or self.finishedMain then return false end
+function Session.finishAdult(self: any, stage: any): boolean
+ local adult=if type(stage)=="table" then stage:isAdult() else stage==3
+	if not adult or self.mode ~= "main" or self.rules ~= "standard" or self.finishedMain then return false end
 	self.finishedMain = true
 	return true
 end

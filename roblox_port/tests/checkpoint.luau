@@ -1748,5 +1748,32 @@ case("invalid garden fly positions use the same refusal as home prey",function()
  check(not ok and gardenText(w)==before and Json.canonical(record)==source,"garden refusal keeps source and all live roots intact")
 end)
 
+-- Both live ladders travel through the real object graph and checkpoint validator.
+case("instar checkpoint and legacy migration preserve growth without rerolls",function()
+ local Growth=require("../src/Shared/Life/Growth")
+ local seeds={};for seed=1,100 do seeds[Growth.drawMaturity(seed)]=seed end
+ for _,adult in {7,8} do
+  local w=newWorld();w.life.growth:useInstarRules(false,seeds[adult],true)
+  local g=w.life.growth;g.stage=adult-3;g.fedSinceMoult=.75;g.ready=true
+  for i=1,g.stage do table.insert(g.exuviae,HOME) end
+  w.life.resting=true;assert(g:beginMoult());g:passHours(3,HOME)
+  local record=assert(Checkpoint.capture(w,0));local bytes=assert(Json.canonical(record))
+  check(#Checkpoint.check(record,w)==0,"extended stages and skins validate in checkpoint graph")
+  g.stage=0;g.ready=false;g.fedSinceMoult=0
+  check(Checkpoint.restore(record,w),"new instar checkpoint restores")
+  local back=w.life.growth;back:useInstarRules(false,914)
+  check(back.matureInstar==adult and back.lifeSeed==seeds[adult] and back.stage==adult-3,"saved draw and stage retained")
+  check(back.ready and back.fedSinceMoult==.75 and back.moultingHoursLeft==9 and #back.exuviae==adult-3,"food, skins and running moult retained")
+  check(Json.canonical(record)==bytes,"restore never rewrites source record")
+ end
+ local w=newWorld();w.life.growth.stage=2;w.life.growth.fedSinceMoult=.9;w.life.growth.ready=true
+ w.life.resting=true
+ local record=assert(Checkpoint.capture(w,0));local bytes=assert(Json.canonical(record))
+ check(Checkpoint.restore(record,w),"legacy subadult still loads")
+ w.life.growth:useInstarRules(false)
+ check(w.life.growth:instar()==6 and w.life.growth.ready and w.life.growth:canRun() and w.life.growth:canLock(),"legacy stage two migrates with readiness and earned abilities")
+ check(Json.canonical(record)==bytes,"legacy migration keeps original save untouched")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

@@ -833,6 +833,25 @@ ant.hang = first.hang
 
 local Appearances = { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle, first_spider_male = male } }
 
+-- Separate per-instar drawing tables. Preserve the approved costume endpoints
+-- and interpolate their old growth silhouette over five or six playable moults.
+-- These are visual tuning, not measured carapace dimensions for every instar.
+Appearances.instars = {} :: {[string]: {[number]: {number}}}
+for id,look in Appearances.profiles :: {[string]: any} do
+ local tables:{[number]: {number}}={}
+ local old=look.growth or {1,1.15,1.32,1.5}
+ for _,adult in {7,8} do
+  local scales={}
+  for stage=0,adult-2 do
+   local t=stage/(adult-2)*3
+   local i=math.min(3,math.floor(t))
+   table.insert(scales,old[i+1]+((old[math.min(4,i+2)] or old[4])-old[i+1])*(t-i))
+  end
+  tables[adult]=scales
+ end
+ Appearances.instars[id]=tables
+end
+
 -- (ROBLOX-127) The look a mate of `sex` ("male" or "female") is drawn with when `played` is the played spider's: the first spider's male mate has his own build
 -- (first_spider_male); every other mate is the played spider's own look, as before (ROBLOX-80).
 function Appearances.mateLook(played: string, sex: string?): string

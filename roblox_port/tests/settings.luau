@@ -64,8 +64,8 @@ for _, s in Spec.LIST do
 	local clean, problem = Model.clean(s.id, s.default)
 	check(clean == s.default and problem == nil, `{s.id}: the default is clean`)
 end
-check(#Spec.LIST == 24, `24 settings in the table (found {#Spec.LIST})`)
-check(perSection.sound == 6 and perSection.camera == 8 and perSection.comfort == 8 and perSection.help == 2, "6 sound, 8 camera, 8 comfort, 2 help")
+check(#Spec.LIST == 25, `25 settings in the table (found {#Spec.LIST})`)
+check(perSection.sound == 6 and perSection.camera == 8 and perSection.comfort == 9 and perSection.help == 2, "6 sound, 8 camera, 9 comfort, 2 help")
 check(Spec.VERSION == 1 and Model.VERSION == 1, "version 1")
 
 -- The seven that were already Player attributes (ROBLOX-39's PREF_KEYS) keep their names and what "unset" meant.

@@ -520,7 +520,7 @@ local function checks(): { Check }
 		-- Acquiring an adult fixture during the ranger's morning must not open
 		-- the nursery window behind the subsequent nursery checks.
 		ctx.life.clock.hour = 12
-		ctx.life.growth.stage = math.max(stage, 2)
+		ctx.life.growth.stage = math.max(stage, if ctx.life.growth.instarVersion==1 then 5 else 2)
 		local ok, err = pcall(function()
 		local motor, lock, lockOn, memory = ctx.motor, ctx.lock, ctx.lockOn, ctx.memory
 		need(lock ~= nil and lockOn ~= nil, "no lock in the hooks")

@@ -27,6 +27,48 @@ local FADE_SECONDS = 1.5
 local RESTING = 0.8 -- the transparency they settle to (a faint trace, not gone)
 local CALM_FOOD = 0.4 -- above this the hunger line settles; at or below it stays in full
 
+-- Four static, soft gradients, with a wide clear centre. No texture download,
+-- camera effect, flashing, heartbeat, or animation tied to the frame count.
+local function hungerEdges(parent: Instance): {Frame}
+ local edges={}
+ for i=1,4 do
+  local edge=Instance.new("Frame")
+  edge.Name="HungerEdge"..i;edge.BorderSizePixel=0;edge.Active=false
+  edge.BackgroundColor3=Color3.fromRGB(145,18,28);edge.BackgroundTransparency=1
+  edge.AnchorPoint=if i==2 then Vector2.new(1,0) elseif i==4 then Vector2.new(0,1) else Vector2.zero
+  edge.Position=if i==2 then UDim2.fromScale(1,0) elseif i==4 then UDim2.fromScale(0,1) else UDim2.fromScale(0,0)
+  local gradient=Instance.new("UIGradient")
+  gradient.Rotation=({0,180,90,270})[i]
+  gradient.Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(.45,.5),NumberSequenceKeypoint.new(1,1)})
+  gradient.Parent=edge;edge.Visible=false;edge.Parent=parent;table.insert(edges,edge)
+ end
+ return edges
+end
+
+-- The effect describes the reserve, not a separate damage meter. Bounds are
+-- fractions of each viewport dimension, so the centre stays clear on phones.
+function Hud.hungerVeil(food: number): (number,number)
+ local hunger=math.clamp((.85-food)/.85,0,1)
+ local pressure=hunger*hunger*(3-2*hunger)
+ return .03+.29*pressure,.4*pressure
+end
+
+function Hud._hunger(self:any,view:any,dt:number)
+ local shown=view.hungerStyle=="veil" and type(view.food)=="number" and view.hungerPaused~=true
+ local target=if shown then math.clamp(view.food,0,1) else 1
+ -- First display and resets start at the actual reserve; subsequent changes
+ -- ease over real elapsed time, independent of rendering speed or slow motion.
+ if not self.hungerShown or not shown then self.hungerFood=target
+ else self.hungerFood+=(target-self.hungerFood)*(1-math.exp(-math.max(0,dt)*2)) end
+ self.hungerShown=shown
+ local extent,opacity=Hud.hungerVeil(self.hungerFood)
+ for i,edge in self.hungerEdges do
+  edge.Visible=shown and opacity>.0001
+  edge.Size=if i<=2 then UDim2.fromScale(extent,1) else UDim2.fromScale(1,extent)
+  edge.BackgroundTransparency=1-opacity
+ end
+end
+
 local function corner(parent: Instance, r: number)
 	local c = Instance.new("UICorner")
 	c.CornerRadius = UDim.new(0, r)
@@ -115,6 +157,7 @@ function Hud.new(playerGui: Instance): any
 	centre.IgnoreGuiInset = true
 	centre.ScreenInsets = Enum.ScreenInsets.None
 	centre.Parent = playerGui
+	local edges=hungerEdges(centre)
 	local reticle = Instance.new("Frame")
 	reticle.Name = "Reticle"
 	reticle.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -261,6 +304,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
+		hungerEdges=edges,hungerFood=1,hungerShown=false,
 		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, reticleStroke = stroke, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, moultProgress = moultProgress, noteLabel = note, noteLeft = 0,
@@ -340,7 +384,7 @@ function Hud.minimalView(view: any): any
 	for line in string.gmatch(view.notice or "", "[^\n]+") do
 		if string.find(line,"^You can now run%.") or string.find(line,"^You can now lock on%.") then notice=line end
 	end
-	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
+	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,hungerStyle=view.hungerStyle,hungerPaused=view.hungerPaused,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,moultProgress=view.moultProgress,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
 		helpText=view.helpText,prompt=view.contextPrompt,status={},
 		caption=view.soundCaption,captionScale=view.captionScale,saveNoticePaused=view.saveNoticePaused}
@@ -352,6 +396,7 @@ function Hud.update(self: any, view: any, dt: number)
 		self.toastLabel.Visible=false;self.noteLabel.Visible=false
 		self.toastLeft=0;self.noteLeft=0
 	end
+	self:_hunger(view,dt)
 	self.foodText.Visible=not minimal
 	self.food.Size=UDim2.fromOffset(if minimal then 150 else HUNGER_WIDTH,if minimal then 6 else 22)
 	self.food.AutomaticSize=if minimal then Enum.AutomaticSize.None else Enum.AutomaticSize.Y
@@ -373,6 +418,7 @@ function Hud.update(self: any, view: any, dt: number)
 		self.track.BackgroundTransparency = 0.6 + 0.3 * a
 		if minimal then self.foodFill.BackgroundTransparency=.15;self.track.BackgroundTransparency=.55 end
 	end
+	if view.hungerStyle=="veil" then self.food.Visible=false end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
  self.court.Visible = view.court ~= nil

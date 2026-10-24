@@ -56,6 +56,9 @@ SettingsSpec.LIST = {
 		note = "The view may turn to show the line while the spider hangs on it." },
 	-- ---------------------------------------------------------------- comfort and accessibility
 	{ id = "ReducedMotion", section = "comfort", label = "Reduced motion (a calmer spider body)", kind = "toggle", default = false },
+	{ id = "HungerDisplay", section = "comfort", label = "Hunger display", kind = "choice", default = "veil",
+		options = { { id = "veil", label = "Closing red edges" }, { id = "bar", label = "Small bar" } },
+		note = "The red edges slowly draw inward as food runs low. Choose the bar for a clear screen." },
 	{ id = "LargeText", section = "comfort", label = "Large text", kind = "toggle", default = false, note = "Menus, panels and the notebook." },
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
 	{ id = "AutomaticGrip", section = "comfort", label = "Hold prey and eat automatically", kind = "toggle", default = false,

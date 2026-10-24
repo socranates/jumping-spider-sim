@@ -301,7 +301,7 @@ M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)
 M.rareHistory=M.RareLedger.new()
 if M.World.world=="preserve" then M.rareBody=M.RareBody.new(M.World.root) end
 M.World.life = life -- (ROBLOX-116: the preserve's nursery rule reads it, Client/HutLife)
-life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
+life.growth:useInstarRules(needs.gentle,math.floor(os.time()+os.clock()*1e6+(player.UserId or 0)),true)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
 -- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
@@ -838,9 +838,9 @@ local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {str
  M.birdSeen=nil;M.frogAt=nil
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
- life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
+ life.growth:useInstarRules(needs.gentle) -- One-time legacy migration; saved ladders keep their seed and draw.
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
- session:finishAdult(life.growth.stage)
+ session:finishAdult(life.growth)
 	session.summary = nil
 	controls:clear()
 	focusState:clear()
@@ -866,7 +866,7 @@ local function applyRules()
  needs:useGameRules()
  life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules()
- life.growth:useGameRules(needs.gentle)
+ life.growth:useInstarRules(needs.gentle)
 end
 local function closeScreens()
  if saveState.localRestore then saveState.localRestore:cancel() end
@@ -888,6 +888,8 @@ local function fresh(mode: string, easy: boolean, position: Vector3?, displayedO
  if not ok then return false end
  if M.rareBody then M.rareBody:clear();M.rareVisitor=nil;M.RareDirector.beginLife(M.rareHistory,life) end
  mateLegs.reset()
+ life.growth=Growth.new()
+ life.growth:useInstarRules(easy or mode=="free",Growth.nextSeed(math.floor(os.time()+os.clock()*1e6+(player.UserId or 0)),life.generation or 0),true)
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
@@ -1967,7 +1969,7 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance), life.growth.stage >= 1, life.growth.stage >= 2), -- (ROBLOX-92: one string, the one the Studio spec measures)
+		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance), life.growth:unlockedRun(), life.growth:unlockedLock()), -- (ROBLOX-92: one string, the one the Studio spec measures)
 		caption = if Q("eye_caption") then eyes:captionView(device) else nil,
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
@@ -2064,6 +2066,7 @@ local function updateHud(frameDt: number)
 	view.day = M.LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.day ..= mateLegs.Text.dayTag(mateLegs.Mating.generation(life))
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
+ view.hungerStyle=setting("HungerDisplay");view.hungerPaused=modal() or life.lifeOver or spiderPick.inspecting
 	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition, if prey.feeding.held then prey.feeding.held.profile.body.prey_kind else nil)
 	view.dayLine = M.LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
 	do -- (ROBLOX-113: which of LifeText.line's lines it is: the weak starving line is needed; the bar says hunger and the light says dusk)
@@ -2126,7 +2129,7 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
-	controls:setTouchVisible("Run", life.growth.stage >= 1 and not onLine and not life.growth:isMoulting() and not spiderPick.inspecting)
+	controls:setTouchVisible("Run", life.growth:canRun() and not onLine and not life.growth:isMoulting() and not spiderPick.inspecting)
 	M.Prof.lap("hud")
 	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
 		local o = motor:observer()
@@ -2419,7 +2422,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
-			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
+			if life.growth.instarVersion ~= 1 then life.growth:useInstarRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			M.World.prey:after(DT,motor,sensor,sightCast)
@@ -2516,17 +2519,18 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor() * M.Nature.coldSpeed(life))
    for _,event in life:drainEvents() do
-    watch:onLife(event.kind,life.growth.stage)
+    watch:onLife(event.kind,life.growth.stage,life.growth:isAdult())
     if event.kind=="woke" then mateLegs.woke(event.day) end
     if event.kind=="starved" then endLife("starved")
     elseif event.kind=="moult_started" then dropAll()
     elseif event.kind=="moulted" then
-     if life.growth.stage==1 then
+     if life.growth:unlockAt("run") then
       life:showNotice(life.morningText .. "\n" .. ControlText.runUnlocked(device));life.noticeSeconds=12
-     elseif life.growth.stage==2 then
+     elseif life.growth:unlockAt("lock") then
       life:showNotice(life.morningText .. "\n" .. ControlText.lockUnlocked(device));life.noticeSeconds=12
-     elseif session:finishAdult(life.growth.stage) then
-      life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
+     end
+     if session:finishAdult(life.growth) then
+      life:showNotice((if life.growth:unlockAt("lock") then ControlText.lockUnlocked(device).."\n" else "").."Your spider is an adult! Easy is now available in the life menu for this session.")
       life.noticeSeconds=12
      end
     end
@@ -2631,7 +2635,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig.reducedMotion=setting("ReducedMotion")==true
  mateLegs.coupleFrame(rig.reducedMotion,frameDt) -- (the mating scene's camera, cues and looks; before the rigs are drawn)
  rig:noteMeals(prey.feeding.mealsFinished) -- a meal ended: a longer cleaning once it stands still (ROBLOX-87)
- rig:setGrowthStage(life.growth.stage)
+ rig:setLifeGrowth(life.growth)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
  rig.hangDirection=if motor:onLine() and motor.silk.taut and not motor.seized then motor.silk:pivot()-motor.pos else nil

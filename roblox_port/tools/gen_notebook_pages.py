@@ -62,11 +62,11 @@ SOURCE_ADDITIONS = {
 
 # Reconciled with the Windows notebook implementation; the JSON remains a frozen reference. These replace the entries of ADAPTED above that have the same id.
 EXTRA_ADAPTED = {
- "bold_jumper": "The first spider is inspired by the bold jumper. The peacock spider, the ant mimic and the two tarantulas are costumes on the same body: other species, the same game rules. Our models and four growth stages (three moults) are stylised; one stud represents a centimetre.",
+ "bold_jumper": "The first spider is inspired by the bold jumper. The peacock spider, the ant mimic and the two tarantulas are costumes on the same body: other species, the same game rules. The game starts at instar 2 and draws adulthood at instar 7 or 8: five or six playable moults. All costumes share this bold-jumper growth model; drawn proportions and meal goals are game tuning. One stud represents a centimetre.",
  "hearing": "Buzzing is a human-audible cue, not a recording of what a spider experiences.",
  "home_before_dark": "Rest in the crack in the evening to sleep until morning. A day lasts about fifteen minutes of active play.",
  "new_skin": "Your spider is pale and its jumps shorter while its skin hardens. The ten game-hour timing is a design choice. The empty skin stays in the crack.",
- "grown_up": "The game compresses growth into three moults. Adulthood in a Standard main life opens Easy for this session. The male peacock look and dance are cosmetic choices at every gameplay stage.",
+ "grown_up": "The game follows a five- or six-moult playable ladder, with its maturity draw kept in the save. Meal goals and time are game tuning. Adulthood in a Standard main life opens Easy for this session. The male peacock look and dance are cosmetic choices at every gameplay stage.",
  "going_without_food": "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it empties much more slowly and cannot starve.",
  "what_the_wasp_does": "A catch ends a Standard life. Return to your last rest or continue as an unrelated spider. In Easy and Free play the wasp only touches and leaves.",
 }

@@ -876,6 +876,14 @@ function SpiderRig.growthScale(self: Rig, stage: number): number
  local scales=self._appearance.growth or Growth.SCALES
  return scales[index+1]
 end
+-- Live growth has its own instar ladder. The four art stages remain the style
+-- landmarks (including juvenile markings); scale advances at every moult.
+function SpiderRig.setLifeGrowth(self: Rig, growth: any)
+ if growth.instarVersion~=1 then self:setGrowthStage(growth.stage);return end
+ local art=math.clamp(math.floor(growth:visualStage()),0,3)
+ if art~=self._stage then self:setGrowthStage(art) end
+ self:setScale(Appearances.instars[self._appearance.id][growth.matureInstar][growth.stage+1])
+end
 -- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.
 function SpiderRig.setScale(self: Rig, g: number)
  if self._growth==g then return end

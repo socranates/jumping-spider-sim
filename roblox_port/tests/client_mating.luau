@@ -328,7 +328,7 @@ end
 check("a rest by a full-grown, well-fed spider makes a mate come in the morning: it is drawn on the sill, the notice says who", function()
 	local d = ClientStubs.driver
 	local life = d.life
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	d.needs.energy = 0.8
 	d.place(CRACK)
 	frames(30)
@@ -563,7 +563,7 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	assert(d.caughtPanel:choose("Carry"), "the button works")
 	frames(3)
 	assert(life.generation == 1 and life.growth.stage == 0 and not life.growth:isAdult(), `generation 1, a young juvenile again: {life.generation}`)
-	assert(life.growth:mealGoal() == 7 and life.growth.gameRules == true, "Carry on keeps the live seven-meal first moult before any save return")
+	assert(life.growth:mealGoal() == (if d.needs.gentle then 2 else 4) and life.growth.gameRules == true, "Carry on keeps the live instar-ladder first moult before any save return")
 	assert(life.mating.stage == "none" and life.mate.state == "away" and legs.phase == "", "the cycle is new")
 	assert(life.clock.day == 6, "the days of the sill go on")
 	assert(math.abs(d.needs.energy - Rules.freshEnergy) < 0.05, `a fresh reserve ({d.needs.energy})`)
@@ -602,7 +602,7 @@ check("a record restored into the hatching goes straight to the ending card, and
 	local life = d.life
 	local legs = d.mateLegs
 	if d.caughtPanel:isShowing() then d.caughtPanel:hide() end
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	life.mating = Mating.normalize({ stage = "hatched", sac_day = 4, guard_day = 2, hatch_day = 9, hatch_hour = 7.0, brood = 11, mates = 1 })
 	life.mate = nil
 	life.clock.day = 9
@@ -634,7 +634,7 @@ check("in Normal a full meter is the mate's to decide (ROBLOX-106): a thin spide
 	local life = d.life
 	if d.caughtPanel:isShowing() then d.caughtPanel:hide() end
 	assert(d.session.rules == "standard", "Normal")
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	life.clock.day += 1
 	d.place(OPEN)
 	frames(5)
@@ -672,7 +672,7 @@ end)
 -- A fresh courtship set up on the open floor and played to the moment the pair are together. `sex`: the mate's; `dance`: the player owes a dance (the peacock spider).
 local function court(d: any, sex: string, dance: boolean): any
 	local life = d.life
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	life.clock.day += 1
 	d.place(OPEN)
 	frames(5)
@@ -1089,7 +1089,7 @@ check("a rest that is refused says so in the game's words, and does not set the 
 	assert(LifeText.restRefusal("something the sim never says") == LifeText.REST_FALLBACK, "an unknown reason has a plain fallback")
 	d.place(OPEN)
 	frames(30)
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	d.needs.energy = 0.9
 	life.clock.hour = 12.0
 	life.mating = Mating.normalize({ stage = "none" })
@@ -1110,7 +1110,7 @@ check("the mirror: a male player's female mate turns to face him, stays and turn
 	local d = ClientStubs.driver
 	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
 	-- become the peacock spider: in the crack, resting, C
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	d.needs.energy = 0.8
 	d.place(CRACK)
 	frames(30)
@@ -1259,7 +1259,7 @@ check("a rest too hungry for a visitor says so (ROBLOX-91), and no visitor is se
 	local life = d.life
 	life.mate = nil
 	life.mating = Mating.normalize({ stage = "none", ready_day = 0, mates = 0, visits = 0 })
-	life.growth.stage = 3
+	life.growth.stage = life.growth:adultStage()
 	d.place(CRACK)
 	frames(30)
 	life.clock.hour = 12.0

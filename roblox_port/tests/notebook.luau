@@ -191,7 +191,7 @@ do
 		check(has(by.mud_dauber.text, "It searches by sight, then checks a spider with its antennae before it stings.") and not has(by.mud_dauber.text, "finds a spider by sight"), "A hunter of spiders: sight searches, the antennae check")
 		check(has(by.getting_away.text, "The mud dauber searches by sight and then checks with its antennae, so a spider that stays out of sight is safer.") and not has(by.getting_away.text, "finds its prey by sight") and not has(by.getting_away.text, "matters most"), "Getting away: staying out of sight is safer, not all that matters")
 		check(has(by.legs_push.game, "In this game the spider braces and crouches before a jump, then pushes off with its back legs.") and not has(by.legs_push.game, "does not yet") and by.legs_push.godotGame == "Watch the back legs straighten as the spider leaves the surface.", "Legs that push: the game does show the back legs pushing off")
-		check(has(by.bold_jumper.game, "four growth stages (three moults)") and not has(by.bold_jumper.game, "three growth stages") and has(by.bold_jumper.game, "The peacock spider, the ant mimic and the two tarantulas are costumes on the same body"), "The first page names every costume and the four stages")
+		check(has(by.bold_jumper.game, "five or six playable moults") and not has(by.bold_jumper.game, "three growth stages") and has(by.bold_jumper.game, "The peacock spider, the ant mimic and the two tarantulas are costumes on the same body"), "The first page names every costume and the four stages")
 		check(has(by.bold_jumper.text, "6 to 19 millimetres long, not including legs") and has(by.bold_jumper.text, "mouthparts, called chelicerae") and not has(by.bold_jumper.text, "green-blue fangs"), "The first page distinguishes the coloured chelicerae from the fangs and includes larger females")
 		check(has(by.walking_like_an_ant.text, "about a tenth of a second") and not has(by.walking_like_an_ant.text, "83") and has(by.walking_like_an_ant.game, "83 milliseconds"), "Walking like an ant: the page says a tenth of a second (the paper's abstract), the game note keeps its own 83 ms rule")
 		check(has(by.eggs_and_wind.text, "court mostly by sight, and often by vibration too") and not has(by.eggs_and_wind.text, "court by sight") and #by.eggs_and_wind.text <= 520, "Eggs, silk and wind: courtship is mostly by sight and often by vibration")
@@ -1077,10 +1077,10 @@ if loaded and d then
 	d.needs:grantEnergy(0.9, "test_meal")
  d.life.mealFood=.9 -- three consumed meals: Godot's moult, no longer the game's (ROBLOX-88)
 	frames(3)
-	check(not d.life.growth.ready and d.life.growth.gameRules == true, "three houseflies do not ready the first moult: it asks for seven")
+	check(not d.life.growth.ready and d.life.growth.gameRules == true, "three houseflies do not ready the first moult: it asks for four")
 	local line = find("SpiderPrompts", "DayLine")
-	check(line ~= nil and string.find(line.Text, "Next moult: 3 of 7 meals", 1, true) ~= nil, `the reference garden screen counts the first moult out of seven ({if line then line.Text else "no line"})`)
-	d.life.mealFood=1.2 -- four more: seven consumed meals in all, independent of reserve capacity
+	check(line ~= nil and string.find(line.Text, "Next moult: 3 of 4 meals", 1, true) ~= nil, `the reference garden screen counts the first moult out of four ({if line then line.Text else "no line"})`)
+	d.life.mealFood=.3 -- fourth consumed meal, independent of reserve capacity
 	frames(3)
 	check(d.life.growth.ready and book:isOpen("outgrowing_a_skin"), "being ready to moult opens its page")
 	tap("Feed"); frames(3)
@@ -1088,12 +1088,12 @@ if loaded and d then
 	d.life.growth.moultingHoursLeft = 0.01
 	frames(60)
 	check(d.life.growth.stage == 1 and book:isOpen("new_skin") and not book:isOpen("grown_up"), "the moult opens the new-skin page, not the adult one")
-	d.life.growth.stage, d.life.growth.softHoursLeft, d.life.growth.ready = 2, 0, true
+	d.life.growth.stage, d.life.growth.softHoursLeft, d.life.growth.ready = d.life.growth:adultStage()-1, 0, true
 	frames(3)
 	check(d.life.growth:isMoulting(), "the next moult begins")
 	d.life.growth.moultingHoursLeft = 0.01
 	frames(60)
-	check(d.life.growth.stage == 3 and book:isOpen("grown_up"), "the moult to the adult opens the adult page")
+	check(d.life.growth:isAdult() and book:isOpen("grown_up"), "the moult to the adult opens the adult page")
 	check(d.session.finishedMain, "(and the adult unlocks Easy, as before)")
 
 	-- the wasp through the real loop: heard, got away from, then caught; the end screen offers the notebook

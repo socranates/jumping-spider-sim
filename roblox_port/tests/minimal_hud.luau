@@ -87,10 +87,10 @@ local player=game:GetService("Players").LocalPlayer
 local ready=false;for _=1,5000 do if driver.fresh("free",false,nil) then ready=true;break end;frames(1) end
 check(ready,"real preserve client starts a fresh life")
 frames(1)
-check(driver.hud.moultProgress.Visible and driver.hud.moultProgress.Text=="0/7 meals · until next moult","real client wires the counter into minimal HUD")
+check(driver.hud.moultProgress.Visible and driver.hud.moultProgress.Text=="0/2 meals · until next moult","real client wires the counter into minimal HUD")
 driver.life.growth.stage=1;frames(1)
-check(driver.hud.moultProgress.Text=="0/10 meals · until next moult","real HUD follows second stage")
-driver.life.growth.stage=3;frames(1)
+check(driver.hud.moultProgress.Text=="0/3 meals · until next moult","real HUD follows second stage")
+driver.life.growth.stage=driver.life.growth:adultStage();frames(1)
 check(not driver.hud.moultProgress.Visible,"real HUD clears counter at adulthood")
 driver.life.growth.stage=0
 check(player:GetAttribute("Captions")==nil and driver.setting("Captions")=="off","untouched real client uses preserve caption default")
@@ -114,7 +114,7 @@ panel.io.set("Captions","normal");frames(2)
 check(driver.hud.caption.Visible,"Normal can reenable an ongoing sound")
 panel.io.reset();frames(2)
 check(driver.setting("Captions")=="off" and not driver.hud.caption.Visible,"Reset uses preserve Off rather than legacy Normal")
-check(driver.hud.food.Visible and not driver.hud.foodText.Visible and driver.hud.foodText.Text=="","caption settings never label the hunger reserve")
+check(not driver.hud.food.Visible and driver.setting("HungerDisplay")=="veil" and not driver.hud.foodText.Visible and driver.hud.foodText.Text=="","caption settings never label the hunger reserve")
 -- The cat keeps walking in a different room even while the sill prey wait.
 do
  local room=assert(Map.region("room_floor_e"))

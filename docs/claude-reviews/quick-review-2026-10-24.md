@@ -257,16 +257,15 @@ Nathan: **"I think the moults should be the accurate number and the curve adjust
 notebook), so the playable life has about **6 moults** for an 8-instar spider and **5** for a 7-instar one.
 - The per-life seed draws which kind of spider this is: about 15% mature at 7 instars, the rest at 8. A rare early maturer is part of the luck.
 
-**Proposal for Chet** (Nathan to confirm the numbers):
+**Approved by Nathan, 2026-10-24** ("That sounds good"). These are now the plan for Chet, not proposals. The numbers are starting points, to be tuned against the measured curve in item 7:
 1. **Data, not golden:** `Growth.game.instars`, the per-stage meal goals and the 7-or-8 draw. Godot's `Growth.ADULT = 3` and its golden data
    stay as they are, and the game uses its own table.
 2. **Meal goals rise each stage,** and prey grows with the spider (springtails and fruit flies early, house flies later). Meals are counted in
    the stage's own currency, so the counter still reads "n / goal".
-   - Example starting points for Normal: 4 · 6 · 8 · 11 · 15 · 20.
+   - **Normal starts at 4 · 6 · 8 · 11 · 15 · 20.** A 7-instar spider skips one stage's goal.
    - Easy and Free stay gentler.
    - The first two or three stages are **the dispersal cliff**: a short starvation clock, small prey, ants and bigger spiders.
-3. **Unlocks move onto the instar ladder.** Run is currently after moult 1 and lock-on after moult 2. Proposal: run at instar 4, lock-on at
-   instar 6. Nathan decides.
+3. **Unlocks move onto the instar ladder:** **run at instar 4, lock-on at instar 6.** Each is explained only when it is earned.
 4. **Every moult is a hazard.** Each needs a retreat. A poor, dry or disturbed retreat risks a failed moult, as in Bailey's first-instar
    deaths. Six or seven moults mean six or seven risks, which is where much of the curve's attrition comes from.
 5. **Size and drawing:** the drawn spider scales per instar toward the adult carapace sizes above. `Appearances` gains a scale per instar. The

@@ -741,7 +741,7 @@ check("leaving with Cancel: the camera eases back over 0.8 s to where it was, an
 	local was: CFrame = beforeEntry :: CFrame
 	assert((cam.camera.CFrame.Position - was.Position).Magnitude < 0.05 and cam.camera.CFrame.LookVector:Dot(was.LookVector) > 0.999, `the camera is where it was ({(cam.camera.CFrame.Position - was.Position).Magnitude})`)
 	assert(not find("SpiderPrompts", "PromptTitle").Visible or words("PromptTitle") ~= "The first spider", "the name line is gone")
-	assert(find("SpiderPrompts", "HungerBar").Visible, "and the hunger bar is back")
+	assert(not find("SpiderPrompts", "HungerBar").Visible and ClientStubs.driver.setting("HungerDisplay")=="veil", "and the chosen hunger display is back")
 	assert(d.rig().focusPoint == nil, "(no stale focus)")
 end)
 
@@ -928,7 +928,7 @@ check("a wasp's warning ends it at once, with its notice: the camera is cut back
 	assert(d.wasp:isVisiting(), "(visiting)")
 	assert(not d.spiderPick.inspecting and cam.inspect == nil and cam.inspectT == 0 and not cam:inspectActive(), "ended at once, and the camera was cut back (no ease)")
 	assert(words("Toast") == InspectText.DANGER, `the toast: "{words("Toast")}"`)
-	assert(find("SpiderPrompts", "HungerBar").Visible and words("PromptTitle") ~= "The first spider", "the game's screen is back")
+	assert(not find("SpiderPrompts", "HungerBar").Visible and ClientStubs.driver.setting("HungerDisplay")=="veil" and words("PromptTitle") ~= "The first spider", "the game's screen is back")
 	local p0 = d.motor.pos
 	key("Forward", true); frames(30); key("Forward", false)
 	assert((d.motor.pos - p0).Magnitude > 0.2 or d.life.lifeOver, "and the spider can move")

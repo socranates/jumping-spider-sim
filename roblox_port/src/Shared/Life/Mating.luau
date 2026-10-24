@@ -291,7 +291,11 @@ function Mating.carryOn(life: any, needs: any, mealsFinished: number?): (number,
 	life.generation = generation
 	life.born = math.max(0, day - 1)
 	life.mealsBase = math.max(0, mealsFinished or 0)
+	local previous=life.growth
 	life.growth = Growth.new()
+	if previous.instarVersion==1 then
+	 life.growth:useInstarRules(needs.gentle,Growth.nextSeed(previous.lifeSeed,generation),true)
+	end
 	life.grantedSeen = needs.grantedTotal
 	life.mealFood = nil
 	life.lifeOver = false

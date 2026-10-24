@@ -85,7 +85,7 @@ function NotebookWatch.onCategory(self: any, category: string)
 end
 
 -- A life loop event ({kind, day}); `stage` is the growth stage after it.
-function NotebookWatch.onLife(self: any, kind: string, stage: number)
+function NotebookWatch.onLife(self: any, kind: string, stage: number, adult: boolean?)
 	if kind == "rest_started" then
 		self.book:notice("rest")
 	elseif kind == "woke" then
@@ -94,7 +94,7 @@ function NotebookWatch.onLife(self: any, kind: string, stage: number)
 		self.book:notice("moult_ready")
 	elseif kind == "moulted" then
 		self.book:notice("moulted")
-		if stage >= ADULT_STAGE then
+		if (if adult~=nil then adult else stage >= ADULT_STAGE) then
 			self.book:notice("adult")
 		end
 	end

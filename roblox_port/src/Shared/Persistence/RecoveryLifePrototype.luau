@@ -35,7 +35,7 @@ local function freeze(t:any)
  if not table.isfrozen(t) then table.freeze(t) end
 end
 local CLOCK={day=true,hour=true,sleeping=true}
-local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true}
+local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true,instarVersion=true,matureInstar=true,lifeSeed=true,gentleRules=true,earnedRun=true,earnedLock=true}
 local MATING={player_sex=true,stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
  away_day=true,drive_offs=true,courts=true,rejections=true,cut_ins=true}
 local VISIT={id=true,serial=true,day=true,hour=true}

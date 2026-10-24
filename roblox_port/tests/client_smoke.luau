@@ -197,7 +197,7 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	life.clock.hour = 12
 	frames(2)
 	assert(string.find(find("SpiderPrompts", "PromptHint").Text, "E: rest", 1, true), "no rest prompt: " .. find("SpiderPrompts", "PromptHint").Text)
-	assert(find("SpiderPrompts", "Day").Text == "Day 1, midday | young juvenile", find("SpiderPrompts", "Day").Text)
+	assert(find("SpiderPrompts", "Day").Text == "Day 1, midday | juvenile (instar 2)", find("SpiderPrompts", "Day").Text)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting and not life.asleep, "E did not rest")
 	assert(string.find(find("SpiderPrompts", "PromptTitle").Text, "Resting", 1, true), find("SpiderPrompts", "PromptTitle").Text)
@@ -639,7 +639,7 @@ check("Run accepts simultaneous sources and clears on focus loss; no controller 
 	assert(not d.input.held.Run, "Run stuck on focus loss")
 	assert(find("SpiderTouch","Run") ~= nil, "touch Run button missing")
 end)
-check("Run stays hidden and refuses motor input until the first moult", function()
+check("Run stays hidden and refuses motor input until the second moult", function()
 	local d=ClientStubs.driver
 	local oldStage=d.life.growth.stage
 	local oldTick=d.motor.tick
@@ -651,9 +651,11 @@ check("Run stays hidden and refuses motor input until the first moult", function
 		assert(seen and not seen.run,"young spider received sprint intent")
 		assert(not find("SpiderTouch","Run").Visible,"touch button spoiled the unlock")
 		d.life.growth.moultingHoursLeft=.000001;frames(3)
-		assert(d.life.growth.stage==1,"first moult did not complete")
+		assert(d.life.growth.stage==1 and not seen.run and not find("SpiderTouch","Run").Visible,"first moult must not reveal run")
+		d.life.growth.moultingHoursLeft=.000001;frames(3)
+		assert(d.life.growth.stage==2,"second moult did not complete")
 		assert(string.find(d.life.notice,"You can now run",1,true),"unlock was not explained at completion")
-		assert(seen.run,"first moult did not enable held run input")
+		assert(seen.run,"second moult did not enable held run input")
 		assert(find("SpiderTouch","Run").Visible,"touch button absent after unlock")
 	end)
 	key("Forward",false);key("Run",false)

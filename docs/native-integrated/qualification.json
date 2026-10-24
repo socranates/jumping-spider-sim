@@ -1,0 +1,29 @@
+{
+  "inputs": {
+    "docs/native-integrated/attempt1-output.txt": "f5d481d67db1cba5e22c3d305b24df1fe98b592637e6b1c9bc73758ccbb17a94",
+    "docs/native-integrated/attempt1-receipt.json": "676c5119e029329cac168b9043353e3062d543d905b496f094c1a7f9f44b1013",
+    "docs/native-integrated/collect.py": "3d41e67f4bf65d67e3f4577dc3051cc44ee512228f4e23d3d8be337ecf264058",
+    "docs/native-integrated/end.png": "a3399b24eaabeb4afbb662b72b090ed0b090187e36cc34ff2b0e8b82599667bc",
+    "docs/native-integrated/fixture.json": "5e1e59572ec3048fab8530a532323fea28c59bb64a152ca2506cd314872ec527",
+    "docs/native-integrated/guard.png": "5f8975050f830553096e82e4c77d3ac5555b2b84bb8052cb80b7e0a578613164",
+    "docs/native-integrated/post-guard.luau": "87a18745c96386b771eca33c14b8905dc721b6241b8baa9d2a1d23cbe3c21ecb",
+    "docs/native-integrated/post-guard.png": "7ab8504eac44419719568bebcbf636d64e97942eac363b99e7a127feab4173fc",
+    "docs/native-integrated/prepare.py": "336667256a6abc269d0d410b18a9deca2868172f972173a43bd1aff2ad28e14c",
+    "docs/native-integrated/README.md": "c799e6b44956020127ac092c9c8f84363fa0a87a2a34a2726a16232644dbc265",
+    "docs/native-integrated/setup.luau": "588f4b09e7c20744fd2e20a16d32c253dbf661d788e0e9fb94b7ed4cfc32ae57",
+    "docs/native-integrated/verify.py": "6279987e2b5be300d1daaa1f87e0ee6cb53fa2153fa0c1340b8dfe0556249893"
+  },
+  "fixture_file": "C:\\Users\\natha\\claude-xfer\\Windowsill-integrated-native-attempt1\\NativeSelfTest.rbxl",
+  "fixture_file_sha256": "9746b85fbd3c643c17d20815c9b9b91fe4037fb44103373c6f05d00ad1a8a5e4",
+  "candidate_model_sha256": "d1e26861d04dd79aa1babc60f13a6e1682aeb3433a114ac57cbf70e2787ea8ed",
+  "native_checks": 274,
+  "failed": 0,
+  "skipped": 0,
+  "seconds": 591,
+  "game_sources_unchanged": 273,
+  "warning_records": 10,
+  "studio_only": true,
+  "published": false,
+  "standalone_player": false,
+  "goal_complete": false
+}

@@ -1,3 +1,15 @@
+# Latest checkpoint - complete native Studio suite, 2026-10-23
+
+Current menu-corrected candidate passed the full native Studio self-test: 274 passed, 0 failed, 0 skipped, 591 seconds. docs/native-integrated contains exact-source pre/post guards, screenshots, bounded original output, ten retained CreatorWarning records, and a reproducible qualification. All 273 game sources stayed unchanged; the local test copy only sets Workspace.SelfTest=true. NEVER publish NativeSelfTest.rbxl. Its source is the same guarded private player candidate recorded below, with the dormant read-only arrival probe. Real test-store selection, no memory fixture or old PortTests runner. Studio8124 is closed; no owned Studio/Rojo/CLI job remains at this checkpoint.
+
+Native short sill sample: 301 frames, mean16.7ms, worst21.5ms; render callback mean5.18ms, worst10.2ms. These scripted Studio samples do not establish a general FPS improvement, natural full life in every mode, standalone performance, phone results, whole-map visual coverage or audible balance. Eight RoundedCorner8 style warnings and two asset203785492 type warnings are retained; their exact source is unproved. Most occurred before Play. No warning-free claim.
+
+docs/audit/integrated-source now indexes the exact 273-source candidate: 65,161 lines, 13 modules over800 lines, 435 lexical runtime sites, three explicitly unresolved/cast imports. It is a source map, not semantic or coverage proof. docs/audit/HEALTH-CURRENT.md reconciles the requested audit against the evidence and explicit remaining work. Previous complete 78-suite result still belongs to the pre-menu-fix candidate; a same-source complete repeat is a remaining audit check.
+
+The outstanding private-upload question remains unanswered. No upload, publication, main merge, production source activation, OneDrive/Godot/synced-source edit or security change occurred. Preferred upload model remains Windowsill-menu-player-attempt1/TheWindowsill-isolated-player.rbxlx, NOT the SelfTest fixture. Safe local audit work continues. Preserve the unrelated three save-cost output edits and roblox_port/sourcemap.json.
+
+---
+
 # Latest checkpoint - native title clipping corrected, 2026-10-23
 
 Goal ACTIVE, this turn PROGRESS. Previous complete assembly/78-suite qualification remains intact below. The upload question from the preceding turn is still UNANSWERED; an automatic goal continuation is not upload approval. No Roblox upload/publication/main merge/production activation/OneDrive/Godot/synced-source edit occurred. Safe independent local Play uncovered and corrected one real menu bug instead.

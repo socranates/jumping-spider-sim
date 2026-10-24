@@ -1,0 +1,12 @@
+{
+  "source_model": "C:\\Users\\natha\\claude-xfer\\Windowsill-menu-player-attempt1",
+  "manifest_sha256": "e558a68ac31c176fb6da66c45d1141f946994f825719dd7a45957321f098016a",
+  "guard_sha256": "970e78fd7a67e42bcc25e97823febdf3e26eccaf4f1abdd5327fb7b153952e1a",
+  "setup_sha256": "588f4b09e7c20744fd2e20a16d32c253dbf661d788e0e9fb94b7ed4cfc32ae57",
+  "source_count": 274,
+  "only_fixture_change": "Workspace.SelfTest=true",
+  "never_publish": true,
+  "published": false,
+  "expected_checks": 274,
+  "post_guard_sha256": "87a18745c96386b771eca33c14b8905dc721b6241b8baa9d2a1d23cbe3c21ecb"
+}

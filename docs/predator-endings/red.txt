@@ -1,0 +1,35 @@
+C:/Users/natha/AppData/Local/Temp/tmpbzq10_bl.luau:64988: continuing failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpbzq10_bl.luau:64988
+FAIL CONTINUING Normal cat ends once
+FAIL CONTINUING cat retains the correct summary
+FAIL CONTINUING cat refuses duplicate death
+FAIL CONTINUING Normal crab_spider ends once
+FAIL CONTINUING crab_spider retains the correct summary
+FAIL CONTINUING crab_spider refuses duplicate death
+FAIL CONTINUING Normal bird ends once
+FAIL CONTINUING bird retains the correct summary
+FAIL CONTINUING bird refuses duplicate death
+FAIL CONTINUING Normal frog ends once
+FAIL CONTINUING frog retains the correct summary
+FAIL CONTINUING frog refuses duplicate death
+FAIL CONTINUING Normal drowned ends once
+FAIL CONTINUING drowned retains the correct summary
+FAIL CONTINUING drowned refuses duplicate death
+CONTINUING passed=125 failed=15
+C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67784: nature_client checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67784
+FAIL nature_client: CatText reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67768: attempt to index nil with 'UI'
+FAIL nature_client: CrabText reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67768: attempt to index nil with 'UI'
+FAIL nature_client: BirdText reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67768: attempt to index nil with 'UI'
+FAIL nature_client: FrogText reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67768: attempt to index nil with 'UI'
+FAIL nature_client: WaterText reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpx2_stjug.luau:67768: attempt to index nil with 'UI'
+NATURE_CLIENT passed=6 failed=5

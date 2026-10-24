@@ -1,3 +1,22 @@
+Latest correctness supplement,2026-10-24: source/test commit642af969,
+ordinary export evidence597db4c421e47c5e,273 sources. docs/predator-endings/
+records a major confirmed bug: LifeSession refused cat/crab/robin/frog/drowning
+causes already requested by the client. The small allowlist fix retains unknown-
+cause/duplicate refusal and both gentle modes. Corrected red regressions show
+15 session assertions and5 client scenarios failing; green four related suites
+29134/0. Unpublished native run1792848463523 verifies all5 actual ending cards,
+Another/lineage and duplicate refusal; continuous120x hunger from fresh reserve
+starves in Normal on day2, while Easy/Free each survive3 game days at0.1.
+Both276-source guards, cleanup,0 CreatorErrors,6 retained warnings; Studio16336
+closed and model hash unchanged. This does not prove natural strikes or feeding/
+moults/mating/generation. Full80-suite Linux CI40098023022 at642af969 remains
+IN PROGRESS (compile/strict passed, All suites running); finish the same job.
+The ordinary exports are current and unpublished; private14 still has preceding
+032b5985ac17eeb2. No new publication, production/main/OneDrive/Godot edits.
+Broader goal ACTIVE. Qualification and exports are recorded for this candidate.
+First finish the same CI run and record its result, then continue full-life/
+rest/save and collision/content gaps; this is not clearance.
+
 Latest private publication and Player supplement,2026-10-24: user explicitly
 approved evidence032b5985ac17eeb2 / VerifiedPrivateCurrent.rbxl for existing
 PRIVATE place109879630247781. docs/private-current/PLAYER.md records published

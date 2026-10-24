@@ -1,0 +1,46 @@
+{
+  "source_commit": "642af9690df63b9b8d5c9dcbd1a6bef7e4310cda",
+  "evidence_id": "597db4c421e47c5e",
+  "sources": 273,
+  "game_module_changes": [
+    "Shared/Life/LifeSession.luau"
+  ],
+  "targeted_suites": {
+    "CONTINUING": [
+      145,
+      0
+    ],
+    "NATURE_CLIENT": [
+      11,
+      0
+    ],
+    "NATURE": [
+      28890,
+      0
+    ],
+    "MEALS": [
+      88,
+      0
+    ]
+  },
+  "targeted_passes": 29134,
+  "targeted_failures": 0,
+  "native_run": "1792848463523",
+  "native_guards": 2,
+  "native_errors": 0,
+  "native_warnings": 6,
+  "native_model_sha256": "fbbc951b3e754e39d4ff8b3b268ab35f722d4a6befdfb2f9c8c7f78246b9abcc",
+  "native_log_sha256": "c523752796c9c8710dac770451cb52bb13dbd9bb856fe328edd591ea60da8aa6",
+  "export_hashes": {
+    "TheWindowsill.rbxlx": "4176fee0d6ecb5ff03e92e8524a8cc5564e7f29be1318aa2772fd5a32c3fa503",
+    "TheWindowsillTests.rbxlx": "af38cf4bf1b05954a2c46e53c3c7cb590cfb4c3050a8e975d1623f1048578acc"
+  },
+  "full_ci_run": 40098023022,
+  "full_ci_status": "in_progress",
+  "full_ci_conclusion": null,
+  "full_ci_suites": null,
+  "published": false,
+  "private_published_version_unchanged": 14,
+  "production_changed": false,
+  "limits": "Local unbound Studio with yielding memory storage. Deliberately invoked predator ending boundaries; not natural sensing/strikes. Hunger accumulates through real client ticks at120x clock; Easy unlocked as fixture setup. Not feeding/mating/generation, real storage, native device comfort or published game qualification."
+}

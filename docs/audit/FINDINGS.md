@@ -1,3 +1,10 @@
+Latest major correctness finding,2026-10-24: [predator death gate](../predator-endings/README.md).
+Source642af969 / evidence597db4c421e47c5e repairs five authored lethal outcomes
+silently refused by LifeSession. Red/green real-client regressions, all5 native
+cards/Another callbacks and continuous fast-clock hunger/gentle survival now pass.
+Full80-suite CI40098023022 is still running; this candidate is unpublished.
+The detailed historical findings below retain their original cohort/status.
+
 # Foundation findings
 
 > Current candidate status: [CURRENT.md](CURRENT.md). This report retains its original named-source evidence.

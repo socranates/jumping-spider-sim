@@ -1,0 +1,22 @@
+sourcemap 0 Created sourcemap at C:\Users\natha\claude-xfer\Windowsill-life-endings-native1\sourcemap.json
+
+strict 1 [INFO] Loading definitions file: @roblox - C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\roblox_tools\globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+c:\Users\natha\claude-xfer\Windowsill-life-endings-native1\src\Client\MatrixPlayback.luau [game/StarterPlayer/StarterPlayerScripts/Client/MatrixPlayback](11,44): TypeError: Table type 'CrabText' not compatible with type 'CatText' because the former is missing field 'caption'
+c:\Users\natha\claude-xfer\Windowsill-life-endings-native1\src\Client\MatrixPlayback.luau [game/StarterPlayer/StarterPlayerScripts/Client/MatrixPlayback](11,75): TypeError: Expected this to be exactly 'CatText', but got 'BirdText'
+caused by:
+  Property 'caption' is not compatible.
+Expected this to be exactly
+	'(number, number, string, boolean) -> { alpha: number, text: string }?'
+but got
+	'(number, string, number?) -> { alpha: number, text: string }?'
+caused by:
+  Argument #2 type is not compatible.
+Expected this to be exactly 'string', but got 'number'
+c:\Users\natha\claude-xfer\Windowsill-life-endings-native1\src\Client\MatrixPlayback.luau [game/StarterPlayer/StarterPlayerScripts/Client/MatrixPlayback](11,75): TypeError: Table type 'BirdText' not compatible with type 'CatText' because the former is missing field 'NUDGED'
+c:\Users\natha\claude-
+Traceback (most recent call last):
+  File "C:\Users\natha\windowsill-verified-integration\docs\performance-matrix\build.py", line 144, in <module>
+    (out/(name+'.txt')).write_bytes(text.encode());print(name,r.returncode,text[:1400],flush=True);assert r.returncode==0
+                                                                                                          ^^^^^^^^^^^^^^^
+AssertionError

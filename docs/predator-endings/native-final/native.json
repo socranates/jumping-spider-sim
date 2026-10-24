@@ -1,0 +1,234 @@
+{
+  "passed": true,
+  "source_count": 276,
+  "original_sources": 273,
+  "source_guards": 2,
+  "events": [
+    {
+      "kind": "BEGIN",
+      "run": "1792848463523",
+      "value": {
+        "source": "current ordinary with diagnostic boundary hooks",
+        "fast_clock": 120,
+        "storage": "yielding-memory"
+      }
+    },
+    {
+      "kind": "ENDING",
+      "run": "1792848463523",
+      "value": {
+        "line": "The cat's paw came down.",
+        "cause": "cat",
+        "deaths": 1,
+        "duplicate_refused": true
+      }
+    },
+    {
+      "kind": "ANOTHER",
+      "run": "1792848463523",
+      "value": {
+        "archived": 1,
+        "cause": "cat",
+        "resumed": true
+      }
+    },
+    {
+      "kind": "ENDING",
+      "run": "1792848463523",
+      "value": {
+        "line": "The crab spider's legs closed.",
+        "cause": "crab_spider",
+        "deaths": 2,
+        "duplicate_refused": true
+      }
+    },
+    {
+      "kind": "ANOTHER",
+      "run": "1792848463523",
+      "value": {
+        "archived": 2,
+        "cause": "crab_spider",
+        "resumed": true
+      }
+    },
+    {
+      "kind": "ENDING",
+      "run": "1792848463523",
+      "value": {
+        "line": "The robin's bill came down.",
+        "cause": "bird",
+        "deaths": 3,
+        "duplicate_refused": true
+      }
+    },
+    {
+      "kind": "ANOTHER",
+      "run": "1792848463523",
+      "value": {
+        "archived": 3,
+        "cause": "bird",
+        "resumed": true
+      }
+    },
+    {
+      "kind": "ENDING",
+      "run": "1792848463523",
+      "value": {
+        "line": "The frog's tongue was quicker.",
+        "cause": "frog",
+        "deaths": 4,
+        "duplicate_refused": true
+      }
+    },
+    {
+      "kind": "ANOTHER",
+      "run": "1792848463523",
+      "value": {
+        "archived": 4,
+        "cause": "frog",
+        "resumed": true
+      }
+    },
+    {
+      "kind": "ENDING",
+      "run": "1792848463523",
+      "value": {
+        "line": "The water held on.",
+        "cause": "drowned",
+        "deaths": 5,
+        "duplicate_refused": true
+      }
+    },
+    {
+      "kind": "ANOTHER",
+      "run": "1792848463523",
+      "value": {
+        "archived": 5,
+        "cause": "drowned",
+        "resumed": true
+      }
+    },
+    {
+      "kind": "SURVIVAL_START",
+      "run": "1792848463523",
+      "value": {
+        "streak": 0,
+        "rules": "standard",
+        "meals": 0,
+        "hour": 9.08066666666655,
+        "ended": false,
+        "day": 1,
+        "retreat": "sill_crevice",
+        "attached": true,
+        "mode": "main",
+        "energy": 0.5459792,
+        "life_over": false
+      }
+    },
+    {
+      "kind": "STARVED",
+      "run": "1792848463523",
+      "value": {
+        "streak": 12.261301587301569,
+        "rules": "standard",
+        "meals": 0,
+        "hour": 8.200666666666867,
+        "ended": true,
+        "action_seconds": 14.450000000000134,
+        "day": 2,
+        "retreat": "sill_crevice",
+        "attached": true,
+        "mode": "main",
+        "energy": 0,
+        "life_over": true
+      }
+    },
+    {
+      "kind": "GENTLE",
+      "run": "1792848463523",
+      "value": {
+        "streak": 0,
+        "rules": "gentle",
+        "meals": 0,
+        "hour": 9.068222222223136,
+        "ended": false,
+        "day": 4,
+        "retreat": "sill_crevice",
+        "attached": true,
+        "mode": "main",
+        "energy": 0.1,
+        "life_over": false
+      }
+    },
+    {
+      "kind": "GENTLE",
+      "run": "1792848463523",
+      "value": {
+        "streak": 0,
+        "rules": "gentle",
+        "meals": 0,
+        "hour": 9.002222222223233,
+        "ended": false,
+        "day": 4,
+        "retreat": "sill_crevice",
+        "attached": true,
+        "mode": "free",
+        "energy": 0.1,
+        "life_over": false
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792848463523",
+      "value": {
+        "lockReleased": true,
+        "active": 0,
+        "requests": 35,
+        "gate": {
+          "actors": 1,
+          "history": 7,
+          "reserved": 0,
+          "started": 0,
+          "read": 7,
+          "write": 6,
+          "queued": 0,
+          "scopes": 0
+        },
+        "archives": 0,
+        "starts": 35,
+        "owners": [
+          {
+            "epoch": ":1792848462:1",
+            "closed": false
+          }
+        ],
+        "rests": {
+          "R_qa_normal_startup_easy": "df1332a08b8a6c8f",
+          "R_qa_normal_startup_main": "a058de39ec87c618",
+          "R_qa_normal_startup_free": "c5a37ea1b87b6dc0"
+        },
+        "optionsCreated": 17,
+        "optionsDestroyed": 17,
+        "ready": true
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792848463523",
+      "value": []
+    }
+  ],
+  "model_sha256": "fbbc951b3e754e39d4ff8b3b268ab35f722d4a6befdfb2f9c8c7f78246b9abcc",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T132540Z_Studio_5FE68_last.log",
+  "log_sha256": "c523752796c9c8710dac770451cb52bb13dbd9bb856fe328edd591ea60da8aa6",
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T13:26:51.359Z,71.359474,53d0,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T13:27:47.150Z,127.150764,5f48,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "limits": "Local unbound Studio with yielding memory storage. Deliberately invoked predator ending boundaries; not natural sensing/strikes. Hunger accumulates through real client ticks at120x clock; Easy unlocked as fixture setup. Not feeding/mating/generation, real storage, native device comfort or published game qualification."
+}

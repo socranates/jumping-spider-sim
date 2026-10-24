@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-10-24T13:34:15.943540+00:00",
+  "studio_pid": 16336,
+  "studio_closed": true,
+  "source_guards": 2,
+  "model_sha256": "fbbc951b3e754e39d4ff8b3b268ab35f722d4a6befdfb2f9c8c7f78246b9abcc",
+  "published": false,
+  "windows_closed": true,
+  "clock_override_cleaned": true,
+  "save_work_quiescent": true
+}

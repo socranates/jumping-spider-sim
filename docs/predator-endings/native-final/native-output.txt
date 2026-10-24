@@ -1,0 +1,25 @@
+2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T13:26:40.408Z,60.408337,1b5c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T13:26:51.359Z,71.359474,53d0,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T13:27:31.265Z,111.265434,6868,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only
+2026-10-24T13:27:47.150Z,127.150764,5f48,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T13:27:53.377Z,133.377029,14f0,6,Info [FLog::CreatorOutput] [LIFE_END_BEGIN] 1792848463523 {"source":"current ordinary with diagnostic boundary hooks","fast_clock":120,"storage":"yielding-memory"}
+2026-10-24T13:27:53.599Z,133.599411,6090,6,Info [FLog::CreatorOutput] [LIFE_END_ENDING] 1792848463523 {"line":"The cat's paw came down.","cause":"cat","deaths":1,"duplicate_refused":true}
+2026-10-24T13:27:57.604Z,137.604904,0bf4,6,Info [FLog::CreatorOutput] [LIFE_END_ANOTHER] 1792848463523 {"archived":1,"cause":"cat","resumed":true}
+2026-10-24T13:28:13.537Z,153.537628,171c,6,Info [FLog::CreatorOutput] [LIFE_END_ENDING] 1792848463523 {"line":"The crab spider's legs closed.","cause":"crab_spider","deaths":2,"duplicate_refused":true}
+2026-10-24T13:28:17.536Z,157.536118,0bf4,6,Info [FLog::CreatorOutput] [LIFE_END_ANOTHER] 1792848463523 {"archived":2,"cause":"crab_spider","resumed":true}
+2026-10-24T13:28:23.519Z,163.519867,0bf4,6,Info [FLog::CreatorOutput] [LIFE_END_ENDING] 1792848463523 {"line":"The robin's bill came down.","cause":"bird","deaths":3,"duplicate_refused":true}
+2026-10-24T13:28:27.536Z,167.536667,14f0,6,Info [FLog::CreatorOutput] [LIFE_END_ANOTHER] 1792848463523 {"archived":3,"cause":"bird","resumed":true}
+2026-10-24T13:28:33.536Z,173.536469,6090,6,Info [FLog::CreatorOutput] [LIFE_END_ENDING] 1792848463523 {"line":"The frog's tongue was quicker.","cause":"frog","deaths":4,"duplicate_refused":true}
+2026-10-24T13:28:37.538Z,177.538910,6bb4,6,Info [FLog::CreatorOutput] [LIFE_END_ANOTHER] 1792848463523 {"archived":4,"cause":"frog","resumed":true}
+2026-10-24T13:28:43.570Z,183.570984,2b48,6,Info [FLog::CreatorOutput] [LIFE_END_ENDING] 1792848463523 {"line":"The water held on.","cause":"drowned","deaths":5,"duplicate_refused":true}
+2026-10-24T13:28:47.587Z,187.587906,6868,6,Info [FLog::CreatorOutput] [LIFE_END_ANOTHER] 1792848463523 {"archived":5,"cause":"drowned","resumed":true}
+2026-10-24T13:28:53.615Z,193.615112,171c,6,Info [FLog::CreatorOutput] [LIFE_END_SURVIVAL_START] 1792848463523 {"streak":0,"rules":"standard","meals":0,"hour":9.08066666666655,"ended":false,"day":1,"retreat":"sill_crevice","attached":true,"mode":"main","energy":0.5459792,"life_over":false}
+2026-10-24T13:29:08.061Z,208.061630,2b48,6,Info [FLog::CreatorOutput] [LIFE_END_STARVED] 1792848463523 {"streak":12.261301587301569,"rules":"standard","meals":0,"hour":8.200666666666868,"ended":true,"action_seconds":14.450000000000135,"day":2,"retreat":"sill_crevice","attached":true,"mode":"main","energy":0,"life_over":true}
+2026-10-24T13:29:58.168Z,258.168365,6090,6,Info [FLog::CreatorOutput] [LIFE_END_GENTLE] 1792848463523 {"streak":0,"rules":"gentle","meals":0,"hour":9.068222222223137,"ended":false,"day":4,"retreat":"sill_crevice","attached":true,"mode":"main","energy":0.1,"life_over":false}
+2026-10-24T13:30:43.325Z,303.325226,0bf4,6,Info [FLog::CreatorOutput] [LIFE_END_GENTLE] 1792848463523 {"streak":0,"rules":"gentle","meals":0,"hour":9.002222222223234,"ended":false,"day":4,"retreat":"sill_crevice","attached":true,"mode":"free","energy":0.1,"life_over":false}
+2026-10-24T13:30:43.422Z,303.422974,6090,6,Info [FLog::CreatorOutput] [LIFE_END_CLEANUP] 1792848463523 {"lockReleased":true,"active":0,"requests":35,"gate":{"actors":1,"history":7,"reserved":0,"started":0,"read":7,"write":6,"queued":0,"scopes":0},"archives":0,"starts":35,"owners":[{"epoch":":1792848462:1","closed":false}],"rests":{"R_qa_normal_startup_easy":"df1332a08b8a6c8f","R_qa_normal_startup_main":"a058de39ec87c618","R_qa_normal_startup_free":"c5a37ea1b87b6dc0"},"optionsCreated":17,"optionsDestroyed":17,"ready":true}
+2026-10-24T13:30:43.422Z,303.422974,6090,6,Info [FLog::CreatorOutput] [LIFE_END_PASS] 1792848463523 []
+2026-10-24T13:31:50.110Z,370.110168,171c,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only

@@ -1,0 +1,35 @@
+C:/Users/natha/AppData/Local/Temp/tmpyr9fuofb.luau:64988: continuing failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpyr9fuofb.luau:64988
+FAIL CONTINUING Normal cat ends once
+FAIL CONTINUING cat retains the correct summary
+FAIL CONTINUING cat refuses duplicate death
+FAIL CONTINUING Normal crab_spider ends once
+FAIL CONTINUING crab_spider retains the correct summary
+FAIL CONTINUING crab_spider refuses duplicate death
+FAIL CONTINUING Normal bird ends once
+FAIL CONTINUING bird retains the correct summary
+FAIL CONTINUING bird refuses duplicate death
+FAIL CONTINUING Normal frog ends once
+FAIL CONTINUING frog retains the correct summary
+FAIL CONTINUING frog refuses duplicate death
+FAIL CONTINUING Normal drowned ends once
+FAIL CONTINUING drowned retains the correct summary
+FAIL CONTINUING drowned refuses duplicate death
+CONTINUING passed=125 failed=15
+C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67786: nature_client checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67786
+FAIL nature_client: cat reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67776: lethal result was silently refused
+FAIL nature_client: crab_spider reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67776: lethal result was silently refused
+FAIL nature_client: bird reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67776: lethal result was silently refused
+FAIL nature_client: frog reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67776: lethal result was silently refused
+FAIL nature_client: drowned reaches the authored ending and allows another life
+    C:/Users/natha/AppData/Local/Temp/tmpgf2ol73s.luau:67776: lethal result was silently refused
+NATURE_CLIENT passed=6 failed=5

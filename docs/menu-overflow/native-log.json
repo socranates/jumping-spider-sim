@@ -1,0 +1,155 @@
+{
+  "log_sha256": "2f2198fd9b06f2381b8e04d3a130b55e487760d17e25031cd247794f1693ea85",
+  "output_sha256": "03322fba80b0889972a23e6297541487b613de38e26b2e311c5d7077b30f5fcf",
+  "before": {
+    "textY": 58,
+    "windowY": 330,
+    "guiY": 375,
+    "lineY": 58,
+    "alignment": "Enum.VerticalAlignment.Center",
+    "contentY": 378,
+    "boxTop": 22.5,
+    "lineTop": -1.5,
+    "boxY": 330,
+    "canvasY": 0
+  },
+  "events": {
+    "1792812342667": [
+      {
+        "kind": "SAMPLE",
+        "run": "1792812342667",
+        "value": {
+          "footer_bottom": 186.94000244140625,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "normal",
+            "text_size": 58,
+            "line_top": 11.94000244140625,
+            "window": 175.1199951171875,
+            "content": 378,
+            "box_top": 11.94000244140625
+          },
+          "max_scroll": 202.8800048828125,
+          "visible_bottom": 187.05999755859375
+        }
+      },
+      {
+        "kind": "SAMPLE",
+        "run": "1792812342667",
+        "value": {
+          "footer_bottom": 186.94000244140625,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "large",
+            "text_size": 72,
+            "line_top": 11.94000244140625,
+            "window": 175.1199951171875,
+            "content": 516,
+            "box_top": 11.94000244140625
+          },
+          "max_scroll": 340.8800048828125,
+          "visible_bottom": 187.05999755859375
+        }
+      },
+      {
+        "kind": "SAMPLE",
+        "run": "1792812342667",
+        "value": {
+          "footer_bottom": 186.94000244140625,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "restored",
+            "text_size": 58,
+            "line_top": 11.94000244140625,
+            "window": 175.1199951171875,
+            "content": 378,
+            "box_top": 11.94000244140625
+          },
+          "max_scroll": 202.8800048828125,
+          "visible_bottom": 187.05999755859375
+        }
+      },
+      {
+        "kind": "END",
+        "run": "1792812342667",
+        "value": {
+          "ok": true,
+          "restored": true,
+          "problem": ""
+        }
+      }
+    ],
+    "1792812389831": [
+      {
+        "kind": "SAMPLE",
+        "run": "1792812389831",
+        "value": {
+          "footer_bottom": 354.6199951171875,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "normal",
+            "text_size": 58,
+            "line_top": 22.6199951171875,
+            "window": 331.760009765625,
+            "content": 378,
+            "box_top": 22.6199951171875
+          },
+          "max_scroll": 46.239990234375,
+          "visible_bottom": 354.3800048828125
+        }
+      },
+      {
+        "kind": "SAMPLE",
+        "run": "1792812389831",
+        "value": {
+          "footer_bottom": 354.6199951171875,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "large",
+            "text_size": 72,
+            "line_top": 22.6199951171875,
+            "window": 331.760009765625,
+            "content": 516,
+            "box_top": 22.6199951171875
+          },
+          "max_scroll": 184.239990234375,
+          "visible_bottom": 354.3800048828125
+        }
+      },
+      {
+        "kind": "SAMPLE",
+        "run": "1792812389831",
+        "value": {
+          "footer_bottom": 354.6199951171875,
+          "bounds": {
+            "canvas": 0,
+            "alignment": "Enum.VerticalAlignment.Top",
+            "name": "restored",
+            "text_size": 58,
+            "line_top": 22.6199951171875,
+            "window": 331.760009765625,
+            "content": 378,
+            "box_top": 22.6199951171875
+          },
+          "max_scroll": 46.239990234375,
+          "visible_bottom": 354.3800048828125
+        }
+      },
+      {
+        "kind": "END",
+        "run": "1792812389831",
+        "value": {
+          "ok": true,
+          "restored": true,
+          "problem": ""
+        }
+      }
+    ]
+  },
+  "scope": "Only nine menu geometry events retained; unrelated account/network/client log data excluded"
+}

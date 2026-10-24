@@ -1,0 +1,15 @@
+{
+  "method": "Copied from the native Studio output observed in this task, before the source change",
+  "observed_at": "2026-10-23T22:15:14.712-05:00",
+  "base_model": "C:/Users/natha/claude-xfer/Windowsill-isolated-player-attempt3",
+  "guiY": 375,
+  "boxTop": 22.5,
+  "boxY": 330,
+  "windowY": 330,
+  "contentY": 378,
+  "canvasY": 0,
+  "lineTop": -1.5,
+  "lineY": 58,
+  "textY": 58,
+  "alignment": "Enum.VerticalAlignment.Center"
+}

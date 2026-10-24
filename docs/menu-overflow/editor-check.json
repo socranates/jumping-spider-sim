@@ -1,0 +1,11 @@
+{
+  "method": "Observed native Studio source guard after both local Play runs, then local Save to File",
+  "observed_at": "2026-10-23T22:30:18.517-05:00",
+  "source_count": 274,
+  "guard_sha256": "970e78fd7a67e42bcc25e97823febdf3e26eccaf4f1abdd5327fb7b153952e1a",
+  "saved_editor": "C:/Users/natha/claude-xfer/Windowsill-menu-player-attempt1/VerifiedEditorBeforeUpload.rbxl",
+  "saved_editor_sha256": "8616844ac52cffcbac84ada921bc146c04c0eb75766ddcf32e74dc1809edb042",
+  "native_menu_tested": true,
+  "uploaded": false,
+  "published": false
+}

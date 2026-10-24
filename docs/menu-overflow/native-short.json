@@ -1,0 +1,71 @@
+{
+  "method": "Studio native output accessibility text",
+  "events": [
+    {
+      "kind": "SAMPLE",
+      "run": "1792812342667",
+      "value": {
+        "footer_bottom": 186.94000244140625,
+        "bounds": {
+          "canvas": 0,
+          "alignment": "Enum.VerticalAlignment.Top",
+          "name": "normal",
+          "text_size": 58,
+          "line_top": 11.94000244140625,
+          "window": 175.1199951171875,
+          "content": 378,
+          "box_top": 11.94000244140625
+        },
+        "max_scroll": 202.8800048828125,
+        "visible_bottom": 187.05999755859375
+      }
+    },
+    {
+      "kind": "SAMPLE",
+      "run": "1792812342667",
+      "value": {
+        "footer_bottom": 186.94000244140625,
+        "bounds": {
+          "canvas": 0,
+          "alignment": "Enum.VerticalAlignment.Top",
+          "name": "large",
+          "text_size": 72,
+          "line_top": 11.94000244140625,
+          "window": 175.1199951171875,
+          "content": 516,
+          "box_top": 11.94000244140625
+        },
+        "max_scroll": 340.8800048828125,
+        "visible_bottom": 187.05999755859375
+      }
+    },
+    {
+      "kind": "SAMPLE",
+      "run": "1792812342667",
+      "value": {
+        "footer_bottom": 186.94000244140625,
+        "bounds": {
+          "canvas": 0,
+          "alignment": "Enum.VerticalAlignment.Top",
+          "name": "restored",
+          "text_size": 58,
+          "line_top": 11.94000244140625,
+          "window": 175.1199951171875,
+          "content": 378,
+          "box_top": 11.94000244140625
+        },
+        "max_scroll": 202.8800048828125,
+        "visible_bottom": 187.05999755859375
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792812342667",
+      "value": {
+        "ok": true,
+        "restored": true,
+        "problem": ""
+      }
+    }
+  ]
+}

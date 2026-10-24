@@ -1,0 +1,60 @@
+{
+  "inputs": {
+    "docs/integrated-release/menu1-receipt.json": "5d60e1b7fe58ac355842649705a6527f8756382907dd5cc1b562a5ebc5558580",
+    "docs/integrated-release/menu1-menu_overflow-output.txt": "01da0fdbba378886a52bb392b26cd4000b9192e77ea8eed67ce3a401834c01ca",
+    "docs/integrated-release/menu1-title-output.txt": "9cdfcaa7b340a8b76df0580b6132379d0e99c908ceaf0891c09c38b27bc82c02",
+    "docs/integrated-release/menu1-hud-output.txt": "cbe7ad763f77d38ca98822e09003c78969ca449557a26507c9be1f1dff5d3f10",
+    "docs/integrated-release/menu1-continuation_menu-output.txt": "2d29e027fbe6e448c9a87088eb65cb40f2b4489f912484df84084d216a9717f7",
+    "docs/integrated-release/menu1-recovery_application-output.txt": "9523f4177ffd25fdbb3213a07a73f86a6ea098751c7e0a0f7bf81ea4e8737488",
+    "docs/integrated-release/menu1-settings-output.txt": "7e4c33b4c2a9bda168cd9bccdbe708ada3c6f4cac5e9425cce5de4fcbee080ef",
+    "docs/integrated-release/menu1-client_smoke-output.txt": "b83b28ce5a0617dcc8fad467de7763eade35636ca5f2b3e52dd2ffd1e1e8f3b2",
+    "docs/integrated-release/menu1-client_mating-output.txt": "3403c4780b063c8dd1e9c56c02da3e2cac00b2757a82a3808c696a7733919cbf",
+    "docs/menu-overflow/after-short.png": "eba71cbc234b5ecae7da4003ed0da27213fbbb5eb8d3df9f010ced6d60cbc2fb",
+    "docs/menu-overflow/after.png": "c5952c896b1192ae5ceac659b1edc202cc7e5db8980ea1afcda13f5b396d102b",
+    "docs/menu-overflow/before-bounds.json": "cb12b00eb096293c6ae9e70f1a17dcbd3363eb02bf8b4ae27d828f0e0e683d7c",
+    "docs/menu-overflow/before.png": "813a5cd518f408e32947a768f31dd183bc5b59cb77163b5e2a5c75026fb8457e",
+    "docs/menu-overflow/build.py": "2ea23f5664d4bd43042a0a89740e21cdb5c03106f758d8075e8eb9e5c7ee0da6",
+    "docs/menu-overflow/caught-panel.luau": "3034cbbbf66e4c14f3e16b44314ffc98a0cf55a6cbafd61bd22a2aa408996d25",
+    "docs/menu-overflow/collect.py": "f80ba135cc8e2bd70a6e8518989fcf9353f461ece0edf246100b7dc8207b1ce8",
+    "docs/menu-overflow/derivation.json": "bca9d1b0204afa614913a823a184902790164f4528609c24a8fd8dd67b37697d",
+    "docs/menu-overflow/editor-check.json": "4e92db0329a58a2387e8a45e4119965fdd6e153819bed0704ed95cc34b80b087",
+    "docs/menu-overflow/guard-after.png": "9a8834ac345bf12f8198205b1e0f8b89e001aa94d5e844b49f8943158f43789c",
+    "docs/menu-overflow/guard.png": "2c8c5cface80f193e7b3f6d8d20b8758ecca3de9f5e4c2193dde0db3a77672a2",
+    "docs/menu-overflow/menu_overflow.luau": "c0ddc62477597f1982c3e7e14f76ac932587661613dabe4c6a29d32bd9436ddb",
+    "docs/menu-overflow/native-check.luau": "5483f821fa90f2bb0ef541671b4be565ef9287c2de347cfcb0e23c45cc426a0a",
+    "docs/menu-overflow/native-command.luau": "f3765789faf83fdee5e7c0e0318ca815c87f9e08f944b5afffede815b0787518",
+    "docs/menu-overflow/native-fixture-strict.txt": "5881178d9047d3e4fae47220934e9a354b93bd3d713610adfe9a4c06236369b9",
+    "docs/menu-overflow/native-log.json": "6288b3a38f41de8c0adf38344599e697f7cadb11f3dd317150a3f2e76508e732",
+    "docs/menu-overflow/native-output.txt": "03322fba80b0889972a23e6297541487b613de38e26b2e311c5d7077b30f5fcf",
+    "docs/menu-overflow/native-regular.json": "fd8debc8a4412b6635c0f83719d7043b6d6513ffcb8175152ffa81ef0b5cb256",
+    "docs/menu-overflow/native-short.json": "7e9363ada2573edeb839346205d93ab75640db3de611e0051ecf7ba58aced203",
+    "docs/menu-overflow/prepare.py": "4873a7664477de03835eeae57ab76e51c1d94b5830f7215cdb151d6fe8f6da04",
+    "docs/menu-overflow/README.md": "d11055d31ba1f887995923e57ccd8af58a150a9a013b81490b6f562754f53c40",
+    "docs/menu-overflow/verify.py": "a0d85d83b5dea7efcadc5d4e2f899f3ff14f02a6f40709220477be2438555208"
+  },
+  "changed_game_source": "StarterPlayer.StarterPlayerScripts.Client.CaughtPanel",
+  "game_sources": 273,
+  "targeted_suites": 8,
+  "passed": 1427,
+  "failed": 0,
+  "native": [
+    {
+      "run": "1792812342667",
+      "window": 175.1199951171875,
+      "cases": 3
+    },
+    {
+      "run": "1792812389831",
+      "window": 331.760009765625,
+      "cases": 3
+    }
+  ],
+  "clean_place_sha256": "bf77f6c885237f14fd274cf4c419300a88507d876c3cf780824b18d9ca2577d9",
+  "player_place_sha256": "d1e26861d04dd79aa1babc60f13a6e1682aeb3433a114ac57cbf70e2787ea8ed",
+  "clean_manifest_sha256": "ce3dec246d2b22b07142838c6f4625a44a7d4412cc50f971900309f3dc0e3d24",
+  "player_manifest_sha256": "e558a68ac31c176fb6da66c45d1141f946994f825719dd7a45957321f098016a",
+  "production_activated": false,
+  "published": false,
+  "standalone_player_tested": false,
+  "goal_complete": false
+}

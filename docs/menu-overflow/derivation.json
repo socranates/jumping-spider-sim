@@ -1,0 +1,11 @@
+{
+  "inputs": {
+    "roblox_port\\src\\Client\\CaughtPanel.luau": "d93b8905305be924183919edde3e9dc0511109913109188c7c43a3c75b3dadf7",
+    "docs\\integrated-release\\build.py": "0db011544448605c2ce3512a5d68eabae2525018192b796ce11ee3e5c5ef08cb"
+  },
+  "outputs": {
+    "caught-panel.luau": "3034cbbbf66e4c14f3e16b44314ffc98a0cf55a6cbafd61bd22a2aa408996d25",
+    "build.py": "2ea23f5664d4bd43042a0a89740e21cdb5c03106f758d8075e8eb9e5c7ee0da6"
+  },
+  "scope": "menu presentation only; no game rules, text, save or input changes"
+}

@@ -1,5 +1,11 @@
 # Integrated playable candidate - 2026-10-23
 
+Deployment is superseded by [the corrected menu candidate](../menu-overflow/README.md).
+This document retains the earlier complete-cohort checkpoint. Subsequent local
+Studio Play exposed and fixed title clipping; the newer handoff records that
+evidence. Neither candidate has been uploaded or published to the private test
+experience, and standalone-player testing remains pending authorization.
+
 This assembles the qualified normal Preserve startup/save owner and scenery
 cache into a complete playable model. It does not activate production sources,
 merge main, publish Roblox production, or change the OneDrive/Godot originals.

@@ -1,0 +1,12 @@
+{
+  "run": "1792801371892",
+  "terminal": "partial",
+  "reason": "Garden geographic zone was not a walkable region id; garden skipped",
+  "model_sha256": "c071b17bffa6383d1892ef5410c434a9e1f01c895e99e8c92f021b968a1a6a99",
+  "output_sha256": "861fe590278fb1630173b7fd5c351676e80546bda072c2d51bbe1ab288af6185",
+  "main_seconds": 25,
+  "main_over_50ms": 0,
+  "main_render_mean_ms": 4.862002136072848,
+  "representative_fps_proved": false,
+  "published": false
+}

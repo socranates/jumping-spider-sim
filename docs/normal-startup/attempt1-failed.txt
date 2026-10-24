@@ -1,0 +1,3 @@
+2026-10-24T00:40:33.175Z,110.175041,10c4,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_GUARD] 274 unbound memory_only normal_startup_enabled
+2026-10-24T00:40:52.600Z,129.600800,10c4,6,Info [FLog::CreatorOutput] [Windowsill] saves: WindowsillTest_v1; account-owned Preserve startup
+2026-10-24T00:40:56.178Z,133.178375,64f0,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_FAIL] 1792802453901 {"problem":"Players.socranates.PlayerScripts.Client.SilkPlayback:9: normal server did not negotiate complete features\nPlayers.socranates.PlayerScripts.Client.SilkPlayback:9\nPlayers.socranates.PlayerScripts.Client.SilkPlayback:33\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2777\n","checks":3}

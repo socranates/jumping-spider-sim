@@ -1,0 +1,11 @@
+{
+  "run": "1792802792256",
+  "terminal": "failed",
+  "checks": 4,
+  "reason": "Observer required active provider count zero during a normally running session",
+  "complete_negotiation_verified": true,
+  "first_observer_timing_cause_confirmed": true,
+  "output_sha256": "e08a57d4556d1fe8afe6e177f582040681fab1fc7201f9511e616578487a1b47",
+  "native_verified": false,
+  "published": false
+}

@@ -1,0 +1,10 @@
+{
+  "run": "1792802453901",
+  "terminal": "failed",
+  "checks": 3,
+  "reason": "Observer asserted negotiation flags after waiting() cleared, without waiting for full negotiation",
+  "observer_cause_unconfirmed": true,
+  "output_sha256": "41c8633fa1f577cec5ca08703cfc262b62e385e7156a67017c1572467f69aa80",
+  "native_verified": false,
+  "published": false
+}

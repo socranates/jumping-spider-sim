@@ -1,0 +1,107 @@
+{
+  "run": "1792801698735",
+  "terminal": "passed",
+  "scenes": {
+    "startup": {
+      "over_50ms": 7,
+      "seconds": 12.454403264448047,
+      "render_mean_ms": 8.332404319807177,
+      "render_worst_ms": 54.24759999732487,
+      "frames": 464,
+      "ended": false,
+      "render_frames": 463,
+      "name": "startup",
+      "worst_ms": 1852.7497053146362,
+      "loading": false,
+      "outliers": [
+        {
+          "at": 0.0011574000018299557,
+          "ended": false,
+          "loading": false,
+          "dt": 0.46912047266960144
+        },
+        {
+          "at": 1.9744476999985636,
+          "ended": false,
+          "loading": false,
+          "dt": 1.6152626276016235
+        },
+        {
+          "at": 3.4897674000021652,
+          "ended": false,
+          "loading": false,
+          "dt": 1.8527497053146362
+        },
+        {
+          "at": 3.602110100000573,
+          "ended": false,
+          "loading": false,
+          "dt": 0.11102086305618286
+        },
+        {
+          "at": 4.027755700000853,
+          "ended": false,
+          "loading": false,
+          "dt": 0.42732471227645874
+        },
+        {
+          "at": 4.15479900000355,
+          "ended": false,
+          "loading": false,
+          "dt": 0.0870082676410675
+        },
+        {
+          "at": 9.844798600002832,
+          "ended": false,
+          "loading": false,
+          "dt": 0.06962171941995621
+        }
+      ],
+      "simulation_seconds": 2.2166666666666637
+    },
+    "main-home": {
+      "over_50ms": 0,
+      "seconds": 24.99786550179124,
+      "render_mean_ms": 4.393954001372847,
+      "render_worst_ms": 13.551900003221817,
+      "frames": 1486,
+      "ended": false,
+      "render_frames": 1487,
+      "name": "main-home",
+      "worst_ms": 40.050119161605835,
+      "loading": false,
+      "outliers": [],
+      "simulation_seconds": 25.016666666666527
+    },
+    "garden": {
+      "over_50ms": 1,
+      "seconds": 24.999273373745382,
+      "render_mean_ms": 4.821134498856641,
+      "render_worst_ms": 59.84139999782201,
+      "frames": 1486,
+      "ended": false,
+      "render_frames": 1487,
+      "name": "garden",
+      "worst_ms": 74.03284311294556,
+      "loading": false,
+      "outliers": [
+        {
+          "at": 0.07067709999682847,
+          "ended": false,
+          "loading": false,
+          "dt": 0.07403284311294556
+        }
+      ],
+      "simulation_seconds": 25.016666666665248
+    }
+  },
+  "output_sha256": "5e25f1b76473f3696f76a51fcce3d427c1aa1b2575ca1d65dcb88ad4d046550e",
+  "model_sha256": "8ab921d570c1725fb748113d6074ac03a334b7c4e81aece6b0c12e0c3e1088a5",
+  "storage": "disabled",
+  "source": "bd67582b5d53473f067244fc1e2e1f94adde173b",
+  "production_sources_unchanged": 224,
+  "foreground_requested": true,
+  "startup_gap_unattributed": true,
+  "representative_fps_proved": false,
+  "published": false
+}

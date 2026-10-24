@@ -1,0 +1,2 @@
+  quiet: 53 kinds, 25 needed, 24 on the first day only, 4 in the gentle modes only; 11 notice lines classified
+QUIET passed=10 failed=0

@@ -1,0 +1,2 @@
+[Windowsill] navigation startup: C:/Users/natha/AppData/Local/Temp/windowsill-integrated-cli-_2djppb7/run.luau:67645: synthetic controller navigation failure
+NAVIGATION_STARTUP passed=15 failed=0

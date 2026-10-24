@@ -1,0 +1,237 @@
+{
+  "studio_log_sha256": "e266f7a9e8837c346fee48ee738018ea2394fbe4ccb2249731349f1dc5fd6c12",
+  "studio_warnings": [
+    "2026-10-24T04:24:46.414Z,11.414430,5d4c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T04:24:46.414Z,11.414430,5d4c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T04:24:46.414Z,11.414430,5d4c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T04:24:46.414Z,11.414430,5d4c,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T04:24:59.350Z,24.350630,1e5c,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "runs": [
+    {
+      "prefix": "private13-final",
+      "run": "1792816238921",
+      "receipt_sha256": "d5f802619c878c7d9de2fb04364b337d02c6df0b7c58466c4a260bc61e547fdb",
+      "log_sha256": "447c6e96a254212969acc7acda3b7c3f912bb41e33c8fd8d32508dee568bf807",
+      "title_ready_seconds": 9.422531499993056,
+      "windows": [
+        {
+          "end_seconds": 15.00003629999992,
+          "frames": 778,
+          "mean_ms": 21.16322656255455,
+          "fps": 47.2517740640439,
+          "worst_ms": 1562.6968145370483,
+          "over50": 15
+        },
+        {
+          "end_seconds": 30.015857999998843,
+          "frames": 899,
+          "mean_ms": 16.70455007924718,
+          "fps": 59.8639290047294,
+          "worst_ms": 39.954278618097305,
+          "over50": 0
+        },
+        {
+          "end_seconds": 45.01403219999338,
+          "frames": 837,
+          "mean_ms": 17.916717636649327,
+          "fps": 55.81379470726613,
+          "worst_ms": 68.65626573562622,
+          "over50": 2
+        },
+        {
+          "end_seconds": 60.00913540000329,
+          "frames": 790,
+          "mean_ms": 18.981510173246452,
+          "fps": 52.68284719565954,
+          "worst_ms": 61.04641035199165,
+          "over50": 1
+        },
+        {
+          "end_seconds": 75.0149231999967,
+          "frames": 862,
+          "mean_ms": 17.406960077402278,
+          "fps": 57.44828479834341,
+          "worst_ms": 50.61563849449158,
+          "over50": 1
+        },
+        {
+          "end_seconds": 90.01649169999291,
+          "frames": 821,
+          "mean_ms": 18.273981103172183,
+          "fps": 54.72261322555542,
+          "worst_ms": 31.06401488184929,
+          "over50": 0
+        }
+      ],
+      "last30": {
+        "frames": 1683,
+        "seconds": 30.007738072425127,
+        "mean_ms": 17.829909728119507,
+        "fps": 56.085533535983224,
+        "worst_ms": 50.61563849449158,
+        "over50": 1
+      },
+      "largest_reported_gap": {
+        "ms": 1562.6968145370483,
+        "t": 0.11481410000124015,
+        "values": {
+          "PhysicsStepTime": 0.00014759668556507677,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 39164,
+          "RenderGPUFrameTime": 0.008561760187149048,
+          "RenderCPUFrameTime": 0.003545300103724003,
+          "FrameTime": 0.04303779825568199
+        },
+        "phase": "initial-replication"
+      },
+      "creator_warnings": [
+        "2026-10-24T04:30:30.896Z,2.896682,6580,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error url:`https://apis.roblox.com/attribution/v1/events/post-authentication`",
+        "2026-10-24T04:30:30.896Z,2.896682,6580,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error code:`nil`",
+        "2026-10-24T04:30:30.896Z,2.896682,6580,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error body:`nil`"
+      ],
+      "creator_errors": [],
+      "recognizable_script_error_records": [],
+      "low_memory_records": [
+        "2026-10-24T04:30:34.747Z,6.747683,6580,6,Warning [FLog::LowMemoryWarning] Low memory warning received. Telemetry will be collected and sent after 5 seconds.",
+        "2026-10-24T04:30:39.915Z,11.915651,5390,6,Warning [FLog::LowMemoryWarning] Low memory warning from Harmony received. Lua App has been unloaded. Memory freed: 160688 KB. Memory used before unloading Lua App: 1090856 KB. Memory used after unloading Lua App: 930168 KB.",
+        "2026-10-24T04:30:39.916Z,11.916650,5390,6,Warning [FLog::LowMemoryWarning] Low memory telemetry event sent."
+      ],
+      "platform_warning_error_categories": {
+        "FLog::RobloxStarter": 13,
+        "FLog::RobloxStarterNetworkStarterModule": 1,
+        "FLog::FlagFetchingStarterModule": 4,
+        "FLog::Output": 32,
+        "FLog::Systray": 2,
+        "FLog::AppRemoteCheckStarterModule": 3,
+        "FLog::LocalStorageHandler": 1,
+        "FLog::SingleSurfaceApp": 3,
+        "FLog::DataModelStarterModule": 1,
+        "FLog::DataModelPatchConfigurer": 10,
+        "DFLog::RbxmFileManager": 2,
+        "FLog::Graphics": 17,
+        "DFLog::DMNotificationMonitor": 5,
+        "FLog::SurfaceController": 3,
+        "FLog::CreatorWarning": 3,
+        "FLog::UgcExperienceController": 2,
+        "DFLog::ClientBlockedImage": 1,
+        "FLog::LowMemoryWarning": 3,
+        "FLog::ExperienceContextHolder": 3,
+        "FLog::ExperienceCoordinator": 2,
+        "FLog::ClientMemStatus": 1
+      },
+      "complete": true
+    },
+    {
+      "prefix": "private13-warm",
+      "run": "1792816638859",
+      "receipt_sha256": "26dc284247d73b12837d78c2ec1c41954efad64bd5d8d0a77c58359411254601",
+      "log_sha256": "52118736dde1857abd5802389e667b3cc54f26ef832811553958dfc688fdfdd8",
+      "title_ready_seconds": 14.130194099998334,
+      "windows": [
+        {
+          "end_seconds": 15.004801100003533,
+          "frames": 592,
+          "mean_ms": 28.321121781561022,
+          "fps": 35.30933582761782,
+          "worst_ms": 1868.8222169876099,
+          "over50": 20
+        },
+        {
+          "end_seconds": 30.012695999990683,
+          "frames": 795,
+          "mean_ms": 18.875740822287476,
+          "fps": 52.97805312198676,
+          "worst_ms": 61.39558553695679,
+          "over50": 1
+        },
+        {
+          "end_seconds": 45.00004329999501,
+          "frames": 754,
+          "mean_ms": 19.87726815459899,
+          "fps": 50.30872412759752,
+          "worst_ms": 38.069721311330795,
+          "over50": 0
+        },
+        {
+          "end_seconds": 60.007253299991135,
+          "frames": 781,
+          "mean_ms": 19.2169645686709,
+          "fps": 52.03735462104579,
+          "worst_ms": 33.098042011260986,
+          "over50": 0
+        },
+        {
+          "end_seconds": 75.00793549999071,
+          "frames": 841,
+          "mean_ms": 17.836637480470145,
+          "fps": 56.06437878747769,
+          "worst_ms": 30.98989464342594,
+          "over50": 0
+        },
+        {
+          "end_seconds": 90.00631440000143,
+          "frames": 868,
+          "mean_ms": 17.277996067584315,
+          "fps": 57.87708227785311,
+          "worst_ms": 31.575392931699753,
+          "over50": 0
+        }
+      ],
+      "last30": {
+        "frames": 1709,
+        "seconds": 29.99791270773858,
+        "mean_ms": 17.55290386643568,
+        "fps": 56.97063047853754,
+        "worst_ms": 31.575392931699753,
+        "over50": 0
+      },
+      "largest_reported_gap": {
+        "ms": 1868.8222169876099,
+        "t": 0.12402879999717698,
+        "values": {
+          "PhysicsStepTime": 0.00017249397933483124,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 39164,
+          "RenderGPUFrameTime": 0.004857469815760851,
+          "RenderCPUFrameTime": 0.0027160001918673515,
+          "FrameTime": 0.035811398178339005
+        },
+        "phase": "initial-replication"
+      },
+      "creator_warnings": [
+        "2026-10-24T04:37:12.663Z,2.663022,2f70,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error url:`https://apis.roblox.com/attribution/v1/events/post-authentication`",
+        "2026-10-24T04:37:12.663Z,2.663022,2f70,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error code:`nil`",
+        "2026-10-24T04:37:12.663Z,2.663022,2f70,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] HTTP error body:`nil`",
+        "2026-10-24T04:37:21.251Z,11.251944,67f0,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] [DiscoveryEventErrorLogger]",
+        "2026-10-24T04:37:21.253Z,11.253945,67f0,6,Warning [FLog::CreatorWarning] Warning: [Roblox][CorePackages.LuauForgeChunks.bundled] [DiscoveryEventErrorLogger]"
+      ],
+      "creator_errors": [],
+      "recognizable_script_error_records": [],
+      "low_memory_records": [],
+      "platform_warning_error_categories": {
+        "FLog::RobloxStarter": 13,
+        "FLog::RobloxStarterNetworkStarterModule": 1,
+        "FLog::FlagFetchingStarterModule": 4,
+        "FLog::Output": 32,
+        "FLog::Systray": 2,
+        "FLog::AppRemoteCheckStarterModule": 3,
+        "FLog::LocalStorageHandler": 1,
+        "FLog::SingleSurfaceApp": 3,
+        "FLog::DataModelStarterModule": 1,
+        "FLog::DataModelPatchConfigurer": 15,
+        "DFLog::RbxmFileManager": 4,
+        "FLog::Graphics": 18,
+        "DFLog::DMNotificationMonitor": 4,
+        "FLog::SurfaceController": 3,
+        "FLog::UgcExperienceController": 2,
+        "FLog::CreatorWarning": 5,
+        "FLog::ExperienceContextHolder": 3,
+        "FLog::ExperienceCoordinator": 2,
+        "FLog::ClientMemStatus": 1
+      },
+      "complete": true
+    }
+  ],
+  "limits": "Initial Heartbeat dt can span time before probe born. Window timings mix title/intro/gameplay; no matched source baseline, full traversal, device comfort, audible balance or direct runtime PlaceVersion query. Platform diagnostics are not all cleared."
+}

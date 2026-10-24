@@ -1,0 +1,614 @@
+{
+  "run": "1792816238921",
+  "complete": true,
+  "log_sha256": "ba60dbd195735b237c60e4dfa25644eb8d16265b787fa70c01ada96c7c0e17a9",
+  "manifest_sha256": "e558a68ac31c176fb6da66c45d1141f946994f825719dd7a45957321f098016a",
+  "model_sha256": "d1e26861d04dd79aa1babc60f13a6e1682aeb3433a114ac57cbf70e2787ea8ed",
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "events": [
+    {
+      "kind": "BEGIN",
+      "value": {
+        "place": 109879630247781,
+        "universe": 10771634917,
+        "readonly": true,
+        "detail": "auto"
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "initial-replication",
+        "t": 0.11481410000124015
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "navigation-or-title",
+        "t": 0.40044070000294596
+      }
+    },
+    {
+      "kind": "PHASE",
+      "value": {
+        "name": "title-ready",
+        "t": 9.422531499993056
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 16.46499026566744,
+        "over50": 15,
+        "worst_ms": 1562.6968145370483,
+        "phase": "title-ready",
+        "t": 15.00003629999992,
+        "frames": 778,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.001557441195473075,
+        "t": 15.00003629999992,
+        "mean": 0.00010740099780650751,
+        "n": 778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 83,
+        "t": 15.00003629999992,
+        "mean": 19.217223650385606,
+        "n": 778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48575,
+        "t": 15.00003629999992,
+        "mean": 46910.27377892031,
+        "n": 778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.029233969748020172,
+        "t": 15.00003629999992,
+        "mean": 0.004003847203729794,
+        "n": 778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.053952597081661224,
+        "t": 15.00003629999992,
+        "mean": 0.0024163601493551504,
+        "n": 778
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 1.5925437211990356,
+        "t": 15.00003629999992,
+        "mean": 0.021182925184197475,
+        "n": 778
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 15.017390521243215,
+        "over50": 0,
+        "worst_ms": 39.954278618097305,
+        "phase": "title-ready",
+        "t": 30.015857999998843,
+        "frames": 899,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.00020893535111099482,
+        "t": 30.015857999998843,
+        "mean": 2.4836559328543646e-05,
+        "n": 899
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 125,
+        "t": 30.015857999998843,
+        "mean": 105.13125695216908,
+        "n": 899
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48569,
+        "t": 30.015857999998843,
+        "mean": 48569,
+        "n": 899
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.022612590342760086,
+        "t": 30.015857999998843,
+        "mean": 0.009603907758198074,
+        "n": 899
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.02225099876523018,
+        "t": 30.015857999998843,
+        "mean": 0.004725828015238245,
+        "n": 899
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 0.039485301822423935,
+        "t": 30.015857999998843,
+        "mean": 0.016703936341814322,
+        "n": 899
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 14.996292661875486,
+        "over50": 2,
+        "worst_ms": 68.65626573562622,
+        "phase": "title-ready",
+        "t": 45.01403219999338,
+        "frames": 837,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.0003492017276585102,
+        "t": 45.01403219999338,
+        "mean": 0.00010443341003690495,
+        "n": 837
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 121,
+        "t": 45.01403219999338,
+        "mean": 110.54480286738351,
+        "n": 837
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48569,
+        "t": 45.01403219999338,
+        "mean": 48569,
+        "n": 837
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.08778468519449234,
+        "t": 45.01403219999338,
+        "mean": 0.016697273789955083,
+        "n": 837
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.07975669950246811,
+        "t": 45.01403219999338,
+        "mean": 0.014184458661666463,
+        "n": 837
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 0.08019319921731949,
+        "t": 45.01403219999338,
+        "mean": 0.017931554952732052,
+        "n": 837
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 14.995393036864698,
+        "over50": 1,
+        "worst_ms": 61.04641035199165,
+        "phase": "title-ready",
+        "t": 60.00913540000329,
+        "frames": 790,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.0003342435520607978,
+        "t": 60.00913540000329,
+        "mean": 0.00013139099912131072,
+        "n": 790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 125,
+        "t": 60.00913540000329,
+        "mean": 118.17215189873417,
+        "n": 790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48569,
+        "t": 60.00913540000329,
+        "mean": 48569,
+        "n": 790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.05915264040231705,
+        "t": 60.00913540000329,
+        "mean": 0.01872240789234638,
+        "n": 790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.05938510224223137,
+        "t": 60.00913540000329,
+        "mean": 0.018520356712367715,
+        "n": 790
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 0.0600333996117115,
+        "t": 60.00913540000329,
+        "mean": 0.01897684697509755,
+        "n": 790
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 15.004799586720765,
+        "over50": 1,
+        "worst_ms": 50.61563849449158,
+        "phase": "title-ready",
+        "t": 75.0149231999967,
+        "frames": 862,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.0002569449716247618,
+        "t": 75.0149231999967,
+        "mean": 4.106066209783527e-05,
+        "n": 862
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 171,
+        "t": 75.0149231999967,
+        "mean": 109.77494199535963,
+        "n": 862
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48569,
+        "t": 75.0149231999967,
+        "mean": 48539.69605568446,
+        "n": 862
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.049270350486040115,
+        "t": 75.0149231999967,
+        "mean": 0.015446909516401538,
+        "n": 862
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.04916609823703766,
+        "t": 75.0149231999967,
+        "mean": 0.008890469917776863,
+        "n": 862
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 0.05023479834198952,
+        "t": 75.0149231999967,
+        "mean": 0.017402127494261947,
+        "n": 862
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "value": {
+        "seconds": 15.002938485704362,
+        "over50": 0,
+        "worst_ms": 31.06401488184929,
+        "phase": "title-ready",
+        "t": 90.01649169999291,
+        "frames": 821,
+        "store": "WindowsillTest_player57_20261023a1"
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "PhysicsStepTime",
+        "max": 0.00030806142603978515,
+        "t": 90.01649169999291,
+        "mean": 7.18627730256582e-05,
+        "n": 821
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "SceneDrawcallCount",
+        "max": 116,
+        "t": 90.01649169999291,
+        "mean": 82.43605359317905,
+        "n": 821
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "InstanceCount",
+        "max": 48544,
+        "t": 90.01649169999291,
+        "mean": 48539.00609013398,
+        "n": 821
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderGPUFrameTime",
+        "max": 0.04134470969438553,
+        "t": 90.01649169999291,
+        "mean": 0.017684412668668978,
+        "n": 821
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "RenderCPUFrameTime",
+        "max": 0.03127890080213547,
+        "t": 90.01649169999291,
+        "mean": 0.01350158575500263,
+        "n": 821
+      }
+    },
+    {
+      "kind": "ENGINE",
+      "value": {
+        "name": "FrameTime",
+        "max": 0.03193730115890503,
+        "t": 90.01649169999291,
+        "mean": 0.018277521334797254,
+        "n": 821
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 1562.6968145370483,
+        "t": 0.11481410000124015,
+        "values": {
+          "PhysicsStepTime": 0.00014759668556507677,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 39164,
+          "RenderGPUFrameTime": 0.008561760187149048,
+          "RenderCPUFrameTime": 0.003545300103724003,
+          "FrameTime": 0.04303779825568199
+        },
+        "phase": "initial-replication"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 451.9050121307373,
+        "t": 0.8880771999974968,
+        "values": {
+          "PhysicsStepTime": 0.0011854975018650293,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 42233,
+          "RenderGPUFrameTime": 0.005770320072770119,
+          "RenderCPUFrameTime": 0.0037618998903781176,
+          "FrameTime": 0.028081700205802917
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 243.48942935466766,
+        "t": 0.40044070000294596,
+        "values": {
+          "PhysicsStepTime": 0.0002828293654602021,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 40095,
+          "RenderGPUFrameTime": 0.016019999980926514,
+          "RenderCPUFrameTime": 0.016724100336432457,
+          "FrameTime": 1.5925437211990356
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 243.05099248886108,
+        "t": 1.2406015000015032,
+        "values": {
+          "PhysicsStepTime": 0.0010699115227907896,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 44056,
+          "RenderGPUFrameTime": 0.006474750116467476,
+          "RenderCPUFrameTime": 0.053952597081661224,
+          "FrameTime": 0.513882577419281
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 144.54272389411926,
+        "t": 0.997146599998814,
+        "values": {
+          "PhysicsStepTime": 0.0011262226616963744,
+          "SceneDrawcallCount": 0,
+          "InstanceCount": 42266,
+          "RenderGPUFrameTime": 0.00449134036898613,
+          "RenderCPUFrameTime": 0.004333899822086096,
+          "FrameTime": 0.2532165050506592
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 133.63152742385864,
+        "t": 1.4495423999906052,
+        "values": {
+          "PhysicsStepTime": 0.0009655951289460063,
+          "SceneDrawcallCount": 5,
+          "InstanceCount": 44130,
+          "RenderGPUFrameTime": 0.0067457398399710655,
+          "RenderCPUFrameTime": 0.0122079998254776,
+          "FrameTime": 0.25014328956604004
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 108.67378860712051,
+        "t": 1.7570752000028733,
+        "values": {
+          "PhysicsStepTime": 0.0008952753851190209,
+          "SceneDrawcallCount": 5,
+          "InstanceCount": 44565,
+          "RenderGPUFrameTime": 0.0034053600393235683,
+          "RenderCPUFrameTime": 0.003634599968791008,
+          "FrameTime": 0.03007029928267002
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "GAP",
+      "value": {
+        "ms": 96.35543823242188,
+        "t": 2.4099387000023853,
+        "values": {
+          "PhysicsStepTime": 0.000884646491613239,
+          "SceneDrawcallCount": 10,
+          "InstanceCount": 45775,
+          "RenderGPUFrameTime": 0.005776979960501194,
+          "RenderCPUFrameTime": 0.0036444999277591705,
+          "FrameTime": 0.030253199860453606
+        },
+        "phase": "navigation-or-title"
+      }
+    },
+    {
+      "kind": "END",
+      "value": {
+        "phase": "title-ready",
+        "t": 90.01649169999291,
+        "world_failed": false,
+        "unavailable": []
+      }
+    }
+  ],
+  "source_identity_verified_in_studio": false,
+  "published_version": null,
+  "manual_play_verified": false,
+  "broad_fps_improvement_proved": false
+}

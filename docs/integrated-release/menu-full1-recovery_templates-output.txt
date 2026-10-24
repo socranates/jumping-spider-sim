@@ -1,0 +1,1 @@
+RECOVERY_TEMPLATES passed=56 failed=0

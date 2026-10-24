@@ -1,0 +1,4 @@
+PREY feel: fruit fly idle 1.68 s, 2 taps/s won 60/60, 4 taps/s 1.00 s; house fly idle 1.15 s, 4 taps/s 4.61 s
+PREY feel (ROBLOX-96): gnat idle 1.94 s, aphid idle 2.34 s
+PREY feel (ROBLOX-101): crane fly idle 0.99 s, won 33/60 at 4 taps/s and 60/60 at 6; house fly 60/60 at 4
+PREY passed=1668 failed=0

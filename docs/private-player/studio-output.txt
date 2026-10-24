@@ -1,0 +1,6 @@
+2026-10-24T04:25:18.587Z,43.587826,4870,6,Info [FLog::CreatorOutput] [ISOLATED_PLAYER_GUARD] 274 normal_gameplay_fresh_test_keys_only_never_production
+2026-10-24T04:25:18.587Z,43.587826,4870,6,Info [FLog::CreatorOutput] [PRIVATE_PUBLISH_EDITOR] 10771634917 109879630247781 verified_candidate_normal_gameplay
+2026-10-24T04:26:35.892Z,120.892441,5d4c,6,Info [FLog::CreatorOutput] Published new changes in "VerifiedCandidate.rbxl" to Roblox.
+2026-10-24T04:26:35.893Z,120.893440,5d4c,6,Info [FLog::CreatorOutput] → Add publish notes to v13
+2026-10-24T04:27:55.277Z,200.277893,5fb4,6,Info [FLog::CreatorOutput] [ISOLATED_PLAYER_GUARD] 274 normal_gameplay_fresh_test_keys_only_never_production
+2026-10-24T04:27:55.277Z,200.277893,5fb4,6,Info [FLog::CreatorOutput] [PRIVATE_PUBLISH_POST] 10771634917 109879630247781 sources_unchanged

@@ -1,0 +1,174 @@
+Browser tab: 3, Title: "socranates's Place: 10152026_1 / Version History", URL: "https://create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history".
+0 AXWebArea socranates's Place: 10152026_1 / Version History, URL: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history
+	1 container
+		2 container
+			3 link Description: CREATOR, Value: create.roblox.com/
+			4 link Description: Home, Value: create.roblox.com/
+			5 link Description: Creations, Value: create.roblox.com/dashboard/creations
+			6 link Description: Learn, Value: create.roblox.com/docs/
+			7 link Description: Store, Value: create.roblox.com/store/
+			8 link Description: Forum, Value: devforum.roblox.com/
+			9 link Description: Updates, Value: create.roblox.com/updates
+			10 link Description: Finances, Value: create.roblox.com/dashboard/devex
+			11 link Description: Analytics, Value: create.roblox.com/dashboard/analytics
+			12 link Description: Ads, Value: create.roblox.com/advertise
+			13 button All tools
+			14 link Description: Roblox.com, Value: roblox.com/
+			15 button Studio
+			16 button Hide sidebar
+			17 link Description: Back to Places, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places
+			69 content list
+				70 container
+					71 image socranates's Place: 10152026_1
+					72 text socranates's Place: 10152026_1
+					73 button more
+			18 outline mui-tree-view-1
+				19 row Basic Settings, Value: 0, ID: mui-tree-view-1-basicSettings
+					20 container
+						21 link Description: Basic Settings, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/configure
+				22 row Icon, Value: 0, ID: mui-tree-view-1-icon
+					23 container
+						24 link Description: Icon, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/icon
+				25 row Thumbnails, Value: 0, ID: mui-tree-view-1-thumbnails
+					26 container
+						27 link Description: Thumbnails, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/thumbnails
+				28 row Videos New, Value: 0, ID: mui-tree-view-1-videos
+					29 container
+						30 link Description: Videos New, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/videos
+				31 row Access, Value: 0, ID: mui-tree-view-1-access
+					32 container
+						33 link Description: Access, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/access
+				34 row Version History, Value: 1, ID: mui-tree-view-1-versionHistory
+					35 container
+						36 link Description: Version History, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history
+				37 row Permissions, Value: 0, ID: mui-tree-view-1-permissions
+					38 container
+						39 link Description: Permissions, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/permissions
+		40 button menu
+		41 container Description: breadcrumb, ID: navigation-breadcrumbs
+			42 content list
+				74 link Description: Creations, Value: create.roblox.com/dashboard/creations
+				75 link Description: The Windowsill, Value: create.roblox.com/dashboard/creations/experiences/10771103250/overview
+				76 link Description: Places, Value: create.roblox.com/dashboard/creations/experiences/10771103250/places
+				77 text socranates's Place: 10152026_1
+				78 text Version History
+		44 button Search
+		45 button Notifications
+		46 pop up button (collapsed) socranates, Secondary Actions: Expand
+			79 image socranates
+		47 container applayout-scroll-container
+			48 container creator-hub-main-content
+				49 heading Version History, Value: 1
+					80 text Version History
+				81 text Choosing to restore a previous version will only save the version. In order to publish the previous version, open and publish it in Studio.
+				82 container
+					83 checkbox (settable, integer) Description: Show published only, Value: 1
+					84 text Show published only
+				171 table
+					172 row
+						173 cell
+							174 text Version
+						175 cell
+							176 text Last Updated (in local time)
+						177 cell
+							178 text Published Version
+					179 row
+						180 cell
+							181 text 140
+						182 cell
+							183 text October 21, 2026 at 10:07 PM
+						184 cell
+							185 button Restore
+					186 row
+						187 cell
+							188 text 139
+						189 cell
+							190 text October 21, 2026 at 8:58 PM
+						191 cell
+							192 button Restore
+					193 row
+						194 cell
+							195 text 138
+						196 cell
+							197 text October 21, 2026 at 7:14 PM
+						198 cell
+							199 button Restore
+					200 row
+						201 cell
+							202 text 137
+						203 cell
+							204 text October 21, 2026 at 4:05 PM
+						205 cell
+							206 button Restore
+					207 row
+						208 cell
+							209 text 61
+						210 cell
+							211 text October 21, 2026 at 8:42 AM
+						212 cell
+							213 button Restore
+					214 row
+						215 cell
+							216 text 53
+						217 cell
+							218 text October 21, 2026 at 4:41 AM
+						219 cell
+							220 button Restore
+					221 row
+						222 cell
+							223 text 48
+						224 cell
+							225 text October 21, 2026 at 12:23 AM
+						226 cell
+							227 button Restore
+					228 row
+						229 cell
+							230 text 46
+						231 cell
+							232 text October 20, 2026 at 9:42 PM
+						233 cell
+							234 button Restore
+					235 row
+						236 cell
+							237 text 44
+						238 cell
+							239 text October 20, 2026 at 1:49 PM
+						240 cell
+							241 button Restore
+					242 row
+						243 cell
+							244 text 43
+						245 cell
+							246 text October 20, 2026 at 11:41 AM
+						247 cell
+							248 button Restore
+					249 row
+						250 cell
+							251 container
+								252 text Rows per page:
+								253 combo box (collapsed) Rows per page: 10, Value: 10, Secondary Actions: Expand
+									254 text 10
+								255 text 1-10
+								256 button (disabled) Go to previous page
+								257 button Go to next page
+			170 text ©2026 Roblox Corporation. All rights reserved.
+			51 container
+				52 link Description: Terms, Value: roblox.com/info/terms
+				53 text ·
+				54 link Description: Privacy, Value: roblox.com/info/privacy
+				55 text ·
+				56 link Description: Accessibility, Value: roblox.com/info/accessibility
+				57 text ·
+				58 link Description: Support, Value: roblox.com/info/help
+				59 text ·
+				60 button Your Privacy Choices
+			61 container
+				62 link Description: X, Value: x.com/Roblox
+				63 link Description: Facebook, Value: facebook.com/Roblox/
+				64 link Description: LinkedIn, Value: linkedin.com/company/roblox
+				65 link Description: Instagram, Value: instagram.com/roblox/
+				66 link Description: YouTube, Value: youtube.com/Roblox
+			67 link Description: English, Value: roblox.com/my/account
+		68 text /dashboard/creations/experiences/10771103250/places/120119801868085/version-history
+
+The focused UI element is 83 checkbox (settable, integer) Description: Show published only, Value: 1

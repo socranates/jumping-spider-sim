@@ -1,0 +1,2 @@
+SHADOWS: the test garden from the sill, 0 of 23 visible boxes cast none
+SHADOWS passed=319 failed=0

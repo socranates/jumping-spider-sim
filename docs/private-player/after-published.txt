@@ -1,0 +1,73 @@
+Browser tab: 1, Title: "Windowsill Save Tests / Version History", URL: "https://create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/version-history".
+1 AXWebArea Windowsill Save Tests / Version History, URL: create.roblox.com/dashboard/creations/experiences/10771634917/places/109879630247781/version-history
+	2 container
+		3 button menu
+		4 container Description: breadcrumb, ID: navigation-breadcrumbs
+			5 content list
+				31 link Description: Creations, Value: create.roblox.com/dashboard/creations
+				32 link Description: Windowsill Save Tests, Value: create.roblox.com/dashboard/creations/experiences/10771634917/overview
+				33 link Description: Places, Value: create.roblox.com/dashboard/creations/experiences/10771634917/places
+				34 text Windowsill Save Tests
+				35 text Version History
+		7 button Search
+		8 button Notifications
+		9 pop up button (collapsed) socranates, Secondary Actions: Expand
+			36 image socranates
+		10 container applayout-scroll-container
+			11 container creator-hub-main-content
+				12 heading Version History, Value: 1
+					37 text Version History
+				38 text Choosing to restore a previous version will only save the version. In order to publish the previous version, open and publish it in Studio.
+				39 container
+					40 checkbox (settable, integer) Description: Show published only, Value: 1
+					41 text Show published only
+				129 table
+					130 row
+						131 cell
+							132 text Version
+						133 cell
+							134 text Last Updated (in local time)
+						135 cell
+							136 text Published Version
+					137 row
+						138 cell
+							139 text 13
+						140 cell
+							141 text October 23, 2026 at 11:26 PM
+					142 row
+						143 cell
+							144 text 2
+						145 cell
+							146 text October 17, 2026 at 10:56 PM
+						147 cell
+							148 button Restore
+					149 row
+						150 cell
+							151 container
+								152 text Rows per page:
+								153 combo box (collapsed) Rows per page: 10, Value: 10, Secondary Actions: Expand
+									154 text 10
+								155 text 1-2
+								156 button (disabled) Go to previous page
+								157 button (disabled) Go to next page
+			127 text ©2026 Roblox Corporation. All rights reserved.
+			14 container
+				15 link Description: Terms, Value: roblox.com/info/terms
+				16 text ·
+				17 link Description: Privacy, Value: roblox.com/info/privacy
+				18 text ·
+				19 link Description: Accessibility, Value: roblox.com/info/accessibility
+				20 text ·
+				21 link Description: Support, Value: roblox.com/info/help
+				22 text ·
+				23 button Your Privacy Choices
+			24 container
+				25 link Description: X, Value: x.com/Roblox
+				26 link Description: Facebook, Value: facebook.com/Roblox/
+				27 link Description: LinkedIn, Value: linkedin.com/company/roblox
+				28 link Description: Instagram, Value: instagram.com/roblox/
+				29 link Description: YouTube, Value: youtube.com/Roblox
+			30 link Description: English, Value: roblox.com/my/account
+		128 text Creator Dashboard
+
+The focused UI element is 40 checkbox (settable, integer) Description: Show published only, Value: 1

@@ -37,15 +37,17 @@ No new targeting, hunger, growth, feeding or biology rule follows from this revi
 - [Jackson1979, journal PDF](https://www.americanarachnology.org/journal-joa/joa-all-articles/article/download/JoA_v7_p47.pdf/?no_cache=1): abstract, introduction and laboratory observation methods. No full-paper reading claimed.
 - [Jackson1978, journal PDF](https://www.americanarachnology.org/journal-joa/joa-all-articles/article/download/JoA_v6_p1.pdf): abstract and introduction, checking lab-versus-field distinction. Not the complete29-page article or its full measurement tables.
 
-## Confirmed game-note mismatch, pending correction
+## Confirmed game-note mismatch, corrected
 
 hungry_at_home says hunger appears in words under the day. In the active
 Preserve, SpiderClient sets view.minimal and SpiderHud.minimalView excludes
 day/dayLine and hunger words; foodText is hidden. The game now uses its
 unlabelled meter and abdomen shape. The generator still carries the obsolete
-sentence in ADAPTED. Correct it through that generator after the ongoing
-native timing cohort, retain godotGame, and rerun the notebook checks. This is
-a UI-description mismatch, not a change to starvation rules or biological text.
+sentence in ADAPTED. After the native timing cohort, it was corrected through
+the generator to describe the abdomen and small meter. godotGame and frozen
+references are unchanged. ../notebook-hud-note records1600 focused passes,
+compile/strict and export evidence2b1c99cacf601b8f. This is a UI-description
+mismatch, not a change to starvation rules or biological text.
 
 ## Access limits retained
 

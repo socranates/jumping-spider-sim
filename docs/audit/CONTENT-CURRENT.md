@@ -31,7 +31,9 @@ The later [vision and feeding supplement](NOTEBOOK-VISION-FEEDING.md) checks
 specific claims in twelve distinct pages against opened primary sections and
 abstracts. Its first six table rows cover five pages, because motion_first
 has two claim rows. The supplement also records a confirmed stale HUD
-description in hungry_at_home, queued for generator correction after timing.
+description in hungry_at_home, subsequently corrected through the generator
+with1600 focused passes, compile/strict and evidence2b1c99cacf601b8f in
+../notebook-hud-note. Biological prose and frozen references are unchanged.
 It records species bounds and incomplete page coverage; it changes no game text.
 This is not a new sentence-by-sentence re-audit of the other49 pages. In
 particular, earlier notes about unconsulted books, abstract-only checks and

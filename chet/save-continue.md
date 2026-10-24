@@ -15,9 +15,10 @@ synced project references are intact. The subsequent notebook correction is
 one game-source difference from that baseline (see below). A subsequent
 SpiderCamera fix restores the configured lens after title/intro ownership;
 docs/camera-handover records its four red title paths and1443 passing focused
-checks. Current normal/test export evidence is66a9319760fa7c29. The corrected
-handover has not run natively yet; full CLI qualification of this later edit
-is not inferred from the preserved baseline.
+checks. Camera native/30-minute evidence is66a9319760fa7c29 at Gitc6f8cf83;
+current normal/test export is2b1c99cacf601b8f after the shorter HUD note below.
+Full Windows CLI qualification of later edits is not inferred from the preserved
+baseline; camera Linux CI and targeted note checks retain separate cohorts.
 
 The normal tests/run.py discovers269 ModuleScripts lazily and keeps server/
 shared admission facades separate. It includes the qualified server-clock shim
@@ -122,9 +123,20 @@ Linux CI40073784522/job120812685573 completed SUCCESS for every configured
 step; docs/camera-handover/github-ci.json records the API outcomes, not exact
 assertion counts. Its fcb8e18e source matches5597fcf6 game/test/project inputs.
 
-NEXT: correct the confirmed obsolete hungry_at_home game note through generator
-ADAPTED (not biological text): it refers to words under the day that minimal
-Preserve HUD removes. Preserve frozen originals; notebook checks/export follow.
+The obsolete hungry_at_home game note is corrected through generator ADAPTED:
+abdomen and small meter replace the words under the day that minimal Preserve
+HUD removes. Frozen original/reference and biology prose remain unchanged.
+docs/notebook-hud-note records1519 notebook+81 minimal checks=1600/0, changed
+module compile, full-source strict0, repeatable generation and both273-source
+exports, evidence2b1c99cacf601b8f. Its first wrapper's report regex needed the
+actual MINIMAL suite name; --collect-only repaired reporting without rerunning
+or altering successful gate outputs. No new native notebook layout is claimed.
+
+NEXT: remaining current performance/native/content audit, with source/goal
+scope in HEALTH-CURRENT.md. A qualified matched-view cache comparison still
+needs corrected-camera full/low cohorts if a causal speed comparison is wanted;
+the old pairs remain descriptive only. Broader native seams, natural mode
+lives, controller/touch/audio and physical-phone proof remain incomplete.
 docs/audit/NOTEBOOK-VISION-FEEDING.md records claim-level primary-source checks
 on12 pages, partial coverage and access limits. Other content/native-device/
 natural-life/whole-map scopes remain in HEALTH-CURRENT.md. The formal pre-fix

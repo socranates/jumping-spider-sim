@@ -253,7 +253,7 @@ NotebookPages.pages = {
 		trigger = "hungry",
 		title = "Hungry, yet at home",
 		text = "In one field study, most bold jumping spiders stayed in their silk nests during the day, and the ones inside were hungrier than the ones out hunting. The author suggests the spiders switch between resting and active spells, with hunger deciding when to switch.",
-		game = "Here hunger shows in the spider's thinner abdomen and in the words under the day. A spider that goes too long without food starves, except on Easy and in free play.",
+		game = "Here hunger shows in the spider's thinner abdomen and the small meter. A spider that goes too long without food starves, except on Easy and in free play.",
 		godotGame = "Here hunger shows in the spider's thinner abdomen and its energy. A reserve that runs out does not yet end a life; that comes in a later version.",
 		sources = {
 			"Okuyama, T. (2011). Biphasic activity of a jumping spider. Naturwissenschaften 98: 15-22. https://doi.org/10.1007/s00114-010-0734-3",

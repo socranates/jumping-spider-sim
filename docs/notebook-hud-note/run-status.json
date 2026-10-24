@@ -1,0 +1,30 @@
+{
+  "origin": "Observed terminal output of exec session67252: targeted, compile, strict, build each exit0. Wrapper exit1 only at report parser expecting MINIMAL_HUD instead of MINIMAL; no runtime inputs changed afterward.",
+  "steps": [
+    {
+      "name": "targeted",
+      "exit_code": 0,
+      "output_sha256": "cacd540dda4aa85f436c1366099ec48e701e4c4036679751b4406bc1d2c79b18"
+    },
+    {
+      "name": "compile",
+      "exit_code": 0,
+      "output_sha256": "d57b705b8886db16a5fd4be577eb228494633241759ce6e34a797f7ac2381f79"
+    },
+    {
+      "name": "strict",
+      "exit_code": 0,
+      "output_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240"
+    },
+    {
+      "name": "build",
+      "exit_code": 0,
+      "output_sha256": "bbf1b46a89a0cf3c32a3a94257056241db3b38affbe4a512717c527574c63d33"
+    }
+  ],
+  "inputs": {
+    "roblox_port/src/Shared/Data/NotebookPages.luau": "7173b7bc09f2a43edcd6e968fa85f1d950f4807296db38fa307a15eccdf54f2a",
+    "roblox_port/tools/gen_notebook_pages.py": "d654a5a55482c463ee497034d9a452f1ade8dd92e1f6643eeb9892d43c095e27",
+    "roblox_port/build-receipt.json": "f476b415b67a119143ea0a5ace490f3d280b1bd7db89f3d71d15592e3d38bf55"
+  }
+}

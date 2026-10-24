@@ -1,5 +1,6 @@
 local Needs=require("../src/Shared/Life/NeedsModel")
 local Loop=require("../src/Shared/Life/LifeLoop")
+local Growth=require("../src/Shared/Life/Growth")
 local Clock=require("../src/Shared/Life/LifeClock")
 local Feeding=require("../src/Shared/Prey/Feeding")
 local Species=require("../src/Shared/Data/Species")
@@ -188,6 +189,24 @@ d.input:simulate("Feed",true);frames(3);d.input:simulate("Feed",false);frames(30
 check(caught.nutrition<before and caught.nutrition>0,"real E input takes a partial bite")
 check(d.meal.heldView.id==caught.id,"client wires held meal to drawer")
 check((d.meal.heldView.frame.Position-d.rig():mouthFrame().Position).Magnitude<.01,"meal follows animated jaw frame")
+-- A press means Eat while prey is held, even if that tick consumes the final
+-- bite. Rest/moult requires a subsequent empty-jaws press, not reusing Eat.
+check(d.fresh("main",false),"new life for final-bite context")
+d.place(Vector3.new(-25.5,.31,6));frames(10)
+local last=d.prey.flies[1];assert(last)
+last.state="CAPTURED";last.captureKey="client-final-bite";last.nutrition=.0001
+local jaws=d.prey.feeding;jaws:capture(last);jaws.struggling=false;jaws.feeding=false
+d.life.growth.fedSinceMoult=d.life.growth:readyAt()-Growth.rivalCredit(last.nutrition)
+-- This fixture isolates input context; real rest preparation/storage has its
+-- own suites and native route. Do not start a second save fixture here.
+local saveForBite=d.life.save
+d.life.save=function() return {ok=true,message="Input-context fixture rest"} end
+d.input:simulate("Feed",true);frames(1);d.input:simulate("Feed",false);frames(3)
+check(jaws.held==nil and last.state=="CONSUMED"and d.life.growth.ready,"last bite finishes the meal and earns moult readiness")
+check(not d.life.resting and not d.life.growth:isMoulting(),"Eat finishing in the Crack does not also Rest or moult")
+d.input:simulate("Feed",true);frames(2);d.input:simulate("Feed",false)
+check(d.life.resting and d.life.growth:isMoulting(),"a new empty-jaws press still rests and begins the ready moult")
+d.life.save=saveForBite
 check(d.fresh("main",false),"new life after meal")
 d.needs.energy=0;d.needs.starvingStreakH=12.1;frames(3)
 check(d.life.lifeOver and d.session.ended and d.caughtPanel:isShowing(),"starvation reaches death screen")

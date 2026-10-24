@@ -1776,7 +1776,9 @@ controls = SpiderInput.bind({
 		ant.stopDisplay()
 		prey.feeding:press()
 		if rivalLegs.Grip.active(rivalLegs.grip) then rivalLegs.Grip.tap(rivalLegs.grip) end -- (the Eat key grips a caught rival too, like the Jump key: ROBLOX-92)
-		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
+		-- Preserve the press's context: a final bite can empty the jaws before
+		-- LifeLoop runs. That Eat press must not also begin a rest or moult.
+		feedPending = prey.feeding.held == nil and not (life.rival ~= nil and life.rival.state == "captured")
 	end,
 	jump = function(phase: string)
   if spiderPick.inspecting then -- the close look: a jump press leaves it (and is nothing else; what is left of the press is swallowed)

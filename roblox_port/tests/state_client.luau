@@ -466,11 +466,11 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 		check(driver.life.rules == "gentle", "gentle rules")
 	end
 	check(canon(driver.stores.main:loadBest().record) == before, "the standard rest is still untouched after the Easy rest")
-	-- Nathan's first moult is seven full-fly equivalents in every mode.
+	-- The live ladder has separate Normal and gentle meal goals.
 	-- Check the active growth line, not stale text in hidden menu labels.
 	frames(5)
 	check(driver.life.growth.stage==0 and driver.life.growth:mealGoal()==2,"Easy: first moult asks for two meal equivalents")
- check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 2 meals",1,true)~=nil,"Easy: visible growth line uses the seven-meal goal")
+ check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 2 meals",1,true)~=nil,"Easy: visible growth line uses the two-meal goal")
 	-- a restore always puts the game's struggle back, whatever the record held
 	local feeding: any = driver.prey.feeding
 	feeding.game, feeding.startGrip = false, 0.123
@@ -486,7 +486,7 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	check(driver.fresh("main", false, nil) and driver.currentStore() == driver.stores.main and driver.life.rules == "standard", "a standard life goes back to the main slot")
 	frames(5)
 	check(driver.life.growth.stage==0 and driver.life.growth:mealGoal()==4,"standard: first moult asks for four meal equivalents")
- check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 2 meals",1,true)~=nil,"standard: visible growth line uses the seven-meal goal")
+ check(not driver.hud.dayLine.Visible or string.find(driver.hud.dayLine.Text,"of 4 meals",1,true)~=nil,"standard: visible growth line uses the four-meal goal")
 end)
 
 case("the menu has a Controls entry that puts the controls card back up and keeps it until H (ROBLOX-92)", function()

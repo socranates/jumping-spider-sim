@@ -1,4 +1,23 @@
-# Current handoff — 2026-10-24
+# Development has moved — 2026-10-24
+
+Continue in **C:/Users/natha/windowsill-verified-integration**, branch
+**codex/verified-integration**, pushed commit7f7eeead. Its normal source tree
+contains the273-source verified candidate and portable normal build/test path.
+Read that checkout's chet/save-continue.md and docs/integration/README.md.
+
+This checkout stays frozen at224 game sources for historical source-derived
+proofs. Do not repeat promotion here. Its old source/model snapshots and
+unrelated save-cost/sourcemap dirt remain intact. Development did not move back
+merely because this is an older calling tool's default directory.
+
+At this pointer checkpoint, standard Windows full79 is live exec45848 and
+Linux CI40067737217 is in progress for7f7eeead. No new publication or main merge.
+Use the new handoff for subsequent results. The frozen checkpoint below is
+historical reference, not an instruction to reintegrate the same source again.
+
+---
+
+# Current handoff â€” 2026-10-24
 
 Goal ACTIVE: keep going until reasonably optimized and problem free. This turn
 made PROGRESS: two complete CLI runs qualified; native touch-font fix verified.
@@ -19,7 +38,7 @@ Studio4880 stopped via Shift+F5, postguard passed, then closed normally with
 Don't Save to preserve the generated XML. Never publish NativeSelfTest.rbxl
 or the unbound timing fixtures. No security/access setting changed.
 
-## Source/publication states — do not conflate these
+## Source/publication states â€” do not conflate these
 
 Ordinary worktree roblox_port/src is still the **224-source** tree at
 bd67582b5d53473f067244fc1e2e1f94adde173b. The tested integrated candidate has
@@ -82,7 +101,7 @@ no production or retired QA actor selected.
 docs/frame-ordinary: LookPlan cache reduces267 regions' cold full-tier views
 from801 to267 generator calls; low tier remains lazy; identical records,
 budgets, density.7338/0 scoped checks. Matched station/garden/pond means mixed;
-garden replan35.86→28.88ms, no general FPS gain. docs/menu-overflow qualifies
+garden replan35.86â†’28.88ms, no general FPS gain. docs/menu-overflow qualifies
 12 new regressions and six native title reflow/scroll cases.
 
 ## Next concrete work

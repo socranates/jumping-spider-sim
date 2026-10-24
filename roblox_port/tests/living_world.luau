@@ -10,6 +10,7 @@ local Garden=require("../src/Shared/World/Garden")
 local Pocket=require("../src/Shared/World/GardenPocket")
 local AntForage=require("../src/Shared/World/AntForage")
 local Hut=require("../src/Shared/World/Hut")
+local Pond=require("../src/Shared/World/Pond")
 local passed,failed=0,0
 local function check(ok,name)
  if ok then passed+=1 else failed+=1;print("FAIL LIVING_WORLD "..name) end
@@ -378,9 +379,17 @@ case("path shoulders have ground and living populations",function()
   check(specs~=nil and specs[1].target>=3 and specs[1].low>=2,"off-path life exists at both graphics tiers")
   parent:Destroy()
  end
- -- Infill must stop before the intentional water hazard rather than putting a floor on the pond.
+ -- Test actual soil footprints: southern/eastern shoulders are legitimate,
+ -- but neither the hut nor the intentional water hazard may gain a floor.
  for _,v in Verge.author(914,WorldMap.seed) do
-  check(v.bounds[2].Z<=-16 and v.bounds[1].Z>=-1416,"ground infill excludes the hut interior and pond")
+  for _,p in Verge.pieces(v)do
+   if string.find(p.id,"_soil_",1,true)then
+    local inHut=p.lo.X<Hut.BUILDING.x1 and p.hi.X>Hut.BUILDING.x0 and p.lo.Z<284 and p.hi.Z> -16
+    local k=Pond.CORE
+    local inPond=p.lo.X<k.x1 and p.hi.X>k.x0 and p.lo.Z<k.z1 and p.hi.Z>k.z0
+    check(not inHut and not inPond,"actual infill soil excludes the hut interior and pond: "..p.id)
+   end
+  end
  end
  check(total>500,"coverage checks sample ordinary travel, not just landmark spawns")
  WorldMap.use("test_garden")

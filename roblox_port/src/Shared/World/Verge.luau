@@ -8,6 +8,12 @@ Verge.CELL = 100
 local RECTANGLES = {
  {-400,190,-1416,-16}, -- compact garden/bench/meadow shoulders
  {90,525,-966,-530}, -- short pond approach and dry bank under the western boardwalk
+ -- The outer hut paths used to end at drawn-only grass. Keep a compact,
+ -- planted shoulder on both sides and around the corners. These strips stop
+ -- at the building's outer faces; none runs beneath either room's floor.
+ {60,650,284,407}, -- south apron, 60 cm beyond the gravel's outer edge
+ {473.5,650,-256,284}, -- east wall to the path and its outer shoulder
+ {190,473.5,-256,-16}, -- north path back into the existing garden infill
 }
 
 local authored: {[number]: {any}} = {}

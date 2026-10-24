@@ -17,6 +17,14 @@ local routes={
  {id="mown_north",region="mown_e1",axis="Z",goal=-750,action="Forward"},
  {id="mown_south",region="mown_e1",axis="Z",goal=-610,action="Back"},
 }
+if WS:GetAttribute("SeamGroup")=="hut_perimeter"then
+ routes={
+  {id="hut_south",region="path_s2",axis="Z",goal=372,action="Back"},
+  {id="hut_east",region="path_e3",axis="X",goal=615,action="Right"},
+  {id="hut_east_inner",region="path_e3",axis="X",goal=505,action="Left"},
+  {id="hut_north",region="path_e6",axis="Z",goal=-221,action="Forward"},
+ }
+end
 return function(d:any)
  assert(Run:IsStudio()and Run:IsClient()and game.PlaceId==0 and game.GameId==0 and WS:GetAttribute("MatrixPerf")==true)
  local tag=tostring(DateTime.now().UnixTimestampMillis)
@@ -106,13 +114,13 @@ return function(d:any)
      minY=math.min(minY,d.motor.pos.Y);maxStep=math.max(maxStep,(d.motor.pos-prior).Magnitude);prior=d.motor.pos
      local coordinate=if route.axis=="X"then d.motor.pos.X else d.motor.pos.Z
      reached=(coordinate-route.goal)*sign>=0
-    until reached or os.clock()-started>=65 or not live()or minY<Hut.GROUND-4
+    until reached or os.clock()-started>=65 or not live()or minY<Hut.GROUND-4 or maxStep>5 or d.world.region.id=="sill"
     d.input:simulate(route.action,false,"seam")
     local result={route=route.id,goal=route.goal,reached=reached,wall_seconds=os.clock()-started,simulation=d.life.elapsed-sim,
-     frames=frames,loading_frames=loading,modes=modes,visited=visited,min_y=minY,max_step=maxStep,start=point(initial)}
+     frames=frames,loading_frames=loading,modes=modes,visited=visited,min_y=minY,max_step=maxStep,returned_home=d.world.region.id=="sill",start=point(initial)}
     table.insert(results,result);emit("WALK",result);emit("STATE",{route=route.id,when="walk_end",state=state()});Probe.endSample(result)
-    assert(reached and live()and minY>=Hut.GROUND-4,"route did not cross safely; inspect WALK evidence")
-    assert(d.motor.mode=="attached","walk ended without attachment")
+    assert(reached and live()and minY>=Hut.GROUND-4 and maxStep<=5 and d.world.region.id~="sill","route did not cross safely; inspect WALK evidence")
+    assert(d.motor.mode=="attached"and d.motor.up.Y>.5,"flat-ground walk ended without upright attachment")
     -- A single short press follows the same event path as Space/A/touch Jump.
     -- No target override or growth/aim assist is injected.
     local last=d.jump.last;local tick=last and last.tick or -1
@@ -127,7 +135,7 @@ return function(d:any)
     local hop={route=route.id,frames=hopFrames,modes=hopModes,left_support=left,
      result=jump and jump.kind,fresh=jump and jump.tick>tick,distance=(d.motor.pos-hopStart).Magnitude}
     emit("HOP",hop);emit("STATE",{route=route.id,when="hop_end",state=state()})
-    assert(jump and jump.tick>tick and jump.kind=="launched"and left and d.motor.mode=="attached"and live(),"tap-hop did not launch/land; inspect HOP evidence")
+    assert(jump and jump.tick>tick and jump.kind=="launched"and left and d.motor.mode=="attached"and d.motor.up.Y>.5 and live(),"tap-hop did not launch/land upright; inspect HOP evidence")
     local untilAt=os.clock()+8;repeat Run.Heartbeat:Wait()until os.clock()>=untilAt
    end,debug.traceback)
    d.input:clear()

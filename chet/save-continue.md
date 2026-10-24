@@ -5,6 +5,17 @@ branch codex/verified-integration. This is a normal Git worktree from c457af12.
 The app's worktree helper could not use the non-Git project mirror. The frozen
 proof checkout remains C:/Users/natha/windowsill-save-continue on codex/save-continue.
 
+Latest unpublished candidate: e7b268a11f55febe,273 sources. Read
+docs/outdoor-seams/HUT-PERIMETER.md before resuming. Four native hut-path
+crossings reproduced missing ground/underside attachment; three compact
+Verge strips add33 regions/304 collision pieces, preserving all233 existing
+map/physics/decor records. A reproduced retained-detail issue also required
+LookPlan to reserve the hut at the sill within the same budgets.
+The first79-suite Windows run FAILED and is retained as such. Current
+compile/strict, runner checks and selected suites pass; the current Preserve
+self-test, full Linux CI and native after-repair routes are not yet complete.
+Do not claim full current Windows success or publish this candidate.
+
 ## Actual integration state
 
 The imported baseline has273 sources matching the native-verified

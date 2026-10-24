@@ -40203,6 +40203,17 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	for _, r in zones do
 		if plan[r.id] == nil then set(r, "far") end
 	end
+	-- At home the hut surrounds the sill. Retained optional room details from
+	-- an outdoor tour must not consume its close-detail allowance first.
+	-- Reserve it within the same budget before considering optional scenery.
+	if own.id == m.HOME then
+		for _, r in zones do
+			if r.id == "hut" and total - count(r, plan[r.id]) + count(r, top) <= budget then
+				set(r, top)
+				required[r.id] = true
+			end
+		end
+	end
 	-- 2b. (ROBLOX-117) the patches near the spider, nearest first, at the tier's detail as the budget allows
 	local patches = patchesOf(m)
 	if #patches > 0 then
@@ -44620,6 +44631,12 @@ Verge.CELL = 100
 local RECTANGLES = {
  {-400,190,-1416,-16}, -- compact garden/bench/meadow shoulders
  {90,525,-966,-530}, -- short pond approach and dry bank under the western boardwalk
+ -- The outer hut paths used to end at drawn-only grass. Keep a compact,
+ -- planted shoulder on both sides and around the corners. These strips stop
+ -- at the building's outer faces; none runs beneath either room's floor.
+ {60,650,284,407}, -- south apron, 60 cm beyond the gravel's outer edge
+ {473.5,650,-256,284}, -- east wall to the path and its outer shoulder
+ {190,473.5,-256,-16}, -- north path back into the existing garden infill
 }
 
 local authored: {[number]: {any}} = {}
@@ -66927,7 +66944,7 @@ return WorldShadows
   <Item class="Workspace" referent="296">
     <Properties>
       <string name="Name">Workspace</string>
-      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADJiMWM5OWNhY2Y2MDFiOGYIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
+      <BinaryString name="AttributesSerialize">BQAAAAwAAABQb3J0RXZpZGVuY2UCEAAAAGU3YjI2OGExMWY1NWZlYmUIAAAAU2F2ZVdhaXQDAQgAAABTZWxmVGVzdAMACgAAAFRlc3RUYXJnZXQDAAUAAABXb3JsZAIIAAAAcHJlc2VydmU=</BinaryString>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
       <bool name="StreamingEnabled">true</bool>

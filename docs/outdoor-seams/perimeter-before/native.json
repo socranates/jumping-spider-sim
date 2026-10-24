@@ -1,0 +1,704 @@
+{
+  "run": "1792830419552",
+  "passed": false,
+  "tier": "full",
+  "source_count": 276,
+  "source_guards": 2,
+  "model_sha256": "25a3beffb3c58d5fd5978a902dcfc53476863ab8e53a87b507af31924b1c8215",
+  "manifest_sha256": "ee26395cf1a25cf2e33528db1a415c0ea0531501e2ead9ef8854b0ef854cbfdf",
+  "native_output_sha256": "c991e327efa1fabba3547cfbe3b8d5f815cef7a6287ace3333fe06b0df47d069",
+  "events": [
+    {
+      "kind": "BEGIN",
+      "run": "1792830419552",
+      "value": {
+        "routes": 4,
+        "storage": "unbound yielding memory only",
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -84.29000091552734,
+            317
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_s2",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_south",
+        "start": [
+          236.5,
+          -84.29000091552734,
+          317
+        ],
+        "returned_home": false,
+        "simulation": 65.01666666666381,
+        "max_step": 0.572773814201355,
+        "min_y": -87.30999755859375,
+        "visited": {
+          "path_s2": true
+        },
+        "goal": 372,
+        "wall_seconds": 65.01411370000278,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 3739
+        },
+        "frames": 3739,
+        "reached": false
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 8,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -87.30999755859375,
+            340.9764404296875
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_s2",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "FAILURE",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_south",
+        "problem": "Players.socranates.PlayerScripts.Client.MatrixPlayback:122: route did not cross safely; inspect WALK evidence\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:122\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:101\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:89\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2786\n"
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "failure",
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 8,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -87.30999755859375,
+            340.9764404296875
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_s2",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            560,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east",
+        "start": [
+          560,
+          -84.29000091552734,
+          69.5
+        ],
+        "returned_home": false,
+        "simulation": 65.01666666666408,
+        "max_step": 0.5714854598045349,
+        "min_y": -87.30999755859375,
+        "visited": {
+          "path_e3": true
+        },
+        "goal": 615,
+        "wall_seconds": 65.01147860000492,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 3766
+        },
+        "frames": 3766,
+        "reached": false
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            583.8470458984375,
+            -87.30999755859375,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "FAILURE",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east",
+        "problem": "Players.socranates.PlayerScripts.Client.MatrixPlayback:122: route did not cross safely; inspect WALK evidence\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:122\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:101\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:89\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2786\n"
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "failure",
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            583.8470458984375,
+            -87.30999755859375,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            560,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east_inner",
+        "start": [
+          560,
+          -84.29000091552734,
+          69.5
+        ],
+        "returned_home": false,
+        "simulation": 64.99999999999741,
+        "max_step": 0.5958442687988281,
+        "min_y": -87.30999755859375,
+        "visited": {
+          "path_e3": true
+        },
+        "goal": 505,
+        "wall_seconds": 65.00193949999812,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 3819
+        },
+        "frames": 3819,
+        "reached": false
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            536.1112670898438,
+            -87.30999755859375,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "FAILURE",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_east_inner",
+        "problem": "Players.socranates.PlayerScripts.Client.MatrixPlayback:122: route did not cross safely; inspect WALK evidence\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:122\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:101\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:89\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2786\n"
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "failure",
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            536.1112670898438,
+            -87.30999755859375,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -84.29000091552734,
+            -171
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e6",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_north",
+        "start": [
+          247.5,
+          -84.29000091552734,
+          -171
+        ],
+        "returned_home": false,
+        "simulation": 64.99999999999741,
+        "max_step": 0.6032618880271912,
+        "min_y": -87.30999755859375,
+        "visited": {
+          "path_e6": true
+        },
+        "goal": -221,
+        "wall_seconds": 65.00585450000654,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 3742
+        },
+        "frames": 3742,
+        "reached": false
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -87.30999755859375,
+            -164.97122192382812
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e6",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "FAILURE",
+      "run": "1792830419552",
+      "value": {
+        "route": "hut_north",
+        "problem": "Players.socranates.PlayerScripts.Client.MatrixPlayback:122: route did not cross safely; inspect WALK evidence\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:122\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:101\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:89\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2786\n"
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792830419552",
+      "value": {
+        "when": "failure",
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            436
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -87.30999755859375,
+            -164.97122192382812
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e6",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792830419552",
+      "value": {
+        "completed": false,
+        "walks": 4,
+        "failures": 4,
+        "focus_lost": 0,
+        "detail": "full"
+      }
+    }
+  ],
+  "walks": [
+    {
+      "route": "hut_south",
+      "start": [
+        236.5,
+        -84.29000091552734,
+        317
+      ],
+      "returned_home": false,
+      "simulation": 65.01666666666381,
+      "max_step": 0.572773814201355,
+      "min_y": -87.30999755859375,
+      "visited": {
+        "path_s2": true
+      },
+      "goal": 372,
+      "wall_seconds": 65.01411370000278,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 3739
+      },
+      "frames": 3739,
+      "reached": false
+    },
+    {
+      "route": "hut_east",
+      "start": [
+        560,
+        -84.29000091552734,
+        69.5
+      ],
+      "returned_home": false,
+      "simulation": 65.01666666666408,
+      "max_step": 0.5714854598045349,
+      "min_y": -87.30999755859375,
+      "visited": {
+        "path_e3": true
+      },
+      "goal": 615,
+      "wall_seconds": 65.01147860000492,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 3766
+      },
+      "frames": 3766,
+      "reached": false
+    },
+    {
+      "route": "hut_east_inner",
+      "start": [
+        560,
+        -84.29000091552734,
+        69.5
+      ],
+      "returned_home": false,
+      "simulation": 64.99999999999741,
+      "max_step": 0.5958442687988281,
+      "min_y": -87.30999755859375,
+      "visited": {
+        "path_e3": true
+      },
+      "goal": 505,
+      "wall_seconds": 65.00193949999812,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 3819
+      },
+      "frames": 3819,
+      "reached": false
+    },
+    {
+      "route": "hut_north",
+      "start": [
+        247.5,
+        -84.29000091552734,
+        -171
+      ],
+      "returned_home": false,
+      "simulation": 64.99999999999741,
+      "max_step": 0.6032618880271912,
+      "min_y": -87.30999755859375,
+      "visited": {
+        "path_e6": true
+      },
+      "goal": -221,
+      "wall_seconds": 65.00585450000654,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 3742
+      },
+      "frames": 3742,
+      "reached": false
+    }
+  ],
+  "hops": [],
+  "completion": {
+    "completed": false,
+    "walks": 4,
+    "failures": 4,
+    "focus_lost": 0,
+    "detail": "full"
+  },
+  "probe_completion": {
+    "kind": "FAIL",
+    "run": "1792830413375",
+    "value": {
+      "problem": "hut_south: Players.socranates.PlayerScripts.Client.MatrixPlayback:122: route did not cross safely; inspect WALK evidence\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:122\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:101\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:89\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2786\n\nhut_east: Players.socranates.PlayerScripts.C",
+      "online": false,
+      "cat_enabled": true,
+      "ordinary_ui": true,
+      "storage": "yielding-memory"
+    }
+  },
+  "creator_errors": 0,
+  "creator_warnings": 9,
+  "limits": "Six authored arrivals and ordinary input walks/tap hops in unbound Studio Free play. Screenshots may be taken; no FPS comparison. Not every map surface, physical controller/phone, natural life or real-store proof."
+}

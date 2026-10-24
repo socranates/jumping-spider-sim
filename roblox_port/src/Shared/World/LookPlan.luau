@@ -205,6 +205,17 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	for _, r in zones do
 		if plan[r.id] == nil then set(r, "far") end
 	end
+	-- At home the hut surrounds the sill. Retained optional room details from
+	-- an outdoor tour must not consume its close-detail allowance first.
+	-- Reserve it within the same budget before considering optional scenery.
+	if own.id == m.HOME then
+		for _, r in zones do
+			if r.id == "hut" and total - count(r, plan[r.id]) + count(r, top) <= budget then
+				set(r, top)
+				required[r.id] = true
+			end
+		end
+	end
 	-- 2b. (ROBLOX-117) the patches near the spider, nearest first, at the tier's detail as the budget allows
 	local patches = patchesOf(m)
 	if #patches > 0 then

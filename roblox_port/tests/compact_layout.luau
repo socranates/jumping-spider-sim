@@ -4,6 +4,7 @@ local Pond=require("../src/Shared/World/Pond")
 local Meadow=require("../src/Shared/World/Meadow")
 local Hut=require("../src/Shared/World/Hut")
 local Verge=require("../src/Shared/World/Verge")
+local LookPlan=require("../src/Shared/World/LookPlan")
 local Build=require("../src/Shared/World/WorldBuild")
 local Motor=require("../src/Shared/Movement/SpiderMotor")
 local Species=require("../src/Shared/Data/Species")
@@ -46,7 +47,45 @@ for i=1,#chain-1 do
  for _,n in r.neighbors do if n.id==chain[i+1] then found=true end end
  check(found,"continuous route "..chain[i].." -> "..chain[i+1])
 end
+-- The grass just outside the hut's outer path must be real ground. Without
+-- support here the motor can wrap onto the gravel slab's underside, even
+-- though the backdrop still looks like level grass.
+for _,probe in {
+ {"south_near",236.5,348},{"south_far",236.5,372},
+ {"east_near",591,69.5},{"east_far",615,69.5},
+ {"east_inner_near",529,69.5},{"east_inner_far",505,69.5},
+ {"north_near",247.5,-197},{"north_far",247.5,-221},
+}do
+ local x,z=probe[2],probe[3]
+ local owner=Map.at(Vector3.new(x,Hut.GROUND+.31,z));local supported=false
+ for _,r in Map.regions()do
+  for _,p in Region.pieces(r)do
+   if x>=p.lo.X and x<=p.hi.X and z>=p.lo.Z and z<=p.hi.Z and math.abs(p.hi.Y-Hut.GROUND)<1e-6 then supported=true;break end
+  end
+  if supported then break end
+ end
+ check(owner~=nil and supported,`hut path shoulder {probe[1]}: region={owner~=nil}, support={supported}`)
+end
+-- Additive ground must not grow through the building or change old surfaces.
+for _,r in Map.regions()do
+ if r.kind=="verge"then
+  for _,p in Region.pieces(r)do
+   if string.find(p.id,"_soil_",1,true)then
+    local inside=p.lo.X<Hut.BUILDING.x1 and p.hi.X>Hut.BUILDING.x0 and p.lo.Z<284 and p.hi.Z> -16
+    check(not inside,"soil stays outside the hut footprint: "..p.id)
+   end
+  end
+ end
+end
 local root=Build.world(workspace)
+-- A tour must not let retained distant-room details displace the hut at home.
+for _,tier in {"full","low"}do
+ local held={}
+ for _,r in Map.regions()do held=LookPlan.plan(r.spawn.pos+Vector3.yAxis*.31,tier,r,held)end
+ local plan,total=LookPlan.plan(Vector3.new(-5,.31,-9),tier,Map.region("sill"),held)
+ check(plan.hut==tier,tier.." returning from all ground regions retains the hut's detail")
+ check(total<=LookPlan.BUDGET[tier],tier.." return still fits the render budget")
+end
 local lo,hi=Map.bounds()
 local casts=Director.casts(root)
 local motor=Motor.new({world=root,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,

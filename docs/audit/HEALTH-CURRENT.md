@@ -3,7 +3,14 @@
 2026-10-24. Integration line: codex/verified-integration. Normal roblox_port/src
 now contains273 sources imported from the verified font candidate. A later
 generator-driven notebook correction and subsequent camera lens handover fix
-are the only game-source differences. The same notebook module also has the
+were the earlier game-source differences. The later unpublished hut-ground
+candidate also changes Verge and LookPlan: evidence e7b268a11f55febe,
+273 sources. ../outdoor-seams/HUT-PERIMETER.md records four reproduced native
+failures, additive ground, unchanged generated data for all233 old regions,
+and the planner's retained-detail correction. Its first full Windows run
+failed and stays failed; current focused/static checks are recorded separately.
+Current full CI and native after-repair qualification remain pending.
+The same notebook module also has the
 later one-sentence HUD note correction,1600 focused passes/compile/strict and
 current export evidence2b1c99cacf601b8f in ../notebook-hud-note.
 Notebook biology evidence1ba4c21a1753e03d stays

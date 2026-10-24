@@ -72,7 +72,7 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	assert(loaded, "SpiderClient did not load: " .. tostring(loadError))
 	assert(WorldMap.world() == "preserve", "the client did not make the preserve the active world")
 	local driver = ClientStubs.driver
-	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 233, `the client's world is the compact preserve ({#WorldMap.regions()} regions; 182 authored plus 51 infill)`)
+	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 266, `the client's world is the compact preserve ({#WorldMap.regions()} regions; 182 authored plus 84 infill)`)
 	assert(WorldMap.region("room_exit") ~= nil, "the cracked back-room window has its authored outdoor landing")
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil, "the hut's window is shut in a new save")
 	for _ = 1, 30 do frame(1 / 60); simClock += 1 / 60 end
@@ -95,6 +95,10 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	assert(co ~= nil, "the self-test was not started")
 	local thread = co :: thread
 	local frames = 0
+	-- Each additional regional visit holds attachment for1.2 s plus readiness.
+	-- Keep the original global allowance and add2 s per new region. Individual
+	-- readiness, save and return deadlines inside SelfTest stay unchanged.
+	local maxPlaySeconds = 600 + math.max(0, preserveRegions - 233) * 2
 	while coroutine.status(thread) ~= "dead" do
 		local ok, seconds = coroutine.resume(thread)
 		assert(ok, "the run raised: " .. tostring(seconds))
@@ -105,7 +109,7 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 			simClock += 1 / 60
 		end
 		frames += n
-		assert(frames < 60 * 600, "the run went on for more than ten minutes of play")
+		assert(frames < 60 * maxPlaySeconds, `the run exceeded its bounded {maxPlaySeconds} s allowance`)
 	end
 	print(string.format("selftest_preserve: the run took %.1f s of play (%d frames)", simClock, frames))
 	local last = lines[#lines]

@@ -44,7 +44,7 @@ local function measure(label)
   local problems=SaveRest.check("main",rec)
   check(#problems==0,problems[1])
   fullRecord=rec
-  print(`REST_STORAGE full_world_chars={#assert(Json.canonical(rec))} regions=233`)
+  print(`REST_STORAGE full_world_chars={#assert(Json.canonical(rec))} regions={#Map.regions()}`)
  end
 end
 motor:place(Vector3.new(-25.5,.31,6),Vector3.yAxis,Vector3.xAxis)

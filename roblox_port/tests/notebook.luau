@@ -34,8 +34,9 @@ end
 -- ---------------------------------------------------------------- the pages are Godot's, word for word
 -- Godot: test_every_page_is_complete_short_and_sourced
 local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "going_without_food" }
--- The audit of 2026-10-19 corrected one sentence of each of these four texts (the generator's TEXT_FIXES; docs/NOTEBOOK_SOURCES.md says why). Godot's whole text stays as godotText.
-local REVISED = { "grown_up", "mud_dauber", "getting_away", "going_without_food" }
+-- Audited text corrections (the generator's TEXT_FIXES; docs/NOTEBOOK_SOURCES.md says why). Godot's whole text stays as godotText.
+local REVISED = { "bold_jumper", "grown_up", "mud_dauber", "getting_away", "going_without_food" }
+local BOLD_SOURCE = "Missouri Department of Conservation (reviewed 2024, read 2026-10-24). Bold Jumper. Missouri Field Guide. https://mdc.mo.gov/discover-nature/field-guide/bold-jumper"
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",
@@ -72,7 +73,9 @@ do
 		else
 			check(p.godotText == nil, `page {p.id}: the text is Godot's, word for word, and there is no godotText`)
 		end
-		check(same(p.sources, g.sources), `page {p.id}: the sources are Godot's, word for word`)
+		local expectedSources = table.clone(g.sources)
+		if p.id == "bold_jumper" then table.insert(expectedSources, BOLD_SOURCE) end
+		check(same(p.sources, expectedSources), `page {p.id}: original sources preserved, only the audited addition allowed`)
 		for _, s in p.sources do
 			check(#s > 20 and string.find(s, "(", 1, true) ~= nil, `page {p.id} names a full source: {s}`)
 			if string.find(s, "https://", 1, true) then urls += 1 end
@@ -86,7 +89,7 @@ do
 			check(p.godotGame == nil, `page {p.id}: no godotGame where the line is Godot's`)
 		end
 	end
-	check(urls == refUrls and urls >= 12, `the source links are all kept ({urls} of {refUrls})`)
+	check(urls == refUrls + 1 and urls >= 12, `the source links are all kept, with one new supporting account ({urls} of {refUrls})`)
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
 	check(same(revised, REVISED), "exactly these pages have a corrected text: " .. table.concat(revised, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
@@ -189,6 +192,7 @@ do
 		check(has(by.getting_away.text, "The mud dauber searches by sight and then checks with its antennae, so a spider that stays out of sight is safer.") and not has(by.getting_away.text, "finds its prey by sight") and not has(by.getting_away.text, "matters most"), "Getting away: staying out of sight is safer, not all that matters")
 		check(has(by.legs_push.game, "In this game the spider braces and crouches before a jump, then pushes off with its back legs.") and not has(by.legs_push.game, "does not yet") and by.legs_push.godotGame == "Watch the back legs straighten as the spider leaves the surface.", "Legs that push: the game does show the back legs pushing off")
 		check(has(by.bold_jumper.game, "four growth stages (three moults)") and not has(by.bold_jumper.game, "three growth stages") and has(by.bold_jumper.game, "The peacock spider, the ant mimic and the two tarantulas are costumes on the same body"), "The first page names every costume and the four stages")
+		check(has(by.bold_jumper.text, "6 to 19 millimetres long, not including legs") and has(by.bold_jumper.text, "mouthparts, called chelicerae") and not has(by.bold_jumper.text, "green-blue fangs"), "The first page distinguishes the coloured chelicerae from the fangs and includes larger females")
 		check(has(by.walking_like_an_ant.text, "about a tenth of a second") and not has(by.walking_like_an_ant.text, "83") and has(by.walking_like_an_ant.game, "83 milliseconds"), "Walking like an ant: the page says a tenth of a second (the paper's abstract), the game note keeps its own 83 ms rule")
 		check(has(by.eggs_and_wind.text, "court mostly by sight, and often by vibration too") and not has(by.eggs_and_wind.text, "court by sight") and #by.eggs_and_wind.text <= 520, "Eggs, silk and wind: courtship is mostly by sight and often by vibration")
 		local tries = 0

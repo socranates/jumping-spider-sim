@@ -1,0 +1,35 @@
+{
+  "baseline_revision": "6dd5ac673266905d74e98fdecae4e24830868c89",
+  "baseline_full_suites": 79,
+  "baseline_full_passed": 468979,
+  "changed_game_sources": [
+    "roblox_port/src/Shared/Data/NotebookPages.luau"
+  ],
+  "source_sha256": "723f58d849b1c131e5ce21038707805690f5f5911fbfaf4ea40b64124b0ac802",
+  "generator_sha256": "3c8f4e20d5ee02287e97d9449fe429aa4a736146d6885d284376ea105ae547b6",
+  "notebook_test_sha256": "cec263840e6c699979bf671da98d4d15fbcb29697dcc786a973c7802a417f871",
+  "targeted_exit_code": 0,
+  "suites": [
+    {
+      "name": "notebook.luau",
+      "passed": 1519,
+      "failed": 0
+    },
+    {
+      "name": "rare_sightings.luau",
+      "passed": 265,
+      "failed": 0
+    }
+  ],
+  "targeted_log_sha256": "ca0d6910d3eab3ae471d922809770c84b47eeb612e77c704078152fbeddc0041",
+  "strict_exit_code": 0,
+  "strict_log_sha256": "ebf4eaaecf3ce24bf51d994a439951587e11dfd3a85c08e0507f314e13149240",
+  "changed_module_compile_exit_code": 0,
+  "pages": 50,
+  "max_body_utf8_bytes": 515,
+  "frozen_reference_sha256": "a24e05571143fe70fccd74ec1a44e2bdfae20c40cca98d97963942b335e912bb",
+  "generator_repeatable": true,
+  "build_evidence": "1ba4c21a1753e03d",
+  "build_receipt_sha256": "3a1db71e86c44b98a91bd266a9861169fe4000442d63916ed0861d24d4586e4c",
+  "limits": "Focused post-correction CLI, compilation, strict and export checks; the earlier full-run cohort is unchanged in its Git revision. No new native layout, full Windows repeat, or publication."
+}

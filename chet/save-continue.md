@@ -7,17 +7,18 @@ proof checkout remains C:/Users/natha/windowsill-save-continue on codex/save-con
 
 ## Actual integration state
 
-Normal roblox_port/src now contains273 sources matching the native-verified
+The imported baseline has273 sources matching the native-verified
 font candidate64a3ff7e865ce53d401569e8e12605ddff419028ccfd887d518e03e2514b0a6b
 after newline normalization. promotion.json records59 added/changed files
 from the224-source base. The frozen proof tree, OneDrive original, Godot and
-synced project references are intact.
+synced project references are intact. The subsequent notebook correction is
+the sole game-source difference from that baseline (see below).
 
 The normal tests/run.py discovers269 ModuleScripts lazily and keeps server/
 shared admission facades separate. It includes the qualified server-clock shim
 and defaults to79 suites (original78 plus the12-check title regression).
 Five Python infrastructure checks and143 selected normal-path checks passed.
-All79 generated programs match staged qualified programs byte for byte after
+All79 baseline generated programs match staged qualified programs byte for byte after
 normalizing only the verified font line (runner-equivalence.json).
 The standard full79 Windows run completed exec45848 terminal exit0:
 468979 top-level passes,0 failures. docs/integration/full-cli.txt and
@@ -25,11 +26,14 @@ full-cli-receipt.json retain exact summaries/input/build hashes; collector creat
 and --check both passed before any subsequent source edits. Its first parse
 refused CRLF output; normalizing line endings for parsing fixed the collector
 without modifying the raw test output or rerunning a successful test.
-Normal source compile273/273 and strict0 finished (exec77874 terminal exit0).
+Normal baseline compile273/273 and strict0 finished (exec77874 terminal exit0).
+The exact full-run source/test/build cohort remains in Git6dd5ac673266905d74e98fdecae4e24830868c89;
+run old input-dependent collectors there, not against the later content change.
 
 The normal builder exports both tracked models, verifies every source hash/
 enablement and authored normal/test modes, protects Future lighting/2022
-materials, and writes build-receipt.json. Evidence4f45e2b55221e1f3. Both models
+materials, and writes build-receipt.json. Current notebook build evidence is
+1ba4c21a1753e03d; baseline full-run build was4f45e2b55221e1f3. Both models
 have the same273 game sources and Workspace.PortEvidence. No source is stamped;
 BuildInfo remains a legacy-runner fixture. The test export now has current
 Client/SelfTest, an empty PortTests marker, fresh owners and a test store.
@@ -38,10 +42,10 @@ test. Never publish TheWindowsillTests.rbxlx. Neither export is a new native
 execution or online-storage proof. Standard source/build/test is portable;
 historical native collectors still need their original laptop snapshots/logs.
 
-Integration code is committed/pushed as7f7eeead. Linux CI40067737217 has
-passed compilation/strict and is running all suites. Next: inspect Linux
-completion/exports, apply the narrow confirmed notebook correction, and retain
-separate evidence for any changed source cohort.
+Integration code7f7eeead passed Linux CI40067737217: compile, strict, all suites,
+normal/test exports and runner regressions. docs/integration/github-ci.json
+records public API steps; exact Linux assertion counts are not inferred from
+status. The later notebook commit has a separate CI cohort.
 Normal branch activation is not main/production/laptop synchronization.
 
 ## Completed evidence, correctly scoped
@@ -87,11 +91,16 @@ qa_s_6e1d2e8c340b49f7 is retired too. Private13 used
 WindowsillTest_player57_20261023a1 and fresh t<server-time>_<UserId> owners.
 No production or retired QA actor was touched.
 
-Next apply the confirmed first-page notebook correction
-through its generator, retaining frozen originals and revised-page expectations:
-green basal chelicerae are not the actual fangs; female size reaches~19mm.
-CONTENT-CURRENT.md cites the opened MDC account. This is UNAPPLIED; Luna is
-checked, other49 pages are not all audited.
+The first-page notebook correction is APPLIED through the generator: green
+basal chelicerae are distinguished from the fangs; female size reaches~19mm.
+The opened MDC account is added to the displayed bibliography. Frozen JSON,
+reference fixtures, original citations, other49 pages and all game notes are
+unchanged; godotText retains the pre-correction wording. Regeneration is
+repeatable. notebook-receipt.json binds the one changed game source to1519
+notebook +265 rare checks (1784/0), compilation, whole-source strict exit0 and
+normal/test exports. No native notebook layout check or publication yet.
+Next finish the remaining priority native/performance/content audit; keep this
+focused correction separate from the preserved full-run cohort.
 
 HEALTH-CURRENT.md retains the full remaining audit scope: eight paired full/
 low scenes,30-minute memory, natural all-mode lives, full visual/clipping/

@@ -46,9 +46,18 @@ retaining the frozen original in godotText and preserving the original source
 reference fixture. Proposed wording: "Adults are about 6 to 19 millimetres
 long" and "shining green-blue mouthparts, called chelicerae".
 
-This is a confirmed finding, **not an applied or published correction**.
-The current font-only candidate has unchanged notebook bytes. Its visual
-verification takes precedence before assembling another candidate. The source
+The correction is **applied in codex/verified-integration, not published**.
+Only Shared/Data/NotebookPages.luau changed in the game sources, through the
+generator's TEXT_FIXES and explicit SOURCE_ADDITIONS. The original citations and
+frozen JSON/reference fixtures are unchanged; godotText retains the original
+wording. The MDC account is appended to the visible bibliography. Repeat
+generation produced identical bytes. All50 body texts remain at most515 UTF-8
+bytes. ../integration/notebook-receipt.json records1519 notebook +265 rare
+checks (1784/0), changed-module compilation, whole-source strict exit0 and
+normal/test export evidence1ba4c21a1753e03d. The earlier full79 Windows run
+468979/0 and successful Linux integration CI retain their separate baseline
+cohort at Git6dd5ac673266905d74e98fdecae4e24830868c89. This content correction
+has no new native notebook layout check or publication. The source
 account was opened and read; the Edwards2004 PDF search result was located but
 its direct web open failed on size (14.5MB). Penn State's direct open returned
 403. Neither is claimed as a full primary-paper reading. The MDC page alone

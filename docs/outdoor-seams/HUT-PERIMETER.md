@@ -86,12 +86,22 @@ optional scenery, within the existing budget. The compact regression was
 red445/1 and now passes446/0 at both tiers; existing LOOK passes1442/0.
 No budget was raised and no scenery record/lighting setting was changed.
 
-Current normal/test exports are evidence e7b268a11f55febe with273 sources.
+The first corrected exports were evidence e7b268a11f55febe with273 sources.
 All273 compile, strict exits0, runner infrastructure5/5, compact446/0,
 living_world4150/0 and rest_storage14/0 have completed. The all-regions
 storage exercise captures3,195,572 canonical characters and names266 regions.
-The current Preserve self-test is still running. final-checks/ retains current
-steps as they finish; look-check.txt is the final tool-output chunk from the
+That Preserve self-test completed621.1 simulated seconds, including saving
+and returning, but failed one check: the home reservation also applied when
+the planner fell back to HOME outside every walkable region. final-checks/
+retains that failed621-second attempt and exact input hashes; it is not green.
+The fix now requires an actually located home region, and a new red450/2
+regression protects both full/low railway views. It is now green452/0.
+
+Current exports are20f2200d79a9e448,273 sources. Compile273/273, strict0,
+runner5/5, compact452/0, living_world4150/0 and rest_storage14/0 have
+completed again. final-checks-v2/ is the current bounded rerun; its long
+Preserve self-test is still running. Full current CI and native crossing
+qualification remain pending. look-check.txt is the final tool-output chunk from the
 completed LOOK run, not a claim to its entire console stream.
 
 The original full attempt used verify-ground.py with the ordinary current
@@ -104,7 +114,8 @@ it predates the current runner's lazy loading and is not used here.
 
 The initial after1 models were compiled before the render-policy fix and
 were never played. The full editor's preguard ran and it was closed without
-saving. They are superseded preparation artifacts, not native pass evidence.
+saving. after2 includes the first home reservation, and was never played.
+Both are superseded preparation artifacts, not native pass evidence.
 Guarded native full/low after-repair routes are still required. Older
 northern-route and30-minute results retain their original source cohorts.
 They do not establish native execution of this new ground or whole-map

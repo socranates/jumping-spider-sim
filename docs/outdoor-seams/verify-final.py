@@ -4,10 +4,11 @@ The separate failed full run stays failed. This targeted run does not claim
 all79 current Windows suites. GitHub CI supplies a separate full Linux run.
 """
 from pathlib import Path
-import hashlib,json,re,subprocess,sys,tempfile
+import argparse,hashlib,json,re,subprocess,sys,tempfile
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 T=Path('C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools')
-out=H/'final-checks';assert not out.exists();out.mkdir()
+p=argparse.ArgumentParser();p.add_argument('--out',type=Path,default=H/'final-checks');a=p.parse_args()
+out=a.out.resolve();assert not out.exists();out.mkdir()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 def inputs():return {f.relative_to(PORT).as_posix():sha(f.read_bytes())for folder in ['src','tests']for f in (PORT/folder).rglob('*')if f.is_file()and '__pycache__'not in f.parts}
 before=inputs();steps=[]
@@ -39,5 +40,5 @@ assert inputs()==before,'Inputs changed while checks ran'
 build=json.loads((PORT/'build-receipt.json').read_text())
 record=dict(inputs=before,steps=steps,source_count=len(sources),suite_summaries=counts,passed=sum(p for n,p,f in counts),failed=0,
  evidence_id=build['evidence_id'],build_receipt_sha256=sha((PORT/'build-receipt.json').read_bytes()),
- limits='Four current Windows suites, all-source compile/types, runner checks and exact exports. The separate LOOK run completed1442/0 before this run. Separate prior full run failed; full current Linux CI/native cohorts must be reported separately.')
+ limits='Four current Windows suites, all-source compile/types, runner checks and exact exports. Earlier LOOK/full attempts retain their own cohorts. Full current Linux CI/native cohorts must be reported separately.')
 (out/'receipt.json').write_bytes((json.dumps(record,indent=2)+'\n').encode());print(json.dumps({k:record[k]for k in ['passed','failed','evidence_id']}),flush=True)

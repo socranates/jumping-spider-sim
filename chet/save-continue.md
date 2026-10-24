@@ -5,7 +5,7 @@ branch codex/verified-integration. This is a normal Git worktree from c457af12.
 The app's worktree helper could not use the non-Git project mirror. The frozen
 proof checkout remains C:/Users/natha/windowsill-save-continue on codex/save-continue.
 
-Latest unpublished candidate: e7b268a11f55febe,273 sources. Read
+Latest unpublished candidate:20f2200d79a9e448,273 sources. Read
 docs/outdoor-seams/HUT-PERIMETER.md before resuming. Four native hut-path
 crossings reproduced missing ground/underside attachment; three compact
 Verge strips add33 regions/304 collision pieces, preserving all233 existing

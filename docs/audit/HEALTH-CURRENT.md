@@ -4,7 +4,7 @@
 now contains273 sources imported from the verified font candidate. A later
 generator-driven notebook correction and subsequent camera lens handover fix
 were the earlier game-source differences. The later unpublished hut-ground
-candidate also changes Verge and LookPlan: evidence e7b268a11f55febe,
+candidate also changes Verge and LookPlan: current evidence20f2200d79a9e448,
 273 sources. ../outdoor-seams/HUT-PERIMETER.md records four reproduced native
 failures, additive ground, unchanged generated data for all233 old regions,
 and the planner's retained-detail correction. Its first full Windows run

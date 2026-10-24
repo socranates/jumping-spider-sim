@@ -165,7 +165,8 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	local radius = if tier == "low" then LookPlan.RADIUS.low else LookPlan.RADIUS.full
 	local regions: { WorldMap.Region } = m.regions()
 	local zones = drawnOf(m)
-	local own: WorldMap.Region = m.at(pos) or here or (m.region(m.HOME) :: WorldMap.Region)
+	local located: WorldMap.Region? = m.at(pos)
+	local own: WorldMap.Region = located or here or (m.region(m.HOME) :: WorldMap.Region)
 	local plan: Plan = {}
 	local total = 0
 	local function has(region: WorldMap.Region): boolean
@@ -208,7 +209,7 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	-- At home the hut surrounds the sill. Retained optional room details from
 	-- an outdoor tour must not consume its close-detail allowance first.
 	-- Reserve it within the same budget before considering optional scenery.
-	if own.id == m.HOME then
+	if located ~= nil and own.id == m.HOME then
 		for _, r in zones do
 			if r.id == "hut" and total - count(r, plan[r.id]) + count(r, top) <= budget then
 				set(r, top)

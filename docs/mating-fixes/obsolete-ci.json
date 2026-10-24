@@ -1,0 +1,19 @@
+{
+  "runs": [
+    {
+      "id": 40105959314,
+      "head_sha": "79dd87f25001c05261bc8e355f2fe7a19989cbb6",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/40105959314"
+    },
+    {
+      "id": 40106556150,
+      "head_sha": "fdf88814bac93f722ab3451e75d9e28fb4aea4bd",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/40106556150"
+    }
+  ],
+  "reason": "The first full run exposed the legacy male-sac expectation. The second was superseded by the corrected nature test and cancelled while incomplete; neither is counted as passing final CI."
+}

@@ -1,0 +1,10 @@
+2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim
+2026-10-24T15:16:49.149Z,109.149475,599c,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T15:17:18.312Z,138.312302,58e0,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only
+2026-10-24T15:17:33.593Z,153.593552,11e4,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-24T15:17:40.007Z,160.007828,3e84,6,Info [FLog::CreatorOutput] [MATING_CONTACT_PAIR] 1792855052955 {"player_sex":"female","player":[187,-84.29000091552735,-171],"mate":[185,-84.29000091552735,-171],"radius":1.1626957476919038,"skip":false}
+2026-10-24T15:19:47.952Z,287.952271,6598,6,Info [FLog::CreatorOutput] [MATING_CONTACT_FAIL] 1792855052955 {"problem":"Players.socranates.PlayerScripts.Client.MatrixPlayback:23: mating contact deadline\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:23 function waitFor\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:68\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:28\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2815\n","routes":[]}
+2026-10-24T15:21:30.795Z,390.795776,58e0,6,Info [FLog::CreatorOutput] [MATRIX_GUARD] 276 after full unbound memory_only

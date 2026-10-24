@@ -1,0 +1,12 @@
+2026-10-24T15:21:31.8145601Z SELFTEST passed=5 failed=0
+2026-10-24T15:21:36.1627554Z /tmp/tmprij1_0lr.luau:65719: nature checks failed
+2026-10-24T15:21:36.1628193Z stacktrace:
+2026-10-24T15:21:36.1654442Z [C] function error
+2026-10-24T15:21:36.1654829Z /tmp/tmprij1_0lr.luau:65719
+2026-10-24T15:21:36.1688597Z FAIL [a full meter is no longer a mating in the standard rules: the mate refuses at the odds, by its own draw, and the chain after an accepted court is the old one] and the next morning's sleep makes the sac
+2026-10-24T15:21:36.1690122Z NATURE passed=28889 failed=1
+2026-10-24T15:21:48.2033992Z NATURE_CLIENT passed=11 failed=0
+2026-10-24T15:21:54.6120443Z TITLE passed=21 failed=0
+2026-10-24T15:22:09.4280935Z LOCK sidestep on the floor: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+2026-10-24T15:27:54.7870636Z MENU_OVERFLOW passed=12 failed=0
+2026-10-24T15:27:54.7970412Z ##[error]Process completed with exit code 1.

@@ -7551,7 +7551,7 @@ function Growth.eat(self: any, energy: number): boolean
  if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end
  self.fedSinceMoult+=energy
  local before=self.ready
- self.ready=self.fedSinceMoult>=self:readyAt()-1e-9
+ self.ready=before or self.fedSinceMoult>=self:readyAt()-1e-9
  return self.ready and not before
 end
 function Growth.beginMoult(self: any): boolean
@@ -8243,6 +8243,13 @@ function Mating.sexOf(appearanceId: string): string
 	return "female"
 end
 
+-- Sex is bound to the accepted court, not a changeable appearance. Missing sex in old
+-- reproductive saves retains their female interpretation; pre-court records stay unbound.
+function Mating.boundSex(m: any): string?
+ if m==nil or m.stage==nil or m.stage=="none" then return nil end
+ return m.player_sex or "female"
+end
+
 -- Is the spider ready to mate: full-grown (Growth's last stage) and well fed.
 function Mating.eligible(growth: any, energy: number): boolean
 	return growth ~= nil and growth:isAdult() and energy >= Rules.energyMin - 1e-9
@@ -8302,7 +8309,7 @@ end
 function Mating.woke(life: any, day: number): string
 	local m = Mating.normalize(life.mating or Mating.new())
 	life.mating = m
-	if m.stage ~= "mated" then return "" end
+	if m.stage ~= "mated" or Mating.boundSex(m) ~= "female" then return "" end
 	m.stage, m.sac_day, m.guard_day = "sac", day, 1
 	return "sac"
 end
@@ -8400,6 +8407,7 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 	elseif event == "courted" and s.nature == true and not Mating.accepts(life, mate, s, events) then
 		-- (ROBLOX-106: refused; Mating.accepts has sent the mate off and said why)
 	elseif event == "courted" then
+		m.player_sex = s.sex or Mate.opposite(mate.sex or "male")
 		m.stage = "courted"
 		table.insert(events, "courted")
 		-- ROBLOX-91: the rival is already winding up or lunging as the meter fills (the caller says so in `s.rivalThreat`): the scene would hold the player in the open, so it is skipped
@@ -8442,6 +8450,7 @@ function Mating.skip(life: any, force: boolean?): { string }
 	if Mate.skip(mate, force) ~= "mated" then return {} end
 	local m = Mating.normalize(life.mating or Mating.new())
 	life.mating = m
+	if m.player_sex == nil then m.player_sex = Mate.opposite(mate.sex or "male") end
 	m.stage = "mated"
 	return { "mated" }
 end
@@ -8488,6 +8497,8 @@ function Mating.problems(m: any): { string }
 	if (m.guard_day or 0) > Rules.guardDays then bad("more guard days than there are") end
 	if (m.brood or 0) > 64 then bad("a brood that large") end
 	local stage = m.stage or "none"
+	if m.player_sex ~= nil and m.player_sex ~= "male" and m.player_sex ~= "female" then bad("invalid played sex") end
+	if m.player_sex == "male" and (stage == "sac" or stage == "guarding" or stage == "hatched") then bad("a male cannot lay eggs or guard a brood") end
 	if stage == "sac" and ((m.sac_day or 0) < 1 or m.guard_day ~= 1) then bad("a new sac with no morning, or not on its first guard day") end
 	if stage == "guarding" and ((m.sac_day or 0) < 1 or (m.guard_day or 0) < 2) then bad("a guarded sac with no morning, or before its second guard day") end
 	if stage == "hatched" and ((m.hatch_day or 0) < 1 or (m.brood or 0) < 1) then bad("a hatching with no day or no brood") end
@@ -11744,6 +11755,53 @@ function Motor._backToSafety(self: any)
 	self:_event("out_of_bounds")
 end
 
+-- Optional partner body clearance, supplied afresh by the client/AI, never saved.
+-- Only coplanar attached walking participates. Air/silk motion and world queries
+-- retain their existing rules; no body is pushed or teleported out of overlap.
+function Motor._avoidStep(self: any, step: Vector3): Vector3
+ local other=self.avoid
+ if other==nil or other.up:Dot(self.up)<math.cos(math.rad(25)) then return step end
+ local delta=self.pos-other.pos
+ if math.abs(delta:Dot(self.up))>.25 then return step end
+ delta-=self.up*delta:Dot(self.up)
+ local radius=other.radius
+ local dist=delta.Magnitude
+ local normal=if dist>1e-6 then delta/dist else (if step.Magnitude>1e-6 then step.Unit else Vector3.xAxis)
+ local length=step.Magnitude
+ if length<1e-9 then return step end
+ -- AI walks round a stationary partner rather than waiting head-on forever.
+ -- Candidate side steps must have support and respect the route keep-out.
+ if other.steer and dist<radius+.5 and step:Dot(normal)<-length*.25 then
+  local side=normal:Cross(self.up)
+  for _,sign in {1,-1} do
+   local candidate=(side*sign+normal*.35).Unit*length
+   local at=self.pos+candidate
+   local below=self:_ray(at+self.up*.25,-self.up*(HEIGHT+.5))
+   if below and self:attachable(below) and below.Normal:Dot(self.up)>.95
+    and not self:_outOfBounds(at) and (other.allowed==nil or other.allowed(at)) then
+    step=candidate;break
+   end
+  end
+ end
+ -- Starting overlapped: allow escape/sideways motion but never further inward.
+ if dist<radius then
+  local inward=step:Dot(normal)
+  return if inward<0 then step-normal*inward else step
+ end
+ -- Swept circle contact, then tangent sliding. Endpoint-only tests tunnel on runs.
+ local a=step:Dot(step)
+ local b=delta:Dot(step)
+ local c=delta:Dot(delta)-radius*radius
+ local discriminant=b*b-a*c
+ if b>=0 or discriminant<0 then return step end
+ local t=(-b-math.sqrt(math.max(0,discriminant)))/a
+ if t<0 or t>1 then return step end
+ local first=step*math.max(0,t-1e-5)
+ local n=(delta+first).Unit
+ local rest=step-first
+ return first+rest-n*math.min(0,rest:Dot(n))
+end
+
 function Motor._tickAttached(self: any, input: TickInput)
 	local silk = self.silk
 	local preparing = self.preparing
@@ -11785,7 +11843,9 @@ function Motor._tickAttached(self: any, input: TickInput)
 	if input.run == true and not stalk and not silk.walk then speed *= Motor.RUN_MULTIPLIER end
 	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
-	local step = dir * speed * DT
+	local step = self:_avoidStep(dir * speed * DT)
+ if step.Magnitude<1e-9 then self.moving=false;self.intent=Vector3.zero;return end
+ dir=step.Unit
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))
 	if ahead and self:attachable(ahead) and SupportMath.angleTo(ahead.Normal, self.up) > math.rad(20) then
@@ -16756,7 +16816,7 @@ local function freeze(t:any)
 end
 local CLOCK={day=true,hour=true,sleeping=true}
 local GROWTH={stage=true,fedSinceMoult=true,ready=true,moultingHoursLeft=true,softHoursLeft=true,exuviae=true,readyFood=true,gameRules=true}
-local MATING={stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
+local MATING={player_sex=true,stage=true,ready_day=true,guard_day=true,sac_day=true,hatch_day=true,hatch_hour=true,brood=true,mates=true,visits=true,visit_day=true,
  away_day=true,drive_offs=true,courts=true,rejections=true,cut_ins=true}
 local VISIT={id=true,serial=true,day=true,hour=true}
 local function whole(v:any,cap:number):boolean return type(v)=="number" and v==v and v>=0 and v<=cap and v%1==0 end
@@ -21271,6 +21331,12 @@ local function exitOf(drive: any): any
 	local exit: any = nil
 	local best = math.huge
 	local at = Mate.exitAt()
+ -- Sparse scenery waypoints may be metres from the authored exit (26 studs
+ -- in garden_b4). Prefer the actual supported floor point when in this region.
+ local face=drive.g and drive.g:faceAt(at,Vector3.yAxis)
+ if face~=nil and not drive.g:inKeepOut(at) then
+  return {pos=at-Vector3.yAxis*.31,up=Vector3.yAxis,face=face}
+ end
 	for _, w in drive.waypoints do
 		local d = (w.pos - at).Magnitude
 		if w.up.Y > 0.5 and d < best then exit, best = w, d end
@@ -21281,7 +21347,7 @@ end
 function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?): any
 	local drive = RivalDrive.new(motor, blocked, region, roam)
 	return setmetatable({
-		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false, player = {},
+		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false, player = {}, avoid = { steer = true },
 		proxy = { state = "dormant", position = motor.pos, previous = motor.pos, up = motor.up, heading = motor.heading, origin = motor.pos, leg = 0, elapsed = 0, notice = 0 },
 	}, MateDrive)
 end
@@ -21306,7 +21372,7 @@ function MateDrive.update(self: any, mate: any, dt: number, s: any)
 	end
 	-- Leaving: the one place it goes to is the exit; entering the state sets it once.
 	if state == "leaving" then
-		if not self.leaving and self.exit ~= nil and mapped == "patrol" then
+		if (not self.leaving or self.drive.goal == nil or self.drive.goalKey ~= "patrol") and self.exit ~= nil and mapped == "patrol" then
 			self.drive:_setGoal(self.exit, "patrol")
 			self.leaving = true
 		end
@@ -21320,6 +21386,16 @@ function MateDrive.update(self: any, mate: any, dt: number, s: any)
 	table.clear(player)
 	for k,v in s do player[k]=v end
 	player.courting, player.scene = nil, nil
+ local motor=self.drive.motor
+ motor.avoid=nil
+ if state~="away" and state~="pair" and s.grounded~=false and not s.airborne and not s.onLine and not s.wasp then
+  local avoid=self.avoid
+  avoid.pos,avoid.up,avoid.radius=s.position,s.up or Vector3.yAxis,s.bodyClearance or 1.15
+  if avoid.allowed==nil then avoid.allowed=function(at: Vector3): boolean
+   return self.drive.g~=nil and not self.drive.g:inKeepOut(at)
+  end end
+  motor.avoid=avoid
+ end
 	self.drive:update(proxy, dt, player)
 	mate.position, mate.up, mate.heading, mate.leg = proxy.position, proxy.up, proxy.heading, proxy.leg
 	if proxy.region ~= nil then mate.region = proxy.region end
@@ -62319,7 +62395,7 @@ local camSettings: any = {} -- the camera's settings, filled each frame (see the
 -- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
 -- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
 local function canChange(): boolean
-	return life.resting and not life.asleep and not life.growth:isMoulting()
+	return life.resting and not life.asleep and not life.growth:isMoulting() and mateLegs.Mating.boundSex(life.mating)==nil
 end
 -- The spider pick (ROBLOX-71): whether the player chose a spider this visit (only then is the choice sent to be saved), and the one way a choice is
 -- made, shared by the crack's key and the Settings row. One table: the client is at Luau's limit of 200 locals.
@@ -62360,7 +62436,7 @@ function spiderPick.occupied(): boolean
 end
 -- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack, and not while something has the spider. Answers the line the panel shows.
 function spiderPick.safe(): boolean
-	if spiderPick.occupied() then return false end
+	if mateLegs.Mating.boundSex(life.mating) ~= nil or spiderPick.occupied() then return false end
 	return SpiderChoice.safeToChange({
 		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
 		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
@@ -62564,6 +62640,12 @@ local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {str
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
+ -- A reproductive rest belongs to its saved sex, even if the account's latest
+ -- cosmetic choice is different. Older reproductive records default to female.
+ local boundSex=mateLegs.Mating.boundSex(life.mating)
+ if boundSex~=nil and mateLegs.Mating.sexOf(appearance)~=boundSex then
+  setAppearance(if boundSex=="male" then "maratus_volans_male" else "first_spider")
+ end
  needs:useGameRules()
  -- These seeded visitors do not serialize transient encounters in a rest.
  if M.crab then M.crab:reset();M.crab.gentle=needs.gentle end
@@ -62698,6 +62780,24 @@ local function showCaught() endLife("wasp") end
 -- ---------------------------------------------------------------- the mating cycle (ROBLOX-80)
 -- Display and the player's side of Life/Mating (which is the cycle itself). The events Mating.tick reports become notices; the hatching plays as a scene in the
 -- crack (about 26 s, the camera and the controls free); the ending card follows it, and Carry on makes the next generation.
+-- Bodies, not full leg spans, define partner clearance. Keep the intentional
+-- mating poses; ordinary approach and departure use their actual drawn sizes.
+function mateLegs.clearance(): number
+ local other=mateLegs.stage.rig
+ local length=if other~=nil then other:bodyLength() else rig:bodyLength()*(if life.mate then life.mate.scale or 1 else 1)
+ return math.max(.6,(rig:bodyLength()+length)*.425)
+end
+function mateLegs.avoidPartner()
+ motor.avoid=nil
+ local mate=life.mate
+ local drive=mateLegs.drive
+ if mate==nil or mate.state=="away" or mate.state=="pair" or drive==nil or drive.drive.motor.mode~="attached" then return end
+ mateLegs.playerAvoid=mateLegs.playerAvoid or {}
+ local avoid=mateLegs.playerAvoid
+ avoid.pos,avoid.up,avoid.radius=mate.position,mate.up or Vector3.yAxis,mateLegs.clearance()
+ motor.avoid=avoid
+end
+
 function mateLegs.say(text: string?)
  if text ~= nil and text ~= "" then life:showNotice(text);life.noticeSeconds=8 end
 end
@@ -63950,6 +64050,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
    end
 			local input = tickInput()
+   mateLegs.avoidPartner()
 			motor:tick(input)
 			M.Prof.lap("motor")
 			-- ROBLOX-106: moving costs energy (NeedsModel.move pays nothing in the gentle modes) and, in Normal, a leaf overhead and stillness hide the spider (Life/Nature).
@@ -64193,6 +64294,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              local ms=mateLegs.state
              table.clear(ms)
              for k,v in rivalState do ms[k]=v end -- (ROBLOX-92: the one table, filled again, not a clone of the rival's every tick)
+             ms.bodyClearance=mateLegs.clearance()
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
              if mateLegs.couple.active and wasp:isThreatening() then mateLegs.skip(true) end -- A resident's routine patrol does not cancel every scene.
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
@@ -67002,7 +67104,7 @@ return WorldShadows
   <Item class="Workspace" referent="297">
     <Properties>
       <string name="Name">Workspace</string>
-      <BinaryString name="AttributesSerialize">BgAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADVlOWFjNDMyZTk5MzNlZDkJAAAAU2F2ZVN0b3JlAiAAAABXaW5kb3dzaWxsVGVzdF9zdHVkaW9faW50ZWdyYXRlZAgAAABTYXZlV2FpdAMBCAAAAFNlbGZUZXN0AwEKAAAAVGVzdFRhcmdldAMABQAAAFdvcmxkAggAAABwcmVzZXJ2ZQ==</BinaryString>
+      <BinaryString name="AttributesSerialize">BgAAAAwAAABQb3J0RXZpZGVuY2UCEAAAADg4YzY4Yzk4YTAzMjRlOGEJAAAAU2F2ZVN0b3JlAiAAAABXaW5kb3dzaWxsVGVzdF9zdHVkaW9faW50ZWdyYXRlZAgAAABTYXZlV2FpdAMBCAAAAFNlbGZUZXN0AwEKAAAAVGVzdFRhcmdldAMABQAAAFdvcmxkAggAAABwcmVzZXJ2ZQ==</BinaryString>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
       <bool name="StreamingEnabled">true</bool>

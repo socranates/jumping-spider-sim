@@ -1,0 +1,332 @@
+{
+  "passed": true,
+  "source_commit": "fdf88814bac93f722ab3451e75d9e28fb4aea4bd",
+  "run": "1792855445329",
+  "events": [
+    {
+      "utc": "2026-10-24T15:24:17.005Z",
+      "kind": "PAIR",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "female",
+        "player": [
+          187,
+          -84.29000091552734,
+          -171
+        ],
+        "mate": [
+          185,
+          -84.29000091552734,
+          -171
+        ],
+        "radius": 1.1626957476919038,
+        "skip": false
+      }
+    },
+    {
+      "utc": "2026-10-24T15:24:37.045Z",
+      "kind": "ROUTE",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "female",
+        "radius": 1.1626957476919038,
+        "min_gap": 1.162758469581604,
+        "skipped": false,
+        "samples": 545,
+        "lost_support": 0,
+        "mate_sex": "male",
+        "reason": "mated",
+        "stage": "mated",
+        "exit_gap": 1.4956740140914917
+      }
+    },
+    {
+      "utc": "2026-10-24T15:24:37.125Z",
+      "kind": "PAIR",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "female",
+        "player": [
+          187,
+          -84.29000091552734,
+          -171
+        ],
+        "mate": [
+          185,
+          -84.29000091552734,
+          -171
+        ],
+        "radius": 1.1626957476919038,
+        "skip": true
+      }
+    },
+    {
+      "utc": "2026-10-24T15:24:50.393Z",
+      "kind": "ROUTE",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "female",
+        "radius": 1.1626957476919038,
+        "min_gap": 1.162757396697998,
+        "skipped": true,
+        "samples": 520,
+        "lost_support": 0,
+        "mate_sex": "male",
+        "reason": "mated",
+        "stage": "mated",
+        "exit_gap": 1.4987972974777222
+      }
+    },
+    {
+      "utc": "2026-10-24T15:24:50.436Z",
+      "kind": "PAIR",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "male",
+        "player": [
+          187,
+          -84.29000091552734,
+          -171
+        ],
+        "mate": [
+          185,
+          -84.29000091552734,
+          -171
+        ],
+        "radius": 0.6,
+        "skip": false
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:13.237Z",
+      "kind": "ROUTE",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "male",
+        "radius": 0.6,
+        "min_gap": 0.6001328229904175,
+        "skipped": false,
+        "samples": 438,
+        "lost_support": 0,
+        "mate_sex": "female",
+        "reason": "mated",
+        "stage": "mated",
+        "exit_gap": 1.4892849922180176
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:13.238Z",
+      "kind": "MALE_NO_SAC",
+      "run": "1792855445329",
+      "data": {
+        "stage": "mated",
+        "sex": "male"
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:13.293Z",
+      "kind": "PAIR",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "male",
+        "player": [
+          187,
+          -84.29000091552734,
+          -171
+        ],
+        "mate": [
+          185,
+          -84.29000091552734,
+          -171
+        ],
+        "radius": 0.6,
+        "skip": true
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:25.648Z",
+      "kind": "ROUTE",
+      "run": "1792855445329",
+      "data": {
+        "player_sex": "male",
+        "radius": 0.6,
+        "min_gap": 0.6001340746879578,
+        "skipped": true,
+        "samples": 426,
+        "lost_support": 0,
+        "mate_sex": "female",
+        "reason": "mated",
+        "stage": "mated",
+        "exit_gap": 1.4873924255371094
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:25.649Z",
+      "kind": "MALE_NO_SAC",
+      "run": "1792855445329",
+      "data": {
+        "stage": "mated",
+        "sex": "male"
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:25.735Z",
+      "kind": "CLEANUP",
+      "run": "1792855445329",
+      "data": {
+        "lockReleased": true,
+        "active": 0,
+        "requests": 23,
+        "gate": {
+          "actors": 1,
+          "history": 12,
+          "reserved": 0,
+          "started": 0,
+          "read": 12,
+          "write": 7,
+          "queued": 0,
+          "scopes": 0
+        },
+        "archives": 0,
+        "starts": 23,
+        "owners": [
+          {
+            "epoch": ":1792855444:1",
+            "closed": false
+          }
+        ],
+        "rests": {
+          "R_qa_normal_startup_free": "bcb4f32d8f4e025a"
+        },
+        "optionsCreated": 13,
+        "optionsDestroyed": 13,
+        "ready": true
+      }
+    },
+    {
+      "utc": "2026-10-24T15:25:25.735Z",
+      "kind": "PASS",
+      "run": "1792855445329",
+      "data": {
+        "routes": [
+          {
+            "player_sex": "female",
+            "radius": 1.1626957476919038,
+            "min_gap": 1.162758469581604,
+            "skipped": false,
+            "samples": 545,
+            "lost_support": 0,
+            "mate_sex": "male",
+            "reason": "mated",
+            "stage": "mated",
+            "exit_gap": 1.4956740140914917
+          },
+          {
+            "player_sex": "female",
+            "radius": 1.1626957476919038,
+            "min_gap": 1.162757396697998,
+            "skipped": true,
+            "samples": 520,
+            "lost_support": 0,
+            "mate_sex": "male",
+            "reason": "mated",
+            "stage": "mated",
+            "exit_gap": 1.4987972974777222
+          },
+          {
+            "player_sex": "male",
+            "radius": 0.6,
+            "min_gap": 0.6001328229904175,
+            "skipped": false,
+            "samples": 438,
+            "lost_support": 0,
+            "mate_sex": "female",
+            "reason": "mated",
+            "stage": "mated",
+            "exit_gap": 1.4892849922180176
+          },
+          {
+            "player_sex": "male",
+            "radius": 0.6,
+            "min_gap": 0.6001340746879578,
+            "skipped": true,
+            "samples": 426,
+            "lost_support": 0,
+            "mate_sex": "female",
+            "reason": "mated",
+            "stage": "mated",
+            "exit_gap": 1.4873924255371094
+          }
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "player_sex": "female",
+      "radius": 1.1626957476919038,
+      "min_gap": 1.162758469581604,
+      "skipped": false,
+      "samples": 545,
+      "lost_support": 0,
+      "mate_sex": "male",
+      "reason": "mated",
+      "stage": "mated",
+      "exit_gap": 1.4956740140914917
+    },
+    {
+      "player_sex": "female",
+      "radius": 1.1626957476919038,
+      "min_gap": 1.162757396697998,
+      "skipped": true,
+      "samples": 520,
+      "lost_support": 0,
+      "mate_sex": "male",
+      "reason": "mated",
+      "stage": "mated",
+      "exit_gap": 1.4987972974777222
+    },
+    {
+      "player_sex": "male",
+      "radius": 0.6,
+      "min_gap": 0.6001328229904175,
+      "skipped": false,
+      "samples": 438,
+      "lost_support": 0,
+      "mate_sex": "female",
+      "reason": "mated",
+      "stage": "mated",
+      "exit_gap": 1.4892849922180176
+    },
+    {
+      "player_sex": "male",
+      "radius": 0.6,
+      "min_gap": 0.6001340746879578,
+      "skipped": true,
+      "samples": 426,
+      "lost_support": 0,
+      "mate_sex": "female",
+      "reason": "mated",
+      "stage": "mated",
+      "exit_gap": 1.4873924255371094
+    }
+  ],
+  "source_guards": 2,
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T15:22:27.053Z,12.053806,3ed0,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:22:27.053Z,12.053806,3ed0,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:22:27.053Z,12.053806,3ed0,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:22:27.053Z,12.053806,3ed0,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:22:41.445Z,26.445948,71e4,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T15:24:09.445Z,114.445206,70d0,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "studio_pid": 26696,
+  "studio_exited": true,
+  "model_unchanged": true,
+  "model_sha256": "a6be877646b10b25c2b35ea4cac329205e075aac7423cfb64c860e1456b4e9a3",
+  "log_sha256": "0058f8cc4950f16e0006a15b8181f98e6569efd92876a6b9a966512474610f94",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T152215Z_Studio_53E54_last.log",
+  "published": false,
+  "limits": "Synthetic adults/pairs and scripted camera/Forward in unbound Studio/memory. Coplanar attached walking contact; not natural mating decisions, complete rig-overlap/whole-map seam proof, online persistence or performance."
+}

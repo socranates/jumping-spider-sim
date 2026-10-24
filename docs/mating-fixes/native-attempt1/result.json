@@ -1,0 +1,55 @@
+{
+  "passed": false,
+  "source_commit": "79dd87f25001c05261bc8e355f2fe7a19989cbb6",
+  "run": "1792855052955",
+  "events": [
+    {
+      "utc": "2026-10-24T15:17:40.007Z",
+      "kind": "PAIR",
+      "run": "1792855052955",
+      "data": {
+        "player_sex": "female",
+        "player": [
+          187,
+          -84.29000091552734,
+          -171
+        ],
+        "mate": [
+          185,
+          -84.29000091552734,
+          -171
+        ],
+        "radius": 1.1626957476919038,
+        "skip": false
+      }
+    },
+    {
+      "utc": "2026-10-24T15:19:47.952Z",
+      "kind": "FAIL",
+      "run": "1792855052955",
+      "data": {
+        "problem": "Players.socranates.PlayerScripts.Client.MatrixPlayback:23: mating contact deadline\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:23 function waitFor\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:68\nPlayers.socranates.PlayerScripts.Client.MatrixPlayback:28\nPlayers.socranates.PlayerScripts.Client.SpiderClient:2815\n",
+        "routes": []
+      }
+    }
+  ],
+  "routes": [],
+  "source_guards": 2,
+  "creator_errors": [],
+  "creator_warnings": [
+    "2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:16:37.504Z,97.504021,5848,6,Warning [FLog::CreatorWarning] Warning: Failed to apply StyleRule property 'CornerRadius' from '>> .RoundedCorner8 ::UICorner': Unable to cast string to UDim",
+    "2026-10-24T15:16:49.149Z,109.149475,599c,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type",
+    "2026-10-24T15:17:33.593Z,153.593552,11e4,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type"
+  ],
+  "studio_pid": 17036,
+  "studio_exited": true,
+  "model_unchanged": true,
+  "model_sha256": "4f6416d68d119790696ab5ec79498742535016afd97a75a0c0eb215a48a7b145",
+  "log_sha256": "0f91a6175fd5a22e35d4d14e12ecc24469fd531e0e2df88a3f9e51f5e260e471",
+  "original_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T151500Z_Studio_FE9B1_last.log",
+  "published": false,
+  "limits": "Synthetic adults/pairs and scripted camera/Forward in unbound Studio/memory. Coplanar attached walking contact; not natural mating decisions, complete rig-overlap/whole-map seam proof, online persistence or performance."
+}

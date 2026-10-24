@@ -1,3 +1,17 @@
+Latest mating-fix supplement, 2026-10-24: game source fdf88814 after 79dd87f2,
+test correction 75ff806d (legacy male-egg expectation); evidence 88c68c98a0324e8a, 273 ordinary sources. docs/mating-fixes/ records
+sex-bound reproduction (males never enter sac/guarding), female-rest identity,
+sticky earned readiness, attached partner clearance and a supported Preserve exit.
+Native 1792855445329 passed all four sex/ordinary/skip routes, 1,929 samples,
+zero support losses/CreatorErrors, two exact source guards, closed Studio,
+immutable model and operation cleanup. Six style/asset warnings are retained.
+The failed initial departure fixture remains recorded; it exposed the distant
+waypoint instead of the actual exit. Full CI status belongs to the new receipt.
+Moult design changed during review: the real instar ladder supersedes 7/15/20;
+Nathan explicitly said "Still discussing; fix mating first." No goal/instar or
+unlock tuning changed. Male continuation, pre-newborn-rest Carry/rejoin, contact
+seams, broader natural/device/world/performance checks remain open. No publication.
+
 Sex-path decision, 2026-10-24: the reproductive receipt below covers the default female in three difficulty modes, not both sexes. The male must not lay eggs or guard young. Nathan and Claude are discussing separate playthroughs; male progression remains an open design. Mating.woke currently has no sex gate, so the shared chain is a known male-route design gap.
 
 Latest reproductive-route supplement, 2026-10-24: test commit 3f6ed486,

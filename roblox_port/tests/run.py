@@ -37,6 +37,8 @@ REFERENCES = ["route_preparation_reference","compact_legacy_fixture","jump_refer
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"route_preparation_reference": {"route_preparation.luau"},"compact_legacy_fixture": {"compact_layout.luau"},"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
+REFERENCES.append("rig_hair_reference")
+REFERENCE_ONLY["rig_hair_reference"] = {"rig_hair_cache.luau"}
 
 
 def source_import(match):
@@ -104,7 +106,12 @@ def bundle(test_file):
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")
         if test_file in REFERENCE_ONLY.get(ref, {test_file}):
-            parts.append(f"__refs.{ref} = " + chunk(path))
+            # The frozen rig imports live dependencies; defer it until every
+            # module loader is registered, without eagerly loading other suites.
+            value = chunk(path)
+            if ref == "rig_hair_reference":
+                value = "function() return " + value + " end"
+            parts.append(f"__refs.{ref} = " + value)
     for name, rel in MODULES + (CLIENT_MODULES if test_file in CLIENT_TESTS else []):
         path = SRC / rel
         parts.append(f"__loaders.{name} = function() return " + chunk(path) + " end")
@@ -119,7 +126,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["recovery_application.luau","recovery_templates.luau","json_encoding.luau","local_return.luau","local_rest_client.luau","local_rest.luau","save_offers.luau","save_restore.luau","save_work.luau","continuation_menu.luau","save_continuation.luau","save_intent.luau","save_observation.luau","navigation_startup.luau","save_notice.luau","outdoor_life_reset.luau","rest_compression.luau","rest_storage.luau","foundation.luau","rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau", "menu_overflow.luau"]:
+    for test_file in named or ["rig_hair_cache.luau","recovery_application.luau","recovery_templates.luau","json_encoding.luau","local_return.luau","local_rest_client.luau","local_rest.luau","save_offers.luau","save_restore.luau","save_work.luau","continuation_menu.luau","save_continuation.luau","save_intent.luau","save_observation.luau","navigation_startup.luau","save_notice.luau","outdoor_life_reset.luau","rest_compression.luau","rest_storage.luau","foundation.luau","rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau", "menu_overflow.luau"]:
         if not (HERE / test_file).exists():
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
             status = 1

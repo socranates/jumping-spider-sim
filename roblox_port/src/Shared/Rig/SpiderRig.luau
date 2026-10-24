@@ -52,8 +52,9 @@ local REACHES = { 1.0, 0.65, 0.35, 0.12 }
 local LEG_NAMES = { "femur", "tibia", "tarsus" }
 
 -- One leg hair: its part and where it grows (spec), with what the drawing needs of it worked out once (ROBLOX-93): the angle round the leg as a cosine and a sine,
--- how far out of the leg it grows (k: 0.8 of the radius, or 1 for a coat that lies along the leg) and its direction in the link's frame.
-type LegHair = { part: Part, spec: Setae.LegHair, c: number, s: number, k: number, dir: Vector3 }
+-- how far out of the leg it grows (k: 0.8 of the radius, or 1 for a coat that lies along the leg), its fixed direction/turn in the link's frame,
+-- and the half-length offset at the current growth scale. Moving a link never changes a hair's local turn.
+type LegHair = { part: Part, spec: Setae.LegHair, c: number, s: number, k: number, dir: Vector3, turn: CFrame, half: Vector3 }
 -- One link of a leg (femur, tibia, tarsus): its rod, the thinner tip rod and the pale band it may have, the length each is drawn at and the diameters of the rods (what
 -- the part's Size holds; kept here so a frame reads no property), the hairs on it, and where they were last placed (its frame and length).
 type Seg = {
@@ -325,6 +326,7 @@ local function refreshScale(self: Rig)
 				seg.tipX, seg.tipDy, seg.tipDz = tipSize.X * g, tipSize.Y * g, tipSize.Z * g
 			end
 			seg.bandX, seg.len = -1, -1 -- the band is given its size, and the hairs their places, at the next drawing
+			for _, hair in seg.hairs do hair.half = hair.dir * (hair.spec.length * g * 0.5) end
 		end
 	end
 	local fan = self._fan
@@ -760,10 +762,11 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				if cfg.every.leg <= 0 or n % cfg.every.leg ~= 0 then continue end
 				-- (what the drawing needs of a hair is worked out here, once: see LegHair)
 				local c, sn, lie = math.cos(spec.theta), math.sin(spec.theta), spec.lift
+				local dir = if lie then Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn) else Vector3.new(1.3, c, sn).Unit
 				local entry: LegHair = {
 					part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec, c = c, s = sn,
 					k = if lie then 1.0 else 0.8,
-					dir = if lie then Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn) else Vector3.new(1.3, c, sn).Unit,
+					dir = dir, turn = CFrame.lookAt(Vector3.zero, dir, Vector3.xAxis), half = Vector3.zero,
 				}
 				table.insert(leg.hairs, entry)
 				table.insert(leg.segs[spec.segment].hairs, entry)
@@ -774,9 +777,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				if keepFringe <= 0 or n % keepFringe ~= 0 then continue end
 				local c, sn, lie = math.cos(spec.theta), math.sin(spec.theta), spec.lift or 1
 				local width = spec.width or fuzz.legWidth
+				local dir = Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn)
 				local entry: LegHair = {
 					part = seta(spec.tone, width, width, spec.length, spec.transparency or fuzz.legTransparency), spec = spec, c = c, s = sn, k = 0.9,
-					dir = Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn),
+					dir = dir, turn = CFrame.lookAt(Vector3.zero, dir, Vector3.xAxis), half = Vector3.zero,
 				}
 				table.insert(leg.hairs, entry)
 				table.insert(leg.segs[spec.segment].hairs, entry)
@@ -1026,8 +1030,7 @@ local function drawSegment(seg: Seg, bandFraction: number, g: number, a: Vector3
 			local spec = hair.spec
 			local r = if tip and spec.t > share then tipRadius else radius
 			local base = Vector3.new((spec.t - 0.5) * len, r * hair.k * hair.c, r * hair.k * hair.s)
-			local dir = hair.dir
-			put(hairBatch, hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
+			put(hairBatch, hair.part, rc * (hair.turn + (base + hair.half)))
 		end
 	end
 end

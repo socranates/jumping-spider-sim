@@ -1,5 +1,5 @@
 {
-  "evidence_id": "105c83862d500f43",
+  "evidence_id": "032b5985ac17eeb2",
   "source_count": 273,
   "sources": {
     "StarterPlayer.StarterPlayerScripts.Client.BirdBody": "e290e574c9064832dd822ab008e9dc247bbb44512b5a381c13b1ea6674b801c7",
@@ -223,7 +223,7 @@
     "ReplicatedStorage.Shared.Rig.PeacockDance": "8f79ee569bd0efe31c7b12476fa0fd08cb1b8f72c311881f292a1b896a594375",
     "ReplicatedStorage.Shared.Rig.Setae": "638606450f52eaa87110ee2a1c1d61c3003f67e026c95c797f97ccec38917504",
     "ReplicatedStorage.Shared.Rig.SpiderChoice": "68ffa8369927f98e5e063742401c71c971c63070b73d487c1cc002c59e4bb2c4",
-    "ReplicatedStorage.Shared.Rig.SpiderRig": "5e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20",
+    "ReplicatedStorage.Shared.Rig.SpiderRig": "780c65eb7849254f5c0401eb0111aeae8caf7f2c1d8eca97ae864feed0355008",
     "ReplicatedStorage.Shared.Rig.TarantulaPose": "0b8c8dc963aac985d827b9f75325bc45b30baaae1f3d6308c8513ce10f2f630f",
     "ReplicatedStorage.Shared.UI.AntMimicText": "553985d3f08813f557e1030cc9b64934e17e062ef92b09b8d2aa903f5170fcbe",
     "ReplicatedStorage.Shared.UI.BirdText": "74340b8a0867d490c9f9069e39f389773bcd5cf4cd40f6dd23ac71467ca5d2ed",
@@ -279,7 +279,7 @@
   "outputs": [
     {
       "file": "TheWindowsill.rbxlx",
-      "sha256": "539627e3fc911723410a45865feff40184cf6c849a3313a87fba808a4b7469dd",
+      "sha256": "35e6ffd68634137ee239f069bae39c84a30845b69b4ec0948d705bb444a514af",
       "selftest": false,
       "source_count": 273,
       "attributes": {
@@ -287,12 +287,12 @@
         "SelfTest": false,
         "TestTarget": false,
         "SaveWait": true,
-        "PortEvidence": "105c83862d500f43"
+        "PortEvidence": "032b5985ac17eeb2"
       }
     },
     {
       "file": "TheWindowsillTests.rbxlx",
-      "sha256": "cfa62b973cb1a24d71d68dbb5b2284cb59b9c3e16b477db0d84c013474933600",
+      "sha256": "c2f1b964d4444ad336ad3297679f15a309bf9740684a5bc0c5af189452ef449c",
       "selftest": true,
       "source_count": 273,
       "attributes": {
@@ -301,7 +301,7 @@
         "TestTarget": false,
         "SaveWait": true,
         "SaveStore": "WindowsillTest_studio_integrated",
-        "PortEvidence": "105c83862d500f43"
+        "PortEvidence": "032b5985ac17eeb2"
       }
     }
   ],

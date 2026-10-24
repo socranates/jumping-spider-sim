@@ -1,11 +1,14 @@
 """Bind source, red/green regressions, native evidence, exports and actual CI."""
 from pathlib import Path
-import argparse,hashlib,json,re,subprocess,urllib.request,datetime,tarfile,io
+import argparse,hashlib,json,re,subprocess,urllib.request,datetime,tarfile,io,ast
 p=argparse.ArgumentParser();p.add_argument('--require-ci',action='store_true');a=p.parse_args()
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 sha=lambda b:hashlib.sha256(b).hexdigest()
 read=lambda f:json.loads(f.read_text(encoding='utf8'))
 commit='642af9690df63b9b8d5c9dcbd1a6bef7e4310cda';runid=40098023022
+runner=ast.parse((PORT/'tests/run.py').read_text())
+defaults=[n.iter.values[1]for n in ast.walk(runner)if isinstance(n,ast.For)and isinstance(n.target,ast.Name)and n.target.id=='test_file'and isinstance(n.iter,ast.BoolOp)]
+assert len(defaults)==1 and isinstance(defaults[0],ast.List)and len(defaults[0].elts)==80
 changed=set(subprocess.check_output(['git','diff','--name-only','e93d413d',commit,'--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).splitlines())
 assert changed=={'roblox_port/src/Shared/Life/LifeSession.luau','roblox_port/tests/continuing.luau','roblox_port/tests/nature_client.luau'}
 manifest=read(H/'native-final/manifest.json');native=read(H/'native-final/native.json')

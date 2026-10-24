@@ -78,13 +78,15 @@ five cards and Another callbacks passed; both276-source guards, cleanup, zero
 CreatorErrors and six retained style/asset warnings complete. Studio16336 is
 closed and the immutable model hash is unchanged. These are fast-clock/client
 boundary results, not an unforced predator encounter or a full reproductive life. See `qualification.json` for current CLI/native/export/CI bindings.
-The full80-suite Linux workflow for642af969 is40098023022; consult its receipt
-before treating the full CI gate as complete.
+Full80-suite Linux workflow40098023022 SUCCEEDS at642af969: compilation,
+strict types, all80 default suites, both exports and runner checks all complete.
+`qualify.py --require-ci` verifies the actual run/job steps and current source/
+export/native hashes. No aggregate Linux assertion total is inferred.
 
 ## Coverage still open
 
 This closes a real death-handler gap and strengthens continuous-hunger evidence.
-The audit's complete fast-clock feedingâ†’7/10 moultsâ†’adultâ†’matingâ†’eggsâ†’generation
+The audit's complete fast-clock feedingÃ¢â€ â€™7/10 moultsÃ¢â€ â€™adultÃ¢â€ â€™matingÃ¢â€ â€™eggsÃ¢â€ â€™generation
 route and every naturally triggered predator ending are still open. Current
 online rest/save/rejoin, controller/touch comfort, whole-map close clipping,
 audio balance and physical-device performance retain their separate evidence

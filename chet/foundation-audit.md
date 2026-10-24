@@ -2,7 +2,7 @@ Latest foundation progress: see [the current health ledger](../docs/audit/HEALTH
 and [predator ending fix](../docs/predator-endings/README.md). Five newer lethal
 outcomes were silently ignored; the small unpublished fix passes targeted and
 native checks, including Normal fast-clock starvation and gentle-mode survival.
-Full CI40098023022 remains running. Earlier summaries below are historical.
+Full80-suite CI40098023022 succeeds. Earlier summaries below are historical.
 
 Current working candidate: [save lease cleanup](save-lease-cleanup.md), source `e315b3a048fddd1729461fb92502f73b7d8e2b94`, evidence `b425324a7f0a8007`. Earlier sections below are historical.
 

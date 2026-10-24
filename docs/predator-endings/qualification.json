@@ -36,9 +36,9 @@
     "TheWindowsillTests.rbxlx": "af38cf4bf1b05954a2c46e53c3c7cb590cfb4c3050a8e975d1623f1048578acc"
   },
   "full_ci_run": 40098023022,
-  "full_ci_status": "in_progress",
-  "full_ci_conclusion": null,
-  "full_ci_suites": null,
+  "full_ci_status": "completed",
+  "full_ci_conclusion": "success",
+  "full_ci_suites": 80,
   "published": false,
   "private_published_version_unchanged": 14,
   "production_changed": false,

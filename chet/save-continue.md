@@ -9,13 +9,14 @@ Another/lineage and duplicate refusal; continuous120x hunger from fresh reserve
 starves in Normal on day2, while Easy/Free each survive3 game days at0.1.
 Both276-source guards, cleanup,0 CreatorErrors,6 retained warnings; Studio16336
 closed and model hash unchanged. This does not prove natural strikes or feeding/
-moults/mating/generation. Full80-suite Linux CI40098023022 at642af969 remains
-IN PROGRESS (compile/strict passed, All suites running); finish the same job.
+moults/mating/generation. Full80-suite Linux CI40098023022 SUCCEEDS at642af969: all suites,
+compilation, strict types, exports and runner checks complete. The receipt and
+source bindings are in docs/predator-endings/github-ci.json and qualification.json.
 The ordinary exports are current and unpublished; private14 still has preceding
 032b5985ac17eeb2. No new publication, production/main/OneDrive/Godot edits.
 Broader goal ACTIVE. Qualification and exports are recorded for this candidate.
-First finish the same CI run and record its result, then continue full-life/
-rest/save and collision/content gaps; this is not clearance.
+CI is complete; continue full-life/rest/save and collision/content gaps.
+This is a qualified small fix, not clearance for the whole audit.
 
 Latest private publication and Player supplement,2026-10-24: user explicitly
 approved evidence032b5985ac17eeb2 / VerifiedPrivateCurrent.rbxl for existing

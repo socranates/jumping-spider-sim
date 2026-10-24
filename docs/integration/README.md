@@ -19,9 +19,12 @@ server/shared admission facades. The qualified server-clock shim and12-check
 title regression are included; the default is79 suites. check_runner.py proves
 all79 programs match qualified staged programs byte for byte after normalizing
 only the independently verified font assignment. This is program equivalence,
-not a new full/native execution. Five runner infrastructure checks and143
-selected normal-path checks passed. The standard full79 execution is pending
-at this checkpoint; inspect its original output before claiming completion.
+not a new native execution. Five runner infrastructure checks and143
+selected normal-path checks passed. The standard Windows command then completed
+all79 suites with468979 top-level passes and0 failures (exit0). full-cli.txt and
+full-cli-receipt.json retain the ordered summaries and exact input/model hashes.
+collect_full.py --exit-code0 --check revalidated that completed output before
+any later source edits; use the receipt's cohort when interpreting this result.
 
 ## Normal commands
 
@@ -66,4 +69,6 @@ check completes controller, phone, audio or full-world performance verification.
 The published production baseline remains140; private test13 predates the font
 fix. No new upload, main merge or laptop synchronization is claimed. Follow
 ../audit/HEALTH-CURRENT.md and ../../chet/save-continue.md for the remaining
-audit, content correction, source/CI checks and release decision.
+audit, content correction, source/CI checks and release decision. Linux CI run
+40067737217 is still running at this checkpoint; Windows success does not
+substitute for that independent job's completion.

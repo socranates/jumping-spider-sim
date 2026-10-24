@@ -19,9 +19,12 @@ and defaults to79 suites (original78 plus the12-check title regression).
 Five Python infrastructure checks and143 selected normal-path checks passed.
 All79 generated programs match staged qualified programs byte for byte after
 normalizing only the verified font line (runner-equivalence.json).
-The standard full79 run is LIVE: exec45848, output docs/integration/full-cli.txt.
-Do not restart it or alter source/test inputs while it runs. Set-Content may
-buffer output; a zero-length file is not evidence that the process stopped.
+The standard full79 Windows run completed exec45848 terminal exit0:
+468979 top-level passes,0 failures. docs/integration/full-cli.txt and
+full-cli-receipt.json retain exact summaries/input/build hashes; collector create
+and --check both passed before any subsequent source edits. Its first parse
+refused CRLF output; normalizing line endings for parsing fixed the collector
+without modifying the raw test output or rerunning a successful test.
 Normal source compile273/273 and strict0 finished (exec77874 terminal exit0).
 
 The normal builder exports both tracked models, verifies every source hash/
@@ -36,9 +39,9 @@ execution or online-storage proof. Standard source/build/test is portable;
 historical native collectors still need their original laptop snapshots/logs.
 
 Integration code is committed/pushed as7f7eeead. Linux CI40067737217 has
-passed compilation/strict and is running all suites. Next: finish/record the
-live standard Windows run, inspect Linux completion/exports, and commit the
-current result/handoff records.
+passed compilation/strict and is running all suites. Next: inspect Linux
+completion/exports, apply the narrow confirmed notebook correction, and retain
+separate evidence for any changed source cohort.
 Normal branch activation is not main/production/laptop synchronization.
 
 ## Completed evidence, correctly scoped
@@ -84,7 +87,7 @@ qa_s_6e1d2e8c340b49f7 is retired too. Private13 used
 WindowsillTest_player57_20261023a1 and fresh t<server-time>_<UserId> owners.
 No production or retired QA actor was touched.
 
-After the live full run, apply the confirmed first-page notebook correction
+Next apply the confirmed first-page notebook correction
 through its generator, retaining frozen originals and revised-page expectations:
 green basal chelicerae are not the actual fangs; female size reaches~19mm.
 CONTENT-CURRENT.md cites the opened MDC account. This is UNAPPLIED; Luna is

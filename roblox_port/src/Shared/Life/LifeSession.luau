@@ -2,6 +2,12 @@
 -- LIFE-19..23: player progress lives outside world checkpoints. Session only until server saves are ported.
 local Session = {}
 Session.__index = Session
+-- Authored lethal outcomes handled by the client. Keep unknown outcomes out;
+-- newer predators and water must reach the same ending/lineage path as hunger.
+local LETHAL_CAUSES = table.freeze({
+ wasp=true,starved=true,rival=true,night=true,
+ cat=true,crab_spider=true,bird=true,frog=true,drowned=true,
+})
 Session.SPOTS = { Vector3.new(12,.31,9), Vector3.new(-8,.31,-10), Vector3.new(24,.31,8), Vector3.new(-2,.31,10) }
 function Session.new(): any
 	return setmetatable({ mode="main", rules="standard", ended=false, summary=nil,
@@ -20,7 +26,7 @@ function Session.finishAdult(self: any, stage: number): boolean
 	return true
 end
 function Session.endLife(self: any, cause: string, summary: any): boolean
-	if self.ended or self.rules == "gentle" or (cause ~= "wasp" and cause ~= "starved" and cause ~= "rival" and cause ~= "night") then return false end
+	if self.ended or self.rules == "gentle" or not LETHAL_CAUSES[cause] then return false end
 	self.ended, self.deaths = true, self.deaths + 1
 	self.summary = table.clone(summary)
 	self.summary.cause, self.summary.mode, self.summary.rules = cause, self.mode, self.rules

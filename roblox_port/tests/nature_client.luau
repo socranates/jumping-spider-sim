@@ -169,5 +169,26 @@ check("in Free play nothing of it: walking is free, no cover factor, a night in 
 	frames(10)
 end)
 
+for _,text in {
+ require("../src/Shared/UI/CatText"),require("../src/Shared/UI/CrabText"),
+ require("../src/Shared/UI/BirdText"),require("../src/Shared/UI/FrogText"),require("../src/Shared/UI/WaterText"),
+} do
+ -- Exercise the real client end handler/panel/Another callback. Predator
+ -- sensing and strike geometry have separate simulation tests.
+ check(text.CAUSE.." reaches the authored ending and allows another life",function()
+  local d=ClientStubs.driver
+  assert(d.fresh("main",false));frames(10)
+  local previous=d.session.deaths
+  d.endLife(text.CAUSE)
+  frames(120)
+  assert(d.session.ended and d.session.deaths==previous+1 and d.session.summary.cause==text.CAUSE,"lethal result was silently refused")
+  assert(d.caughtPanel:isShowing() and d.caughtPanel.line.Text==text.LINE and d.caughtPanel.sub.Text==text.SUB,"wrong or missing ending panel")
+  d.endLife("wasp")
+  assert(d.session.deaths==previous+1 and d.session.summary.cause==text.CAUSE,"duplicate result replaced the ending")
+  local archived=#d.session.lives
+  d.caughtPanel:update(5);assert(d.caughtPanel:choose("Another"));frames(10)
+  assert(not d.session.ended and not d.caughtPanel:isShowing() and #d.session.lives==archived+1 and d.session.lives[#d.session.lives].cause==text.CAUSE,"Another did not preserve lineage and resume play")
+ end)
+end
 print(`NATURE_CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("nature_client checks failed") end

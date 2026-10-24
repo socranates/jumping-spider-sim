@@ -42,5 +42,29 @@ check(s:another()==Session.SPOTS[2],"new unrelated spot matches Godot")
 check(#s.lives==1 and s.lives[1].cause=="starved" and not s.ended,"life archived")
 check(s:begin("main",true) and s.rules=="gentle","Easy unlocked")
 check(not s:endLife("starved",{}),"Easy cannot die")
+-- Every authored lethal cause must reach the session/lineage, not only the
+-- original wasp/rival/night causes. Unknown causes still cannot end a life.
+local causes={"wasp","starved","rival","night","cat","crab_spider","bird","frog","drowned"}
+for _,cause in causes do
+ local normal=Session.new();assert(normal:begin("main",false))
+ local summary={hours=7,meals=2,stage=1}
+ local ended=normal:endLife(cause,summary)
+ check(ended and normal.ended and normal.deaths==1,`Normal {cause} ends once`)
+ check(normal.summary~=nil and normal.summary.cause==cause and normal.summary.hours==7 and normal.summary.meals==2,`{cause} retains the correct summary`)
+ check(not normal:endLife("starved",{}) and normal.deaths==(if ended then 1 else 0),`{cause} refuses duplicate death`)
+ if ended then
+  normal:another()
+  check(#normal.lives==1 and normal.lives[1].cause==cause and not normal.ended,`{cause} archives once and permits another life`)
+ end
+ for _,mode in {"free","easy"} do
+  local gentle=Session.new();gentle.finishedMain=true
+  assert(gentle:begin(if mode=="free"then"free"else"main",mode=="easy"))
+  check(not gentle:endLife(cause,summary) and not gentle.ended and gentle.deaths==0 and gentle.summary==nil,`{mode} refuses lethal {cause}`)
+ end
+end
+for _,cause in {"","unknown","Cat","moulted"} do
+ local normal=Session.new();normal:begin("main",false)
+ check(not normal:endLife(cause,{}) and not normal.ended and normal.deaths==0 and normal.summary==nil,`unknown {cause} has no side effects`)
+end
 print(`CONTINUING passed={passed} failed={failed}`)
 if failed>0 then error("continuing failed") end

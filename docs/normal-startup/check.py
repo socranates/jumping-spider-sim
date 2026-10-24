@@ -7,7 +7,8 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 checker=m.checker();prior=checker.paths
 def paths():
  out=prior();out.update({'Server/Persistence.server.luau':H/'persistence.server.luau',
-  'Server/RecoveryStartup.luau':H/'composition.luau','Client/SpiderClient.client.luau':H/'spider-client.client.luau'})
+  'Server/RecoveryStartup.luau':H/'composition.luau','Client/SpiderClient.client.luau':H/'spider-client.client.luau',
+  'Server/ReplacementOwnerPrototype.luau':H/'ordinary-replacement-owner.luau'})
  return out
 checker.paths=paths
 if __name__=='__main__':

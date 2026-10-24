@@ -61,4 +61,4 @@ for number in (1,2):
   assert ends['main-home']['over_50ms']==0 and ends['garden']['over_50ms']==1
   assert ends['startup']['worst_ms']>1800 and receipt['representative_fps_proved'] is False
  else:assert receipt['terminal']=='partial' and 'garden' not in ends
-print('54-target type inputs; two startup attempts; two frame models and exact output receipts verified. Startup remains unqualified.')
+print('Retained v2 type inputs, original startup attempts and two frame models verified; this checks their historical scope only.')

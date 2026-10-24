@@ -1,0 +1,3 @@
+2026-10-24T01:18:48.269Z,44.269169,3bb0,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_GUARD] 274 unbound memory_only normal_startup_enabled
+2026-10-24T01:19:04.462Z,60.462070,3bb0,6,Info [FLog::CreatorOutput] [Windowsill] saves: WindowsillTest_v1; account-owned Preserve startup
+2026-10-24T01:19:16.410Z,72.410385,34c8,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_PASS] 1792804747610 {"real_storage":false,"mode":"no_api","snapshot":{"lockReleased":false,"active":0,"requests":5,"gate":{"actors":1,"history":5,"reserved":0,"started":0,"read":5,"write":1,"queued":0,"scopes":0},"archives":0,"starts":5,"owners":[{"epoch":":1792804744:1","closed":false}],"rests":[],"optionsCreated":4,"optionsDestroyed":4,"ready":true},"checks":10}

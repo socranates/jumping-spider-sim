@@ -1,0 +1,45 @@
+{
+  "run": "1792804747610",
+  "terminal": "passed",
+  "result": {
+    "real_storage": false,
+    "mode": "no_api",
+    "snapshot": {
+      "lockReleased": false,
+      "active": 0,
+      "requests": 5,
+      "gate": {
+        "actors": 1,
+        "history": 5,
+        "reserved": 0,
+        "started": 0,
+        "read": 5,
+        "write": 1,
+        "queued": 0,
+        "scopes": 0
+      },
+      "archives": 0,
+      "starts": 5,
+      "owners": [
+        {
+          "epoch": ":1792804744:1",
+          "closed": false
+        }
+      ],
+      "rests": [],
+      "optionsCreated": 4,
+      "optionsDestroyed": 4,
+      "ready": true
+    },
+    "checks": 10
+  },
+  "model_sha256": "8522293fa6f42c1229ca900977465bc9dbc729a7b6b9aa4a0b6699539c2eb9c3",
+  "source_count": 274,
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261024T011804Z_Studio_09C2F_last.log",
+  "output_sha256": "9fcf9dccb1b7e710226ef7dbcd3b60dc15d38bf602beef14160d87251098dc84",
+  "diagnostic_unavailable": true,
+  "storage": "yielding-memory",
+  "normal_entrypoints": true,
+  "real_storage": false,
+  "published": false
+}

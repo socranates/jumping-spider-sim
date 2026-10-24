@@ -1,0 +1,38 @@
+{
+  "full_checks": 289785,
+  "full_failures": 0,
+  "service_checks": 1754,
+  "service_cases": 48,
+  "new_cases": 12,
+  "new_case_checks": 288,
+  "changed_target": "Server/ReplacementOwnerPrototype.luau",
+  "candidate_sha256": "c74f0547a112c7927ab8766f4346028ee4f67eb36d256a0799e20b0cace9371d",
+  "native_runs": [
+    {
+      "run": "1792804165728",
+      "checks": 19,
+      "starts": 25,
+      "options": 16,
+      "model_sha256": "bf17bf98f45fa71af7460c99d5ccbcc6d926cb910ad3cfe321bfcddea6b2927c"
+    },
+    {
+      "run": "1792804622366",
+      "checks": 18,
+      "starts": 28,
+      "options": 19,
+      "model_sha256": "a376df18a891ac4981ce3e0f637e593bca891b68ff829c16d389a979f0026409"
+    }
+  ],
+  "no_api_run": {
+    "run": "1792804747610",
+    "checks": 10,
+    "starts": 5,
+    "options": 4
+  },
+  "storage": "yielding-memory",
+  "real_storage_verified": false,
+  "legacy_startup_verified": false,
+  "production_activated": false,
+  "published": false,
+  "optimization_goal_complete": false
+}

@@ -6,11 +6,13 @@ sha=lambda b:hashlib.sha256(b).hexdigest()
 m=json.loads((a.stage/'manifest.json').read_text())
 assert m['startup_clock']and m['source_count']==276 and m['variant']=='after'
 assert sha(Path(m['place']).read_bytes())==m['place_sha256']and sha((a.stage/'guard.luau').read_bytes())==m['guard_sha256']
-events=[];guards=[];diagnostics=[];lines=[]
+events=[];guards=[];diagnostics=[];lines=[];server=[]
 for line in a.log.read_text(encoding='utf8').splitlines():
  if '[FLog::CreatorOutput]'in line and '[STARTUP_CLOCK_'in line:
   hit=re.search(r'\[STARTUP_CLOCK_(\w+)\]\s+(\d+)\s+(\{.*\})$',line);assert hit,'Truncated observer line'
   events.append(dict(kind=hit[1],run=hit[2],value=json.loads(hit[3])));lines.append(line)
+ elif '[FLog::CreatorOutput]'in line and '[STARTUP_SERVER_MARK]'in line:
+  hit=re.search(r'\[STARTUP_SERVER_MARK\]\s+(\{.*\})$',line);assert hit;server.append(json.loads(hit[1]));lines.append(line)
  elif '[FLog::CreatorOutput]'in line and '[MATRIX_GUARD]'in line:guards.append(line);lines.append(line)
  elif '[FLog::CreatorError]'in line or '[FLog::CreatorWarning]'in line:diagnostics.append(line);lines.append(line)
 assert len({x['run']for x in events})==1
@@ -26,13 +28,17 @@ assert summary['raw_after_first']['n']==summary['callback_after_first']['n']==su
 marks=[x['value']for x in events if x['kind']=='MARK']
 required=['client-enter','direct-imports-done','world-client-begin','world-client-end','module-table-done','spider-rig-begin','spider-rig-end',
  'stream-looks-begin','stream-looks-end','hud-begin','hud-end','animal-bodies-begin','animal-bodies-end','render-binding-begin','client-hooks-ready','title-ready']
+if m.get('startup_profile'):
+ required[3:3]=['world-client-import-begin','world-client-dependencies-ready','world-client-import-end','world-client-new-begin',
+  'world-map-selected','home-region-begin','home-region-end','world-bounds-ready','home-collision-begin','home-collision-end','world-client-new-end']
+ assert [x['name']for x in server]==['imports-begin','imports-end','decor-begin','decor-end','hidden-plan-begin','physical-world-begin','physical-world-end']
 assert [x['name']for x in marks]==required,[x['name']for x in marks]
 assert all(b['t']>=a['t']for a,b in zip(marks,marks[1:]))
 assert not any('[FLog::CreatorError]'in x for x in diagnostics)
 raw=('\n'.join(lines)+'\n').encode();assert not a.out.exists();a.out.mkdir(parents=True)
 (a.out/'native-output.txt').write_bytes(raw);(a.out/'manifest.json').write_bytes((a.stage/'manifest.json').read_bytes())
 record=dict(run=events[0]['run'],tier=m['tier'],model_sha256=m['place_sha256'],source_guards=len(guards),
- manifest_sha256=sha((a.stage/'manifest.json').read_bytes()),native_output_sha256=sha(raw),events=events,first=first,summary=summary,marks=marks,
+ manifest_sha256=sha((a.stage/'manifest.json').read_bytes()),native_output_sha256=sha(raw),events=events,server_marks=server,first=first,summary=summary,marks=marks,
  creator_errors=sum('[FLog::CreatorError]'in x for x in diagnostics),creator_warnings=sum('[FLog::CreatorWarning]'in x for x in diagnostics),
  limits='Unbound Studio ordinary startup/title only, memory backend and timing hooks. First raw dt and observed wall time are separate. After-first distributions span changing startup phases, not steady gameplay FPS. Not private Player startup, real storage or a before/after optimization claim.')
 (a.out/'native.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())

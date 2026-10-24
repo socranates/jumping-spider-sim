@@ -3,6 +3,7 @@
 local Run=game:GetService("RunService")
 local WS=game:GetService("Workspace")
 local Http=game:GetService("HttpService")
+local Prof=require(script.Parent.FrameProfile)
 local P={}
 local s:any={begun=false,phase="none",frames=0,gaps={},raw={},intervals={}}
 local tag=tostring(DateTime.now().UnixTimestampMillis)
@@ -17,6 +18,7 @@ function P.note(name:string,value:any)emit(name,value)end
 function P.begin()
  assert(not s.begun and Run:IsStudio()and Run:IsClient()and game.PlaceId==0 and game.GameId==0 and WS:GetAttribute("StartupClock")==true)
  s.begun=true;s.born=os.clock();s.lastMark=s.born
+ Prof.start()
  P.mark("client-enter")
  s.connection=Run.Heartbeat:Connect(function(dt:number)
   local now=os.clock();local elapsed=now-s.born
@@ -26,7 +28,8 @@ function P.begin()
     preprobe_span_lower_bound_ms=math.max(0,dt-interval)*1000,phase=s.phase})
   else table.insert(s.raw,dt);table.insert(s.intervals,interval)end
   if dt>.04 or interval>.04 then
-   local row={t=elapsed,raw_dt_ms=dt*1000,callback_interval_ms=interval*1000,first=s.frames==1,phase=s.phase,heap_kb=gcinfo()}
+   local row={t=elapsed,raw_dt_ms=dt*1000,callback_interval_ms=interval*1000,first=s.frames==1,phase=s.phase,heap_kb=gcinfo(),
+    profile_frames=Prof.state.frames,parts=table.clone(Prof.state.current)}
    table.insert(s.gaps,row)
    table.sort(s.gaps,function(a:any,b:any):boolean return math.max(a.raw_dt_ms,a.callback_interval_ms)>math.max(b.raw_dt_ms,b.callback_interval_ms)end)
    if #s.gaps>12 then table.remove(s.gaps)end
@@ -44,7 +47,11 @@ local function summary(values:{number}):any
 end
 function P.finish(ok:boolean,why:any)
  if s.connection then s.connection:Disconnect()end
- for _,row in s.gaps do emit("GAP",row)end
+ Prof.stop()
+ for _,row in s.gaps do
+  local parts=row.parts;row.parts=nil;emit("GAP",row)
+  for name,seconds in parts do if seconds>.001 then emit("GAP_PART",{t=row.t,name=name,ms=seconds*1000,profile_frames=row.profile_frames})end end
+ end
  emit("SUMMARY",{wall_seconds=os.clock()-s.born,frames=s.frames,raw_after_first=summary(s.raw),callback_after_first=summary(s.intervals)})
  emit(if ok then"PASS"else"FAIL",{problem=if ok then nil else string.sub(tostring(why),1,400),unbound=true,storage="yielding-memory",detail=WS:GetAttribute("Detail")})
  WS:SetAttribute("StartupClockFinished",true)

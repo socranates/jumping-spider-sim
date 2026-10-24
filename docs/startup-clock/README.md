@@ -43,3 +43,35 @@ No FPS gain, standalone startup fix, physical-phone result or natural-life
 qualification follows. After-first distributions span changing startup and
 title phases, so their mean is not steady gameplay FPS. The existing Studio
 style/asset warnings remain in the raw bounded output.
+
+## Detailed current observation
+
+Run1792835122806 is retained in full-deep1/. Model SHA256:
+721c4ee2381b291535bd5867a5d0098bbaded2e030071a2e8123d2ca086ee00a.
+Stage:C:/Users/natha/claude-xfer/Windowsill-startup-clock-full-deep1.
+This diagnostic also times the server Main phases, splits WorldClient import
+from construction, and enables the existing per-render-part profiler. The
+game's normal profiler remains off in ordinary exports.
+
+The import takes20.88ms; home/region/bounds selection is below1ms. The
+construction block covering essential home/decor arrival spans2394.95ms.
+It does not yet identify the particular missing child or optional Decor wait.
+The server's physical-world call spans105.48ms and has already completed
+before client entry. The hidden-piece plan spans6.40ms. These measured spans
+do not support blaming the entire client delay on module imports or slow
+server box construction.
+
+The two largest callback intervals are2561.51ms and1106.66ms, both with zero
+completed game render callbacks. The next750.37ms interval contains one
+profiled frame whose navigation part is8.40ms. This does not establish an
+engine root cause, but prevents assigning the whole long interval to the
+navigation/render callback. A later readiness frame has several10–13ms parts
+(looks, shadows, rig), rather than one1s Lua part.
+
+Client hooks ready at2.945s; title/navigation/save ready at11.300s. Capture
+finishes at21.394s with cleanup and both276-source guards passing, zero
+CreatorErrors, and retained warnings. No viewport or accessibility snapshots
+occurred after the initial text-only F5 refresh until capture completion.
+This is a separate, more instrumented cohort, not a speed comparison with
+the initial run. Next locate the exact required-child/decor wait and sample
+engine counters at those gaps before deciding whether a game fix is justified.

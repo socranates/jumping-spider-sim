@@ -38,7 +38,7 @@ if a.startup_clock:
  anchors={
   'local M = {':mark+'.mark("direct-imports-done")\nlocal M = {',
   'M.lock = M.LockOn.new()':mark+'.mark("module-table-done")\nM.lock = M.LockOn.new()',
-  'World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),':'World = '+mark+'.call("world-client",function()return require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer)end),',
+  'World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),':'World = '+mark+'.call("world-client",function()local module='+mark+'.call("world-client-import",function()return require(script.Parent.WorldClient)end);return '+mark+'.call("world-client-new",function()return module.new(Workspace, Players.LocalPlayer)end)end),',
   'local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)':'local rig = '+mark+'.call("spider-rig",function()return SpiderRig.new(Workspace, M.World.root, appearance, detail)end)',
   'M.World:streamLooks(Workspace, detail)':mark+'.call("stream-looks",function()M.World:streamLooks(Workspace, detail)end)',
   'local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))':'local hud = '+mark+'.call("hud",function()return SpiderHud.new(player:WaitForChild("PlayerGui"))end)',
@@ -48,6 +48,27 @@ if a.startup_clock:
  for old,new in anchors.items():assert client.count(old)==1,old;client=client.replace(old,new)
 client+='\nif RunService:IsStudio() and Workspace:GetAttribute("MatrixPerf")==true then task.spawn(function()require(script.Parent.MatrixPlayback)(M.hooks())end)end\n'
 source['Client/SpiderClient.client.luau']=client.encode()
+if a.startup_clock:
+ code=source['Client/WorldClient.luau'].decode()
+ anchors={
+  'local WorldClient = {}':'local StartupTrace=require(script.Parent.MatrixProbe)\nStartupTrace.mark("world-client-dependencies-ready")\nlocal WorldClient = {}',
+  'WorldMap.use(Worlds.choose(named))':'WorldMap.use(Worlds.choose(named))\nStartupTrace.mark("world-map-selected")',
+  'local home = m.region(m.HOME) :: WorldMap.Region':'local home = StartupTrace.call("home-region",function()return m.region(m.HOME)end) :: WorldMap.Region',
+  'local lo, hi = m.bounds()':'local lo, hi = m.bounds();StartupTrace.mark("world-bounds-ready")',
+  'local flat = ws:FindFirstChild(name)':'StartupTrace.mark("home-collision-begin")\nlocal flat = ws:FindFirstChild(name)',
+  'pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)':'StartupTrace.mark("home-collision-end")\npcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)'}
+ for old,new in anchors.items():assert code.count(old)==1,old;code=code.replace(old,new)
+ source['Client/WorldClient.luau']=code.encode()
+ code=source['Server/Main.server.luau'].decode()
+ anchors={'local Habitat =':('imports-begin',None),'Players.CharacterAutoLoads = false':('imports-end',None),
+  'local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil, worldId)':('decor-begin','decor-end'),
+  'local hidden: { [string]: boolean } = {}':('hidden-plan-begin',None),
+  'WorldBuild.world(Workspace, WorldMap.SEED, hidden)':('physical-world-begin','physical-world-end')}
+ for anchor,(before,after)in anchors.items():
+  assert code.count(anchor)==1,anchor
+  def server_mark(label):return 'print("[STARTUP_SERVER_MARK]",game:GetService("HttpService"):JSONEncode({name="'+label+'",at=workspace:GetServerTimeNow(),clock=os.clock(),heap_kb=gcinfo()}))'
+  code=code.replace(anchor,server_mark(before)+'\n'+anchor+('\n'+server_mark(after)if after else ''))
+ source['Server/Main.server.luau']=code.encode()
 source['Server/NormalStartupDiagnosticStorage.luau']=(ROOT/'docs/normal-startup/diagnostic-storage.luau').read_bytes()
 persistence=source['Server/Persistence.server.luau'].decode()
 start=persistence.index('local function loadStore()');end=persistence.index('local dataStore,available=loadStore()',start)
@@ -101,6 +122,6 @@ guard='assert(game.PlaceId==0 and game.GameId==0 and not game:GetService("RunSer
 if a.seam_group:guard='assert(workspace:GetAttribute("SeamGroup")=='+json.dumps(a.seam_group)+');'+guard
 guard+='for _,r in expected do local it=game;for n in string.gmatch(r[1],"[^.]+")do it=assert(it:FindFirstChild(n),r[1])end;local s=string.gsub(it.Source,"\\r\\n","\\n");local x,y=1,0;for i=1,#s do x=(x+string.byte(s,i))%65521;y=(y+x)%65521 end;assert(#s==r[2] and y*65536+x==r[3],r[1])end;assert(not game.ServerScriptService.Server.Persistence.Disabled);print("[MATRIX_GUARD]",'+str(source_count)+',"'+a.variant+'","'+a.tier+'","unbound memory_only")'
 (out/'guard.luau').write_bytes((guard+'\n').encode())
-manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
+manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,startup_profile=a.startup_clock,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
 (out/'manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode())
 print(json.dumps(dict(place=str(place),sha256=manifest['place_sha256'],sources=source_count,variant=a.variant,tier=a.tier)),flush=True)

@@ -1,0 +1,1021 @@
+{
+  "run": "1792835122806",
+  "tier": "full",
+  "model_sha256": "721c4ee2381b291535bd5867a5d0098bbaded2e030071a2e8123d2ca086ee00a",
+  "source_guards": 2,
+  "manifest_sha256": "7683a29b1d1064c8fc8568f9fa94d2e6cadb354ef48c04991d3f349fbfc7541d",
+  "native_output_sha256": "271dde9866762db00ca8431616e727ca44a8a2e78abdbcb1505ffe85a949a84b",
+  "events": [
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "client-enter",
+        "heap_kb": 1327,
+        "t": 2.4000037228688598e-06,
+        "delta": 2.4000037228688598e-06,
+        "server_at": 1792835122.810937
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "direct-imports-done",
+        "heap_kb": 9019,
+        "t": 0.3149543000035919,
+        "delta": 0.31495189999986906,
+        "server_at": 1792835123.12589
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-begin",
+        "heap_kb": 9402,
+        "t": 0.33038340001075994,
+        "delta": 0.015429100007168017,
+        "server_at": 1792835123.141337
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-import-begin",
+        "heap_kb": 9402,
+        "t": 0.3306468000082532,
+        "delta": 0.00026339999749325216,
+        "server_at": 1792835123.141578
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-dependencies-ready",
+        "heap_kb": 9840,
+        "t": 0.35127950001333375,
+        "delta": 0.02063270000508055,
+        "server_at": 1792835123.162221
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-import-end",
+        "heap_kb": 9842,
+        "t": 0.3515219000109937,
+        "delta": 0.0002423999976599589,
+        "server_at": 1792835123.162454
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-new-begin",
+        "heap_kb": 9842,
+        "t": 0.35158750000118744,
+        "delta": 6.559999019373208e-05,
+        "server_at": 1792835123.162519
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-map-selected",
+        "heap_kb": 9843,
+        "t": 0.3516797000047518,
+        "delta": 9.220000356435776e-05,
+        "server_at": 1792835123.162611
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "home-region-begin",
+        "heap_kb": 9844,
+        "t": 0.3517376000090735,
+        "delta": 5.7900004321709275e-05,
+        "server_at": 1792835123.162669
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "home-region-end",
+        "heap_kb": 9844,
+        "t": 0.3517891000083182,
+        "delta": 5.149999924469739e-05,
+        "server_at": 1792835123.162727
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-bounds-ready",
+        "heap_kb": 9845,
+        "t": 0.35185370000544935,
+        "delta": 6.459999713115394e-05,
+        "server_at": 1792835123.162785
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "home-collision-begin",
+        "heap_kb": 9845,
+        "t": 0.3519078000099398,
+        "delta": 5.4100004490464926e-05,
+        "server_at": 1792835123.162839
+      }
+    },
+    {
+      "kind": "FIRST",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 499.3915855884552,
+        "phase": "home-collision-begin",
+        "t": 0.40309330000309274,
+        "observed_since_begin_ms": 403.09330000309274,
+        "preprobe_span_lower_bound_ms": 96.29828558536246
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "home-collision-end",
+        "heap_kb": 10903,
+        "t": 2.7468556000094395,
+        "delta": 2.3949477999994997,
+        "server_at": 1792835125.557794
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-new-end",
+        "heap_kb": 10906,
+        "t": 2.7473276000091573,
+        "delta": 0.00047199999971780926,
+        "server_at": 1792835125.558263
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "world-client-end",
+        "heap_kb": 10906,
+        "t": 2.747577000001911,
+        "delta": 0.0002493999927537516,
+        "server_at": 1792835125.558511
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "module-table-done",
+        "heap_kb": 11378,
+        "t": 2.783499400000437,
+        "delta": 0.03592239999852609,
+        "server_at": 1792835125.594435
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "spider-rig-begin",
+        "heap_kb": 11385,
+        "t": 2.7850379000010435,
+        "delta": 0.001538500000606291,
+        "server_at": 1792835125.595973
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "spider-rig-end",
+        "heap_kb": 12203,
+        "t": 2.80909700000484,
+        "delta": 0.02405910000379663,
+        "server_at": 1792835125.620033
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "stream-looks-begin",
+        "heap_kb": 12546,
+        "t": 2.8253912000072887,
+        "delta": 0.016294200002448633,
+        "server_at": 1792835125.636328
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "stream-looks-end",
+        "heap_kb": 12620,
+        "t": 2.8365448000113247,
+        "delta": 0.01115360000403598,
+        "server_at": 1792835125.64748
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "hud-begin",
+        "heap_kb": 12622,
+        "t": 2.836838000002899,
+        "delta": 0.00029319999157451093,
+        "server_at": 1792835125.647771
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "hud-end",
+        "heap_kb": 12632,
+        "t": 2.840568500003428,
+        "delta": 0.0037305000005289912,
+        "server_at": 1792835125.651505
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "animal-bodies-begin",
+        "heap_kb": 12701,
+        "t": 2.859571799999685,
+        "delta": 0.01900329999625683,
+        "server_at": 1792835125.670507
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "animal-bodies-end",
+        "heap_kb": 12882,
+        "t": 2.8740660000039497,
+        "delta": 0.014494200004264712,
+        "server_at": 1792835125.685001
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "render-binding-begin",
+        "heap_kb": 13294,
+        "t": 2.944235500006471,
+        "delta": 0.07016950000252109,
+        "server_at": 1792835125.755184
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "client-hooks-ready",
+        "heap_kb": 13316,
+        "t": 2.9454893000074662,
+        "delta": 0.0012538000009953976,
+        "server_at": 1792835125.756422
+      }
+    },
+    {
+      "kind": "CLIENT",
+      "run": "1792835122806",
+      "value": {
+        "navigation": "pending",
+        "title_ready": false,
+        "save_ready": true,
+        "menu": false,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792835122806",
+      "value": {
+        "name": "title-ready",
+        "heap_kb": 35250,
+        "t": 11.299569900002098,
+        "delta": 8.354080599994631,
+        "server_at": 1792835134.111507
+      }
+    },
+    {
+      "kind": "READY",
+      "run": "1792835122806",
+      "value": {
+        "navigation": "ready",
+        "title_ready": true,
+        "save_status": "saved",
+        "save_ready": true,
+        "menu": true,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792835122806",
+      "value": {
+        "focus_lost": 0,
+        "life_started": false,
+        "scopes": 0,
+        "active": 0
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 2545.520067214966,
+        "heap_kb": 13317,
+        "profile_frames": 0,
+        "callback_interval_ms": 2561.512500004028,
+        "phase": "client-hooks-ready",
+        "t": 2.9646058000071207,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 981.9386601448059,
+        "heap_kb": 13318,
+        "profile_frames": 0,
+        "callback_interval_ms": 1106.6589999973075,
+        "phase": "client-hooks-ready",
+        "t": 4.071264800004428,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 875.6501078605652,
+        "heap_kb": 14238,
+        "profile_frames": 1,
+        "callback_interval_ms": 750.3735000063898,
+        "phase": "client-hooks-ready",
+        "t": 4.821638300010818,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.39839999389369,
+        "t": 4.821638300010818,
+        "name": "navigation startup",
+        "profile_frames": 1
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 499.3915855884552,
+        "heap_kb": 10813,
+        "profile_frames": 0,
+        "callback_interval_ms": 403.09330000309274,
+        "phase": "home-collision-begin",
+        "t": 0.40309330000309274,
+        "first": true
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 83.52792263031006,
+        "heap_kb": 13356,
+        "profile_frames": 4,
+        "callback_interval_ms": 78.65619999938644,
+        "phase": "client-hooks-ready",
+        "t": 5.000573600002099,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 9.260100006940775,
+        "t": 5.000573600002099,
+        "name": "navigation startup",
+        "profile_frames": 4
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 64.11436945199966,
+        "heap_kb": 33710,
+        "profile_frames": 363,
+        "callback_interval_ms": 64.32109999877866,
+        "phase": "client-hooks-ready",
+        "t": 11.240987900004257,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 3.7468999944394454,
+        "t": 11.240987900004257,
+        "name": "sound",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 10.19570000062231,
+        "t": 11.240987900004257,
+        "name": "shadows",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 12.631199992028996,
+        "t": 11.240987900004257,
+        "name": "spider rig",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 12.613900005817413,
+        "t": 11.240987900004257,
+        "name": "looks",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.496800001012161,
+        "t": 11.240987900004257,
+        "name": "navigation startup",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 1.4783999940846115,
+        "t": 11.240987900004257,
+        "name": "hud",
+        "profile_frames": 363
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 58.467548340559006,
+        "heap_kb": 35251,
+        "profile_frames": 364,
+        "callback_interval_ms": 59.268500001053326,
+        "phase": "title-ready",
+        "t": 11.30025640000531,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 2.4471000069752336,
+        "t": 11.30025640000531,
+        "name": "prey",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 10.230300002149306,
+        "t": 11.30025640000531,
+        "name": "other rigs",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 4.725300008431077,
+        "t": 11.30025640000531,
+        "name": "sound",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 1.5374000067822635,
+        "t": 11.30025640000531,
+        "name": "rival",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 5.441900008008815,
+        "t": 11.30025640000531,
+        "name": "fly bodies",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 2.905300003476441,
+        "t": 11.30025640000531,
+        "name": "looks",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 11.271900002611801,
+        "t": 11.30025640000531,
+        "name": "light",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 1.3168000004952773,
+        "t": 11.30025640000531,
+        "name": "wasp",
+        "profile_frames": 364
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 59.189360588788986,
+        "heap_kb": 15114,
+        "profile_frames": 2,
+        "callback_interval_ms": 58.6633999919286,
+        "phase": "client-hooks-ready",
+        "t": 4.880301700002747,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 9.430899997823872,
+        "t": 4.880301700002747,
+        "name": "navigation startup",
+        "profile_frames": 2
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 55.9404157102108,
+        "heap_kb": 14017,
+        "profile_frames": 5,
+        "callback_interval_ms": 57.1256999974139,
+        "phase": "client-hooks-ready",
+        "t": 5.057699299999513,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.137400000123307,
+        "t": 5.057699299999513,
+        "name": "navigation startup",
+        "profile_frames": 5
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 53.047001361846924,
+        "heap_kb": 15924,
+        "profile_frames": 15,
+        "callback_interval_ms": 32.84159999748226,
+        "phase": "client-hooks-ready",
+        "t": 5.396806800010381,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.616500010248274,
+        "t": 5.396806800010381,
+        "name": "navigation startup",
+        "profile_frames": 15
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 28.20689231157303,
+        "heap_kb": 15007,
+        "profile_frames": 14,
+        "callback_interval_ms": 49.665600003208965,
+        "phase": "client-hooks-ready",
+        "t": 5.363965200012899,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.68149999587331,
+        "t": 5.363965200012899,
+        "name": "navigation startup",
+        "profile_frames": 14
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792835122806",
+      "value": {
+        "raw_dt_ms": 43.23466867208481,
+        "heap_kb": 14834,
+        "profile_frames": 12,
+        "callback_interval_ms": 36.820300010731444,
+        "phase": "client-hooks-ready",
+        "t": 5.285152000011294,
+        "first": false
+      }
+    },
+    {
+      "kind": "GAP_PART",
+      "run": "1792835122806",
+      "value": {
+        "ms": 8.7993000051938,
+        "t": 5.285152000011294,
+        "name": "navigation startup",
+        "profile_frames": 12
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "run": "1792835122806",
+      "value": {
+        "raw_after_first": {
+          "over50": 9,
+          "mean_ms": 21.622045353515862,
+          "p95_ms": 18.87115091085434,
+          "max_ms": 2545.520067214966,
+          "p50_ms": 16.93752408027649,
+          "n": 970
+        },
+        "callback_after_first": {
+          "over50": 8,
+          "mean_ms": 21.621024639186086,
+          "p95_ms": 18.246499996166676,
+          "max_ms": 2561.512500004028,
+          "p50_ms": 16.680200002156198,
+          "n": 970
+        },
+        "frames": 971,
+        "wall_seconds": 21.394232000006014
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792835122806",
+      "value": {
+        "unbound": true,
+        "storage": "yielding-memory",
+        "detail": "full"
+      }
+    }
+  ],
+  "server_marks": [
+    {
+      "at": 1792835122.101144,
+      "heap_kb": 7825,
+      "name": "imports-begin",
+      "clock": 71.88140539999586
+    },
+    {
+      "at": 1792835122.121971,
+      "heap_kb": 8169,
+      "name": "imports-end",
+      "clock": 71.90222879999783
+    },
+    {
+      "at": 1792835122.12742,
+      "heap_kb": 8172,
+      "name": "decor-begin",
+      "clock": 71.90767899999628
+    },
+    {
+      "at": 1792835122.156982,
+      "heap_kb": 9327,
+      "name": "decor-end",
+      "clock": 71.93724030000158
+    },
+    {
+      "at": 1792835122.167832,
+      "heap_kb": 9327,
+      "name": "hidden-plan-begin",
+      "clock": 71.94809169998916
+    },
+    {
+      "at": 1792835122.174236,
+      "heap_kb": 9111,
+      "name": "physical-world-begin",
+      "clock": 71.95449449999433
+    },
+    {
+      "at": 1792835122.279712,
+      "heap_kb": 10037,
+      "name": "physical-world-end",
+      "clock": 72.05997099999513
+    }
+  ],
+  "first": {
+    "raw_dt_ms": 499.3915855884552,
+    "phase": "home-collision-begin",
+    "t": 0.40309330000309274,
+    "observed_since_begin_ms": 403.09330000309274,
+    "preprobe_span_lower_bound_ms": 96.29828558536246
+  },
+  "summary": {
+    "raw_after_first": {
+      "over50": 9,
+      "mean_ms": 21.622045353515862,
+      "p95_ms": 18.87115091085434,
+      "max_ms": 2545.520067214966,
+      "p50_ms": 16.93752408027649,
+      "n": 970
+    },
+    "callback_after_first": {
+      "over50": 8,
+      "mean_ms": 21.621024639186086,
+      "p95_ms": 18.246499996166676,
+      "max_ms": 2561.512500004028,
+      "p50_ms": 16.680200002156198,
+      "n": 970
+    },
+    "frames": 971,
+    "wall_seconds": 21.394232000006014
+  },
+  "marks": [
+    {
+      "name": "client-enter",
+      "heap_kb": 1327,
+      "t": 2.4000037228688598e-06,
+      "delta": 2.4000037228688598e-06,
+      "server_at": 1792835122.810937
+    },
+    {
+      "name": "direct-imports-done",
+      "heap_kb": 9019,
+      "t": 0.3149543000035919,
+      "delta": 0.31495189999986906,
+      "server_at": 1792835123.12589
+    },
+    {
+      "name": "world-client-begin",
+      "heap_kb": 9402,
+      "t": 0.33038340001075994,
+      "delta": 0.015429100007168017,
+      "server_at": 1792835123.141337
+    },
+    {
+      "name": "world-client-import-begin",
+      "heap_kb": 9402,
+      "t": 0.3306468000082532,
+      "delta": 0.00026339999749325216,
+      "server_at": 1792835123.141578
+    },
+    {
+      "name": "world-client-dependencies-ready",
+      "heap_kb": 9840,
+      "t": 0.35127950001333375,
+      "delta": 0.02063270000508055,
+      "server_at": 1792835123.162221
+    },
+    {
+      "name": "world-client-import-end",
+      "heap_kb": 9842,
+      "t": 0.3515219000109937,
+      "delta": 0.0002423999976599589,
+      "server_at": 1792835123.162454
+    },
+    {
+      "name": "world-client-new-begin",
+      "heap_kb": 9842,
+      "t": 0.35158750000118744,
+      "delta": 6.559999019373208e-05,
+      "server_at": 1792835123.162519
+    },
+    {
+      "name": "world-map-selected",
+      "heap_kb": 9843,
+      "t": 0.3516797000047518,
+      "delta": 9.220000356435776e-05,
+      "server_at": 1792835123.162611
+    },
+    {
+      "name": "home-region-begin",
+      "heap_kb": 9844,
+      "t": 0.3517376000090735,
+      "delta": 5.7900004321709275e-05,
+      "server_at": 1792835123.162669
+    },
+    {
+      "name": "home-region-end",
+      "heap_kb": 9844,
+      "t": 0.3517891000083182,
+      "delta": 5.149999924469739e-05,
+      "server_at": 1792835123.162727
+    },
+    {
+      "name": "world-bounds-ready",
+      "heap_kb": 9845,
+      "t": 0.35185370000544935,
+      "delta": 6.459999713115394e-05,
+      "server_at": 1792835123.162785
+    },
+    {
+      "name": "home-collision-begin",
+      "heap_kb": 9845,
+      "t": 0.3519078000099398,
+      "delta": 5.4100004490464926e-05,
+      "server_at": 1792835123.162839
+    },
+    {
+      "name": "home-collision-end",
+      "heap_kb": 10903,
+      "t": 2.7468556000094395,
+      "delta": 2.3949477999994997,
+      "server_at": 1792835125.557794
+    },
+    {
+      "name": "world-client-new-end",
+      "heap_kb": 10906,
+      "t": 2.7473276000091573,
+      "delta": 0.00047199999971780926,
+      "server_at": 1792835125.558263
+    },
+    {
+      "name": "world-client-end",
+      "heap_kb": 10906,
+      "t": 2.747577000001911,
+      "delta": 0.0002493999927537516,
+      "server_at": 1792835125.558511
+    },
+    {
+      "name": "module-table-done",
+      "heap_kb": 11378,
+      "t": 2.783499400000437,
+      "delta": 0.03592239999852609,
+      "server_at": 1792835125.594435
+    },
+    {
+      "name": "spider-rig-begin",
+      "heap_kb": 11385,
+      "t": 2.7850379000010435,
+      "delta": 0.001538500000606291,
+      "server_at": 1792835125.595973
+    },
+    {
+      "name": "spider-rig-end",
+      "heap_kb": 12203,
+      "t": 2.80909700000484,
+      "delta": 0.02405910000379663,
+      "server_at": 1792835125.620033
+    },
+    {
+      "name": "stream-looks-begin",
+      "heap_kb": 12546,
+      "t": 2.8253912000072887,
+      "delta": 0.016294200002448633,
+      "server_at": 1792835125.636328
+    },
+    {
+      "name": "stream-looks-end",
+      "heap_kb": 12620,
+      "t": 2.8365448000113247,
+      "delta": 0.01115360000403598,
+      "server_at": 1792835125.64748
+    },
+    {
+      "name": "hud-begin",
+      "heap_kb": 12622,
+      "t": 2.836838000002899,
+      "delta": 0.00029319999157451093,
+      "server_at": 1792835125.647771
+    },
+    {
+      "name": "hud-end",
+      "heap_kb": 12632,
+      "t": 2.840568500003428,
+      "delta": 0.0037305000005289912,
+      "server_at": 1792835125.651505
+    },
+    {
+      "name": "animal-bodies-begin",
+      "heap_kb": 12701,
+      "t": 2.859571799999685,
+      "delta": 0.01900329999625683,
+      "server_at": 1792835125.670507
+    },
+    {
+      "name": "animal-bodies-end",
+      "heap_kb": 12882,
+      "t": 2.8740660000039497,
+      "delta": 0.014494200004264712,
+      "server_at": 1792835125.685001
+    },
+    {
+      "name": "render-binding-begin",
+      "heap_kb": 13294,
+      "t": 2.944235500006471,
+      "delta": 0.07016950000252109,
+      "server_at": 1792835125.755184
+    },
+    {
+      "name": "client-hooks-ready",
+      "heap_kb": 13316,
+      "t": 2.9454893000074662,
+      "delta": 0.0012538000009953976,
+      "server_at": 1792835125.756422
+    },
+    {
+      "name": "title-ready",
+      "heap_kb": 35250,
+      "t": 11.299569900002098,
+      "delta": 8.354080599994631,
+      "server_at": 1792835134.111507
+    }
+  ],
+  "creator_errors": 0,
+  "creator_warnings": 6,
+  "limits": "Unbound Studio ordinary startup/title only, memory backend and timing hooks. First raw dt and observed wall time are separate. After-first distributions span changing startup phases, not steady gameplay FPS. Not private Player startup, real storage or a before/after optimization claim."
+}

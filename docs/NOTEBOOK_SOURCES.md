@@ -1,5 +1,41 @@
 # Naturalist's notebook: sources and how far each was checked
 
+Current private-candidate scope, 2026-10-23: the staged NotebookPages contains
+50 pages. The original opening counts below describe an earlier notebook;
+later entries extend it. See [the current content checkpoint](audit/CONTENT-CURRENT.md).
+
+## Luna moth sentence/source reconciliation - 2026-10-23
+
+Page `rare_luna_moth`, trigger `rare_luna`. The game text is unchanged.
+This adds an index to the earlier Luna source audit in RARE_SIGHTINGS_PLAN.md.
+
+- Sentence 1: Illinois origin and green coloration, four eyespots and long hindwing
+  tails are supported by the **Illinois DNR** species account's status,
+  Features and Behaviors sections, opened this session:
+  [IDNR luna moth](https://dnr.illinois.gov/education/wildaboutpages/wildaboutinvertebrates/wildaboutmoths/family-saturniidae/wamblunamoth.html).
+- Sentence 2: the nonfeeding adult is stated in that account and in the Life
+  Cycle and Biology section of the opened **UF/IFAS** profile:
+  [IN737](https://ask.ifas.ufl.edu/publication/IN737).
+- Sentence 3: the experimental tail-diversion claim is supported by the
+  **Barber et al. 2015** abstract, opened at the author's institutional repository:
+  [Boise State, Moth Tails Divert Bat Attack](https://scholarworks.boisestate.edu/bio_facpubs/432/).
+  It describes filmed encounters with big brown bats and diversion toward the
+  moving hindwing appendages. The game sentence remains qualitative; it does
+  not generalize the experiment to every predator or assert an exact benefit.
+- Sentence 4: geographic variation in flight periods and generation count is
+  supported by UF/IFAS's Adults section. The page avoids prescribing the same
+  brood count throughout Illinois.
+
+The game note's weather-gated visit, outer-sill location, dawn departure,
+noncatchable body and climbable wing are authored rules, not biological claims.
+RareSightings/RareDirector/RareBody remain their implementation references.
+There is no new probability or calendar change. Direct PubMed opening exposed
+no abstract in this session and PMC returned a browser challenge; the primary
+institutional abstract above was read, not the full paper. Earlier full-text
+access limitations remain preserved.
+
+## Historical notebook source material
+
 The notebook's first 24 pages are the Godot game's, in `data/notebook/pages.json` (LEARN-01), which is now a frozen reference. The Roblox game, The Windowsill, has 33: those 24 and nine of its own (the peacock's dance, the ant mimic, eggs and wind, the velvet cousins, since ROBLOX-96 the life on the ground, and since ROBLOX-101 the springtails, the leafhoppers, the small moths and the crane flies). Roblox's pages are generated from the frozen file by `roblox_port/tools/gen_notebook_pages.py` into `roblox_port/src/Shared/Data/NotebookPages.luau`; the generator is the one place its words are edited, and the few sentences where it departs from Godot's are listed under "Audit" at the end. A game that teaches must not teach what it fakes, so this file records how each source was checked. Claude, 2026-10-11; extended 2026-10-13, 2026-10-17, 2026-10-18 and 2026-10-19 (the audit, ROBLOX-91..93; the garden's pages, ROBLOX-96 and ROBLOX-101).
 
 **How they were checked:**

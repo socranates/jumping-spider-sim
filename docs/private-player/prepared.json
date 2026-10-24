@@ -1,0 +1,16 @@
+{
+  "source_editor": "C:\\Users\\natha\\claude-xfer\\Windowsill-menu-player-attempt1\\VerifiedEditorBeforeUpload.rbxl",
+  "source_editor_sha256": "8616844ac52cffcbac84ada921bc146c04c0eb75766ddcf32e74dc1809edb042",
+  "local_editor": "C:\\Users\\natha\\claude-xfer\\Windowsill-private-publish-attempt1\\VerifiedCandidate.rbxl",
+  "initial_copy_sha256": "8616844ac52cffcbac84ada921bc146c04c0eb75766ddcf32e74dc1809edb042",
+  "candidate_manifest": "C:\\Users\\natha\\claude-xfer\\Windowsill-menu-player-attempt1\\manifest.json",
+  "candidate_manifest_sha256": "e558a68ac31c176fb6da66c45d1141f946994f825719dd7a45957321f098016a",
+  "model_sha256": "d1e26861d04dd79aa1babc60f13a6e1682aeb3433a114ac57cbf70e2787ea8ed",
+  "clean_model_sha256": "bf77f6c885237f14fd274cf4c419300a88507d876c3cf780824b18d9ca2577d9",
+  "setup_sha256": "3817ee5a234ab1845a9859dd9c1309d0bba823074b321acf358a5c472b1affa5",
+  "universe": 10771634917,
+  "place_id": 109879630247781,
+  "test_store": "WindowsillTest_player57_20261023a1",
+  "authorization": "Human reply: Publish private test build; specific candidate, read-only probe, existing private target and fresh test namespace.",
+  "published": false
+}

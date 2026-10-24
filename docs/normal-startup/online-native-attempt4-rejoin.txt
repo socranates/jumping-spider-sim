@@ -1,0 +1,5 @@
+2026-10-24T02:05:26.126Z,82.126938,59d8,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_GUARD] 276 bound real_test_storage normal_startup_enabled never_publish
+2026-10-24T02:05:41.286Z,97.286613,4ab8,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_BOOTSTRAP] 1792807534677 {"ordinary_persistence":true,"real_storage":true,"rejoining":true,"starts":13,"state":"await_rejoin","user":"qa_s_74c52a1d98ef430b"} nil
+2026-10-24T02:06:07.806Z,123.806541,4a50,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_MODE] 1792807540797 {"archives":8,"starts":88,"checks":20,"mode":"main","stage":1,"food":0.25}
+2026-10-24T02:06:07.946Z,123.946175,5024,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_CLIENT_PASS] 1792807540797 {"real_storage":true,"starts":88,"checks":23,"rejoining":true,"ordinary_ui":true,"user":"qa_s_74c52a1d98ef430b"}
+2026-10-24T02:06:13.746Z,129.746704,4ab8,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_DEPARTURE_PASS] 1792807534677 {"actual_removals":1,"checks":51,"history":104,"lock_released":true,"optionsCreated":99,"optionsDestroyed":99,"read":104,"rejoining":true,"scopes":0,"starts":104,"state":"done","user":"qa_s_74c52a1d98ef430b","write":5} nil

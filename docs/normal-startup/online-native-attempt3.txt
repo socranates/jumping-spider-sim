@@ -1,0 +1,4 @@
+2026-10-24T01:56:52.262Z,67.262512,6498,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_GUARD] 276 bound real_test_storage normal_startup_enabled never_publish
+2026-10-24T01:58:30.401Z,165.401627,6554,6,Info [FLog::CreatorOutput] [NORMAL_STARTUP_GUARD] 276 bound real_test_storage normal_startup_enabled never_publish
+2026-10-24T01:59:02.161Z,197.161270,3860,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_BOOTSTRAP] 1792807133648 {"ordinary_persistence":true,"real_storage":true,"rejoining":false,"starts":23,"state":"seeded","user":"qa_s_6e1d2e8c340b49f7"} nil
+2026-10-24T01:59:40.345Z,235.345184,5b20,6,Info [FLog::CreatorOutput] [ONLINE_STARTUP_FAIL] 1792807133648 {"problem":"ServerScriptService.Server.NormalStartupDiagnosticStorage:27: unarmed departure cannot qualify\nServerScriptService.Server.NormalStartupDiagnosticStorage:27\nServerScriptService.Server.NormalStartupDiagnosticStorage:124 function departed\n","stage":"departure"} nil

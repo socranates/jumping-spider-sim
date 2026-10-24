@@ -1,0 +1,61 @@
+{
+  "receipts": [
+    "online-native-attempt4-first",
+    "online-native-attempt4-rejoin"
+  ],
+  "inputs": {
+    "docs/normal-startup/online-native-attempt4-first.json": "6c3dd97f26112801a4db4932592a6dd4ca734a57d5e531f530fb4f2869ee44cb",
+    "docs/normal-startup/online-native-attempt4-first.txt": "4153825e1800d327989ac44529a9cf9d02b69ba74933f2229d86fb207b50bc1f",
+    "docs/normal-startup/online-native-attempt4-rejoin.json": "57704a4403ad9539f3b001208c096d5fe841d1f20195da50c358a6b061faacf0",
+    "docs/normal-startup/online-native-attempt4-rejoin.txt": "3120b5fdd10c1ae58b4794c2b398efe32d2592da0265b772f4c63a415e8805ee",
+    "docs/normal-startup/online-storage.luau": "ad4e2cbd6384cbf539777b485296a6b646985c6a3e89a255bb9aa6893c065b72",
+    "docs/normal-startup/online-playback.luau": "0e1c94b1d2bb13e8275fb140a57ac8fd5b42771f379deba897599ca7bc75b5e7",
+    "docs/normal-startup/online-seed.luau": "15fe3a6c205899caf531b6d146a7268838673d473f2e3583b3531012961c3a64",
+    "docs/normal-startup/prepare-online.py": "766859441a29c3928dc10c176923df1f177c48f820450860650f64f9321613f8",
+    "docs/normal-startup/build-online.py": "64569343a81efadfed229dd0a242a662b8e74487a86d60f4f301dfd993e763a2",
+    "docs/normal-startup/collect-online.py": "2f2a888d8f05f158bce07c7ae9a7aafaba3430a06329ad2d6f647975c2cfe94d"
+  },
+  "runs": [
+    {
+      "run": "1792807270773",
+      "client_run": "1792807275359",
+      "client_checks": 46,
+      "server_checks": 32,
+      "starts": 283,
+      "options_destroyed": 239,
+      "state": "await_rejoin",
+      "actual_removals": 1,
+      "modes": [
+        "main",
+        "free",
+        "easy"
+      ]
+    },
+    {
+      "run": "1792807534677",
+      "client_run": "1792807540797",
+      "client_checks": 23,
+      "server_checks": 51,
+      "starts": 104,
+      "options_destroyed": 99,
+      "state": "done",
+      "actual_removals": 1,
+      "modes": [
+        "main"
+      ]
+    }
+  ],
+  "model_sha256": "fd9b4fb298be2a6421c23e268af46f0563206e0cb68e625fcef77221f88c3840",
+  "typed_targets": 56,
+  "source_count": 276,
+  "storage": "real WindowsillTest_v1",
+  "ordinary_startup": true,
+  "legacy_progress_preserved": true,
+  "current_schema3_rejoin": true,
+  "exact_archives": true,
+  "actual_departures": 2,
+  "terminal_control": "done",
+  "production_activated": false,
+  "published": false,
+  "goal_complete": false
+}

@@ -1,0 +1,14 @@
+20:57:00.850  [Windowsill] world: The Preserve (preserve)  -  Server - Main:30
+  20:57:00.852  [Windowsill] sun: through the window, clock 10, latitude -40.7  -  Server - Main:39
+  20:57:07.002  ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type  -  Studio
+  20:57:08.138  ServerScriptService.Server.NormalStartupDiagnosticStorage:28: value: a nil  -  Server - NormalStartupDiagnosticStorage:28
+  20:57:08.138  Stack Begin  -  Studio
+  20:57:08.138  Script 'ServerScriptService.Server.NormalStartupDiagnosticStorage', Line 28  -  Studio - NormalStartupDiagnosticStorage:28
+  20:57:08.138  Stack End  -  Studio
+  20:57:08.142  Transform function error ServerScriptService.Server.NormalStartupDiagnosticStorage:28: value: a nil  -  Studio
+  20:57:08.271  ServerScriptService.Server.NormalStartupDiagnosticStorage:28: value: a nil  -  Server - NormalStartupDiagnosticStorage:28
+  20:57:08.271  Stack Begin  -  Studio
+  20:57:08.272  Script 'ServerScriptService.Server.NormalStartupDiagnosticStorage', Line 28 - function write  -  Studio - NormalStartupDiagnosticStorage:28
+  20:57:08.272  Script 'ServerScriptService.Server.NormalStartupDiagnosticStorage', Line 167 - function observe  -  Studio - NormalStartupDiagnosticStorage:167
+  20:57:08.272  Script 'ServerScriptService.Server.Persistence', Line 48  -  Studio - Persistence:48
+  20:57:08.272  Stack End  -  Studio

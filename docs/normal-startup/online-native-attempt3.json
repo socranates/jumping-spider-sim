@@ -1,0 +1,34 @@
+{
+  "events": [
+    {
+      "kind": "BOOTSTRAP",
+      "run": "1792807133648",
+      "value": {
+        "ordinary_persistence": true,
+        "real_storage": true,
+        "rejoining": false,
+        "starts": 23,
+        "state": "seeded",
+        "user": "qa_s_6e1d2e8c340b49f7"
+      }
+    },
+    {
+      "kind": "FAIL",
+      "run": "1792807133648",
+      "value": {
+        "problem": "ServerScriptService.Server.NormalStartupDiagnosticStorage:27: unarmed departure cannot qualify\nServerScriptService.Server.NormalStartupDiagnosticStorage:27\nServerScriptService.Server.NormalStartupDiagnosticStorage:124 function departed\n",
+        "stage": "departure"
+      }
+    }
+  ],
+  "raw_sha256": "a72fc04279cd4eefe53a99ea817d3ae569d725223020f353c583f27aa01d51a0",
+  "manifest": "C:\\Users\\natha\\claude-xfer\\Windowsill-online-startup-attempt3\\manifest.json",
+  "manifest_sha256": "bbe2033481256f4d2356cd9645a113859b80b2036eba810355caae585f9b404a",
+  "model_sha256": "241ed56faaaea9dbf5cb58468127ad18761d5ab8d4653d61279890276836c950",
+  "source_count": 276,
+  "private_targets": 56,
+  "compile_sha256": "c21ef4ec335f57d59e245d2b113688f7821e4880ba159fbe5611641eb5c8c3bd",
+  "strict_sha256": "8702a09d01c42d765c6d29029a0c06d6c54f22dc3223866b516e73aba06c0aff",
+  "production_activated": false,
+  "published": false
+}

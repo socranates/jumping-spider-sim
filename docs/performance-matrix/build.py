@@ -6,7 +6,8 @@ import argparse,hashlib,json,subprocess,xml.etree.ElementTree as ET,zlib
 H=Path(__file__).resolve().parent;ROOT=H.parents[1];PORT=ROOT/'roblox_port'
 TOOLS=Path('C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools')
 sha=lambda b:hashlib.sha256(b).hexdigest()
-p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);p.add_argument('--playback-source',type=Path,default=H/'playback.luau');p.add_argument('--seam-group',choices=['northern','hut_perimeter']);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);p.add_argument('--tier',choices=['full','low'],required=True);p.add_argument('--variant',choices=['before','after'],required=True);p.add_argument('--long-trace-seconds',type=int,default=0);p.add_argument('--playback-source',type=Path,default=H/'playback.luau');p.add_argument('--seam-group',choices=['northern','hut_perimeter']);p.add_argument('--startup-clock',action='store_true');a=p.parse_args()
+assert not a.startup_clock or(a.variant=='after'and a.seam_group is None and not a.long_trace_seconds and a.playback_source.resolve()==(ROOT/'docs/startup-clock/playback.luau').resolve())
 assert a.long_trace_seconds==0 or 60<=a.long_trace_seconds<=3600
 assert not a.long_trace_seconds or (a.playback_source.resolve()==(H/'playback.luau').resolve()and a.seam_group is None)
 out=a.out.resolve();assert out.parent.is_dir() and not out.exists();out.mkdir()
@@ -20,6 +21,7 @@ probe=(ROOT/'docs/frame-ordinary/probe.luau').read_text()
 probe=probe.replace('ORDINARY_FRAME_','MATRIX_FRAME_').replace('"InstanceCount"}','"InstanceCount","DataReceiveKbps","DataSendKbps"}')
 probe=probe.replace('p50_ms=percentile(.5),','mean_ms=s.duration/math.max(1,s.frames)*1000,p50_ms=percentile(.5),')
 assert 'mean_ms=s.duration/'in probe and 'DataReceiveKbps'in probe
+if a.startup_clock:probe=(ROOT/'docs/startup-clock/probe.luau').read_text()
 source['Client/MatrixProbe.luau']=probe.encode()
 source['Client/MatrixPlayback.luau']=a.playback_source.read_bytes()
 if a.long_trace_seconds:
@@ -31,6 +33,19 @@ if a.long_trace_seconds:
 client=source['Client/SpiderClient.client.luau'].decode()
 assert client.startswith('--!strict\n')
 client=client.replace('--!strict\n','--!strict\nrequire(script.Parent.MatrixProbe).begin()\n',1)
+if a.startup_clock:
+ mark='require(script.Parent.MatrixProbe)'
+ anchors={
+  'local M = {':mark+'.mark("direct-imports-done")\nlocal M = {',
+  'M.lock = M.LockOn.new()':mark+'.mark("module-table-done")\nM.lock = M.LockOn.new()',
+  'World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),':'World = '+mark+'.call("world-client",function()return require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer)end),',
+  'local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)':'local rig = '+mark+'.call("spider-rig",function()return SpiderRig.new(Workspace, M.World.root, appearance, detail)end)',
+  'M.World:streamLooks(Workspace, detail)':mark+'.call("stream-looks",function()M.World:streamLooks(Workspace, detail)end)',
+  'local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))':'local hud = '+mark+'.call("hud",function()return SpiderHud.new(player:WaitForChild("PlayerGui"))end)',
+  'local flyBodies = FlyBodies.new(Workspace, detail)':mark+'.mark("animal-bodies-begin")\nlocal flyBodies = FlyBodies.new(Workspace, detail)',
+  'M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)':'M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)\n'+mark+'.mark("animal-bodies-end")',
+  'local accumulator = 0':mark+'.mark("render-binding-begin")\nlocal accumulator = 0'}
+ for old,new in anchors.items():assert client.count(old)==1,old;client=client.replace(old,new)
 client+='\nif RunService:IsStudio() and Workspace:GetAttribute("MatrixPerf")==true then task.spawn(function()require(script.Parent.MatrixPlayback)(M.hooks())end)end\n'
 source['Client/SpiderClient.client.luau']=client.encode()
 source['Server/NormalStartupDiagnosticStorage.luau']=(ROOT/'docs/normal-startup/diagnostic-storage.luau').read_bytes()
@@ -57,6 +72,7 @@ project['tree']['ServerScriptService']['Server']={'$path':str(out/'src/Server'),
 assert 'PortTests'not in project['tree']['ServerScriptService']
 attrs=project['tree']['Workspace']['$attributes']
 attrs.update(World='preserve',Detail=a.tier,SelfTest=False,TestTarget=False,SaveWait=True,NormalStartupDiagnostic=True,DiagnosticUnavailable=False,OrdinaryPerf=True,MatrixPerf=True,MatrixVariant=a.variant)
+if a.startup_clock:attrs['StartupClock']=True
 if a.seam_group:attrs['SeamGroup']=a.seam_group
 config=out/'matrix.project.json';config.write_bytes((json.dumps(project,indent=2)+'\n').encode())
 errors=[]
@@ -85,6 +101,6 @@ guard='assert(game.PlaceId==0 and game.GameId==0 and not game:GetService("RunSer
 if a.seam_group:guard='assert(workspace:GetAttribute("SeamGroup")=='+json.dumps(a.seam_group)+');'+guard
 guard+='for _,r in expected do local it=game;for n in string.gmatch(r[1],"[^.]+")do it=assert(it:FindFirstChild(n),r[1])end;local s=string.gsub(it.Source,"\\r\\n","\\n");local x,y=1,0;for i=1,#s do x=(x+string.byte(s,i))%65521;y=(y+x)%65521 end;assert(#s==r[2] and y*65536+x==r[3],r[1])end;assert(not game.ServerScriptService.Server.Persistence.Disabled);print("[MATRIX_GUARD]",'+str(source_count)+',"'+a.variant+'","'+a.tier+'","unbound memory_only")'
 (out/'guard.luau').write_bytes((guard+'\n').encode())
-manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
+manifest=dict(revision=revision,variant=a.variant,tier=a.tier,seam_group=a.seam_group,startup_clock=a.startup_clock,playback_source=str(a.playback_source.resolve()),place=str(place),place_sha256=sha(place.read_bytes()),sources={k:sha(v)for k,v in expected.items()},original_sources={k:sha(v)for k,v in original.items()},guard_sha256=sha((out/'guard.luau').read_bytes()),source_count=source_count,long_trace_seconds=a.long_trace_seconds,published=False,storage='unbound yielding memory only',limits='Controlled scene fixtures, not natural lives, online saves or physical phones.')
 (out/'manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode())
 print(json.dumps(dict(place=str(place),sha256=manifest['place_sha256'],sources=source_count,variant=a.variant,tier=a.tier)),flush=True)

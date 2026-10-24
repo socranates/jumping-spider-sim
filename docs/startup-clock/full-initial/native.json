@@ -1,0 +1,557 @@
+{
+  "run": "1792834719053",
+  "tier": "full",
+  "model_sha256": "efcd124efe027db1f34ed4f216dc2b1b963a2aee84b7cbc3ce27cc7fa5117450",
+  "source_guards": 2,
+  "manifest_sha256": "c5ec35d06e4dc55dead03aa4403e3fd3f91d5a0579c3eb945592b901c79f7e13",
+  "native_output_sha256": "7f5d451ab26224b7dff7889d72945b9102f1a1670074555739b34a1b2f7263ae",
+  "events": [
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "client-enter",
+        "heap_kb": 2160,
+        "t": 7.00005330145359e-07,
+        "delta": 7.00005330145359e-07,
+        "server_at": 1792834719.058741
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "direct-imports-done",
+        "heap_kb": 9653,
+        "t": 0.3767783000075724,
+        "delta": 0.37677760000224225,
+        "server_at": 1792834719.43552
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "world-client-begin",
+        "heap_kb": 10036,
+        "t": 0.3902371000003768,
+        "delta": 0.013458799992804416,
+        "server_at": 1792834719.448982
+      }
+    },
+    {
+      "kind": "FIRST",
+      "run": "1792834719053",
+      "value": {
+        "raw_dt_ms": 599.7477173805237,
+        "phase": "world-client-begin",
+        "t": 0.42006240000773687,
+        "observed_since_begin_ms": 420.06240000773687,
+        "preprobe_span_lower_bound_ms": 179.6853173727868
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "world-client-end",
+        "heap_kb": 10713,
+        "t": 2.0919687999994494,
+        "delta": 1.7017316999990726,
+        "server_at": 1792834721.14771
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "module-table-done",
+        "heap_kb": 11192,
+        "t": 2.1782644000049913,
+        "delta": 0.08629560000554193,
+        "server_at": 1792834721.234007
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "spider-rig-begin",
+        "heap_kb": 11204,
+        "t": 2.1832703000109177,
+        "delta": 0.005005900005926378,
+        "server_at": 1792834721.239014
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "spider-rig-end",
+        "heap_kb": 12208,
+        "t": 2.23817890000646,
+        "delta": 0.05490859999554232,
+        "server_at": 1792834721.293927
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "stream-looks-begin",
+        "heap_kb": 12551,
+        "t": 2.266050800011726,
+        "delta": 0.02787190000526607,
+        "server_at": 1792834721.321797
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "stream-looks-end",
+        "heap_kb": 12624,
+        "t": 2.3244859000114957,
+        "delta": 0.05843509999976959,
+        "server_at": 1792834721.38023
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "hud-begin",
+        "heap_kb": 12626,
+        "t": 2.3250633000134258,
+        "delta": 0.0005774000019300729,
+        "server_at": 1792834721.380971
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "hud-end",
+        "heap_kb": 12637,
+        "t": 2.340496800010442,
+        "delta": 0.015433499997016042,
+        "server_at": 1792834721.396243
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "animal-bodies-begin",
+        "heap_kb": 12703,
+        "t": 2.365757300009136,
+        "delta": 0.025260499998694286,
+        "server_at": 1792834721.421512
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "animal-bodies-end",
+        "heap_kb": 12881,
+        "t": 2.392752500003553,
+        "delta": 0.026995199994416907,
+        "server_at": 1792834721.448495
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "render-binding-begin",
+        "heap_kb": 13294,
+        "t": 2.534692700006417,
+        "delta": 0.141940200002864,
+        "server_at": 1792834721.590438
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "client-hooks-ready",
+        "heap_kb": 13315,
+        "t": 2.5364283000089927,
+        "delta": 0.0017356000025756657,
+        "server_at": 1792834721.592169
+      }
+    },
+    {
+      "kind": "CLIENT",
+      "run": "1792834719053",
+      "value": {
+        "navigation": "pending",
+        "title_ready": false,
+        "save_ready": true,
+        "menu": false,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "MARK",
+      "run": "1792834719053",
+      "value": {
+        "name": "title-ready",
+        "heap_kb": 27171,
+        "t": 10.884438100008992,
+        "delta": 8.3480098,
+        "server_at": 1792834729.938179
+      }
+    },
+    {
+      "kind": "READY",
+      "run": "1792834719053",
+      "value": {
+        "navigation": "ready",
+        "title_ready": true,
+        "save_status": "saved",
+        "save_ready": true,
+        "menu": true,
+        "loading": false,
+        "region": "sill",
+        "title_holding": false,
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "CLEANUP",
+      "run": "1792834719053",
+      "value": {
+        "focus_lost": 0,
+        "life_started": false,
+        "scopes": 0,
+        "active": 0
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 13317,
+        "callback_interval_ms": 2120.3722000063863,
+        "phase": "client-hooks-ready",
+        "t": 2.5577489000133937,
+        "first": false,
+        "raw_dt_ms": 2103.210687637329
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 13358,
+        "callback_interval_ms": 1103.945399998338,
+        "phase": "client-hooks-ready",
+        "t": 3.6616943000117317,
+        "first": false,
+        "raw_dt_ms": 1106.2400341033936
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 13294,
+        "callback_interval_ms": 726.8462999927578,
+        "phase": "client-hooks-ready",
+        "t": 4.3885406000044895,
+        "first": false,
+        "raw_dt_ms": 596.4155793190002
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 10710,
+        "callback_interval_ms": 420.06240000773687,
+        "phase": "world-client-begin",
+        "t": 0.42006240000773687,
+        "first": true,
+        "raw_dt_ms": 599.7477173805237
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 14133,
+        "callback_interval_ms": 153.75300000596326,
+        "phase": "client-hooks-ready",
+        "t": 4.542293600010453,
+        "first": false,
+        "raw_dt_ms": 283.1316590309143
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 16634,
+        "callback_interval_ms": 77.88549999531824,
+        "phase": "client-hooks-ready",
+        "t": 4.7220932000054745,
+        "first": false,
+        "raw_dt_ms": 76.55487954616547
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 15002,
+        "callback_interval_ms": 70.0961999973515,
+        "phase": "client-hooks-ready",
+        "t": 4.612389800007804,
+        "first": false,
+        "raw_dt_ms": 71.09899073839188
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 27173,
+        "callback_interval_ms": 65.83549999049865,
+        "phase": "title-ready",
+        "t": 10.885262600000715,
+        "first": false,
+        "raw_dt_ms": 65.15372544527054
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 36966,
+        "callback_interval_ms": 49.39130001002923,
+        "phase": "client-hooks-ready",
+        "t": 10.819427100010216,
+        "first": false,
+        "raw_dt_ms": 51.10644921660423
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 15572,
+        "callback_interval_ms": 35.8917000121437,
+        "phase": "client-hooks-ready",
+        "t": 4.915978900011396,
+        "first": false,
+        "raw_dt_ms": 41.346609592437744
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 18997,
+        "callback_interval_ms": 31.203000005916692,
+        "phase": "client-hooks-ready",
+        "t": 5.040559600005508,
+        "first": false,
+        "raw_dt_ms": 41.269928216934204
+      }
+    },
+    {
+      "kind": "GAP",
+      "run": "1792834719053",
+      "value": {
+        "heap_kb": 37060,
+        "callback_interval_ms": 40.691400005016476,
+        "phase": "title-ready",
+        "t": 16.626638400004595,
+        "first": false,
+        "raw_dt_ms": 40.85874184966087
+      }
+    },
+    {
+      "kind": "SUMMARY",
+      "run": "1792834719053",
+      "value": {
+        "raw_after_first": {
+          "over50": 8,
+          "mean_ms": 21.25579089612756,
+          "p95_ms": 18.99593323469162,
+          "max_ms": 2103.210687637329,
+          "p50_ms": 16.90075360238552,
+          "n": 966
+        },
+        "callback_after_first": {
+          "over50": 7,
+          "mean_ms": 21.256078053831015,
+          "p95_ms": 18.184299988206476,
+          "max_ms": 2120.3722000063863,
+          "p50_ms": 16.693199999281205,
+          "n": 966
+        },
+        "frames": 967,
+        "wall_seconds": 20.970999800003483
+      }
+    },
+    {
+      "kind": "PASS",
+      "run": "1792834719053",
+      "value": {
+        "unbound": true,
+        "storage": "yielding-memory",
+        "detail": "full"
+      }
+    }
+  ],
+  "first": {
+    "raw_dt_ms": 599.7477173805237,
+    "phase": "world-client-begin",
+    "t": 0.42006240000773687,
+    "observed_since_begin_ms": 420.06240000773687,
+    "preprobe_span_lower_bound_ms": 179.6853173727868
+  },
+  "summary": {
+    "raw_after_first": {
+      "over50": 8,
+      "mean_ms": 21.25579089612756,
+      "p95_ms": 18.99593323469162,
+      "max_ms": 2103.210687637329,
+      "p50_ms": 16.90075360238552,
+      "n": 966
+    },
+    "callback_after_first": {
+      "over50": 7,
+      "mean_ms": 21.256078053831015,
+      "p95_ms": 18.184299988206476,
+      "max_ms": 2120.3722000063863,
+      "p50_ms": 16.693199999281205,
+      "n": 966
+    },
+    "frames": 967,
+    "wall_seconds": 20.970999800003483
+  },
+  "marks": [
+    {
+      "name": "client-enter",
+      "heap_kb": 2160,
+      "t": 7.00005330145359e-07,
+      "delta": 7.00005330145359e-07,
+      "server_at": 1792834719.058741
+    },
+    {
+      "name": "direct-imports-done",
+      "heap_kb": 9653,
+      "t": 0.3767783000075724,
+      "delta": 0.37677760000224225,
+      "server_at": 1792834719.43552
+    },
+    {
+      "name": "world-client-begin",
+      "heap_kb": 10036,
+      "t": 0.3902371000003768,
+      "delta": 0.013458799992804416,
+      "server_at": 1792834719.448982
+    },
+    {
+      "name": "world-client-end",
+      "heap_kb": 10713,
+      "t": 2.0919687999994494,
+      "delta": 1.7017316999990726,
+      "server_at": 1792834721.14771
+    },
+    {
+      "name": "module-table-done",
+      "heap_kb": 11192,
+      "t": 2.1782644000049913,
+      "delta": 0.08629560000554193,
+      "server_at": 1792834721.234007
+    },
+    {
+      "name": "spider-rig-begin",
+      "heap_kb": 11204,
+      "t": 2.1832703000109177,
+      "delta": 0.005005900005926378,
+      "server_at": 1792834721.239014
+    },
+    {
+      "name": "spider-rig-end",
+      "heap_kb": 12208,
+      "t": 2.23817890000646,
+      "delta": 0.05490859999554232,
+      "server_at": 1792834721.293927
+    },
+    {
+      "name": "stream-looks-begin",
+      "heap_kb": 12551,
+      "t": 2.266050800011726,
+      "delta": 0.02787190000526607,
+      "server_at": 1792834721.321797
+    },
+    {
+      "name": "stream-looks-end",
+      "heap_kb": 12624,
+      "t": 2.3244859000114957,
+      "delta": 0.05843509999976959,
+      "server_at": 1792834721.38023
+    },
+    {
+      "name": "hud-begin",
+      "heap_kb": 12626,
+      "t": 2.3250633000134258,
+      "delta": 0.0005774000019300729,
+      "server_at": 1792834721.380971
+    },
+    {
+      "name": "hud-end",
+      "heap_kb": 12637,
+      "t": 2.340496800010442,
+      "delta": 0.015433499997016042,
+      "server_at": 1792834721.396243
+    },
+    {
+      "name": "animal-bodies-begin",
+      "heap_kb": 12703,
+      "t": 2.365757300009136,
+      "delta": 0.025260499998694286,
+      "server_at": 1792834721.421512
+    },
+    {
+      "name": "animal-bodies-end",
+      "heap_kb": 12881,
+      "t": 2.392752500003553,
+      "delta": 0.026995199994416907,
+      "server_at": 1792834721.448495
+    },
+    {
+      "name": "render-binding-begin",
+      "heap_kb": 13294,
+      "t": 2.534692700006417,
+      "delta": 0.141940200002864,
+      "server_at": 1792834721.590438
+    },
+    {
+      "name": "client-hooks-ready",
+      "heap_kb": 13315,
+      "t": 2.5364283000089927,
+      "delta": 0.0017356000025756657,
+      "server_at": 1792834721.592169
+    },
+    {
+      "name": "title-ready",
+      "heap_kb": 27171,
+      "t": 10.884438100008992,
+      "delta": 8.3480098,
+      "server_at": 1792834729.938179
+    }
+  ],
+  "creator_errors": 0,
+  "creator_warnings": 6,
+  "limits": "Unbound Studio ordinary startup/title only, memory backend and timing hooks. First raw dt and observed wall time are separate. After-first distributions span changing startup phases, not steady gameplay FPS. Not private Player startup, real storage or a before/after optimization claim."
+}

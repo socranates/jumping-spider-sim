@@ -1,0 +1,25 @@
+{
+  "rows": [
+    {
+      "file": "private13-final-player.json",
+      "sha256": "d5f802619c878c7d9de2fb04364b337d02c6df0b7c58466c4a260bc61e547fdb",
+      "run": "1792816238921",
+      "largest_raw_dt_ms": 1562.6968145370483,
+      "callback_since_probe_ms": 114.81410000124015,
+      "preprobe_span_lower_bound_ms": 1447.8827145358082,
+      "initial_window_wall_seconds": 15.00003629999992,
+      "initial_window_sum_raw_dt_seconds": 16.46499026566744
+    },
+    {
+      "file": "private13-warm-player.json",
+      "sha256": "26dc284247d73b12837d78c2ec1c41954efad64bd5d8d0a77c58359411254601",
+      "run": "1792816638859",
+      "largest_raw_dt_ms": 1868.8222169876099,
+      "callback_since_probe_ms": 124.02879999717698,
+      "preprobe_span_lower_bound_ms": 1744.793416990433,
+      "initial_window_wall_seconds": 15.004801100003533,
+      "initial_window_sum_raw_dt_seconds": 16.766104094684124
+    }
+  ],
+  "limits": "The first raw Heartbeat includes time before the probe began. The callback timestamp only bounds the observed interval; it does not locate the cause of earlier loading or prove there was no game/engine stall. Original metrics remain unchanged. No current native or standalone speedup claimed."
+}

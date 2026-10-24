@@ -1,0 +1,792 @@
+{
+  "run": "1792833489498",
+  "passed": true,
+  "tier": "full",
+  "source_count": 276,
+  "source_guards": 2,
+  "model_sha256": "668afe80a81909ae07222b4e70a46ce6ba00de4f8bdcbd4d3250c614350677ae",
+  "manifest_sha256": "bcec285e8fa82776f987530f04417167222825e2161593c2648c3369230f3e2d",
+  "native_output_sha256": "e9572fe1180485b9dd6e750aa32ce6a714b15280dd4bd25c321691fa861323ae",
+  "events": [
+    {
+      "kind": "BEGIN",
+      "run": "1792833489498",
+      "value": {
+        "routes": 4,
+        "storage": "unbound yielding memory only",
+        "detail": "full"
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -84.29000091552734,
+            317
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_s2",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_south",
+        "start": [
+          236.5,
+          -84.29000091552734,
+          317
+        ],
+        "returned_home": false,
+        "simulation": 22.016666666666243,
+        "max_step": 0.1666259765625,
+        "min_y": -84.29000854492188,
+        "visited": {
+          "path_s2": true,
+          "verge_160_284": true
+        },
+        "goal": 372,
+        "wall_seconds": 22.005528399997274,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 1302
+        },
+        "frames": 1302,
+        "reached": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 4,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -84.29000091552734,
+            372.0282287597656
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_160_284",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "HOP",
+      "run": "1792833489498",
+      "value": {
+        "distance": 1.707366943359375,
+        "route": "hut_south",
+        "result": "launched",
+        "fresh": true,
+        "modes": {
+          "air": 10,
+          "attached": 1
+        },
+        "frames": 11,
+        "left_support": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "hop_end",
+        "route": "hut_south",
+        "state": {
+          "prey_projected": 4,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            236.5,
+            -84.29000091552734,
+            373.735595703125
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_160_284",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            560,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_east",
+        "start": [
+          560,
+          -84.29000091552734,
+          69.5
+        ],
+        "returned_home": false,
+        "simulation": 22.33333333333317,
+        "max_step": 0.5548007488250732,
+        "min_y": -84.29000854492188,
+        "visited": {
+          "verge_573.5_44": true,
+          "path_e3": true
+        },
+        "goal": 615,
+        "wall_seconds": 22.335226100010914,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 1171
+        },
+        "frames": 1171,
+        "reached": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 2,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            615.001953125,
+            -82.7716064453125,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_573.5_44",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "HOP",
+      "run": "1792833489498",
+      "value": {
+        "distance": 1.7066650390625,
+        "route": "hut_east",
+        "result": "launched",
+        "fresh": true,
+        "modes": {
+          "air": 10,
+          "attached": 1
+        },
+        "frames": 11,
+        "left_support": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "hop_end",
+        "route": "hut_east",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            616.7086181640625,
+            -82.77159881591797,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_573.5_44",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            560,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e3",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_east_inner",
+        "start": [
+          560,
+          -84.29000091552734,
+          69.5
+        ],
+        "returned_home": false,
+        "simulation": 21.999999999999854,
+        "max_step": 0.1666259765625,
+        "min_y": -84.29000854492188,
+        "visited": {
+          "verge_473.5_44": true,
+          "path_e3": true
+        },
+        "goal": 505,
+        "wall_seconds": 21.995430599999963,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 1166
+        },
+        "frames": 1166,
+        "reached": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            504.9783020019531,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_473.5_44",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "HOP",
+      "run": "1792833489498",
+      "value": {
+        "distance": 1.707366943359375,
+        "route": "hut_east_inner",
+        "result": "launched",
+        "fresh": true,
+        "modes": {
+          "air": 12,
+          "attached": 1
+        },
+        "frames": 13,
+        "left_support": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "hop_end",
+        "route": "hut_east_inner",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            503.27093505859375,
+            -84.29000091552734,
+            69.5
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_473.5_44",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "ARRIVAL",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 3,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -84.29000091552734,
+            -171
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "path_e6",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "WALK",
+      "run": "1792833489498",
+      "value": {
+        "route": "hut_north",
+        "start": [
+          247.5,
+          -84.29000091552734,
+          -171
+        ],
+        "returned_home": false,
+        "simulation": 19.999999999999968,
+        "max_step": 0.083343505859375,
+        "min_y": -84.29000854492188,
+        "visited": {
+          "path_e6": true,
+          "verge_190_-256": true
+        },
+        "goal": -221,
+        "wall_seconds": 20.00249509999412,
+        "loading_frames": 0,
+        "modes": {
+          "attached": 1145
+        },
+        "frames": 1145,
+        "reached": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "walk_end",
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -84.29000091552734,
+            -221.006103515625
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_190_-256",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "HOP",
+      "run": "1792833489498",
+      "value": {
+        "distance": 1.707000732421875,
+        "route": "hut_north",
+        "result": "launched",
+        "fresh": true,
+        "modes": {
+          "air": 14,
+          "attached": 1
+        },
+        "frames": 15,
+        "left_support": true
+      }
+    },
+    {
+      "kind": "STATE",
+      "run": "1792833489498",
+      "value": {
+        "when": "hop_end",
+        "route": "hut_north",
+        "state": {
+          "prey_projected": 5,
+          "prey": {
+            "unknown": 4,
+            "springtail": 6
+          },
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "live": true,
+          "viewport": [
+            1360,
+            441
+          ],
+          "fov": 65,
+          "position": [
+            247.5,
+            -84.29000091552734,
+            -222.71310424804688
+          ],
+          "loading": false,
+          "mode": "attached",
+          "region": "verge_190_-256",
+          "detail": "full"
+        }
+      }
+    },
+    {
+      "kind": "END",
+      "run": "1792833489498",
+      "value": {
+        "completed": true,
+        "walks": 4,
+        "failures": 0,
+        "focus_lost": 0,
+        "detail": "full"
+      }
+    }
+  ],
+  "walks": [
+    {
+      "route": "hut_south",
+      "start": [
+        236.5,
+        -84.29000091552734,
+        317
+      ],
+      "returned_home": false,
+      "simulation": 22.016666666666243,
+      "max_step": 0.1666259765625,
+      "min_y": -84.29000854492188,
+      "visited": {
+        "path_s2": true,
+        "verge_160_284": true
+      },
+      "goal": 372,
+      "wall_seconds": 22.005528399997274,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 1302
+      },
+      "frames": 1302,
+      "reached": true
+    },
+    {
+      "route": "hut_east",
+      "start": [
+        560,
+        -84.29000091552734,
+        69.5
+      ],
+      "returned_home": false,
+      "simulation": 22.33333333333317,
+      "max_step": 0.5548007488250732,
+      "min_y": -84.29000854492188,
+      "visited": {
+        "verge_573.5_44": true,
+        "path_e3": true
+      },
+      "goal": 615,
+      "wall_seconds": 22.335226100010914,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 1171
+      },
+      "frames": 1171,
+      "reached": true
+    },
+    {
+      "route": "hut_east_inner",
+      "start": [
+        560,
+        -84.29000091552734,
+        69.5
+      ],
+      "returned_home": false,
+      "simulation": 21.999999999999854,
+      "max_step": 0.1666259765625,
+      "min_y": -84.29000854492188,
+      "visited": {
+        "verge_473.5_44": true,
+        "path_e3": true
+      },
+      "goal": 505,
+      "wall_seconds": 21.995430599999963,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 1166
+      },
+      "frames": 1166,
+      "reached": true
+    },
+    {
+      "route": "hut_north",
+      "start": [
+        247.5,
+        -84.29000091552734,
+        -171
+      ],
+      "returned_home": false,
+      "simulation": 19.999999999999968,
+      "max_step": 0.083343505859375,
+      "min_y": -84.29000854492188,
+      "visited": {
+        "path_e6": true,
+        "verge_190_-256": true
+      },
+      "goal": -221,
+      "wall_seconds": 20.00249509999412,
+      "loading_frames": 0,
+      "modes": {
+        "attached": 1145
+      },
+      "frames": 1145,
+      "reached": true
+    }
+  ],
+  "hops": [
+    {
+      "distance": 1.707366943359375,
+      "route": "hut_south",
+      "result": "launched",
+      "fresh": true,
+      "modes": {
+        "air": 10,
+        "attached": 1
+      },
+      "frames": 11,
+      "left_support": true
+    },
+    {
+      "distance": 1.7066650390625,
+      "route": "hut_east",
+      "result": "launched",
+      "fresh": true,
+      "modes": {
+        "air": 10,
+        "attached": 1
+      },
+      "frames": 11,
+      "left_support": true
+    },
+    {
+      "distance": 1.707366943359375,
+      "route": "hut_east_inner",
+      "result": "launched",
+      "fresh": true,
+      "modes": {
+        "air": 12,
+        "attached": 1
+      },
+      "frames": 13,
+      "left_support": true
+    },
+    {
+      "distance": 1.707000732421875,
+      "route": "hut_north",
+      "result": "launched",
+      "fresh": true,
+      "modes": {
+        "air": 14,
+        "attached": 1
+      },
+      "frames": 15,
+      "left_support": true
+    }
+  ],
+  "completion": {
+    "completed": true,
+    "walks": 4,
+    "failures": 0,
+    "focus_lost": 0,
+    "detail": "full"
+  },
+  "probe_completion": {
+    "kind": "PASS",
+    "run": "1792833488682",
+    "value": {
+      "online": false,
+      "cat_enabled": true,
+      "ordinary_ui": true,
+      "storage": "yielding-memory"
+    }
+  },
+  "creator_errors": 0,
+  "creator_warnings": 9,
+  "limits": "4 authored arrivals and ordinary input walks/tap hops in unbound Studio Free play. Screenshots may be taken; no FPS comparison. Not every map surface, physical controller/phone, natural life or real-store proof."
+}

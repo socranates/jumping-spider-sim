@@ -2,6 +2,45 @@
 
 2026-10-24. Work on codex/verified-integration; no place publication.
 
+## Verified result
+
+Current exports: **20f2200d79a9e448**, 273 ordinary sources. Code/test commit:
+**16169af60f16696f442fe8227bbe954f1a24b858**. Both native fixtures derive from
+those same 273 original game sources, add three diagnostic modules, and patch
+the client entry/persistence only for observation and isolated memory storage.
+qualified-native.json checks the original-source hashes against both exports.
+
+| Check | Completed result |
+|---|---|
+| Native full, run1792833489498 | 4 walks and4 tap hops;4784 walking frames,50 hop frames |
+| Native low, run1792833854524 | 4 walks and4 tap hops;5176 walking frames,68 hop frames |
+| Both native cohorts |9960 walking frames, all attached; minimumY=-84.2900085; zero measured loading frames, reset-home events, focus-loss events or CreatorErrors; all endpoints upright |
+| Current Windows |4623/0 across compact, living-world, rest-storage and Preserve self-test; nested self-test END307/0/0 in637.8 simulated seconds |
+| Static/build/infrastructure |273/273 compile, strict exit0,5/5 runner tests, both exact-source exports |
+| Full Linux CI |[40081320611](https://github.com/socranates/jumping-spider-sim/actions/runs/40081320611): all79 suites, compile/types, exports and runner checks succeed; github-ci.json retains completed run/job/step metadata |
+
+Both native source guards passed before and after each run. Both editors
+stopped and closed without saving temporary state; immutable model hashes
+still match their manifests. No fixture can access an online save store.
+The current full Linux result is separate from the earlier failed Windows
+full run; there is no claim of a new green full79-suite Windows run.
+
+Native warnings remain:9 full,14 low. Each includes three readiness holds
+before forced arrivals at path_s2/path_e3/path_e6. Physics waited for complete
+collision before ARRIVAL and the measured walk; none occurred during a walk.
+The other records are retained style-rule/asset warnings, plus one pre-Play
+profile-annotation warning in low. These are not called zero-warning runs.
+
+The trials overlapped the Windows CLI rerun and included UI snapshots. They
+are collision evidence, **not an FPS comparison**, physical-phone test,
+standalone streaming test, natural life or whole-map clipping sign-off.
+Direct views included gravel and the planted north shoulder; a fly was
+visible there at full detail. These are selected views, not every angle.
+
+![Full-detail north landing](full-north-landing.png)
+
+![Low-detail north landing](low-north-landing.png)
+
 ## Reproduction before repair
 
 The six passing northern/meadow/pond routes in README.md did not cover the
@@ -99,9 +138,9 @@ regression protects both full/low railway views. It is now green452/0.
 
 Current exports are20f2200d79a9e448,273 sources. Compile273/273, strict0,
 runner5/5, compact452/0, living_world4150/0 and rest_storage14/0 have
-completed again. final-checks-v2/ is the current bounded rerun; its long
-Preserve self-test is still running. Full current CI and native crossing
-qualification remain pending. look-check.txt is the final tool-output chunk from the
+completed again. final-checks-v2/ is the completed current bounded rerun;
+its Preserve self-test passes7/0 with nested END307/0/0. Full current CI
+and native crossing qualification are completed above. look-check.txt is the final tool-output chunk from the
 completed LOOK run, not a claim to its entire console stream.
 
 The original full attempt used verify-ground.py with the ordinary current
@@ -116,7 +155,7 @@ The initial after1 models were compiled before the render-policy fix and
 were never played. The full editor's preguard ran and it was closed without
 saving. after2 includes the first home reservation, and was never played.
 Both are superseded preparation artifacts, not native pass evidence.
-Guarded native full/low after-repair routes are still required. Older
+The guarded native full/low after3 cohorts are the qualified results above. Older
 northern-route and30-minute results retain their original source cohorts.
 They do not establish native execution of this new ground or whole-map
 clipping coverage. The production build and online saves remain unchanged.

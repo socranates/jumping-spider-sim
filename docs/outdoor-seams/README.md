@@ -1,5 +1,10 @@
 # Native outdoor crossing exercise
 
+Later hut-path repair and current qualification are in
+[HUT-PERIMETER.md](HUT-PERIMETER.md): four edges failed before repair;
+eight full/low walks and eight hops now pass at20f2200d79a9e448. The six
+routes below retain their older, separate source cohort.
+
 2026-10-24, game-source cohort at863f188b/evidence2b1c99cacf601b8f.
 Six independent authored arrivals, followed by actual movement through the
 ordinary SpiderInput path and a short Jump press. Movement is not transported
@@ -52,8 +57,8 @@ proof that every projected insect was visible through scenery or perceived.
 
 This is12 selected route cases, not all233 walkable regions, physical input
 comfort, natural lives or standalone network streaming. In particular, the
-outer hut path south/east/north lies outside Verge's current infill rectangles;
-those edges need a separate native reproduction. Do not use these passing
+outer hut path south/east/north lay outside the infill rectangles in this cohort;
+those edges subsequently failed and were repaired in HUT-PERIMETER.md. Do not use these passing
 northern/pond routes to declare every reported off-path fall fixed.
 
 ## Reproduction

@@ -11,10 +11,16 @@ crossings reproduced missing ground/underside attachment; three compact
 Verge strips add33 regions/304 collision pieces, preserving all233 existing
 map/physics/decor records. A reproduced retained-detail issue also required
 LookPlan to reserve the hut at the sill within the same budgets.
-The first79-suite Windows run FAILED and is retained as such. Current
-compile/strict, runner checks and selected suites pass; the current Preserve
-self-test, full Linux CI and native after-repair routes are not yet complete.
-Do not claim full current Windows success or publish this candidate.
+The first79-suite Windows run FAILED and is retained as such, as is the
+subsequent one-failure621-second attempt. Current Windows targeted checks
+pass4623/0, including Preserve END307/0/0 in637.8 simulated seconds.
+Current full Linux CI40081320611 passes all79 suites and all configured
+steps at16169af6. Eight native full/low edge walks and eight hops pass:
+9960 walking frames all attached, both guards per cohort, no measured
+loading/reset/focus-loss or CreatorError. Warnings, setup readiness holds,
+concurrent CLI load and selected-view limits remain explicit in the report.
+Both editors are closed and model hashes unchanged. Do not infer current
+full Windows/all-map/phone/FPS proof or publish this candidate.
 
 ## Actual integration state
 

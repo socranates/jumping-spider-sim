@@ -1,0 +1,2 @@
+REST_STORAGE full_world_chars=3195572 regions=266
+REST_STORAGE passed=14 failed=0

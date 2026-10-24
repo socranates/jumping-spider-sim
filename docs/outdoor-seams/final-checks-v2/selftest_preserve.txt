@@ -1,0 +1,480 @@
+[SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+[SELFTEST] INFO world: preserve (revision preserve-3)
+[SELFTEST] PASS new life
+[SELFTEST] PASS intro
+[SELFTEST] PASS world folders
+[SELFTEST] PASS region sill
+[SELFTEST] ... region hut_window (6 s in)
+[SELFTEST] PASS region hut_window
+[SELFTEST] PASS region hut_outer_sill
+[SELFTEST] PASS region hut_desk
+[SELFTEST] PASS region hut_board
+[SELFTEST] PASS region hut_shelf
+[SELFTEST] ... region hut_chair (11 s in)
+[SELFTEST] PASS region hut_chair
+[SELFTEST] PASS region hut_door
+[SELFTEST] PASS region hut_door_up
+[SELFTEST] PASS region hut_doorway
+[SELFTEST] ... region hut_doorway_up (17 s in)
+[SELFTEST] PASS region hut_doorway_up
+[SELFTEST] PASS region room_window
+[SELFTEST] PASS region room_exit
+[SELFTEST] PASS region room_tv
+[SELFTEST] PASS region room_games
+[SELFTEST] ... region room_sofa_w (22 s in)
+[SELFTEST] PASS region room_sofa_w
+[SELFTEST] PASS region room_sofa_e
+[SELFTEST] PASS region hut_floor_a
+[SELFTEST] PASS region hut_floor_b
+[SELFTEST] ... region hut_floor_c (28 s in)
+[SELFTEST] PASS region hut_floor_c
+[SELFTEST] PASS region hut_floor_d
+[SELFTEST] PASS region hut_floor_e
+[SELFTEST] PASS region hut_floor_f
+[SELFTEST] PASS region hut_floor_g
+[SELFTEST] ... region hut_floor_h (33 s in)
+[SELFTEST] PASS region hut_floor_h
+[SELFTEST] PASS region hut_floor_i
+[SELFTEST] PASS region room_floor_a
+[SELFTEST] PASS region room_floor_b
+[SELFTEST] ... region room_floor_c (39 s in)
+[SELFTEST] PASS region room_floor_c
+[SELFTEST] PASS region room_floor_d
+[SELFTEST] PASS region room_floor_e
+[SELFTEST] PASS region room_floor_f
+[SELFTEST] PASS region room_floor_g
+[SELFTEST] ... region room_floor_h (44 s in)
+[SELFTEST] PASS region room_floor_h
+[SELFTEST] PASS region room_floor_i
+[SELFTEST] PASS region hut_up_a
+[SELFTEST] PASS region hut_up_b
+[SELFTEST] ... region hut_up_c (50 s in)
+[SELFTEST] PASS region hut_up_c
+[SELFTEST] PASS region hut_up_d
+[SELFTEST] PASS region hut_up_e
+[SELFTEST] PASS region hut_up_f
+[SELFTEST] PASS region hut_up_g
+[SELFTEST] ... region hut_up_h (55 s in)
+[SELFTEST] PASS region hut_up_h
+[SELFTEST] PASS region hut_up_i
+[SELFTEST] PASS region room_up_a
+[SELFTEST] PASS region room_up_b
+[SELFTEST] ... region room_up_c (61 s in)
+[SELFTEST] PASS region room_up_c
+[SELFTEST] PASS region room_up_d
+[SELFTEST] PASS region room_up_e
+[SELFTEST] PASS region room_up_f
+[SELFTEST] PASS region room_up_g
+[SELFTEST] ... region room_up_h (66 s in)
+[SELFTEST] PASS region room_up_h
+[SELFTEST] PASS region room_up_i
+[SELFTEST] PASS region hut_wall_mid
+[SELFTEST] PASS region hut_wall_w
+[SELFTEST] ... region hut_wall_e (72 s in)
+[SELFTEST] PASS region hut_wall_e
+[SELFTEST] PASS region hut_wall_x1
+[SELFTEST] PASS region hut_wall_x2
+[SELFTEST] PASS region hut_wall_x3
+[SELFTEST] PASS region hut_eave_w2
+[SELFTEST] ... region hut_eave_w1 (77 s in)
+[SELFTEST] PASS region hut_eave_w1
+[SELFTEST] PASS region hut_eave_mid
+[SELFTEST] PASS region hut_eave_e1
+[SELFTEST] PASS region hut_eave_e2
+[SELFTEST] ... region hut_eave_x1 (83 s in)
+[SELFTEST] PASS region hut_eave_x1
+[SELFTEST] PASS region hut_eave_x2
+[SELFTEST] PASS region hut_eave_x3
+[SELFTEST] PASS region hut_eave_x4
+[SELFTEST] PASS region hut_bench
+[SELFTEST] ... region hut_butt (88 s in)
+[SELFTEST] PASS region hut_butt
+[SELFTEST] PASS region garden_feeder
+[SELFTEST] PASS region garden_pole
+[SELFTEST] PASS region garden_a1
+[SELFTEST] ... region garden_a2 (94 s in)
+[SELFTEST] PASS region garden_a2
+[SELFTEST] PASS region garden_a3
+[SELFTEST] PASS region garden_a4
+[SELFTEST] PASS region garden_b1
+[SELFTEST] PASS region garden_b2
+[SELFTEST] ... region garden_b3 (99 s in)
+[SELFTEST] PASS region garden_b3
+[SELFTEST] PASS region garden_b4
+[SELFTEST] PASS region garden_c1
+[SELFTEST] PASS region garden_c2
+[SELFTEST] ... region garden_c3 (105 s in)
+[SELFTEST] PASS region garden_c3
+[SELFTEST] PASS region garden_c4
+[SELFTEST] PASS region garden_d1
+[SELFTEST] PASS region garden_d2
+[SELFTEST] PASS region garden_d3
+[SELFTEST] ... region garden_d4 (111 s in)
+[SELFTEST] PASS region garden_d4
+[SELFTEST] PASS region path_s1
+[SELFTEST] PASS region path_s2
+[SELFTEST] PASS region path_s3
+[SELFTEST] ... region path_s4 (117 s in)
+[SELFTEST] PASS region path_s4
+[SELFTEST] PASS region path_s5
+[SELFTEST] PASS region path_e1
+[SELFTEST] PASS region path_e2
+[SELFTEST] PASS region path_e3
+[SELFTEST] ... region path_e4 (122 s in)
+[SELFTEST] PASS region path_e4
+[SELFTEST] PASS region path_e5
+[SELFTEST] PASS region path_n3
+[SELFTEST] PASS region path_n2
+[SELFTEST] ... region path_n1 (128 s in)
+[SELFTEST] PASS region path_n1
+[SELFTEST] PASS region path_e6
+[SELFTEST] PASS region path_m1
+[SELFTEST] PASS region path_m2
+[SELFTEST] PASS region path_m3
+[SELFTEST] ... region path_m4 (133 s in)
+[SELFTEST] PASS region path_m4
+[SELFTEST] PASS region bench_w
+[SELFTEST] PASS region bench_e
+[SELFTEST] PASS region bin
+[SELFTEST] ... region lamp_1 (138 s in)
+[SELFTEST] PASS region lamp_1
+[SELFTEST] PASS region lamp_2
+[SELFTEST] PASS region lamp_3
+[SELFTEST] PASS region lamp_4
+[SELFTEST] PASS region pad_a1
+[SELFTEST] ... region pad_a2 (143 s in)
+[SELFTEST] PASS region pad_a2
+[SELFTEST] PASS region pad_a3
+[SELFTEST] PASS region pad_b1
+[SELFTEST] PASS region pad_b2
+[SELFTEST] ... region pad_b3 (149 s in)
+[SELFTEST] PASS region pad_b3
+[SELFTEST] PASS region pad_c1
+[SELFTEST] PASS region pad_c2
+[SELFTEST] PASS region pad_c3
+[SELFTEST] PASS region meadow_a1
+[SELFTEST] ... region meadow_a2 (154 s in)
+[SELFTEST] PASS region meadow_a2
+[SELFTEST] PASS region meadow_a3
+[SELFTEST] PASS region meadow_a4
+[SELFTEST] PASS region meadow_a5
+[SELFTEST] ... region meadow_b1 (160 s in)
+[SELFTEST] PASS region meadow_b1
+[SELFTEST] PASS region meadow_b2
+[SELFTEST] PASS region meadow_b3
+[SELFTEST] PASS region meadow_b4
+[SELFTEST] PASS region meadow_b5
+[SELFTEST] ... region meadow_c1 (165 s in)
+[SELFTEST] PASS region meadow_c1
+[SELFTEST] PASS region meadow_c2
+[SELFTEST] PASS region meadow_c3
+[SELFTEST] PASS region meadow_c4
+[SELFTEST] ... region meadow_c5 (171 s in)
+[SELFTEST] PASS region meadow_c5
+[SELFTEST] PASS region meadow_d1
+[SELFTEST] PASS region meadow_d2
+[SELFTEST] PASS region meadow_d3
+[SELFTEST] PASS region meadow_d4
+[SELFTEST] ... region meadow_d5 (176 s in)
+[SELFTEST] PASS region meadow_d5
+[SELFTEST] PASS region meadow_e1
+[SELFTEST] PASS region meadow_e2
+[SELFTEST] PASS region meadow_e3
+[SELFTEST] ... region meadow_e4 (182 s in)
+[SELFTEST] PASS region meadow_e4
+[SELFTEST] PASS region meadow_e5
+[SELFTEST] PASS region cattail_1a
+[SELFTEST] PASS region cattail_1b
+[SELFTEST] PASS region cattail_2a
+[SELFTEST] ... region cattail_2b (187 s in)
+[SELFTEST] PASS region cattail_2b
+[SELFTEST] PASS region walk_s1
+[SELFTEST] PASS region walk_n1
+[SELFTEST] PASS region walk_s2
+[SELFTEST] ... region walk_n2 (192 s in)
+[SELFTEST] PASS region walk_n2
+[SELFTEST] PASS region walk_s3
+[SELFTEST] PASS region walk_n3
+[SELFTEST] PASS region walk_s4
+[SELFTEST] PASS region walk_n4
+[SELFTEST] ... region deck_s1 (197 s in)
+[SELFTEST] PASS region deck_s1
+[SELFTEST] PASS region deck_n1
+[SELFTEST] PASS region deck_s2
+[SELFTEST] PASS region deck_n2
+[SELFTEST] ... region deck_s3 (203 s in)
+[SELFTEST] PASS region deck_s3
+[SELFTEST] PASS region deck_n3
+[SELFTEST] PASS region deck_s4
+[SELFTEST] PASS region deck_n4
+[SELFTEST] PASS region pond_a1
+[SELFTEST] ... region pond_a2 (208 s in)
+[SELFTEST] PASS region pond_a2
+[SELFTEST] PASS region pond_a3
+[SELFTEST] PASS region pond_a4
+[SELFTEST] PASS region pond_b1
+[SELFTEST] ... region pond_b2 (214 s in)
+[SELFTEST] PASS region pond_b2
+[SELFTEST] PASS region pond_b3
+[SELFTEST] PASS region pond_b4
+[SELFTEST] PASS region pond_c1
+[SELFTEST] PASS region pond_c2
+[SELFTEST] ... region pond_c3 (219 s in)
+[SELFTEST] PASS region pond_c3
+[SELFTEST] PASS region pond_c4
+[SELFTEST] PASS region mown_e1
+[SELFTEST] PASS region mown_e2
+[SELFTEST] ... region mown_n1 (225 s in)
+[SELFTEST] PASS region mown_n1
+[SELFTEST] PASS region verge_-400_-1416
+[SELFTEST] PASS region verge_-400_-1316
+[SELFTEST] PASS region verge_-400_-1216
+[SELFTEST] PASS region verge_-400_-1116
+[SELFTEST] ... region verge_-400_-1016 (230 s in)
+[SELFTEST] PASS region verge_-400_-1016
+[SELFTEST] PASS region verge_-400_-916
+[SELFTEST] PASS region verge_-400_-816
+[SELFTEST] PASS region verge_-400_-716
+[SELFTEST] ... region verge_-400_-616 (236 s in)
+[SELFTEST] PASS region verge_-400_-616
+[SELFTEST] PASS region verge_-400_-516
+[SELFTEST] PASS region verge_-400_-416
+[SELFTEST] PASS region verge_-400_-316
+[SELFTEST] PASS region verge_-400_-216
+[SELFTEST] ... region verge_-400_-116 (241 s in)
+[SELFTEST] PASS region verge_-400_-116
+[SELFTEST] PASS region verge_-300_-1416
+[SELFTEST] PASS region verge_-300_-816
+[SELFTEST] PASS region verge_-300_-716
+[SELFTEST] ... region verge_-300_-616 (246 s in)
+[SELFTEST] PASS region verge_-300_-616
+[SELFTEST] PASS region verge_-300_-516
+[SELFTEST] PASS region verge_-300_-416
+[SELFTEST] PASS region verge_-300_-316
+[SELFTEST] PASS region verge_-300_-216
+[SELFTEST] ... region verge_-300_-116 (251 s in)
+[SELFTEST] PASS region verge_-300_-116
+[SELFTEST] PASS region verge_-200_-1416
+[SELFTEST] PASS region verge_-200_-516
+[SELFTEST] PASS region verge_-100_-1416
+[SELFTEST] ... region verge_-100_-516 (257 s in)
+[SELFTEST] PASS region verge_-100_-516
+[SELFTEST] PASS region verge_0_-1416
+[SELFTEST] PASS region verge_0_-816
+[SELFTEST] PASS region verge_0_-716
+[SELFTEST] PASS region verge_0_-616
+[SELFTEST] ... region verge_0_-516 (262 s in)
+[SELFTEST] PASS region verge_0_-516
+[SELFTEST] PASS region verge_100_-1416
+[SELFTEST] PASS region verge_100_-816
+[SELFTEST] PASS region verge_100_-716
+[SELFTEST] ... region verge_100_-616 (268 s in)
+[SELFTEST] PASS region verge_100_-616
+[SELFTEST] PASS region verge_100_-516
+[SELFTEST] PASS region verge_190_-666
+[SELFTEST] PASS region verge_190_-566
+[SELFTEST] PASS region verge_290_-866
+[SELFTEST] ... region verge_290_-766 (274 s in)
+[SELFTEST] PASS region verge_290_-766
+[SELFTEST] PASS region verge_290_-666
+[SELFTEST] PASS region verge_290_-566
+[SELFTEST] PASS region verge_390_-866
+[SELFTEST] ... region verge_390_-766 (279 s in)
+[SELFTEST] PASS region verge_390_-766
+[SELFTEST] PASS region verge_390_-666
+[SELFTEST] PASS region verge_390_-566
+[SELFTEST] PASS region verge_490_-866
+[SELFTEST] PASS region verge_490_-766
+[SELFTEST] ... region verge_490_-666 (285 s in)
+[SELFTEST] PASS region verge_490_-666
+[SELFTEST] PASS region verge_490_-566
+[SELFTEST] PASS region verge_60_284
+[SELFTEST] PASS region verge_60_384
+[SELFTEST] ... region verge_160_284 (291 s in)
+[SELFTEST] PASS region verge_160_284
+[SELFTEST] PASS region verge_160_384
+[SELFTEST] PASS region verge_260_284
+[SELFTEST] PASS region verge_260_384
+[SELFTEST] PASS region verge_360_284
+[SELFTEST] ... region verge_360_384 (296 s in)
+[SELFTEST] PASS region verge_360_384
+[SELFTEST] PASS region verge_460_284
+[SELFTEST] PASS region verge_460_384
+[SELFTEST] PASS region verge_560_284
+[SELFTEST] ... region verge_560_384 (302 s in)
+[SELFTEST] PASS region verge_560_384
+[SELFTEST] PASS region verge_473.5_-256
+[SELFTEST] PASS region verge_473.5_-156
+[SELFTEST] PASS region verge_473.5_-56
+[SELFTEST] PASS region verge_473.5_44
+[SELFTEST] ... region verge_473.5_144 (307 s in)
+[SELFTEST] PASS region verge_473.5_144
+[SELFTEST] PASS region verge_473.5_244
+[SELFTEST] PASS region verge_573.5_-256
+[SELFTEST] PASS region verge_573.5_-156
+[SELFTEST] ... region verge_573.5_-56 (313 s in)
+[SELFTEST] PASS region verge_573.5_-56
+[SELFTEST] PASS region verge_573.5_44
+[SELFTEST] PASS region verge_573.5_144
+[SELFTEST] PASS region verge_573.5_244
+[SELFTEST] PASS region verge_190_-256
+[SELFTEST] ... region verge_190_-156 (318 s in)
+[SELFTEST] PASS region verge_190_-156
+[SELFTEST] PASS region verge_190_-56
+[SELFTEST] PASS region verge_290_-256
+[SELFTEST] PASS region verge_290_-156
+[SELFTEST] ... region verge_290_-56 (324 s in)
+[SELFTEST] PASS region verge_290_-56
+[SELFTEST] PASS region verge_390_-256
+[SELFTEST] PASS region verge_390_-156
+[SELFTEST] PASS region verge_390_-56
+[SELFTEST] ... walk on the sill (329 s in)
+[SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+[SELFTEST] PASS walk on the sill
+[SELFTEST] INFO prey on the sill: 4 flies drawn
+[SELFTEST] PASS prey on the sill
+[SELFTEST] ... lock (334 s in)
+[SELFTEST] INFO lock: 3.0 studs away, facing it within 2 degrees, a sidestep of 0.62 studs in 1 s
+[SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+[SELFTEST] PASS lock
+[SELFTEST] INFO the hut's sill: 156 parts of the hut at the full tier; 1500 parts of the backdrop held of 1500 planned
+[SELFTEST] PASS the hut's sill
+[SELFTEST] INFO backdrop: at the sill the hut full and the railway far; at the railway's crest the railway full (Base+Full) and the hut far (Far), 563 parts; back at the sill the hut full (Base+Full)
+[SELFTEST] PASS the backdrop near and far
+[SELFTEST] INFO trains: the pass a commuter of 5 cars at 403 to 416 s; mid-pass 5 cars (15 parts) drawn; the clock at 335 s, the next at 403 s
+[SELFTEST] PASS the trains
+[SELFTEST] ... the nursery: the window shut (339 s in)
+[SELFTEST] INFO the nursery: a walk at the shut sash came to z -12.19 (the sash's outer face is -13.5); regions sill
+[SELFTEST] PASS the nursery: the window shut
+[SELFTEST] ... the nursery: the ranger props the window (344 s in)
+[SELFTEST] INFO the nursery: the ranger's moment took 5.8 s; the wedge at x 6.2..8.0
+[SELFTEST] PASS the nursery: the ranger props the window
+[SELFTEST] ... the hut's inside (349 s in)
+[SELFTEST] ... the hut's inside (354 s in)
+[SELFTEST] ... the hut's inside (359 s in)
+[SELFTEST] ... the hut's inside (364 s in)
+[SELFTEST] ... the hut's inside (369 s in)
+[SELFTEST] ... the hut's inside (374 s in)
+[SELFTEST] INFO the hut's inside: from the sill's front edge to hut_floor_b at (0.00, -69.61, 14.31); regions hut_floor_b, sill
+[SELFTEST] PASS the hut's inside
+[SELFTEST] ... the way out (379 s in)
+[SELFTEST] INFO the way out: through the sash to hut_outer_sill at (-3.00, 0.31, -16.06); regions hut_outer_sill, sill
+[SELFTEST] ... the way out (384 s in)
+[SELFTEST] ... the way out (389 s in)
+[SELFTEST] ... the way out (394 s in)
+[SELFTEST] ... the way out (399 s in)
+[SELFTEST] INFO the way out: from the outer sill's edge to hut_bench at (-3.00, -39.69, -24.06); regions hut_bench, hut_outer_sill, hut_wall_mid
+[SELFTEST] ... the way out (404 s in)
+[SELFTEST] ... the way out (409 s in)
+[SELFTEST] ... the way out (414 s in)
+[SELFTEST] ... the way out (420 s in)
+[SELFTEST] INFO the way out: down the bench's leg to garden_a2 at (-77.00, -84.29, -61.06); regions garden_a2, hut_bench
+[SELFTEST] PASS the way out
+[SELFTEST] ... the hut garden (425 s in)
+[SELFTEST] ... the hut garden (431 s in)
+[SELFTEST] INFO the hut garden: 1 gnats and 3 aphids on the milkweed with a ladybird, 1 leafhoppers on the goldenrod, 4 springtails in the mulch, 3 woodlice by the trough, all drawn
+[SELFTEST] PASS the hut garden
+[SELFTEST] INFO the garden's near detail: 16 patches, 697 parts of them, 1500 parts of looks at full; dew at dawn on 13 of 13 drops
+[SELFTEST] PASS the garden's near detail
+[SELFTEST] ... the station's rival and garden's mate (436 s in)
+[SELFTEST] ... the station's rival and garden's mate (441 s in)
+[SELFTEST] INFO the station's rival and garden's mate: the rival came in at hut_floor_b and walked 3.1 studs, in hut_floor_b; the mate came in at garden_b4, in garden_b4
+[SELFTEST] PASS the station's rival and garden's mate
+[SELFTEST] INFO the hut's homes: hut_desk_drawer, hut_board_gap, garden_a1_trough, garden_a3_stone, garden_d3_mulch
+[SELFTEST] PASS the hut's homes
+[SELFTEST] PASS the hut by night: the lamp
+[SELFTEST] ... the ceiling and the upper walls (446 s in)
+[SELFTEST] INFO the ceiling: up the west wall past WALL_TOP to hut_up_d at (-146.19, 66.04, 134.00); regions hut_floor_d, hut_up_d
+[SELFTEST] ... the ceiling and the upper walls (451 s in)
+[SELFTEST] INFO the ceiling: head down under the boards at (-146.19, 149.69, 134.00) in hut_up_d
+[SELFTEST] PASS the ceiling and the upper walls
+[SELFTEST] ... the back room (456 s in)
+[SELFTEST] ... the back room (461 s in)
+[SELFTEST] ... the back room (466 s in)
+[SELFTEST] ... the back room (471 s in)
+[SELFTEST] ... the back room (476 s in)
+[SELFTEST] INFO the back room: through the doorway to room_floor_g at (180.04, -69.69, 215.00); regions hut_doorway, hut_floor_i, room_floor_g
+[SELFTEST] ... the back room (481 s in)
+[SELFTEST] PASS the back room
+[SELFTEST] ... the eaves (486 s in)
+[SELFTEST] ... the eaves (491 s in)
+[SELFTEST] ... the eaves (496 s in)
+[SELFTEST] INFO the eaves: along the gutter to hut_eave_e1 at (37.04, 122.81, -54.00) (208 cm over the ground); regions hut_eave_e1, hut_eave_mid
+[SELFTEST] PASS the eaves
+[SELFTEST] INFO the cat: walking from the bowls to the window (walk), moved 59.9 studs in a second; the bell 0.66 at 176 studs
+[SELFTEST] INFO the cat: at its bowls it noticed a spider moving in front of it (true), crouched to pat (true), gave up once it was up on the desk (true); notices 1, pats 0, swats 0
+[SELFTEST] PASS the cat
+[SELFTEST] ... the bench patch (501 s in)
+[SELFTEST] ... the bench patch (506 s in)
+[SELFTEST] ... the bench patch (512 s in)
+[SELFTEST] INFO the bench patch: walked path_m4 to pad_a2, pad_a2 to pad_b2, pad_c2 to meadow_a3; homes bench_slats, bin_lip, meadow_b2_leaf; the lamppost lit at night (true) and out by day (true)
+[SELFTEST] PASS the bench patch
+[SELFTEST] INFO the meadow's edge: on the coneflower's cone 74 cm over the ground; 1 leafhoppers on the bluestem, 6 ants at the hill (6 drawn)
+[SELFTEST] PASS the meadow's edge
+[SELFTEST] INFO the crab spiders: a yellow one on meadow_e3 and a white one on meadow_d4, 2 drawn; the close look opened its page
+[SELFTEST] PASS the crab spiders
+[SELFTEST] ... the robin (517 s in)
+[SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
+[SELFTEST] PASS the robin
+[SELFTEST] ... the field crickets (522 s in)
+[SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+[SELFTEST] PASS the field crickets
+[SELFTEST] ... ballooning's landings (527 s in)
+[SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+[SELFTEST] PASS ballooning's landings
+[SELFTEST] ... the mown path and the boardwalk (532 s in)
+[SELFTEST] ... the mown path and the boardwalk (537 s in)
+[SELFTEST] ... the mown path and the boardwalk (542 s in)
+[SELFTEST] ... the mown path and the boardwalk (547 s in)
+[SELFTEST] ... the mown path and the boardwalk (552 s in)
+[SELFTEST] ... the mown path and the boardwalk (557 s in)
+[SELFTEST] ... the mown path and the boardwalk (562 s in)
+[SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n1 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+[SELFTEST] PASS the mown path and the boardwalk
+[SELFTEST] ... the water (567 s in)
+[SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+[SELFTEST] PASS the water
+[SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+[SELFTEST] PASS the pond's life
+[SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+[SELFTEST] PASS the green frog
+[SELFTEST] PASS the nursery: the window put back
+[SELFTEST] PASS notebook
+[SELFTEST] ... rest and checkpoint (572 s in)
+[SELFTEST] ... rest and checkpoint (577 s in)
+[SELFTEST] ... rest and checkpoint (582 s in)
+[SELFTEST] ... rest and checkpoint (587 s in)
+[SELFTEST] ... rest and checkpoint (592 s in)
+[SELFTEST] ... rest and checkpoint (597 s in)
+[SELFTEST] ... rest and checkpoint (602 s in)
+[SELFTEST] ... rest and checkpoint (607 s in)
+[SELFTEST] ... rest and checkpoint (612 s in)
+[SELFTEST] ... rest and checkpoint (618 s in)
+[SELFTEST] PASS rest and checkpoint
+[SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+[SELFTEST] PASS sound
+[SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill: 300 frames, the render step 22.32 ms a frame (worst 70.1): spider rig 8.43/30.7, other rigs 3.13/15.0, fly bodies 2.51/11.4, wasp 2.18/5.0, sound 1.31/5.7, light 1.02/13.7, senses 0.81/3.9, camera 0.79/3.3, hud 0.45/3.3, rival 0.41/19.4, prey 0.36/2.0, life 0.27/2.4, motor 0.10/0.7, looks 0.08/1.1, world 0.07/0.3, percepts 0.06/0.4, lock button 0.06/2.6, save 0.06/0.2, poses 0.05/0.2, mating 0.05/1.2, small 0.12 (mean/worst ms); a frame: spider parts placed 669, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2923 KB a frame (looks 4, percepts 3, senses 69, prey 22, motor 4, nature 3, wasp 35, rival 22, life 3, camera 97, light 146, poses 2, spider rig 1370, other rigs 486, hud 6, lock button 4, fly bodies 484, sound 161)
+[SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 256.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census on the sill: 6534 parts, 899 see-through, 614 casting shadows, 1201 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 721/149/42/388, Flies 156/52/0/68, JumpArc 34/0/0/0, LivingHabitat 231/32/3/95, PondAnimals 43/4/0/43, RivalSpider 211/112/60/44, Robin 24/0/0/20, Spider 707/514/86/94, World 2770/1/327/0, WorldDecor 1505/35/64/359, the rest 24/0/0/16)
+[SELFTEST] INFO shadows on the sill: 1718 of 2734 visible walkable boxes cast, 1016 too small to see at their distance cast none (336 passes, 40824 writes)
+[SELFTEST] INFO frame time on the sill without the far preserve: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without the far preserve: 180 frames, the render step 20.26 ms a frame (worst 52.5): spider rig 7.68/25.0, other rigs 3.14/11.3, fly bodies 2.54/11.0, sound 1.29/6.5, light 1.15/6.2, wasp 0.90/2.6, senses 0.75/15.6, camera 0.70/1.9, hud 0.48/2.2, prey 0.40/4.4, rival 0.33/5.9, life 0.28/1.8, motor 0.10/0.5, world 0.08/0.3, looks 0.07/0.7, save 0.06/0.3, percepts 0.06/0.2, lock button 0.06/0.8, poses 0.05/0.2, small 0.15 (mean/worst ms); a frame: spider parts placed 610, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2949 KB a frame (looks 3, percepts 3, senses 65, prey 22, motor 4, nature 2, wasp 33, rival 15, life 3, camera 95, light 197, poses 2, spider rig 1315, other rigs 519, hud 6, lock button 4, fly bodies 493, sound 166)
+[SELFTEST] INFO engine on the sill without the far preserve: memory ? MB, Lua heap 264.8 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO frame time on the sill without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without shadows: 180 frames, the render step 12.25 ms a frame (worst 73.9): spider rig 4.14/10.6, fly bodies 2.04/7.0, other rigs 2.02/6.3, sound 1.12/3.2, wasp 0.72/2.8, senses 0.47/47.6, hud 0.42/0.9, light 0.37/5.2, camera 0.24/1.5, prey 0.11/0.8, rival 0.08/0.6, world 0.08/0.2, life 0.08/0.5, save 0.06/0.2, poses 0.05/0.2, shadows 0.01/1.6, small 0.23 (mean/worst ms); a frame: spider parts placed 325, fly parts placed 119, bug parts placed 0, camera casts 1, camera overlaps 1, camera rays 0, framing searches 0; allocated 1869 KB a frame (percepts 1, senses 21, prey 8, motor 2, wasp 13, rival 3, life 1, camera 36, light 71, poses 2, spider rig 785, other rigs 365, hud 6, lock button 4, fly bodies 405, sound 143)
+[SELFTEST] INFO engine on the sill without shadows: memory ? MB, Lua heap 351.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO the far preserve on the sill: mean ? ms as it is, ? ms without the far preserve (211 folders, 2611 parts out), ? ms without shadows
+[SELFTEST] PASS frame time on the sill
+[SELFTEST] INFO parts at the full tier: 6522 in the workspace (Cat 62, CrabSpiders 46, Decor 721, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, LivingHabitat 231, PondAnimals 43, RivalSpider 211, Robin 24, Spider 707, StationMouse 16, StreetLamp 1, WindowsillAudio 5, World 2770, WorldDecor 1493)
+[SELFTEST] INFO looks outside the window: 1493 parts held of 1493 planned at the full tier, 166422 made and 164902 destroyed this session, 559 plans
+[SELFTEST] PASS part counts
+[SELFTEST] ... fallbacks clear the shelf books and station boots (630 s in)
+[SELFTEST] PASS fallbacks clear the shelf books and station boots
+[SELFTEST] ... visible meal and contextual controls (635 s in)
+[SELFTEST] PASS visible meal and contextual controls
+[SELFTEST] PASS Normal starvation reaches the life-ending handler
+[SELFTEST] INFO took 637 s
+[SELFTEST] END pass=307 fail=0 skip=0
+selftest_preserve: the run took 637.8 s of play (38236 frames)
+SELFTEST_PRESERVE passed=7 failed=0
